@@ -1,0 +1,16 @@
+Makefile
+Makefile.in
+Makefile.in.in
+configure
+config.log
+config.status
+aclocal.m4
+autom4te.cache/
+po/POTFILES
+po/stamp-it
+
+*~
+*.gmo
+metadata.json
+*.gschema.xml
+*.gschema.valid

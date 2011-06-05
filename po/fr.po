@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extensions-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-06-05 17:12+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Jean-Philippe Braun <eon@patapon.info>\n"
+"Language-Team: Jean-Philippe Braun <eon@patapon.info>\n"
+"Language: French\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: extension.js:174
+msgid "Next"
+msgstr "Suivant"
+
+#: extension.js:160
+msgid "Previous"
+msgstr "Précédent"
+
+#: extension.js:192
+msgid "Repeat"
+msgstr "Répéter"
+
+#: extension.js:185
+msgid "Shuffle"
+msgstr "Aléatoire"
+
+#: extension.js:167
+msgid "Toggle playback"
+msgstr "Jouer/Pause"
+
+#: extension.js:152
+msgid "Unknown Album"
+msgstr "Album inconnu"
+
+#: extension.js:151
+msgid "Unknown Artist"
+msgstr "Artiste inconnu"
+
+#: extension.js:153
+msgid "Unknown Title"
+msgstr "Titre inconnu"
