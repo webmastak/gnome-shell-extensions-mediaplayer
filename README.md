@@ -6,7 +6,7 @@ gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRI
 
 ### Screenshots
 
-![Screenshot](gnome-shell-extension-mediaplayer/raw/master/data/mediaplayer1.png)
+![Screenshot](gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
 ----
 
