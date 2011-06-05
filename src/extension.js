@@ -209,7 +209,7 @@ Indicator.prototype = {
         }));
         this.menu.addMenuItem(this._repeat);
 
-        this._volume_text = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high");
+        this._volume_text = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", { reactive: false });
         this._volume = new PopupMenu.PopupSliderMenuItem(0);
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
@@ -253,19 +253,19 @@ Indicator.prototype = {
     },
 
     _updateVolume: function() {
-    	this._mediaServer.getVolume(Lang.bind(this,
-	    function(sender, volume) {
-	        global.log(this._volume_text);
-		this._volume_text.setIcon = "audio-volume-low";
-	    	if (volume > 0.30) {
-		    this._volume_text.setIcon = "audio-volume-medium";
-		}
-	    	if (volume > 0.70) {
-		    this._volume_text.setIcon = "audio-volume-high";
-		}
-	        this._volume.setValue(volume);
-	    }
-	));
+        this._mediaServer.getVolume(Lang.bind(this,
+        function(sender, volume) {
+            global.log(this._volume_text);
+        this._volume_text.setIcon = "audio-volume-low";
+            if (volume > 0.30) {
+            this._volume_text.setIcon = "audio-volume-medium";
+        }
+            if (volume > 0.70) {
+            this._volume_text.setIcon = "audio-volume-high";
+        }
+            this._volume.setValue(volume);
+        }
+    ));
     },
 
     _updateButtons: function() {
