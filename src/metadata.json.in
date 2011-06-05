@@ -1,10 +1,10 @@
 {
-"uuid": "media@sotecware.net",
-"name": "Media",
-"description": "Some cool stuff",
+"uuid": "@uuid@",
+"name": "Media player indicator",
+"description": "Control media players",
 "original-author": "j.wielicki@sotecware.net",
-"shell-version": [ "3.0.1" ],
-"localedir": "/usr/share/locale",
-"url": "none"
+"shell-version": [ "@shell_current@" ],
+"localedir": "@LOCALEDIR@",
+"url": "@url@"
 }
 
