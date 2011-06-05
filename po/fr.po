@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-extensions-mediaplayer\n"
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-05 17:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
