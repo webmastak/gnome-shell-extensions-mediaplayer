@@ -117,12 +117,12 @@ MediaServer2Player.prototype = {
         this.GetRemote('Volume', Lang.bind(this,
             function(volume, ex) {
                 if (!ex)
-                    callback(this, volume / 100);
+                    callback(this, volume);
             }));
     },
 
     setVolume: function(value) {
-        this.SetRemote('Volume', value * 100);
+        this.SetRemote('Volume', value);
     },
 
     getRepeat: function(callback) {
