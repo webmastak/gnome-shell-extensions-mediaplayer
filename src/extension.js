@@ -50,6 +50,9 @@ const MediaServer2PlayerIFace = {
               { name: 'Play',
                 inSignature: '',
                 outSignature: '' },
+              { name: 'Stop',
+                inSignature: '',
+                outSignature: '' },
               { name: 'Next',
                 inSignature: '',
                 outSignature: '' },
@@ -207,6 +210,14 @@ Indicator.prototype = {
                 }
         ));
         controlsBox.add_actor(this._mediaPlay); 
+
+        this._mediaStop = new St.Button({ style_class: 'button' });
+        this._mediaStop.connect('clicked', Lang.bind(this, 
+                function () {
+                    this._mediaServer.StopRemote();
+                }
+        ));
+        controlsBox.add_actor(this._mediaStop); 
         
         this._mediaNext = new St.Button({ style_class: 'button' });
         this._mediaNext.connect('clicked', Lang.bind(this, 
@@ -229,13 +240,6 @@ Indicator.prototype = {
         });
         this._mediaPrev.set_child(this._mediaPrevIcon);
         
-        this._mediaNextIcon = new St.Icon({
-            icon_type: St.IconType.SYMBOLIC,
-            icon_name: 'media-skip-forward',
-            style_class: 'button-icon',
-        });
-        this._mediaNext.set_child(this._mediaNextIcon);
-        
         this._mediaPlayIcon = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,
             icon_name: 'media-playback-start',
@@ -248,6 +252,20 @@ Indicator.prototype = {
             icon_name: 'media-playback-pause',
             style_class: 'button-icon',
         });
+
+        this._mediaStopIcon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-playback-stop',
+            style_class: 'button-icon',
+        });
+        this._mediaStop.set_child(this._mediaStopIcon);
+        
+        this._mediaNextIcon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-skip-forward',
+            style_class: 'button-icon',
+        });
+        this._mediaNext.set_child(this._mediaNextIcon);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
