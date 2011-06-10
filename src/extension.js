@@ -68,6 +68,9 @@ const MediaServer2PlayerIFace = {
                  { name: 'Volume',
                    signature: 'd',
                    access: 'readwrite'},
+                 { name: 'PlaybackStatus',
+                   signature: 's',
+                   access: 'read'},
                  { name: 'CanGoNext',
                    signature: 'b',
                    access: 'read'},
@@ -98,6 +101,14 @@ MediaServer2Player.prototype = {
             function(metadata, ex) {
                 if (!ex)
                     callback(this, metadata);
+            }));
+    },
+
+    getPlaybackStatus: function(callback) {
+        this.GetRemote('PlaybackStatus', Lang.bind(this,
+            function(status, ex) {
+                if (!ex) 
+                    callback(this, status);
             }));
     },
 
@@ -170,30 +181,75 @@ Indicator.prototype = {
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        this._prev = new PopupMenu.PopupImageMenuItem(_("Previous"), "media-skip-backward");
-        this._prev.connect('activate', Lang.bind(this,
+        let mainBox = new St.BoxLayout({vertical: true});
+        this._controlsButtons = new St.Bin({});
+        let controlsBox = new St.BoxLayout();
+        this._controlsButtons.set_child(controlsBox);
+        mainBox.add_actor(this._controlsButtons);
+        this.menu.addActor(mainBox);
+
+        /*this._openApp = new St.Button({ style_class: 'button' });
+        this._openApp.connect('clicked', Lang.bind(this, this._loadPlayer));
+        controlsBox.add_actor(this._openApp);*/
+        
+        this._mediaPrev = new St.Button({ style_class: 'button' });
+        this._mediaPrev.connect('clicked', Lang.bind(this,  
             function () {
                 this._mediaServer.PreviousRemote();
-                this._updateMetadata();
             }
+        ));        
+        controlsBox.add_actor(this._mediaPrev);
+    
+        this._mediaPlay = new St.Button({ style_class: 'button' });
+        this._mediaPlay.connect('clicked', Lang.bind(this, 
+                function () {
+                    this._mediaServer.PlayPauseRemote();
+                }
         ));
-        this._togglePlayback = new PopupMenu.PopupImageMenuItem(_("Toggle playback"), "media-playback-start");
-        this._togglePlayback.connect('activate', Lang.bind(this,
-            function () {
-                this._mediaServer.PlayPauseRemote();
-                this._updateMetadata();
-            }
-        ));
-        this._next = new PopupMenu.PopupImageMenuItem(_("Next"), "media-skip-forward");
-        this._next.connect('activate', Lang.bind(this,
+        controlsBox.add_actor(this._mediaPlay); 
+        
+        this._mediaNext = new St.Button({ style_class: 'button' });
+        this._mediaNext.connect('clicked', Lang.bind(this, 
             function () {
                 this._mediaServer.NextRemote();
-                this._updateMetadata();
             }
         ));
-        this.menu.addMenuItem(this._prev);
-        this.menu.addMenuItem(this._togglePlayback);
-        this.menu.addMenuItem(this._next);
+        controlsBox.add_actor(this._mediaNext); 
+
+        /*let openAppI = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-eject'
+        });
+        this._openApp.set_child(openAppI);*/
+        
+        this._mediaPrevIcon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-skip-backward',
+            style_class: 'button-icon',
+        });
+        this._mediaPrev.set_child(this._mediaPrevIcon);
+        
+        this._mediaNextIcon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-skip-forward',
+            style_class: 'button-icon',
+        });
+        this._mediaNext.set_child(this._mediaNextIcon);
+        
+        this._mediaPlayIcon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-playback-start',
+            style_class: 'button-icon',
+        });
+        this._mediaPlay.set_child(this._mediaPlayIcon);
+
+        this._mediaPauseIcon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'media-playback-pause',
+            style_class: 'button-icon',
+        });
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         this._shuffle = new PopupMenu.PopupSwitchMenuItem(_("Shuffle"), false);
         this._shuffle.connect('toggled', Lang.bind(this, function(item) {
@@ -209,33 +265,44 @@ Indicator.prototype = {
         }));
         this.menu.addMenuItem(this._repeat);
 
-        this._volume_text = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", { reactive: false });
+        this._volumeText = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", { reactive: false });
         this._volume = new PopupMenu.PopupSliderMenuItem(0);
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
         }));
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addMenuItem(this._volume_text);
+        this.menu.addMenuItem(this._volumeText);
         this.menu.addMenuItem(this._volume);
 
         this._updateMetadata();
         this._updateSwitches();
         this._updateButtons();
         this._updateVolume();
+        this._updateButtons();
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(arg) {
                 this._updateMetadata();
                 this._updateSwitches();
                 this._updateButtons();
                 this._updateVolume();
+                this._updateButtons();
             }));
     },
 
     _updateMetadata: function() {
         this._mediaServer.getMetadata(Lang.bind(this,
             function(sender, metadata) {
-                this._artist.label.set_text(metadata["xesam:artist"].toString());
-                this._album.label.set_text(metadata["xesam:album"].toString());
-                this._title.label.set_text(metadata["xesam:title"].toString());
+                if (metadata["xesam:artist"])
+                    this._artist.label.set_text(metadata["xesam:artist"].toString());
+                else
+                    this._artist.label.set_text(_("Unknown Artist"));
+                if (metadata["xesam:album"])
+                    this._album.label.set_text(metadata["xesam:album"].toString());
+                else
+                    this._album.label.set_text(_("Unknown Album"));
+                if (metadata["xesam:title"])
+                    this._title.label.set_text(metadata["xesam:title"].toString());
+                else
+                    this._title.label.set_text(_("Unknown Title"));
             }));
     },
 
@@ -255,25 +322,27 @@ Indicator.prototype = {
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
         function(sender, volume) {
-            global.log(this._volume_text);
-        this._volume_text.setIcon = "audio-volume-low";
+            this._volumeText.setIcon = "audio-volume-low";
             if (volume > 0.30) {
-            this._volume_text.setIcon = "audio-volume-medium";
-        }
+                this._volumeText.setIcon = "audio-volume-medium";
+            }
             if (volume > 0.70) {
-            this._volume_text.setIcon = "audio-volume-high";
-        }
+                this._volumeText.setIcon = "audio-volume-high";
+            }
             this._volume.setValue(volume);
         }
     ));
     },
 
     _updateButtons: function() {
-        /*this._mediaServer.getCanGoNext(Lang.bind(this,
-            function(sender, canGoNext) {
-                this._next.
+        this._mediaServer.getPlaybackStatus(Lang.bind(this,
+            function(sender, status) {
+                if (status == "Playing") 
+                    this._mediaPlay.set_child(this._mediaPauseIcon);
+                else if (status == "Paused" || status == "Stopped")
+                    this._mediaPlay.set_child(this._mediaPlayIcon);
             }
-        ));*/
+        ));
     }
 };
 

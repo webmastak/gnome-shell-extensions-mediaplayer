@@ -1,0 +1,14 @@
+.button {
+    width: 22px;
+    height: 13px;
+    padding: 5px;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+.button:hover {
+    border: 1px solid white;
+}
+
+.button-icon {
+    icon-size: 1.4em;
+}
