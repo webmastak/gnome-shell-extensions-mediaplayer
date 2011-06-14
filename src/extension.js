@@ -161,20 +161,23 @@ MediaServer2Player.prototype = {
 }
 DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
 
-function TrackInfo(text, iconName) {
-    this.info = new St.BoxLayout({style_class: 'track-info'});
-    this.text = new St.Label({ text: text, style_class: 'track-info-text'});
-    this.icon = new St.Icon({icon_name: iconName, style_class: 'track-info-icon'});
-    this.info.add_actor(this.icon, { span: 0 });
-    this.info.add_actor(this.text, { span: -1 });
+function TrackInfo() {
+    this._init.apply(this, arguments);
 }
 
 TrackInfo.prototype = {
-    getInfo: function() {
-        return this.info;
+    _init: function(label, icon) {
+        this.actor = new St.BoxLayout({style_class: 'track-info'});
+        this.label = new St.Label({text: label.toString(), style_class: 'track-info-text'});
+        this.icon = new St.Icon({icon_name: icon.toString(), style_class: 'track-info-icon'});
+        this.actor.add_actor(this.icon, { span: 0 });
+        this.actor.add_actor(this.label, { span: -1 });
     },
-    setText: function(text) {
-        this.text.text = text;
+    getActor: function() {
+        return this.actor;
+    },
+    setLabel: function(label) {
+        this.label.text = label;
     },
 };
 
@@ -192,6 +195,14 @@ Indicator.prototype = {
         this._prop = new Prop();
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
+        let coverImg = new Clutter.Texture(
+            {
+                keep_aspect_ratio: true,
+                height: 100,
+                filename: default_cover,
+            }
+        );
+        this._trackCover.set_child(coverImg);
         this._trackInfos = new St.Bin({style_class: 'track-infos'});
 
         let mainBox = new St.BoxLayout({style_class: 'track-box'});
@@ -204,9 +215,9 @@ Indicator.prototype = {
         this._artist = new TrackInfo(_('Unknown Artist'), "system-users");
         this._album = new TrackInfo(_('Unknown Album'), "media-optical");
         this._title = new TrackInfo(_('Unknown Title'), "audio-x-generic");
-        infos.add_actor(this._artist.getInfo());
-        infos.add_actor(this._album.getInfo());
-        infos.add_actor(this._title.getInfo());
+        infos.add_actor(this._artist.getActor());
+        infos.add_actor(this._album.getActor());
+        infos.add_actor(this._title.getActor());
 
         let controls = new St.BoxLayout({style_class: 'playback-control'});
         infos.add_actor(controls);
@@ -333,18 +344,19 @@ Indicator.prototype = {
         this._mediaServer.getMetadata(Lang.bind(this,
             function(sender, metadata) {
                 if (metadata["xesam:artist"])
-                    this._artist.setText(metadata["xesam:artist"].toString());
+                    this._artist.setLabel(metadata["xesam:artist"].toString());
                 else
-                    this._artist.setText(_("Unknown Artist"));
+                    this._artist.setLabel(_("Unknown Artist"));
                 if (metadata["xesam:album"])
-                    this._album.setText(metadata["xesam:album"].toString());
+                    this._album.setLabel(metadata["xesam:album"].toString());
                 else
-                    this._album.setText(_("Unknown Album"));
+                    this._album.setLabel(_("Unknown Album"));
                 if (metadata["xesam:title"])
-                    this._title.setText(metadata["xesam:title"].toString());
+                    this._title.setLabel(metadata["xesam:title"].toString());
                 else
-                    this._title.setText(_("Unknown Title"));
-	    
+                    this._title.setLabel(_("Unknown Title"));
+	   
+                let cover = "";
                 if (metadata["mpris:artUrl"]) {
                     cover = metadata["mpris:artUrl"].toString();
                     cover = cover.substr(7);
