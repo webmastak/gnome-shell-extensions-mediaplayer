@@ -1,9 +1,9 @@
 .button {
     width: 22px;
     height: 13px;
-    padding: 5px;
     border: 1px solid #555;
     border-radius: 4px;
+    padding: 7px;
 }
 .button:hover {
     border: 1px solid white;
@@ -11,4 +11,31 @@
 
 .button-icon {
     icon-size: 1.4em;
+}
+
+.track-info-icon {
+    icon-size: 1em;
+}
+
+.track-info-text {
+    padding-left: 5px;
+}
+
+.track-box {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.track-infos {
+    padding-left: 10px;
+}
+
+.track-cover {
+    border: 1px solid #555;
+    padding: 3px;
+    max-width: 120px;
+}
+
+.playback-control {
+    padding-top: 10px;
 }

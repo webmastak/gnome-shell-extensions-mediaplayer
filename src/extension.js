@@ -16,9 +16,6 @@ const Util = imports.misc.util;
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
 
-const VOLUME_ADJUSTMENT_STEP = 0.05; /* Volume adjustment step in % */
-const VOLUME_NOTIFY_ID = 1;
-
 const Main = imports.ui.main;
 const Panel = imports.ui.panel;
 
@@ -27,6 +24,8 @@ const PropIFace = {
     signals: [{ name: 'PropertiesChanged',
                 inSignature: 'a{sv}'}]
 }
+
+let default_cover = "";
 
 function Prop() {
     this._init();
@@ -110,7 +109,7 @@ MediaServer2Player.prototype = {
     getPlaybackStatus: function(callback) {
         this.GetRemote('PlaybackStatus', Lang.bind(this,
             function(status, ex) {
-                if (!ex) 
+                if (!ex)
                     callback(this, status);
             }));
     },
@@ -162,6 +161,23 @@ MediaServer2Player.prototype = {
 }
 DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
 
+function TrackInfo(text, iconName) {
+    this.info = new St.BoxLayout({style_class: 'track-info'});
+    this.text = new St.Label({ text: text, style_class: 'track-info-text'});
+    this.icon = new St.Icon({icon_name: iconName, style_class: 'track-info-icon'});
+    this.info.add_actor(this.icon, { span: 0 });
+    this.info.add_actor(this.text, { span: -1 });
+}
+
+TrackInfo.prototype = {
+    getInfo: function() {
+        return this.info;
+    },
+    setText: function(text) {
+        this.text.text = text;
+    },
+};
+
 function Indicator() {
     this._init.apply(this, arguments);
 }
@@ -175,71 +191,77 @@ Indicator.prototype = {
         this._mediaServer = new MediaServer2Player();
         this._prop = new Prop();
 
-        this._artist = new PopupMenu.PopupImageMenuItem(_("Unknown Artist"), "system-users", { reactive: false });
-        this._album = new PopupMenu.PopupImageMenuItem(_("Unknown Album"), "media-optical", { reactive: false });
-        this._title = new PopupMenu.PopupImageMenuItem(_("Unknown Title"), "audio-x-generic", { reactive: false });
-        this.menu.addMenuItem(this._artist);
-        this.menu.addMenuItem(this._album);
-        this.menu.addMenuItem(this._title);
+        this._trackCover = new St.Bin({style_class: 'track-cover'})
+        this._trackInfos = new St.Bin({style_class: 'track-infos'});
 
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        let mainBox = new St.BoxLayout({style_class: 'track-box'});
+        mainBox.add_actor(this._trackCover);
+        mainBox.add_actor(this._trackInfos);
 
-        let mainBox = new St.BoxLayout({vertical: true});
-        this._controlsButtons = new St.Bin({});
-        let controlsBox = new St.BoxLayout();
-        this._controlsButtons.set_child(controlsBox);
-        mainBox.add_actor(this._controlsButtons);
         this.menu.addActor(mainBox);
+
+        let infos = new St.BoxLayout({vertical: true});
+        this._artist = new TrackInfo(_('Unknown Artist'), "system-users");
+        this._album = new TrackInfo(_('Unknown Album'), "media-optical");
+        this._title = new TrackInfo(_('Unknown Title'), "audio-x-generic");
+        infos.add_actor(this._artist.getInfo());
+        infos.add_actor(this._album.getInfo());
+        infos.add_actor(this._title.getInfo());
+
+        let controls = new St.BoxLayout({style_class: 'playback-control'});
+        infos.add_actor(controls);
+
+        this._trackInfos.set_child(infos);
 
         /*this._openApp = new St.Button({ style_class: 'button' });
         this._openApp.connect('clicked', Lang.bind(this, this._loadPlayer));
         controlsBox.add_actor(this._openApp);*/
-        
+
         this._mediaPrev = new St.Button({ style_class: 'button' });
-        this._mediaPrev.connect('clicked', Lang.bind(this,  
+        this._mediaPrev.connect('clicked', Lang.bind(this,
             function () {
                 this._mediaServer.PreviousRemote();
             }
-        ));        
-        controlsBox.add_actor(this._mediaPrev);
-    
+        ));
+        controls.add_actor(this._mediaPrev);
+
         this._mediaPlay = new St.Button({ style_class: 'button' });
-        this._mediaPlay.connect('clicked', Lang.bind(this, 
+        this._mediaPlay.connect('clicked', Lang.bind(this,
                 function () {
                     this._mediaServer.PlayPauseRemote();
                 }
         ));
-        controlsBox.add_actor(this._mediaPlay); 
+        controls.add_actor(this._mediaPlay);
 
         this._mediaStop = new St.Button({ style_class: 'button' });
-        this._mediaStop.connect('clicked', Lang.bind(this, 
+        this._mediaStop.connect('clicked', Lang.bind(this,
                 function () {
                     this._mediaServer.StopRemote();
                 }
         ));
-        controlsBox.add_actor(this._mediaStop); 
-        
+        controls.add_actor(this._mediaStop);
+
         this._mediaNext = new St.Button({ style_class: 'button' });
-        this._mediaNext.connect('clicked', Lang.bind(this, 
+        this._mediaNext.connect('clicked', Lang.bind(this,
             function () {
                 this._mediaServer.NextRemote();
             }
         ));
-        controlsBox.add_actor(this._mediaNext); 
+        controls.add_actor(this._mediaNext);
 
         /*let openAppI = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,
             icon_name: 'media-eject'
         });
         this._openApp.set_child(openAppI);*/
-        
+
         this._mediaPrevIcon = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,
             icon_name: 'media-skip-backward',
             style_class: 'button-icon',
         });
         this._mediaPrev.set_child(this._mediaPrevIcon);
-        
+
         this._mediaPlayIcon = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,
             icon_name: 'media-playback-start',
@@ -259,7 +281,7 @@ Indicator.prototype = {
             style_class: 'button-icon',
         });
         this._mediaStop.set_child(this._mediaStopIcon);
-        
+
         this._mediaNextIcon = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,
             icon_name: 'media-skip-forward',
@@ -297,31 +319,49 @@ Indicator.prototype = {
         this._updateButtons();
         this._updateVolume();
         this._updateButtons();
+
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(arg) {
-                this._updateMetadata();
-                this._updateSwitches();
-                this._updateButtons();
-                this._updateVolume();
-                this._updateButtons();
-            }));
+            this._updateMetadata();
+            this._updateSwitches();
+            this._updateButtons();
+            this._updateVolume();
+            this._updateButtons();
+        }));
     },
 
     _updateMetadata: function() {
         this._mediaServer.getMetadata(Lang.bind(this,
             function(sender, metadata) {
                 if (metadata["xesam:artist"])
-                    this._artist.label.set_text(metadata["xesam:artist"].toString());
+                    this._artist.setText(metadata["xesam:artist"].toString());
                 else
-                    this._artist.label.set_text(_("Unknown Artist"));
+                    this._artist.setText(_("Unknown Artist"));
                 if (metadata["xesam:album"])
-                    this._album.label.set_text(metadata["xesam:album"].toString());
+                    this._album.setText(metadata["xesam:album"].toString());
                 else
-                    this._album.label.set_text(_("Unknown Album"));
+                    this._album.setText(_("Unknown Album"));
                 if (metadata["xesam:title"])
-                    this._title.label.set_text(metadata["xesam:title"].toString());
+                    this._title.setText(metadata["xesam:title"].toString());
                 else
-                    this._title.label.set_text(_("Unknown Title"));
-            }));
+                    this._title.setText(_("Unknown Title"));
+	    
+                if (metadata["mpris:artUrl"]) {
+                    cover = metadata["mpris:artUrl"].toString();
+                    cover = cover.substr(7);
+                }
+                else
+                    cover = default_cover;
+
+                let coverImg = new Clutter.Texture(
+                    {
+	        	        keep_aspect_ratio: true,
+        	        	height: 100,
+	                	filename: cover,
+                    }
+                );
+	        	this._trackCover.set_child(coverImg);
+            }
+        ));
     },
 
     _updateSwitches: function() {
@@ -339,23 +379,23 @@ Indicator.prototype = {
 
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
-        function(sender, volume) {
-            this._volumeText.setIcon = "audio-volume-low";
-            if (volume > 0.30) {
-                this._volumeText.setIcon = "audio-volume-medium";
+            function(sender, volume) {
+                this._volumeText.setIcon = "audio-volume-low";
+                if (volume > 0.30) {
+                    this._volumeText.setIcon = "audio-volume-medium";
+                }
+                if (volume > 0.70) {
+                    this._volumeText.setIcon = "audio-volume-high";
+                }
+                this._volume.setValue(volume);
             }
-            if (volume > 0.70) {
-                this._volumeText.setIcon = "audio-volume-high";
-            }
-            this._volume.setValue(volume);
-        }
-    ));
+        ));
     },
 
     _updateButtons: function() {
         this._mediaServer.getPlaybackStatus(Lang.bind(this,
             function(sender, status) {
-                if (status == "Playing") 
+                if (status == "Playing")
                     this._mediaPlay.set_child(this._mediaPauseIcon);
                 else if (status == "Paused" || status == "Stopped")
                     this._mediaPlay.set_child(this._mediaPlayIcon);
@@ -366,7 +406,8 @@ Indicator.prototype = {
 
 // Put your extension initialization code here
 function main(metadata) {
-    imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.localedir);
+    imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
+    default_cover = metadata.path + '/cover.png'
 
     Panel.STANDARD_TRAY_ICON_ORDER.unshift('player');
     Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['player'] = Indicator;

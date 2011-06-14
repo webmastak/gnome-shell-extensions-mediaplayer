@@ -1,10 +1,11 @@
 {
-"uuid": "@uuid@",
+"uuid": "@UUID@",
 "name": "Media player indicator",
-"description": "Control media players",
+"description": "Control MPRIS capable media players",
 "original-author": "j.wielicki@sotecware.net",
-"shell-version": [ "@shell_current@" ],
-"localedir": "@LOCALEDIR@",
-"url": "@url@"
+"shell-version": [ "@SHELLVERSION@" ],
+"locale": "@LOCALEDIR@",
+"path": "@EXTENSIONDIR@",
+"url": "@URL@"
 }
 
