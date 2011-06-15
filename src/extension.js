@@ -25,15 +25,35 @@ const PropIFace = {
                 inSignature: 'a{sv}'}]
 }
 
-let default_cover = "";
+const MonitorIFace = {
+    name: 'org.freedesktop.DBus',
+    methods: [{ name: 'ListNames',
+                inSignature: '',
+                outSignature: 'as' }],
+    signals: [{ name: 'NameOwnerChanged',
+                inSignature: 'a{sv}'}]
+}
+
+let default_cover = null;
+
+function Monitor() {
+    this._init.apply(this, arguments);
+}
+
+Monitor.prototype = {
+    _init: function() {
+        DBus.session.proxifyObject(this, 'org.freedesktop.DBus', '/org/freedesktop/DBus', this);
+    },
+}
+DBus.proxifyPrototype(Monitor.prototype, MonitorIFace)
 
 function Prop() {
-    this._init();
+    this._init.apply(this, arguments);
 }
 
 Prop.prototype = {
-    _init: function() {
-        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.mpd', '/org/mpris/MediaPlayer2', this);
+    _init: function(player) {
+        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.'+player, '/org/mpris/MediaPlayer2', this);
     }
 }
 DBus.proxifyPrototype(Prop.prototype, PropIFace)
@@ -90,14 +110,12 @@ const MediaServer2PlayerIFace = {
 };
 
 function MediaServer2Player() {
-    this._init();
+    this._init.apply(this, arguments);
 }
 MediaServer2Player.prototype = {
-    _init: function() {
-        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.mpd', '/org/mpris/MediaPlayer2', this);
+    _init: function(player) {
+        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.'+player, '/org/mpris/MediaPlayer2', this);
     },
-
-
     getMetadata: function(callback) {
         this.GetRemote('Metadata', Lang.bind(this,
             function(metadata, ex) {
@@ -105,7 +123,6 @@ MediaServer2Player.prototype = {
                     callback(this, metadata);
             }));
     },
-
     getPlaybackStatus: function(callback) {
         this.GetRemote('PlaybackStatus', Lang.bind(this,
             function(status, ex) {
@@ -113,7 +130,6 @@ MediaServer2Player.prototype = {
                     callback(this, status);
             }));
     },
-
     getShuffle: function(callback) {
         this.GetRemote('Shuffle', Lang.bind(this,
             function(shuffle, ex) {
@@ -121,11 +137,9 @@ MediaServer2Player.prototype = {
                     callback(this, shuffle);
             }));
     },
-
     setShuffle: function(value) {
         this.SetRemote('Shuffle', value);
     },
-
     getVolume: function(callback) {
         this.GetRemote('Volume', Lang.bind(this,
             function(volume, ex) {
@@ -133,11 +147,9 @@ MediaServer2Player.prototype = {
                     callback(this, volume);
             }));
     },
-
     setVolume: function(value) {
         this.SetRemote('Volume', value);
     },
-
     getRepeat: function(callback) {
         this.GetRemote('LoopStatus', Lang.bind(this,
             function(repeat, ex) {
@@ -150,7 +162,6 @@ MediaServer2Player.prototype = {
                 }
             }));
     },
-
     setRepeat: function(value) {
         if (value)
             value = "Playlist"
@@ -181,18 +192,19 @@ TrackInfo.prototype = {
     },
 };
 
-function Indicator() {
+function Player() {
     this._init.apply(this, arguments);
 }
 
-Indicator.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
+Player.prototype = {
+    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
+    
+    _init: function(name) {
+        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, name.charAt(0).toUpperCase() + name.slice(1));
 
-    _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
-
-        this._mediaServer = new MediaServer2Player();
-        this._prop = new Prop();
+        this.name = name;
+        this._mediaServer = new MediaServer2Player(name);
+        this._prop = new Prop(name);
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
         let coverImg = new Clutter.Texture(
@@ -338,6 +350,7 @@ Indicator.prototype = {
             this._updateVolume();
             this._updateButtons();
         }));
+
     },
 
     _updateMetadata: function() {
@@ -413,7 +426,90 @@ Indicator.prototype = {
                     this._mediaPlay.set_child(this._mediaPlayIcon);
             }
         ));
-    }
+    },
+
+
+}
+
+function Indicator() {
+    this._init.apply(this, arguments);
+}
+
+Indicator.prototype = {
+    __proto__: PanelMenu.SystemStatusButton.prototype,
+
+    _init: function() {
+        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
+        this._players = {};
+        this._queue = {};
+        this._monitor = new Monitor();
+        this._monitor.connect('NameOwnerChanged', Lang.bind(this, this._setPlayerStatus));
+        this._loadPlayers();
+        this.menu.connect('open-state-changed', Lang.bind(this, 
+            function(sender, state) {
+                if (state) {
+                    let children = this.menu._getMenuItems();
+                    for (let i = 0; i < children.length; i++) {
+                        let item = children[i];
+                        item.activate();
+                    }
+                }
+            }
+        ));
+    },
+
+    _loadPlayers: function() {
+        this._monitor.ListNamesRemote(Lang.bind(this, 
+            function(names) {
+                let names = names.toString().split(',');
+                for (let i = 0; i < names.length; i++) {
+                    if (names[i].match('^org.mpris.MediaPlayer2')) {
+                        let player = names[i].split('.');
+                        player = player[player.length-1];
+                        this._addPlayer(player);
+                    }
+                }
+            }
+        ));
+    },
+
+    _addPlayer: function(name) {
+        this._players[name] = new Player(name);
+        this.menu.addMenuItem(this._players[name]);
+    },
+
+    _removePlayer: function(name) {
+        delete this._players[name];
+        this.menu.removeAll();
+        for (name in this._players) { 
+            this._addPlayer(name);
+        }
+    },
+    
+    _setPlayerStatus: function(dbus, name, id1, id2) {
+        if (id2 == name && !this._queue[id2]) {
+            this._queue[id2] = { state: "requested", name: "" };
+        }
+        else if (name.match('^org.mpris.MediaPlayer2') && this._queue[id2] && this._queue[id2].state == "requested") {
+            let player = name.split('.');
+            player = player[player.length-1];
+            this._queue[id2].state = "active";
+            this._queue[id2].name = player;
+            this._addPlayer(player);
+        }
+        else if (this._queue[id2] && this._queue[id2] == "requested") {
+            // not a MPRIS player
+            delete this._queue[id2];
+        }
+        else if (name.match('^org.mpris.MediaPlayer2')) {
+            let player = name.split('.');
+            player = player[player.length-1];
+            this._removePlayer(player);
+            if (this._queue[id1] && this._queue[id1].state == "active")
+                delete this._queue[id1];
+        }
+    },
+
 };
 
 // Put your extension initialization code here
