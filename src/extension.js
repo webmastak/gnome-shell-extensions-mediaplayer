@@ -353,6 +353,10 @@ Player.prototype = {
 
     },
 
+    _setTitle: function(status) {
+        this.label.text = this.name.charAt(0).toUpperCase() + this.name.slice(1) + " - " + status;
+    },
+
     _updateMetadata: function() {
         this._mediaServer.getMetadata(Lang.bind(this,
             function(sender, metadata) {
@@ -424,6 +428,7 @@ Player.prototype = {
                     this._mediaPlay.set_child(this._mediaPauseIcon);
                 else if (status == "Paused" || status == "Stopped")
                     this._mediaPlay.set_child(this._mediaPlayIcon);
+                this._setTitle(status);
             }
         ));
     },
