@@ -93,6 +93,10 @@ const MediaServer2PlayerIFace = {
 };
 
 let default_cover = null;
+/* dummy vars for translation */
+let x = _("Playing");
+x = _("Paused");
+x = _("Stopped");
 
 function Monitor() {
     this._init.apply(this, arguments);
@@ -382,7 +386,7 @@ Player.prototype = {
     },
 
     _setTitle: function(status) {
-        this.label.text = this._getName() + " - " + status;
+        this.label.text = this._getName() + " - " + _(status);
     },
 
     _updateMetadata: function() {
