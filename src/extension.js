@@ -19,12 +19,6 @@ const _ = Gettext.gettext;
 const Main = imports.ui.main;
 const Panel = imports.ui.panel;
 
-const PropIFace = {
-    name: 'org.freedesktop.DBus.Properties',
-    signals: [{ name: 'PropertiesChanged',
-                inSignature: 'a{sv}'}]
-}
-
 const MonitorIFace = {
     name: 'org.freedesktop.DBus',
     methods: [{ name: 'ListNames',
@@ -32,31 +26,20 @@ const MonitorIFace = {
                 outSignature: 'as' }],
     signals: [{ name: 'NameOwnerChanged',
                 inSignature: 'a{sv}'}]
-}
+};
 
-let default_cover = null;
+const PropIFace = {
+    name: 'org.freedesktop.DBus.Properties',
+    signals: [{ name: 'PropertiesChanged',
+                inSignature: 'a{sv}'}]
+};
 
-function Monitor() {
-    this._init.apply(this, arguments);
-}
-
-Monitor.prototype = {
-    _init: function() {
-        DBus.session.proxifyObject(this, 'org.freedesktop.DBus', '/org/freedesktop/DBus', this);
-    },
-}
-DBus.proxifyPrototype(Monitor.prototype, MonitorIFace)
-
-function Prop() {
-    this._init.apply(this, arguments);
-}
-
-Prop.prototype = {
-    _init: function(player) {
-        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.'+player, '/org/mpris/MediaPlayer2', this);
-    }
-}
-DBus.proxifyPrototype(Prop.prototype, PropIFace)
+const NotificationIFace = {
+    name: 'org.freedesktop.Notifications',
+    methods: [{ name: 'Notify',
+                inSignature: 'susssasa{sv}i',
+                outSignature: 'u'}]
+};
 
 const MediaServer2PlayerIFace = {
     name: 'org.mpris.MediaPlayer2.Player',
@@ -108,6 +91,42 @@ const MediaServer2PlayerIFace = {
     signals: [{ name: 'Seeked',
                 inSignature: 'x' }]
 };
+
+let default_cover = null;
+
+function Monitor() {
+    this._init.apply(this, arguments);
+}
+
+Monitor.prototype = {
+    _init: function() {
+        DBus.session.proxifyObject(this, 'org.freedesktop.DBus', '/org/freedesktop/DBus', this);
+    },
+}
+DBus.proxifyPrototype(Monitor.prototype, MonitorIFace)
+
+function Notification() {
+    this._init.apply(this, arguments);
+}
+
+Notification.prototype = {
+    _init: function() {
+        DBus.session.proxifyObject(this, 'org.freedesktop.Notifications', '/org/freedesktop/Notifications', this);
+    },
+}
+DBus.proxifyPrototype(Notification.prototype, NotificationIFace)
+
+function Prop() {
+    this._init.apply(this, arguments);
+}
+
+Prop.prototype = {
+    _init: function(player) {
+        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.'+player, '/org/mpris/MediaPlayer2', this);
+    }
+}
+DBus.proxifyPrototype(Prop.prototype, PropIFace)
+
 
 function MediaServer2Player() {
     this._init.apply(this, arguments);
@@ -190,6 +209,9 @@ TrackInfo.prototype = {
     setLabel: function(label) {
         this.label.text = label;
     },
+    getLabel: function() {
+        return this.label.text.toString();
+    },
 };
 
 function Player() {
@@ -200,11 +222,12 @@ Player.prototype = {
     __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
     
     _init: function(name) {
-        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, name.charAt(0).toUpperCase() + name.slice(1));
+        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, name);
 
         this.name = name;
         this._mediaServer = new MediaServer2Player(name);
         this._prop = new Prop(name);
+        this._notif = new Notification();
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
         let coverImg = new Clutter.Texture(
@@ -353,8 +376,13 @@ Player.prototype = {
 
     },
 
+    _getName: function() {
+        return this.name.charAt(0).toUpperCase() + this.name.slice(1);
+
+    },
+
     _setTitle: function(status) {
-        this.label.text = this.name.charAt(0).toUpperCase() + this.name.slice(1) + " - " + status;
+        this.label.text = this._getName() + " - " + status;
     },
 
     _updateMetadata: function() {
@@ -389,6 +417,11 @@ Player.prototype = {
                     }
                 );
 	        	this._trackCover.set_child(coverImg);
+                /*this._notif.NotifyRemote(
+                    this.name, 0, 'dialog-info', this._getName(),
+                    this._artist.getLabel() + ' - ' + this._title.getLabel(),
+                    [], {}, 120, function(result, err){}
+                );*/
             }
         ));
     },
@@ -456,17 +489,32 @@ Indicator.prototype = {
                     let children = this.menu._getMenuItems();
                     for (let i = 0; i < children.length; i++) {
                         let item = children[i];
-                        item.activate();
+                        if (item instanceof Player)
+                            item.activate();
                     }
+                }
+            }
+        ));
+        this.menu.connect('players-loaded', Lang.bind(this,
+            function(sender, state) {
+                if (this._nbPlayers() == 0) {
+                    this.menu.addMenuItem(new PopupMenu.PopupMenuItem(_("No player running"), { reactive: false }));
                 }
             }
         ));
     },
 
+    _nbPlayers: function() {
+        if (!this._players)
+            return 0
+        else
+            return Object.keys(this._players).length;
+    },
+
     _loadPlayers: function() {
         this._monitor.ListNamesRemote(Lang.bind(this, 
             function(names) {
-                let names = names.toString().split(',');
+                names = names.toString().split(',');
                 for (let i = 0; i < names.length; i++) {
                     if (names[i].match('^org.mpris.MediaPlayer2')) {
                         let player = names[i].split('.');
@@ -474,11 +522,15 @@ Indicator.prototype = {
                         this._addPlayer(player);
                     }
                 }
+                this.menu.emit('players-loaded', true);
             }
         ));
     },
 
     _addPlayer: function(name) {
+        // ensure menu is empty
+        if (this._nbPlayers() == 0)
+            this.menu.removeAll();
         this._players[name] = new Player(name);
         this.menu.addMenuItem(this._players[name]);
     },
@@ -489,6 +541,7 @@ Indicator.prototype = {
         for (name in this._players) { 
             this._addPlayer(name);
         }
+        this.menu.emit('players-loaded', true);
     },
     
     _setPlayerStatus: function(dbus, name, id1, id2) {
