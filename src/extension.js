@@ -332,7 +332,7 @@ Player.prototype = {
         });
         this._mediaNext.set_child(this._mediaNextIcon);
 
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        /*this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         this._shuffle = new PopupMenu.PopupSwitchMenuItem(_("Shuffle"), false);
         this._shuffle.connect('toggled', Lang.bind(this, function(item) {
@@ -346,26 +346,25 @@ Player.prototype = {
             this._mediaServer.setRepeat(item.state);
             this._updateSwitches();
         }));
-        this.menu.addMenuItem(this._repeat);
+        this.menu.addMenuItem(this._repeat);*/
 
         this._volumeText = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", { reactive: false });
         this._volume = new PopupMenu.PopupSliderMenuItem(0);
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
         }));
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addMenuItem(this._volumeText);
         this.menu.addMenuItem(this._volume);
 
         this._updateMetadata();
-        this._updateSwitches();
+        //this._updateSwitches();
         this._updateButtons();
         this._updateVolume();
         this._updateButtons();
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(arg) {
             this._updateMetadata();
-            this._updateSwitches();
+            //this._updateSwitches();
             this._updateButtons();
             this._updateVolume();
             this._updateButtons();
@@ -423,7 +422,7 @@ Player.prototype = {
         ));
     },
 
-    _updateSwitches: function() {
+    /*_updateSwitches: function() {
         this._mediaServer.getShuffle(Lang.bind(this,
             function(sender, shuffle) {
                 this._shuffle.setToggleState(shuffle);
@@ -434,7 +433,7 @@ Player.prototype = {
                 this._repeat.setToggleState(repeat);
             }
         ));
-    },
+    },*/
 
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
