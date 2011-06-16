@@ -1,23 +1,16 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
-const Clutter = imports.gi.Clutter;
+const Mainloop = imports.mainloop;
 const DBus = imports.dbus;
 const Lang = imports.lang;
-const Mainloop = imports.mainloop;
-const Shell = imports.gi.Shell;
-const Gvc = imports.gi.Gvc;
-const Signals = imports.signals;
+const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
-
+const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const Util = imports.misc.util;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
-
-const Main = imports.ui.main;
-const Panel = imports.ui.panel;
 
 const MonitorIFace = {
     name: 'org.freedesktop.DBus',
