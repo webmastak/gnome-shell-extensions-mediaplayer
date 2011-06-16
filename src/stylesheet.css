@@ -19,12 +19,14 @@
 
 .track-info-text {
     padding-left: 5px;
+    font-size: 13px;
 }
 
 .track-box {
     padding-top: 20px;
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 10px;
 }
 
 .track-infos {

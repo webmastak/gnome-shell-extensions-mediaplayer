@@ -250,11 +250,10 @@ Player.prototype = {
         infos.add_actor(this._artist.getActor());
         infos.add_actor(this._album.getActor());
         infos.add_actor(this._title.getActor());
+        this._trackInfos.set_child(infos);
 
         let controls = new St.BoxLayout({style_class: 'playback-control'});
         infos.add_actor(controls);
-
-        this._trackInfos.set_child(infos);
 
         /*this._openApp = new St.Button({ style_class: 'button' });
         this._openApp.connect('clicked', Lang.bind(this, this._loadPlayer));
@@ -349,7 +348,7 @@ Player.prototype = {
         this.menu.addMenuItem(this._repeat);*/
 
         this._volumeText = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", { reactive: false });
-        this._volume = new PopupMenu.PopupSliderMenuItem(0);
+        this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
         }));
