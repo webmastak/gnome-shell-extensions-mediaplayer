@@ -1,3 +1,7 @@
+.button-container {
+    padding-right: 5px;
+}
+
 .button {
     width: 22px;
     height: 13px;
