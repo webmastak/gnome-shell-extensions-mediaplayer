@@ -306,13 +306,11 @@ Player.prototype = {
         this._updateMetadata();
         this._updateButtons();
         this._updateVolume();
-        this._updateButtons();
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(arg) {
             this._updateMetadata();
             this._updateButtons();
             this._updateVolume();
-            this._updateButtons();
         }));
 
     },
@@ -371,13 +369,11 @@ Player.prototype = {
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
             function(sender, volume) {
-                this._volumeText.setIcon = "audio-volume-low";
-                if (volume > 0.30) {
-                    this._volumeText.setIcon = "audio-volume-medium";
-                }
-                if (volume > 0.70) {
-                    this._volumeText.setIcon = "audio-volume-high";
-                }
+                this._volumeText.setIcon("audio-volume-low");
+                if (volume > 0.30) 
+                    this._volumeText.setIcon("audio-volume-medium");
+                if (volume > 0.70)
+                    this._volumeText.setIcon("audio-volume-high");
                 this._volume.setValue(volume);
             }
         ));
