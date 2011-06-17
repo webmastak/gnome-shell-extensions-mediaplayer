@@ -399,7 +399,7 @@ Player.prototype = {
                 let cover = "";
                 if (metadata["mpris:artUrl"]) {
                     cover = metadata["mpris:artUrl"].toString();
-                    cover = cover.substr(7);
+                    cover = decodeURIComponent(cover.substr(7));
                 }
                 else
                     cover = default_cover;
