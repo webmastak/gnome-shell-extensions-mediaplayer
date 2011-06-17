@@ -406,9 +406,10 @@ Player.prototype = {
 
                 let coverImg = new Clutter.Texture(
                     {
-	        	        keep_aspect_ratio: true,
-        	        	height: 100,
-	                	filename: cover,
+                        keep_aspect_ratio: true,
+                        height: 100,
+                        filter_quality: 2,
+                        filename: cover,
                     }
                 );
 	        	this._trackCover.set_child(coverImg);
