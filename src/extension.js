@@ -8,6 +8,7 @@ const St = imports.gi.St;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const GLib = imports.gi.GLib;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -349,14 +350,13 @@ Player.prototype = {
                 else
                     this._title.setLabel(_("Unknown Title"));
 	   
-                let cover = "";
+                let cover = default_cover;
                 if (metadata["mpris:artUrl"]) {
                     cover = metadata["mpris:artUrl"].toString();
                     cover = decodeURIComponent(cover.substr(7));
+                    if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
+                        cover = default_cover;
                 }
-                else
-                    cover = default_cover;
-
                 let coverImg = new Clutter.Texture(
                     {
                         keep_aspect_ratio: true,
@@ -366,11 +366,6 @@ Player.prototype = {
                     }
                 );
 	        	this._trackCover.set_child(coverImg);
-                /*this._notif.NotifyRemote(
-                    this.name, 0, 'dialog-info', this._getName(),
-                    this._artist.getLabel() + ' - ' + this._title.getLabel(),
-                    [], {}, 120, function(result, err){}
-                );*/
             }
         ));
     },
