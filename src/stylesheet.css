@@ -41,8 +41,8 @@
 
 .track-box {
     padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
     padding-bottom: 10px;
 }
 
@@ -58,4 +58,13 @@
 
 .playback-control {
     padding-top: 10px;
+}
+
+.volume-info {
+    padding-left: 30px;
+}
+
+.volume-icon {
+    icon-size: 1.14em;
+    padding-left: 10px;
 }

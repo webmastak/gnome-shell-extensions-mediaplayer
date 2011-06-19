@@ -305,12 +305,17 @@ Player.prototype = {
         controls.add_actor(this._stopButton.getActor());
         controls.add_actor(this._nextButton.getActor());
 
-        this._volumeText = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", {reactive: false});
+        this._volumeInfo = new St.BoxLayout({style_class: 'volume-info'});
+        this._volumeText = new St.Label({text: _("Volume"), style_class: 'volume-text'});
+        this._volumeIcon = new St.Icon({icon_name: "audio-volume-high", style_class: 'volume-icon'});
+        this._volumeInfo.add_actor(this._volumeText, { span: 0 });
+        this._volumeInfo.add_actor(this._volumeIcon, { span: -1 });
+
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
         }));
-        this.addMenuItem(this._volumeText);
+        this.addActor(this._volumeInfo);
         this.addMenuItem(this._volume);
 
         this._updateMetadata();
@@ -334,19 +339,27 @@ Player.prototype = {
         this._playerName.text = this._getName() + " - " + _(status);
     },
 
+    _formatTrackInfo: function(text) {
+        text = text.toString();
+        if (text.length > 20) {
+            text = text.substr(0, 20) + "...";
+        }
+        return text;
+    },
+
     _updateMetadata: function() {
         this._mediaServer.getMetadata(Lang.bind(this,
             function(sender, metadata) {
                 if (metadata["xesam:artist"])
-                    this._artist.setLabel(metadata["xesam:artist"].toString());
+                    this._artist.setLabel(this._formatTrackInfo(metadata["xesam:artist"]));
                 else
                     this._artist.setLabel(_("Unknown Artist"));
                 if (metadata["xesam:album"])
-                    this._album.setLabel(metadata["xesam:album"].toString());
+                    this._album.setLabel(this._formatTrackInfo(metadata["xesam:album"]));
                 else
                     this._album.setLabel(_("Unknown Album"));
                 if (metadata["xesam:title"])
-                    this._title.setLabel(metadata["xesam:title"].toString());
+                    this._title.setLabel(this._formatTrackInfo(metadata["xesam:title"]));
                 else
                     this._title.setLabel(_("Unknown Title"));
 	   
@@ -373,11 +386,11 @@ Player.prototype = {
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
             function(sender, volume) {
-                this._volumeText.setIcon("audio-volume-low");
+                this._volumeIcon.icon_name = "audio-volume-low";
                 if (volume > 0.30) 
-                    this._volumeText.setIcon("audio-volume-medium");
+                    this._volumeIcon.icon_name = "audio-volume-medium";
                 if (volume > 0.70)
-                    this._volumeText.setIcon("audio-volume-high");
+                    this._volumeIcon.icon_name = "audio-volume-high";
                 this._volume.setValue(volume);
             }
         ));
