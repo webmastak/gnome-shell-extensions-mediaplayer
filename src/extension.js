@@ -242,15 +242,24 @@ function Player() {
 }
 
 Player.prototype = {
-    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
+    __proto__: PopupMenu.PopupMenuSection.prototype,
     
     _init: function(name) {
-        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, name);
+        PopupMenu.PopupMenuSection.prototype._init.call(this);
 
         this.name = name;
+
         this._mediaServer = new MediaServer2Player(name);
         this._prop = new Prop(name);
         this._notif = new Notification();
+
+        this._playerInfo = new St.BoxLayout({style_class: 'player-info'});
+        this._playerIcon = new St.Icon({icon_name: "audio-x-generic", style_class: 'player-icon'});
+        this._playerName = new St.Label({text: this._getName(), style_class: 'player-name'});
+        this._playerInfo.add_actor(this._playerIcon, { span: 0 });
+        this._playerInfo.add_actor(this._playerName, { span: -1 });
+        
+        this.addActor(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
         let coverImg = new Clutter.Texture(
@@ -267,7 +276,7 @@ Player.prototype = {
         mainBox.add_actor(this._trackCover);
         mainBox.add_actor(this._trackInfos);
 
-        this.menu.addActor(mainBox);
+        this.addActor(mainBox);
 
         let infos = new St.BoxLayout({vertical: true});
         this._artist = new TrackInfo(_('Unknown Artist'), "system-users");
@@ -295,13 +304,13 @@ Player.prototype = {
         controls.add_actor(this._stopButton.getActor());
         controls.add_actor(this._nextButton.getActor());
 
-        this._volumeText = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", { reactive: false });
+        this._volumeText = new PopupMenu.PopupImageMenuItem(_("Volume"), "audio-volume-high", {reactive: false});
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
         }));
-        this.menu.addMenuItem(this._volumeText);
-        this.menu.addMenuItem(this._volume);
+        this.addMenuItem(this._volumeText);
+        this.addMenuItem(this._volume);
 
         this._updateMetadata();
         this._updateButtons();
@@ -320,8 +329,8 @@ Player.prototype = {
 
     },
 
-    _setTitle: function(status) {
-        this.label.text = this._getName() + " - " + _(status);
+    _setName: function(status) {
+        this._playerName.text = this._getName() + " - " + _(status);
     },
 
     _updateMetadata: function() {
@@ -386,7 +395,7 @@ Player.prototype = {
                     this._playButton.setIcon("media-playback-pause");
                 else if (status == "Paused" || status == "Stopped")
                     this._playButton.setIcon("media-playback-start");
-                this._setTitle(status);
+                this._setName(status);
             }
         ));
     },
@@ -408,18 +417,6 @@ Indicator.prototype = {
         this._monitor = new Monitor();
         this._monitor.connect('NameOwnerChanged', Lang.bind(this, this._setPlayerStatus));
         this._loadPlayers();
-        this.menu.connect('open-state-changed', Lang.bind(this, 
-            function(sender, state) {
-                if (state) {
-                    let children = this.menu._getMenuItems();
-                    for (let i = 0; i < children.length; i++) {
-                        let item = children[i];
-                        if (item instanceof Player)
-                            item.activate();
-                    }
-                }
-            }
-        ));
         this.menu.connect('players-loaded', Lang.bind(this,
             function(sender, state) {
                 if (this._nbPlayers() == 0) {
