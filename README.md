@@ -4,12 +4,18 @@ gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRI
 
 This extension will monitor DBus to look for active players automatically. Active players are shown automatically in the menu.
 
+Tested players :
+
+* Clementine
+* Banshee
+* Rhythmbox
+* mpd (with mpDris2)
+
 ----
 
 ### Screenshots
 
 ![Screenshot](gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
-
 ![Screenshot](gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png)
 
 ----
