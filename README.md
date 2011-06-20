@@ -22,7 +22,9 @@ Tested players :
 
 ### Installation
 
-For installation, run the following commands:
+Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=50014)
+
+Manual installation :
 
     ./autogen.sh --prefix=/usr
     make
