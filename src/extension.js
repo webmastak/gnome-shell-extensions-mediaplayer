@@ -165,7 +165,7 @@ MediaServer2Player.prototype = {
             }));
     },
     setVolume: function(value) {
-        this.SetRemote('Volume', value);
+        this.SetRemote('Volume', parseFloat(value));
     },
     getRepeat: function(callback) {
         this.GetRemote('LoopStatus', Lang.bind(this,
