@@ -238,6 +238,39 @@ ControlButton.prototype = {
     },
 }
 
+function TextImageMenuItem() {
+    this._init.apply(this, arguments);
+}
+
+TextImageMenuItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function(text, icon, image, align, style) {
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
+
+        this.actor = new St.BoxLayout({style_class: style});
+        if (icon)
+            this.icon = new St.Icon({icon_name: icon, style_class: style + '-icon'});
+        this.text = new St.Label({text: text, style_class: style + '-name'});
+        if (align === "left") {
+            this.actor.add_actor(this.icon, { span: 0 });
+            this.actor.add_actor(this.text, { span: -1 });
+        }
+        else {
+            this.actor.add_actor(this.text, { span: 0 });
+            this.actor.add_actor(this.icon, { span: -1 });
+        }
+    },
+
+    setText: function(text) {
+        this.text.text = text;
+    },
+
+    setIcon: function(icon) {
+        this.icon.icon_name = icon;
+    },
+}
+
 function Player() {
     this._init.apply(this, arguments);
 }
@@ -254,13 +287,8 @@ Player.prototype = {
         this._prop = new Prop(name);
         this._notif = new Notification();
 
-        this._playerInfo = new St.BoxLayout({style_class: 'player-info'});
-        this._playerIcon = new St.Icon({icon_name: "audio-x-generic", style_class: 'player-icon'});
-        this._playerName = new St.Label({text: this._getName(), style_class: 'player-name'});
-        this._playerInfo.add_actor(this._playerIcon, { span: 0 });
-        this._playerInfo.add_actor(this._playerName, { span: -1 });
-        
-        this.addActor(this._playerInfo);
+        this._playerInfo = new TextImageMenuItem(this._getName(), "audio-x-generic", false, "left", "player");
+        this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
         let coverImg = new Clutter.Texture(
@@ -305,17 +333,12 @@ Player.prototype = {
         controls.add_actor(this._stopButton.getActor());
         controls.add_actor(this._nextButton.getActor());
 
-        this._volumeInfo = new St.BoxLayout({style_class: 'volume-info'});
-        this._volumeText = new St.Label({text: _("Volume"), style_class: 'volume-text'});
-        this._volumeIcon = new St.Icon({icon_name: "audio-volume-high", style_class: 'volume-icon'});
-        this._volumeInfo.add_actor(this._volumeText, { span: 0 });
-        this._volumeInfo.add_actor(this._volumeIcon, { span: -1 });
-
+        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", false, "right", "volume");
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServer.setVolume(item._value);
         }));
-        this.addActor(this._volumeInfo);
+        this.addMenuItem(this._volumeInfo);
         this.addMenuItem(this._volume);
 
         this._updateMetadata();
@@ -336,13 +359,13 @@ Player.prototype = {
     },
 
     _setName: function(status) {
-        this._playerName.text = this._getName() + " - " + _(status);
+        this._playerInfo.setText(this._getName() + " - " + _(status));
     },
 
     _formatTrackInfo: function(text) {
         text = text.toString();
-        if (text.length > 20) {
-            text = text.substr(0, 20) + "...";
+        if (text.length > 25) {
+            text = text.substr(0, 25) + "...";
         }
         return text;
     },
@@ -386,11 +409,11 @@ Player.prototype = {
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
             function(sender, volume) {
-                this._volumeIcon.icon_name = "audio-volume-low";
+                this._volumeInfo.setIcon("audio-volume-low");
                 if (volume > 0.30) 
-                    this._volumeIcon.icon_name = "audio-volume-medium";
-                if (volume > 0.70)
-                    this._volumeIcon.icon_name = "audio-volume-high";
+                    this._volumeInfo.setIcon("audio-volume-medium");
+                if (volume > 0.80)
+                    this._volumeInfo.setIcon("audio-volume-high");
                 this._volume.setValue(volume);
             }
         ));
