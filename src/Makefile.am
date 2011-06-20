@@ -7,7 +7,7 @@ uuid = mediaplayer@patapon.info
 
 extensiondir = $(topextensiondir)/$(uuid)
 
-dist_extension_DATA = extension.js stylesheet.css cover.png
+dist_extension_DATA = extension.js stylesheet.css cover.png icons/*.svg
 nodist_extension_DATA = metadata.json $(EXTRA_EXTENSION)
 
 EXTRA_DIST = metadata.json.in

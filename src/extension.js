@@ -1,6 +1,7 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
 const Mainloop = imports.mainloop;
+const Gio = imports.gi.Gio;
 const DBus = imports.dbus;
 const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
@@ -87,6 +88,7 @@ const MediaServer2PlayerIFace = {
 };
 
 let default_cover = null;
+let icon_path = null;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
@@ -249,8 +251,13 @@ TextImageMenuItem.prototype = {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.actor = new St.BoxLayout({style_class: style});
-        if (icon)
+        if (icon) {
             this.icon = new St.Icon({icon_name: icon, style_class: style + '-icon'});
+        }
+        if (image) {
+            this.icon = new St.Bin({style_class: style + '-icon'});
+            this.icon.set_child(this._getIconImage(image));
+        }
         this.text = new St.Label({text: text, style_class: style + '-name'});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
@@ -268,6 +275,19 @@ TextImageMenuItem.prototype = {
 
     setIcon: function(icon) {
         this.icon.icon_name = icon;
+    },
+
+    setImage: function(image) {
+        this.icon.set_child(this._getIconImage(image));
+    },
+
+    // retrieve an icon image
+    _getIconImage: function(icon_name) {
+         let icon_file = icon_path + icon_name + ".svg";
+         let file = Gio.file_new_for_path(icon_file);
+         let icon_uri = file.get_uri();
+ 
+         return St.TextureCache.get_default().load_uri_sync(1, icon_uri, 16, 16);
     },
 }
 
@@ -287,7 +307,7 @@ Player.prototype = {
         this._prop = new Prop(name);
         this._notif = new Notification();
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), "audio-x-generic", false, "left", "player");
+        this._playerInfo = new TextImageMenuItem(this._getName(), false, "player-stopped", "left", "player");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
@@ -358,6 +378,7 @@ Player.prototype = {
 
     },
 
+
     _setName: function(status) {
         this._playerInfo.setText(this._getName() + " - " + _(status));
     },
@@ -409,7 +430,10 @@ Player.prototype = {
     _updateVolume: function() {
         this._mediaServer.getVolume(Lang.bind(this,
             function(sender, volume) {
-                this._volumeInfo.setIcon("audio-volume-low");
+                if (volume === 0)
+                    this._volumeInfo.setIcon("audio-volume-muted");
+                if (volume > 0)
+                    this._volumeInfo.setIcon("audio-volume-low");
                 if (volume > 0.30) 
                     this._volumeInfo.setIcon("audio-volume-medium");
                 if (volume > 0.80)
@@ -422,10 +446,11 @@ Player.prototype = {
     _updateButtons: function() {
         this._mediaServer.getPlaybackStatus(Lang.bind(this,
             function(sender, status) {
-                if (status == "Playing")
+                if (status == "Playing") 
                     this._playButton.setIcon("media-playback-pause");
-                else if (status == "Paused" || status == "Stopped")
+                else if (status == "Paused" || status == "Stopped") 
                     this._playButton.setIcon("media-playback-start");
+                this._playerInfo.setImage("player-" + status.toLowerCase());
                 this._setName(status);
             }
         ));
@@ -526,7 +551,8 @@ Indicator.prototype = {
 // Put your extension initialization code here
 function main(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
-    default_cover = metadata.path + '/cover.png'
+    default_cover = metadata.path + '/cover.png';
+    icon_path = metadata.path + '/';
 
     Panel.STANDARD_TRAY_ICON_ORDER.unshift('player');
     Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['player'] = Indicator;
