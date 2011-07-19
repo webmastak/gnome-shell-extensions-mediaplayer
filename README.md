@@ -2,14 +2,16 @@
 
 gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRIS capable Mediaplayer.
 
-This extension will monitor DBus to look for active players automatically. Active players are shown automatically in the menu.
+This extension will monitor DBus to look for active players automatically. All active players are shown in the menu.
 
 Tested players :
 
 * Clementine
-* Banshee
-* Rhythmbox
+* Banshee (with MPRIS D-Bus interface plugin)
+* Rhythmbox (with MPRIS D-Bus interface plugin)
 * mpd (with mpDris2)
+* Pragha
+* Quod Libet (with MPRIS D-Bus interface plugin)
 
 ----
 
@@ -22,7 +24,7 @@ Tested players :
 
 ### Installation
 
-Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=50014)
+Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=49367) by Alucryd
 
 Manual installation :
 
