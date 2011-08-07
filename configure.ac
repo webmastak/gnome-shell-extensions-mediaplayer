@@ -1,6 +1,6 @@
 AC_PREREQ(2.63)
 dnl be carefull, the version needs to be in sync with your gnome shell version
-AC_INIT([gnome-shell-extension-mediaplayer],[3.0],[https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer])
+AC_INIT([gnome-shell-extension-mediaplayer],[0.1],[https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([config])

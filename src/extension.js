@@ -6,6 +6,7 @@ const DBus = imports.dbus;
 const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
+const Main = imports.ui.main;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
@@ -27,13 +28,6 @@ const PropIFace = {
     name: 'org.freedesktop.DBus.Properties',
     signals: [{ name: 'PropertiesChanged',
                 inSignature: 'a{sv}'}]
-};
-
-const NotificationIFace = {
-    name: 'org.freedesktop.Notifications',
-    methods: [{ name: 'Notify',
-                inSignature: 'susssasa{sv}i',
-                outSignature: 'u'}]
 };
 
 const MediaServer2PlayerIFace = {
@@ -108,13 +102,6 @@ DBus.proxifyPrototype(Monitor.prototype, MonitorIFace)
 function Notification() {
     this._init.apply(this, arguments);
 }
-
-Notification.prototype = {
-    _init: function() {
-        DBus.session.proxifyObject(this, 'org.freedesktop.Notifications', '/org/freedesktop/Notifications', this);
-    },
-}
-DBus.proxifyPrototype(Notification.prototype, NotificationIFace)
 
 function Prop() {
     this._init.apply(this, arguments);
@@ -305,7 +292,6 @@ Player.prototype = {
 
         this._mediaServer = new MediaServer2Player(name);
         this._prop = new Prop(name);
-        this._notif = new Notification();
 
         this._playerInfo = new TextImageMenuItem(this._getName(), false, "player-stopped", "left", "player");
         this.addMenuItem(this._playerInfo);
@@ -476,7 +462,12 @@ Indicator.prototype = {
         this.menu.connect('players-loaded', Lang.bind(this,
             function(sender, state) {
                 if (this._nbPlayers() == 0) {
-                    this.menu.addMenuItem(new PopupMenu.PopupMenuItem(_("No player running"), { reactive: false }));
+                    global.log("hide menu");
+                    this.actor.hide();
+                }
+                else {
+                    global.log("show menu");
+                    this.actor.show();
                 }
             }
         ));
@@ -511,6 +502,7 @@ Indicator.prototype = {
             this.menu.removeAll();
         this._players[name] = new Player(name);
         this.menu.addMenuItem(this._players[name]);
+        this.menu.emit('players-loaded', true);
     },
 
     _removePlayer: function(name) {
@@ -552,7 +544,7 @@ Indicator.prototype = {
 function main(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
     default_cover = metadata.path + '/cover.png';
-    icon_path = metadata.path + '/';
+    icon_path = metadata.path + '/icons/';
 
     Panel.STANDARD_TRAY_ICON_ORDER.unshift('player');
     Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['player'] = Indicator;
