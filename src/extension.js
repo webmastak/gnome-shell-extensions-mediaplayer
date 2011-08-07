@@ -462,11 +462,9 @@ Indicator.prototype = {
         this.menu.connect('players-loaded', Lang.bind(this,
             function(sender, state) {
                 if (this._nbPlayers() == 0) {
-                    global.log("hide menu");
                     this.actor.hide();
                 }
                 else {
-                    global.log("show menu");
                     this.actor.show();
                 }
             }
