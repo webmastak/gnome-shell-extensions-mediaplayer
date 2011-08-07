@@ -1,41 +1,47 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-08-07 13:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Jean-Philippe Braun <eon@patapon.info>\n"
-"Language-Team: Jean-Philippe Braun <eon@patapon.info>\n"
-"Language: French\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. dummy vars for translation
 #: ../src/extension.js:87
 msgid "Playing"
-msgstr "En cours"
+msgstr ""
 
 #: ../src/extension.js:88
 msgid "Paused"
-msgstr "En pause"
+msgstr ""
 
 #: ../src/extension.js:89
 msgid "Stopped"
-msgstr "Stoppé"
+msgstr ""
 
 #: ../src/extension.js:342
 msgid "Volume"
-msgstr "Volume"
+msgstr ""
 
 #: ../src/extension.js:386
 msgid "Unknown Artist"
-msgstr "Artiste inconnu"
+msgstr ""
 
 #: ../src/extension.js:390
 msgid "Unknown Album"
-msgstr "Album inconnu"
+msgstr ""
 
 #: ../src/extension.js:394
 msgid "Unknown Title"
-msgstr "Titre inconnu"
+msgstr ""
