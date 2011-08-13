@@ -185,8 +185,8 @@ function TrackInfo() {
 TrackInfo.prototype = {
     _init: function(label, icon) {
         this.actor = new St.BoxLayout({style_class: 'track-info'});
-        this.label = new St.Label({text: label.toString(), style_class: 'track-info-text'});
-        this.icon = new St.Icon({icon_name: icon.toString(), style_class: 'track-info-icon'});
+        this.label = new St.Label({text: label.toString()});
+        this.icon = new St.Icon({icon_name: icon.toString()});
         this.actor.add_actor(this.icon, { span: 0 });
         this.actor.add_actor(this.label, { span: -1 });
     },
@@ -238,14 +238,15 @@ TextImageMenuItem.prototype = {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.actor = new St.BoxLayout({style_class: style});
+        this.actor.add_style_pseudo_class('active');
         if (icon) {
-            this.icon = new St.Icon({icon_name: icon, style_class: style + '-icon'});
+            this.icon = new St.Icon({icon_name: icon});
         }
         if (image) {
-            this.icon = new St.Bin({style_class: style + '-icon'});
+            this.icon = new St.Bin();
             this.icon.set_child(this._getIconImage(image));
         }
-        this.text = new St.Label({text: text, style_class: style + '-name'});
+        this.text = new St.Label({text: text});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
             this.actor.add_actor(this.text, { span: -1 });
@@ -293,7 +294,7 @@ Player.prototype = {
         this._mediaServer = new MediaServer2Player(name);
         this._prop = new Prop(name);
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), false, "player-stopped", "left", "player");
+        this._playerInfo = new TextImageMenuItem(this._getName(), false, "player-stopped", "left", "popup-menu-item");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover'})
