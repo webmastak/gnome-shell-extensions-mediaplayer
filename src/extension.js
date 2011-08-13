@@ -30,6 +30,22 @@ const PropIFace = {
                 inSignature: 'a{sv}'}]
 };
 
+const MediaServer2IFace = {
+    name: 'org.mpris.MediaPlayer2',
+    methods: [{ name: 'Raise',
+                inSignature: '',
+                outSignature: '' },
+              { name: 'Quit',
+                inSignature: '',
+                outSignature: '' }],
+    properties: [{ name: 'CanRaise',
+                   signature: 'b',
+                   access: 'read'},
+                 { name: 'CanQuit',
+                   signature: 'b',
+                   access: 'read'}],
+};
+
 const MediaServer2PlayerIFace = {
     name: 'org.mpris.MediaPlayer2.Player',
     methods: [{ name: 'PlayPause',
@@ -99,10 +115,6 @@ Monitor.prototype = {
 }
 DBus.proxifyPrototype(Monitor.prototype, MonitorIFace)
 
-function Notification() {
-    this._init.apply(this, arguments);
-}
-
 function Prop() {
     this._init.apply(this, arguments);
 }
@@ -114,10 +126,28 @@ Prop.prototype = {
 }
 DBus.proxifyPrototype(Prop.prototype, PropIFace)
 
+function MediaServer2() {
+    this._init.apply(this, arguments);
+}
+
+MediaServer2.prototype = {
+    _init: function(player) {
+        DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.'+player, '/org/mpris/MediaPlayer2', this);
+    },
+    getRaise: function(callback) {
+        this.GetRemote('CanRaise', Lang.bind(this,
+            function(raise, ex) {
+                if (!ex)
+                    callback(this, raise);
+            }));
+    }
+}
+DBus.proxifyPrototype(MediaServer2.prototype, MediaServer2IFace)
 
 function MediaServer2Player() {
     this._init.apply(this, arguments);
 }
+
 MediaServer2Player.prototype = {
     _init: function(player) {
         DBus.session.proxifyObject(this, 'org.mpris.MediaPlayer2.'+player, '/org/mpris/MediaPlayer2', this);
@@ -291,7 +321,8 @@ Player.prototype = {
 
         this.name = name;
 
-        this._mediaServer = new MediaServer2Player(name);
+        this._mediaServerPlayer = new MediaServer2Player(name);
+        this._mediaServer = new MediaServer2(name);
         this._prop = new Prop(name);
 
         this._playerInfo = new TextImageMenuItem(this._getName(), false, "player-stopped", "left", "popup-menu-item");
@@ -323,27 +354,35 @@ Player.prototype = {
         infos.add_actor(this._title.getActor());
         this._trackInfos.set_child(infos);
 
-        let controls = new St.BoxLayout({style_class: 'playback-control'});
-        infos.add_actor(controls);
+        this.controls = new St.BoxLayout({style_class: 'playback-control'});
+        infos.add_actor(this.controls);
 
         this._prevButton = new ControlButton('media-skip-backward',
-            Lang.bind(this, function () { this._mediaServer.PreviousRemote(); }));
+            Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
         this._playButton = new ControlButton('media-playback-start',
-            Lang.bind(this, function () { this._mediaServer.PlayPauseRemote(); }));
+            Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
         this._stopButton = new ControlButton('media-playback-stop',
-            Lang.bind(this, function () { this._mediaServer.StopRemote(); }));
+            Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._nextButton = new ControlButton('media-skip-forward',
-            Lang.bind(this, function () { this._mediaServer.NextRemote(); }));
+            Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
 
-        controls.add_actor(this._prevButton.getActor());
-        controls.add_actor(this._playButton.getActor());
-        controls.add_actor(this._stopButton.getActor());
-        controls.add_actor(this._nextButton.getActor());
+        this.controls.add_actor(this._prevButton.getActor());
+        this.controls.add_actor(this._playButton.getActor());
+        this.controls.add_actor(this._stopButton.getActor());
+        this.controls.add_actor(this._nextButton.getActor());
+
+        this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
+            if (raise) {
+                this._raiseButton = new ControlButton('go-up',
+                    Lang.bind(this, function () { this._mediaServer.RaiseRemote(); }));
+                this.controls.add_actor(this._raiseButton.getActor());
+            }
+        }));
 
         this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", false, "right", "volume");
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
-            this._mediaServer.setVolume(item._value);
+            this._mediaServerPlayer.setVolume(item._value);
         }));
         this.addMenuItem(this._volumeInfo);
         this.addMenuItem(this._volume);
@@ -379,7 +418,7 @@ Player.prototype = {
     },
 
     _updateMetadata: function() {
-        this._mediaServer.getMetadata(Lang.bind(this,
+        this._mediaServerPlayer.getMetadata(Lang.bind(this,
             function(sender, metadata) {
                 if (metadata["xesam:artist"])
                     this._artist.setLabel(this._formatTrackInfo(metadata["xesam:artist"]));
@@ -415,7 +454,7 @@ Player.prototype = {
     },
 
     _updateVolume: function() {
-        this._mediaServer.getVolume(Lang.bind(this,
+        this._mediaServerPlayer.getVolume(Lang.bind(this,
             function(sender, volume) {
                 if (volume === 0)
                     this._volumeInfo.setIcon("audio-volume-muted");
@@ -431,7 +470,7 @@ Player.prototype = {
     },
 
     _updateButtons: function() {
-        this._mediaServer.getPlaybackStatus(Lang.bind(this,
+        this._mediaServerPlayer.getPlaybackStatus(Lang.bind(this,
             function(sender, status) {
                 if (status == "Playing") 
                     this._playButton.setIcon("media-playback-pause");
