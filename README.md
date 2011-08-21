@@ -18,7 +18,6 @@ Tested players :
 ### Screenshots
 
 ![Screenshot](gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
-![Screenshot](gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png)
 
 ----
 

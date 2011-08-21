@@ -13,17 +13,8 @@
     border: 1px solid white;
 }
 
-.button-icon {
+.button StIcon {
     icon-size: 1.4em;
-}
-
-.volume {
-    padding-left: 30px;
-}
-
-.volume StIcon {
-    icon-size: 1.14em;
-    padding-left: 8px;
 }
 
 .track-infos {
@@ -31,7 +22,7 @@
 }
 
 .track-info {
-    padding-bottom: 5px;
+    padding-bottom: 4px;
 }
 
 .track-info StIcon {
@@ -49,13 +40,16 @@
     padding-bottom: 10px;
 }
 
-.track-cover {
-    border: 1px solid #555;
-    padding: 3px;
-    max-width: 120px;
+.volume-menu-item {
+    padding: .4em 1.75em;
+}
+
+.volume-menu-item StIcon {
+    icon-size: 1.14em;
+    padding-left: 8px;
 }
 
 .playback-control {
-    padding-top: 10px;
+    padding-top: 5px;
+    padding-bottom: 10px;
 }
-
