@@ -12,6 +12,7 @@ Tested players :
 * mpd (with mpDris2)
 * Pragha
 * Quod Libet (with MPRIS D-Bus interface plugin)
+* Guayadeque 0.3.2
 
 ----
 
