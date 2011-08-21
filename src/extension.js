@@ -621,13 +621,17 @@ Indicator.prototype = {
 
     _init: function() {
         PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
+        // menu not showed by default
+        this.actor.hide();
         this._players = {};
+        // watch players
         for (var p=0; p<compatible_players.length; p++) {
             DBus.session.watch_name('org.mpris.MediaPlayer2.'+compatible_players[p], false,
                 Lang.bind(this, this._addPlayer),
                 Lang.bind(this, this._removePlayer)
             );
         }
+        // show players if any on signal
         this.menu.connect('players-loaded', Lang.bind(this,
             function(sender, state) {
                 if (this._nbPlayers() == 0)
