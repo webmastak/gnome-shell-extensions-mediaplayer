@@ -104,6 +104,7 @@ const MediaServer2PlayerIFace = {
 /* global values */
 let icon_path = null;
 let compatible_players = null;
+let support_seek = null;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
@@ -405,7 +406,7 @@ Player.prototype = {
         /*this.addMenuItem(this._trackPosition);*/
        
         /* this players don't support seek */
-        if (this._name == "pragha" || this._name == "quodlibet" || this._name == "mpd")
+        if (support_seek.indexOf(this._name) == -1)
             this._time.hide();
         this._getStatus();
         this._trackId = {};
@@ -664,6 +665,7 @@ function main(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
     icon_path = metadata.path + '/icons/';
     compatible_players = metadata.players;
+    support_seek = metadata.support_seek;
     Panel.STANDARD_TRAY_ICON_ORDER.unshift('mediaplayer');
     Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['mediaplayer'] = Indicator;
 }
