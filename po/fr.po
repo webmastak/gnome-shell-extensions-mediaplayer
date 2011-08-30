@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-07 13:36+0200\n"
+"POT-Creation-Date: 2011-08-30 09:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Jean-Philippe Braun <eon@patapon.info>\n"
 "Language-Team: Jean-Philippe Braun <eon@patapon.info>\n"
@@ -12,30 +12,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:87
+#: ../src/extension.js:109
 msgid "Playing"
 msgstr "En cours"
 
-#: ../src/extension.js:88
+#: ../src/extension.js:110
 msgid "Paused"
 msgstr "En pause"
 
-#: ../src/extension.js:89
+#: ../src/extension.js:111
 msgid "Stopped"
 msgstr "Stoppé"
 
-#: ../src/extension.js:342
+#: ../src/extension.js:394
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:386
+#: ../src/extension.js:476
 msgid "Unknown Artist"
 msgstr "Artiste inconnu"
 
-#: ../src/extension.js:390
+#: ../src/extension.js:480
 msgid "Unknown Album"
 msgstr "Album inconnu"
 
-#: ../src/extension.js:394
+#: ../src/extension.js:484
 msgid "Unknown Title"
 msgstr "Titre inconnu"
