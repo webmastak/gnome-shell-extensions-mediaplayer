@@ -663,13 +663,24 @@ Indicator.prototype = {
         }
         this.menu.emit('players-loaded', true);
     },
+
+    enable: function() {
+        Main.panel._rightBox.insert_actor(this.actor, 0);
+    },
+
+    disable: function() {
+        Main.panel._rightBox.remove_actor(this.actor);
+    }
 };
 
-function main(metadata) {
+function init(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
     icon_path = metadata.path + '/icons/';
     compatible_players = metadata.players;
     support_seek = metadata.support_seek;
-    Panel.STANDARD_TRAY_ICON_ORDER.unshift('mediaplayer');
-    Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['mediaplayer'] = Indicator;
+    return new Indicator();
 }
+
+function main(metadata) { 
+    init(metadata).enable(); 
+} 
