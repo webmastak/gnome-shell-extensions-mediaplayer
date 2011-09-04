@@ -13,6 +13,7 @@ Tested players :
 * Pragha
 * Quod Libet (with MPRIS D-Bus interface plugin)
 * Guayadeque 0.3.2
+* Amarok
 
 ----
 
