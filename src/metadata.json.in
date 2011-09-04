@@ -4,8 +4,8 @@
 "description": "Control MPRIS capable media players",
 "original-author": "eon@patapon.info",
 "shell-version": [ "3.1.90" ],
-"players": [ "clementine", "mpd", "banshee", "rhythmbox", "pragha", "quodlibet", "guayadeque" ],
-"support_seek": [ "clementine", "banshee", "rhythmbox", "quodlibet" ],
+"players": [ "clementine", "mpd", "banshee", "rhythmbox", "pragha", "quodlibet", "guayadeque", "amarok" ],
+"support_seek": [ "clementine", "banshee", "rhythmbox", "quodlibet", "amarok" ],
 "locale": "@LOCALEDIR@",
 "path": "@EXTENSIONDIR@",
 "url": "@URL@"
