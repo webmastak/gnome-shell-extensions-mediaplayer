@@ -5,7 +5,7 @@
 "original-author": "eon@patapon.info",
 "shell-version": [ "3.1.90" ],
 "players": [ "clementine", "mpd", "banshee", "rhythmbox", "pragha", "quodlibet", "guayadeque" ],
-"support_seek": [ "clementine", "banshee", "rhythmbox" ],
+"support_seek": [ "clementine", "banshee", "rhythmbox", "quodlibet" ],
 "locale": "@LOCALEDIR@",
 "path": "@EXTENSIONDIR@",
 "url": "@URL@"
