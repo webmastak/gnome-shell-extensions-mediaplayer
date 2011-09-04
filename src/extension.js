@@ -110,6 +110,7 @@ let x = _("Playing");
 x = _("Paused");
 x = _("Stopped");
 
+
 function Prop() {
     this._init.apply(this, arguments);
 }
@@ -606,7 +607,7 @@ Indicator.prototype = {
     __proto__: PanelMenu.SystemStatusButton.prototype,
 
     _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
+        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic');
         // menu not showed by default
         this.actor.hide();
         this._players = {};
@@ -650,13 +651,20 @@ Indicator.prototype = {
             this._addPlayer(owner);
         }
         this.menu.emit('players-loaded', true);
-    },
+    }
 };
 
-function main(metadata) {
+function init(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
     compatible_players = metadata.players;
     support_seek = metadata.support_seek;
-    Panel.STANDARD_TRAY_ICON_ORDER.unshift('mediaplayer');
-    Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['mediaplayer'] = Indicator;
+}
+
+function enable() {
+    indicator = new Indicator();
+    Main.panel.addToStatusArea('mediaplayer', indicator);
+}
+
+function disable() {
+    indicator.destroy();
 }
