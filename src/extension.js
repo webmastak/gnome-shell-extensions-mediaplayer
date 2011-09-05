@@ -102,15 +102,13 @@ const MediaServer2PlayerIFace = {
 };
 
 /* global values */
-let icon_path;
-let compatible_players;
-let support_seek;
-let indicator;
+let icon_path = null;
+let compatible_players = null;
+let support_seek = null;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
 x = _("Stopped");
-
 
 function Prop() {
     this._init.apply(this, arguments);
@@ -625,7 +623,7 @@ Indicator.prototype = {
     __proto__: PanelMenu.SystemStatusButton.prototype,
 
     _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic');
+        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
         // menu not showed by default
         this.actor.hide();
         this._players = {};
@@ -667,21 +665,14 @@ Indicator.prototype = {
             this._addPlayer(owner);
         }
         this.menu.emit('players-loaded', true);
-    }
+    },
 };
 
-function init(metadata) {
+function main(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
     icon_path = metadata.path + '/icons/';
     compatible_players = metadata.players;
     support_seek = metadata.support_seek;
-}
-
-function enable() {
-    indicator = new Indicator();
-    Main.panel.addToStatusArea('mediaplayer', indicator);
-}
-
-function disable() {
-    indicator.destroy();
+    Panel.STANDARD_TRAY_ICON_ORDER.unshift('mediaplayer');
+    Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['mediaplayer'] = Indicator;
 }
