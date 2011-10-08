@@ -451,7 +451,8 @@ Player.prototype = {
     _setPosition: function(sender, value) {
         this._stopTimer();
         this._currentTime = value / 1000000;
-        this._runTimer();
+        if (this._playerStatus == "Playing")
+            this._runTimer();
     },
 
     _getPosition: function() {
@@ -469,7 +470,8 @@ Player.prototype = {
                 this._songLength = metadata["mpris:length"] / 1000;
             // reset timer
             this._stopTimer();
-            this._runTimer();
+            if (this._playerStatus == "Playing")
+                this._runTimer();
         }
         else {
             this._songLength = 0;
