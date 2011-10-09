@@ -1,0 +1,47 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-08-30 09:37+0200\n"
+"PO-Revision-Date: 2011-10-08 23:02-0000\n"
+"Last-Translator: Yakir Sitbon <kingyes1@gmail.com>\n"
+"Language-Team: Yakir Sitbon <kingyes1@gmail.com>\n"
+"Language: Hebrew\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. dummy vars for translation
+#: ../src/extension.js:109
+msgid "Playing"
+msgstr "מתנגן"
+
+#: ../src/extension.js:110
+msgid "Paused"
+msgstr "הושהה"
+
+#: ../src/extension.js:111
+msgid "Stopped"
+msgstr "נעצר"
+
+#: ../src/extension.js:394
+msgid "Volume"
+msgstr "עוצמת קול"
+
+#: ../src/extension.js:476
+msgid "Unknown Artist"
+msgstr "אומן לא ידוע"
+
+#: ../src/extension.js:480
+msgid "Unknown Album"
+msgstr "אלבום לא ידוע"
+
+#: ../src/extension.js:484
+msgid "Unknown Title"
+msgstr "שיר לא ידוע"
+
