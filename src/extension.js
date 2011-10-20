@@ -599,17 +599,15 @@ Player.prototype = {
 
 }
 
-function Indicator() {
+function PlayerManager() {
     this._init.apply(this, arguments);
 }
 
-Indicator.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
+PlayerManager.prototype = {
 
-    _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic');
-        // menu not showed by default
-        this.actor.hide();
+    _init: function(menu) {
+        // the volume menu
+        this.menu = menu
         this._players = {};
         // watch players
         for (var p=0; p<compatible_players.length; p++) {
@@ -618,39 +616,23 @@ Indicator.prototype = {
                 Lang.bind(this, this._removePlayer)
             );
         }
-        // show players if any on signal
-        this.menu.connect('players-loaded', Lang.bind(this,
-            function(sender, state) {
-                if (this._nbPlayers() == 0)
-                    this.actor.hide();
-                else
-                    this.actor.show();
-            }
-        ));
-    },
-
-    _nbPlayers: function() {
-        return Object.keys(this._players).length;
     },
 
     _addPlayer: function(owner) {
-        // ensure menu is empty
-        if (this._nbPlayers() == 0)
-            this.menu.removeAll();
         this._players[owner] = new Player(owner);
-        if (this._nbPlayers() > 1)
-            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem())
-        this.menu.addMenuItem(this._players[owner]);
-        this.menu.emit('players-loaded', true);
+        this.menu.addMenuItem(this._players[owner], 3);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), 4)
     },
 
     _removePlayer: function(owner) {
+        this._players[owner].destroy();
         delete this._players[owner];
-        this.menu.removeAll();
+    },
+
+    destroy: function() {
         for (owner in this._players) {
-            this._addPlayer(owner);
+            this._players[owner].destroy();
         }
-        this.menu.emit('players-loaded', true);
     }
 };
 
@@ -661,10 +643,14 @@ function init(metadata) {
 }
 
 function enable() {
-    indicator = new Indicator();
-    Main.panel.addToStatusArea('mediaplayer', indicator);
+    // wait for the volume menu
+    while(Main.panel._statusArea['volume']) {
+        volumeMenu = Main.panel._statusArea['volume'].menu;
+        playerManager = new PlayerManager(volumeMenu);
+        break;
+    }
 }
 
 function disable() {
-    indicator.destroy();
+    playerManager.destroy();
 }
