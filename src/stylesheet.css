@@ -10,7 +10,7 @@
     padding: 7px;
 }
 .button:hover {
-    border: 1px solid white;
+    border: 1px solid #eee;
 }
 
 .button StIcon {
@@ -18,11 +18,11 @@
 }
 
 .track-infos {
-    padding-left: 10px;
+    padding-left: 5px;
 }
 
 .track-info {
-    padding-bottom: 4px;
+    height: 25px;
 }
 
 .track-info StIcon {
@@ -34,7 +34,7 @@
 }
 
 .track-box {
-    padding-top: 20px;
+    padding-top: 10px;
     padding-left: 30px;
     padding-right: 30px;
     padding-bottom: 10px;
@@ -52,4 +52,13 @@
 .playback-control {
     padding-top: 5px;
     padding-bottom: 10px;
+}
+
+.player-title {
+    padding: .4em 1.74em;
+}
+
+.player-title StIcon {
+    icon-size: 1.14em;
+    padding-right: .5em;
 }

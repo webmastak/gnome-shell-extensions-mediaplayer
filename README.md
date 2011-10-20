@@ -20,7 +20,7 @@ Tested players :
 ### Gnome Shell support
 
 * master supports gnome-shell 3.0.x
-* branch 3.2 supports gnome-shell 3.1.90
+* branch 3.2 supports gnome-shell > 3.1.90
 
 ----
 
@@ -33,6 +33,7 @@ Tested players :
 ### Installation
 
 Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=49367) by Alucryd
+Ubuntu [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
 
 Manual installation :
 
