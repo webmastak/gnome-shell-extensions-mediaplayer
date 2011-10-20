@@ -32,8 +32,8 @@ Tested players :
 
 ### Installation
 
-Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=49367) by Alucryd
-Ubuntu [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
+* Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=49367) by Alucryd
+* Ubuntu [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
 
 Manual installation :
 
