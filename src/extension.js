@@ -331,11 +331,11 @@ Player.prototype = {
         this._trackInfos = new St.Bin({style_class: 'track-infos'});
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
-        let mainBox = new St.BoxLayout({style_class: 'track-box'});
-        mainBox.add_actor(this._trackCover);
-        mainBox.add_actor(this._trackInfos);
+        this._mainBox = new St.BoxLayout({style_class: 'track-box'});
+        this._mainBox.add_actor(this._trackCover);
+        this._mainBox.add_actor(this._trackInfos);
 
-        this.addActor(mainBox);
+        this.addActor(this._mainBox);
 
         this.infos = new St.BoxLayout({vertical: true});
         this._artist = new TrackInfo(_('Unknown Artist'), "system-users");
@@ -373,13 +373,13 @@ Player.prototype = {
             }
         }));
 
-        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
+        /*this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.setVolume(item._value);
         }));
         this.addMenuItem(this._volumeInfo);
-        this.addMenuItem(this._volume);
+        this.addMenuItem(this._volume);*/
 
         /*this._trackPosition = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'position-slider'});
         this._trackPosition.connect('value-changed', Lang.bind(this, function(item) {
@@ -393,13 +393,13 @@ Player.prototype = {
         this._getStatus();
         this._trackId = {};
         this._getMetadata();
-        this._getVolume();
+        /*this._getVolume();*/
         this._currentTime = 0;
         this._getPosition();
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(sender, iface, value) {
-            if (value["Volume"])
-                this._setVolume(iface, value["Volume"]);
+            /*if (value["Volume"])
+                this._setVolume(iface, value["Volume"]);*/
             if (value["PlaybackStatus"])
                 this._setStatus(iface, value["PlaybackStatus"]);
             if (value["Metadata"])
@@ -526,6 +526,8 @@ Player.prototype = {
         if (status == "Playing") {
             this._playButton.setIcon("media-playback-pause");
             this._runTimer();
+            this._mainBox.show();
+            this._stopButton.actor.show()
         }
         else if (status == "Paused") {
             this._playButton.setIcon("media-playback-start");
@@ -534,6 +536,8 @@ Player.prototype = {
         else if (status == "Stopped") {
             this._playButton.setIcon("media-playback-start");
             this._stopTimer();
+            this._mainBox.hide();
+            this._stopButton.actor.hide()
         }
         /*this._playerInfo.setImage("player-" + status.toLowerCase());*/
         this._setName(status);
