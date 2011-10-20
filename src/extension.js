@@ -104,7 +104,8 @@ const MediaServer2PlayerIFace = {
 /* global values */
 let compatible_players;
 let support_seek;
-let indicator;
+let playerManager;
+let volumeMenu;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
@@ -281,11 +282,11 @@ function TextImageMenuItem() {
 TextImageMenuItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function(text, icon, align, style) {
+    _init: function(text, icon, type, align, style) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.actor = new St.BoxLayout({style_class: style});
-        this.icon = new St.Icon({icon_name: icon});
+        this.icon = new St.Icon({icon_name: icon, icon_type: type});
         this.text = new St.Label({text: text});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
@@ -322,7 +323,7 @@ Player.prototype = {
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), "audio-x-generic", "left", "player-title");
+        this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
@@ -372,7 +373,7 @@ Player.prototype = {
             }
         }));
 
-        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", "right", "volume-menu-item");
+        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.setVolume(item._value);
