@@ -273,6 +273,12 @@ ControlButton.prototype = {
     setIcon: function(icon) {
         this.icon.icon_name = icon;
     },
+    hide: function() {
+        this.actor.hide();
+    },
+    show: function() {
+        this.actor.show();
+    },
 }
 
 function TextImageMenuItem() {
@@ -544,11 +550,11 @@ Player.prototype = {
     _refreshStatus: function() {
         if (this._playerStatus == "Playing") {
             this._mainBox.show();
-            this._stopButton.actor.show()
+            this._stopButton.show()
         }
         else if (this._playerStatus == "Stopped") {
             this._mainBox.hide();
-            this._stopButton.actor.hide();
+            this._stopButton.hide();
         }
         this._setName(this._playerStatus);
     },
