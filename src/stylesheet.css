@@ -17,6 +17,10 @@
     icon-size: 16px;
 }
 
+.track-cover {
+    min-width: 120px;
+}
+
 .track-infos {
     padding-left: 5px;
 }
@@ -32,6 +36,7 @@
 .track-info StLabel {
     padding-left: 5px;
     font-size: 0.8em;
+    width: 10em;
 }
 
 .track-box {
