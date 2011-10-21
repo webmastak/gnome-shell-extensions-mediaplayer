@@ -625,8 +625,9 @@ PlayerManager.prototype = {
 
     _addPlayer: function(owner) {
         this._players[owner] = new Player(owner);
-        this.menu.addMenuItem(this._players[owner], 3);
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), 4)
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), this.menu.numMenuItems - 2)
+        this.menu.addMenuItem(this._players[owner], this.menu.numMenuItems - 2);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), this.menu.numMenuItems - 2)
     },
 
     _removePlayer: function(owner) {
