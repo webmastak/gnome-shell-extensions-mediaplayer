@@ -19,8 +19,8 @@ Tested players :
 
 ### Gnome Shell support
 
-* master supports gnome-shell 3.0.x
-* branch 3.2 supports gnome-shell > 3.1.90
+* master supports gnome-shell 3.2.X
+* branch gnome-shell-3.0 supports gnome-shell 3.0.X
 
 ----
 
