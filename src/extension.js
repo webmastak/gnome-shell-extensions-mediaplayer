@@ -526,8 +526,6 @@ Player.prototype = {
         if (status == "Playing") {
             this._playButton.setIcon("media-playback-pause");
             this._runTimer();
-            this._mainBox.show();
-            this._stopButton.actor.show()
         }
         else if (status == "Paused") {
             this._playButton.setIcon("media-playback-start");
@@ -536,11 +534,23 @@ Player.prototype = {
         else if (status == "Stopped") {
             this._playButton.setIcon("media-playback-start");
             this._stopTimer();
-            this._mainBox.hide();
-            this._stopButton.actor.hide()
         }
-        /*this._playerInfo.setImage("player-" + status.toLowerCase());*/
-        this._setName(status);
+        // Wait a little before changing the state
+        // Some players are sending the stopped signal
+        // when changing tracks
+        Mainloop.timeout_add(1000, Lang.bind(this, this._refreshStatus));
+    },
+
+    _refreshStatus: function() {
+        if (this._playerStatus == "Playing") {
+            this._mainBox.show();
+            this._stopButton.actor.show()
+        }
+        else if (this._playerStatus == "Stopped") {
+            this._mainBox.hide();
+            this._stopButton.actor.hide();
+        }
+        this._setName(this._playerStatus);
     },
 
     _getStatus: function() {
