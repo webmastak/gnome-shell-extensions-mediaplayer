@@ -102,9 +102,9 @@ const MediaServer2PlayerIFace = {
 };
 
 /* global values */
-let icon_path = null;
-let compatible_players = null;
-let support_seek = null;
+let compatible_players;
+let support_seek;
+let indicator;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
@@ -224,11 +224,11 @@ function TrackInfo() {
 
 TrackInfo.prototype = {
     _init: function(label, icon) {
-        this.actor = new St.BoxLayout({style_class: 'track-info'});
+        this.actor = new St.BoxLayout({vertical: false, style_class: 'track-info'});
         this.label = new St.Label({text: label.toString()});
         this.icon = new St.Icon({icon_name: icon.toString()});
-        this.actor.add_actor(this.icon, { span: 0 });
-        this.actor.add_actor(this.label, { span: -1 });
+        this.actor.add(this.icon, {y_align: St.Align.MIDDLE, y_fill: false});
+        this.actor.add(this.label, {y_align: St.Align.MIDDLE, y_fill: false});
     },
     getActor: function() {
         return this.actor;
@@ -280,18 +280,11 @@ function TextImageMenuItem() {
 TextImageMenuItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function(text, icon, image, align, style) {
+    _init: function(text, icon, align, style) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.actor = new St.BoxLayout({style_class: style});
-        this.actor.add_style_pseudo_class('active');
-        if (icon) {
-            this.icon = new St.Icon({icon_name: icon});
-        }
-        if (image) {
-            this.icon = new St.Bin();
-            this.icon.set_child(this._getIconImage(image));
-        }
+        this.icon = new St.Icon({icon_name: icon});
         this.text = new St.Label({text: text});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
@@ -310,19 +303,6 @@ TextImageMenuItem.prototype = {
     setIcon: function(icon) {
         this.icon.icon_name = icon;
     },
-
-    setImage: function(image) {
-        this.icon.set_child(this._getIconImage(image));
-    },
-
-    // retrieve an icon image
-    _getIconImage: function(icon_name) {
-         let icon_file = icon_path + icon_name + ".svg";
-         let file = Gio.file_new_for_path(icon_file);
-         let icon_uri = file.get_uri();
- 
-         return St.TextureCache.get_default().load_uri_sync(1, icon_uri, 16, 16);
-    },
 }
 
 function Player() {
@@ -331,7 +311,7 @@ function Player() {
 
 Player.prototype = {
     __proto__: PopupMenu.PopupMenuSection.prototype,
-    
+
     _init: function(owner) {
         PopupMenu.PopupMenuSection.prototype._init.call(this);
 
@@ -341,12 +321,12 @@ Player.prototype = {
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), false, "player-stopped", "left", "popup-menu-item");
+        this._playerInfo = new TextImageMenuItem(this._getName(), "audio-x-generic", "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
         this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
-        this._trackInfos = new St.Bin({style_class: 'track-infos', y_align: St.Align.MIDDLE});
+        this._trackInfos = new St.Bin({style_class: 'track-infos'});
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         let mainBox = new St.BoxLayout({style_class: 'track-box'});
@@ -360,10 +340,10 @@ Player.prototype = {
         this._album = new TrackInfo(_('Unknown Album'), "media-optical");
         this._title = new TrackInfo(_('Unknown Title'), "audio-x-generic");
         this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");
-        this.infos.add_actor(this._artist.getActor());
-        this.infos.add_actor(this._album.getActor());
-        this.infos.add_actor(this._title.getActor());
-        this.infos.add_actor(this._time.getActor());
+        this.infos.add(this._artist.getActor());
+        this.infos.add(this._album.getActor());
+        this.infos.add(this._title.getActor());
+        this.infos.add(this._time.getActor());
         this._trackInfos.set_child(this.infos);
 
         this._prevButton = new ControlButton('media-skip-backward',
@@ -391,7 +371,7 @@ Player.prototype = {
             }
         }));
 
-        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", false, "right", "volume-menu-item");
+        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", "right", "volume-menu-item");
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.setVolume(item._value);
@@ -404,7 +384,7 @@ Player.prototype = {
             this._mediaServerPlayer.SetPositionRemote(this._trackId, item._value * this._songLength);
         }));*/
         /*this.addMenuItem(this._trackPosition);*/
-       
+
         /* this players don't support seek */
         if (support_seek.indexOf(this._name) == -1)
             this._time.hide();
@@ -454,7 +434,7 @@ Player.prototype = {
     },
 
     _getPosition: function() {
-        this._mediaServerPlayer.getPosition(Lang.bind(this, 
+        this._mediaServerPlayer.getPosition(Lang.bind(this,
             this._setPosition
         ));
     },
@@ -508,6 +488,7 @@ Player.prototype = {
                 b.set_width(120);
                 b.add_actor(c);
                 this._trackCover.set_child(b);
+                /*this._trackCover.set_style('background-image: url("' + cover + '");');*/
             }
         }
         else
@@ -525,7 +506,7 @@ Player.prototype = {
             this._volumeInfo.setIcon("audio-volume-muted");
         if (value > 0)
             this._volumeInfo.setIcon("audio-volume-low");
-        if (value > 0.30) 
+        if (value > 0.30)
             this._volumeInfo.setIcon("audio-volume-medium");
         if (value > 0.80)
             this._volumeInfo.setIcon("audio-volume-high");
@@ -546,13 +527,13 @@ Player.prototype = {
         }
         else if (status == "Paused") {
             this._playButton.setIcon("media-playback-start");
-            this._pauseTimer(); 
+            this._pauseTimer();
         }
         else if (status == "Stopped") {
             this._playButton.setIcon("media-playback-start");
             this._stopTimer();
         }
-        this._playerInfo.setImage("player-" + status.toLowerCase());
+        /*this._playerInfo.setImage("player-" + status.toLowerCase());*/
         this._setName(status);
     },
 
@@ -579,7 +560,7 @@ Player.prototype = {
     _runTimer: function() {
         if (!Tweener.resumeTweens(this)) {
             Tweener.addTween(this,
-                { _currentTime: this._songLength, 
+                { _currentTime: this._songLength,
                   time: this._songLength - this._currentTime,
                   transition: 'linear',
                   onUpdate: Lang.bind(this, this._updateTimer) });
@@ -656,6 +637,8 @@ Indicator.prototype = {
         if (this._nbPlayers() == 0)
             this.menu.removeAll();
         this._players[owner] = new Player(owner);
+        if (this._nbPlayers() > 1)
+            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem())
         this.menu.addMenuItem(this._players[owner]);
         this.menu.emit('players-loaded', true);
     },
@@ -663,7 +646,7 @@ Indicator.prototype = {
     _removePlayer: function(owner) {
         delete this._players[owner];
         this.menu.removeAll();
-        for (owner in this._players) { 
+        for (owner in this._players) {
             this._addPlayer(owner);
         }
         this.menu.emit('players-loaded', true);
@@ -672,7 +655,6 @@ Indicator.prototype = {
 
 function main(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
-    icon_path = metadata.path + '/icons/';
     compatible_players = metadata.players;
     support_seek = metadata.support_seek;
     Panel.STANDARD_TRAY_ICON_ORDER.unshift('mediaplayer');

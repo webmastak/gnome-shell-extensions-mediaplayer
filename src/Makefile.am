@@ -4,7 +4,7 @@ topextensiondir = $(datadir)/gnome-shell/extensions
 extensiondir = $(topextensiondir)/$(uuid)
 uuid = mediaplayer@patapon.info
 
-nobase_dist_extension_DATA = extension.js stylesheet.css icons/*.svg
+nobase_dist_extension_DATA = extension.js stylesheet.css
 nodist_extension_DATA = metadata.json $(EXTRA_EXTENSION)
 
 EXTRA_DIST = metadata.json.in
