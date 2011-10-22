@@ -11,7 +11,7 @@ const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
-const Tweener = imports.tweener.tweener;
+//const Tweener = imports.tweener.tweener;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -394,7 +394,7 @@ Player.prototype = {
         /*this.addMenuItem(this._trackPosition);*/
 
         /* this players don't support seek */
-        if (support_seek.indexOf(this._name) == -1)
+        //if (support_seek.indexOf(this._name) == -1)
             this._time.hide();
         this._getStatus();
         this._trackId = {};
@@ -580,21 +580,21 @@ Player.prototype = {
     },
 
     _runTimer: function() {
-        if (!Tweener.resumeTweens(this)) {
+        /*if (!Tweener.resumeTweens(this)) {
             Tweener.addTween(this,
                 { _currentTime: this._songLength,
                   time: this._songLength - this._currentTime,
                   transition: 'linear',
                   onUpdate: Lang.bind(this, this._updateTimer) });
-        }
+        }*/
     },
 
     _pauseTimer: function() {
-        Tweener.pauseTweens(this);
+        //Tweener.pauseTweens(this);
     },
 
     _stopTimer: function() {
-        Tweener.removeTweens(this);
+        //Tweener.removeTweens(this);
         this._currentTime = 0;
         this._updateTimer();
     },
