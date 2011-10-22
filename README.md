@@ -1,8 +1,9 @@
 ## gnome-shell-extension-mediaplayer
 
-gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRIS capable Mediaplayer.
+gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRIS v2.1 capable Mediaplayer.
 
-This extension will monitor DBus to look for active players automatically. All active players are shown in the menu.
+This extension will monitor DBus to look for active players automatically (player names are referenced in the 
+metadata.json file). All active players are shown in the gnome-shell volume menu.
 
 Tested players :
 
