@@ -11,7 +11,7 @@ const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
-const Tweener = imports.ui.tweener;
+//const Tweener = imports.tweener.tweener;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -104,7 +104,8 @@ const MediaServer2PlayerIFace = {
 /* global values */
 let compatible_players;
 let support_seek;
-let indicator;
+let playerManager;
+let volumeMenu;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
@@ -272,6 +273,12 @@ ControlButton.prototype = {
     setIcon: function(icon) {
         this.icon.icon_name = icon;
     },
+    hide: function() {
+        this.actor.hide();
+    },
+    show: function() {
+        this.actor.show();
+    },
 }
 
 function TextImageMenuItem() {
@@ -281,11 +288,11 @@ function TextImageMenuItem() {
 TextImageMenuItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function(text, icon, align, style) {
+    _init: function(text, icon, type, align, style) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.actor = new St.BoxLayout({style_class: style});
-        this.icon = new St.Icon({icon_name: icon});
+        this.icon = new St.Icon({icon_name: icon, icon_type: type});
         this.text = new St.Label({text: text});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
@@ -322,7 +329,7 @@ Player.prototype = {
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), "audio-x-generic", "left", "player-title");
+        this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
@@ -330,11 +337,11 @@ Player.prototype = {
         this._trackInfos = new St.Bin({style_class: 'track-infos'});
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
-        let mainBox = new St.BoxLayout({style_class: 'track-box'});
-        mainBox.add_actor(this._trackCover);
-        mainBox.add_actor(this._trackInfos);
+        this._mainBox = new St.BoxLayout({style_class: 'track-box'});
+        this._mainBox.add_actor(this._trackCover);
+        this._mainBox.add_actor(this._trackInfos);
 
-        this.addActor(mainBox);
+        this.addActor(this._mainBox);
 
         this.infos = new St.BoxLayout({vertical: true});
         this._artist = new TrackInfo(_('Unknown Artist'), "system-users");
@@ -372,13 +379,13 @@ Player.prototype = {
             }
         }));
 
-        this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", "right", "volume-menu-item");
+        /*this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
         this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.setVolume(item._value);
         }));
         this.addMenuItem(this._volumeInfo);
-        this.addMenuItem(this._volume);
+        this.addMenuItem(this._volume);*/
 
         /*this._trackPosition = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'position-slider'});
         this._trackPosition.connect('value-changed', Lang.bind(this, function(item) {
@@ -387,18 +394,18 @@ Player.prototype = {
         /*this.addMenuItem(this._trackPosition);*/
 
         /* this players don't support seek */
-        if (support_seek.indexOf(this._name) == -1)
+        //if (support_seek.indexOf(this._name) == -1)
             this._time.hide();
         this._getStatus();
         this._trackId = {};
         this._getMetadata();
-        this._getVolume();
+        /*this._getVolume();*/
         this._currentTime = 0;
         this._getPosition();
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(sender, iface, value) {
-            if (value["Volume"])
-                this._setVolume(iface, value["Volume"]);
+            /*if (value["Volume"])
+                this._setVolume(iface, value["Volume"]);*/
             if (value["PlaybackStatus"])
                 this._setStatus(iface, value["PlaybackStatus"]);
             if (value["Metadata"])
@@ -534,8 +541,22 @@ Player.prototype = {
             this._playButton.setIcon("media-playback-start");
             this._stopTimer();
         }
-        /*this._playerInfo.setImage("player-" + status.toLowerCase());*/
-        this._setName(status);
+        // Wait a little before changing the state
+        // Some players are sending the stopped signal
+        // when changing tracks
+        Mainloop.timeout_add(1000, Lang.bind(this, this._refreshStatus));
+    },
+
+    _refreshStatus: function() {
+        if (this._playerStatus == "Playing") {
+            this._mainBox.show();
+            this._stopButton.show()
+        }
+        else if (this._playerStatus == "Stopped") {
+            this._mainBox.hide();
+            this._stopButton.hide();
+        }
+        this._setName(this._playerStatus);
     },
 
     _getStatus: function() {
@@ -559,21 +580,21 @@ Player.prototype = {
     },
 
     _runTimer: function() {
-        if (!Tweener.resumeTweens(this)) {
+        /*if (!Tweener.resumeTweens(this)) {
             Tweener.addTween(this,
                 { _currentTime: this._songLength,
                   time: this._songLength - this._currentTime,
                   transition: 'linear',
                   onUpdate: Lang.bind(this, this._updateTimer) });
-        }
+        }*/
     },
 
     _pauseTimer: function() {
-        Tweener.pauseTweens(this);
+        //Tweener.pauseTweens(this);
     },
 
     _stopTimer: function() {
-        Tweener.removeTweens(this);
+        //Tweener.removeTweens(this);
         this._currentTime = 0;
         this._updateTimer();
     },
@@ -599,17 +620,15 @@ Player.prototype = {
 
 }
 
-function Indicator() {
+function PlayerManager() {
     this._init.apply(this, arguments);
 }
 
-Indicator.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
+PlayerManager.prototype = {
 
-    _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic');
-        // menu not showed by default
-        this.actor.hide();
+    _init: function(menu) {
+        // the volume menu
+        this.menu = menu
         this._players = {};
         // watch players
         for (var p=0; p<compatible_players.length; p++) {
@@ -618,39 +637,24 @@ Indicator.prototype = {
                 Lang.bind(this, this._removePlayer)
             );
         }
-        // show players if any on signal
-        this.menu.connect('players-loaded', Lang.bind(this,
-            function(sender, state) {
-                if (this._nbPlayers() == 0)
-                    this.actor.hide();
-                else
-                    this.actor.show();
-            }
-        ));
-    },
-
-    _nbPlayers: function() {
-        return Object.keys(this._players).length;
     },
 
     _addPlayer: function(owner) {
-        // ensure menu is empty
-        if (this._nbPlayers() == 0)
-            this.menu.removeAll();
         this._players[owner] = new Player(owner);
-        if (this._nbPlayers() > 1)
-            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem())
-        this.menu.addMenuItem(this._players[owner]);
-        this.menu.emit('players-loaded', true);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), this.menu.numMenuItems - 2)
+        this.menu.addMenuItem(this._players[owner], this.menu.numMenuItems - 2);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), this.menu.numMenuItems - 2)
     },
 
     _removePlayer: function(owner) {
+        this._players[owner].destroy();
         delete this._players[owner];
-        this.menu.removeAll();
+    },
+
+    destroy: function() {
         for (owner in this._players) {
-            this._addPlayer(owner);
+            this._players[owner].destroy();
         }
-        this.menu.emit('players-loaded', true);
     }
 };
 
@@ -661,10 +665,14 @@ function init(metadata) {
 }
 
 function enable() {
-    indicator = new Indicator();
-    Main.panel.addToStatusArea('mediaplayer', indicator);
+    // wait for the volume menu
+    while(Main.panel._statusArea['volume']) {
+        volumeMenu = Main.panel._statusArea['volume'].menu;
+        playerManager = new PlayerManager(volumeMenu);
+        break;
+    }
 }
 
 function disable() {
-    indicator.destroy();
+    playerManager.destroy();
 }
