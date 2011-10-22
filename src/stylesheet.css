@@ -7,14 +7,14 @@
     height: 13px;
     border: 1px solid #555;
     border-radius: 4px;
-    padding: 5px;
+    padding: 6px;
 }
 .button:hover {
     border: 1px solid #eee;
 }
 
 .button StIcon {
-    icon-size: 16px;
+    icon-size: 22px;
 }
 
 .track-cover {
