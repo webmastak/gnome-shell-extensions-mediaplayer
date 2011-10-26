@@ -299,9 +299,9 @@ function TrackTitle() {
 TrackTitle.prototype = {
     _init: function(pattern, style) {
         this.label = new St.Label({style_class: style});
-        this.label.clutter_text.line_wrap = true;
+        /*this.label.clutter_text.line_wrap = true;
         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;*/
         this.text = pattern;
     },
 
@@ -337,7 +337,6 @@ Player.prototype = {
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
         this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
-        this._trackInfos = new St.Bin({style_class: 'track-infos', x_align: St.Align.START, y_align: St.Align.START, y_fill: true});
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         this._mainBox = new St.BoxLayout({style_class: 'track-box'});
@@ -351,12 +350,11 @@ Player.prototype = {
         this.trackAlbum.format([_('Unknown Album')]);
 
         /*this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");*/
-        this.infos = new St.BoxLayout({vertical: true, style_class: "infos"});
-        this.infos.add(this.trackTitle.label);
-        this.infos.add(this.trackArtist.label);
-        this.infos.add(this.trackAlbum.label);
-        this._trackInfos.set_child(this.infos);
-        this._mainBox.add_actor(this._trackInfos);
+        this.trackInfos = new St.BoxLayout({vertical: true, style_class: "track-infos"});
+        this.trackInfos.add(this.trackTitle.label);
+        this.trackInfos.add(this.trackArtist.label);
+        this.trackInfos.add(this.trackAlbum.label);
+        this._mainBox.add(this.trackInfos);
 
         this.addActor(this._mainBox);
 

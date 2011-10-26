@@ -41,19 +41,6 @@
     font-size: 0.8em;
 }
 
-.track-info {
-    height: 25px;
-}
-
-.track-info StIcon {
-    icon-size: 1em;
-}
-
-.track-info StLabel {
-    padding-left: 5px;
-    font-size: 0.9em;
-}
-
 .track-box {
     padding-top: 10px;
     padding-left: 30px;
