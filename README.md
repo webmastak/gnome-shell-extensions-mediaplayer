@@ -28,7 +28,7 @@ Tested players :
 
 ### Screenshots
 
-![Screenshot](gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
 
 ----
 
