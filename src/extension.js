@@ -344,9 +344,9 @@ Player.prototype = {
 
         this.trackTitle = new TrackTitle('%s', 'track-title');
         this.trackTitle.format([_('Unknown Title')]);
-        this.trackArtist = new TrackTitle('<span foreground="#ccc">' + _('by') +'</span> %s', 'track-artist');
+        this.trackArtist = new TrackTitle('<span foreground="#ccc">' + _("by") +'</span> %s', 'track-artist');
         this.trackArtist.format([_('Unknown Artist')]);
-        this.trackAlbum = new TrackTitle('<span foreground="#ccc">' + _('from') + '</span> %s', 'track-album');
+        this.trackAlbum = new TrackTitle('<span foreground="#ccc">' + _("from") + '</span> %s', 'track-album');
         this.trackAlbum.format([_('Unknown Album')]);
 
         /*this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");*/

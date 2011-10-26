@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-30 09:37+0200\n"
+"POT-Creation-Date: 2011-10-26 21:31+0200\n"
 "PO-Revision-Date: 2011-10-21 00:04+0200\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
@@ -19,27 +19,40 @@ msgstr ""
 "%100<10 || n%100>=20)) ? 1 : 2));\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:109
+#: ../src/extension.js:116
 msgid "Playing"
 msgstr "Odtwarzanie"
 
-#: ../src/extension.js:110
+#: ../src/extension.js:117
 msgid "Paused"
 msgstr "Wstrzymano"
 
-#: ../src/extension.js:111
+#: ../src/extension.js:118
 msgid "Stopped"
 msgstr "Zatrzymano"
 
-#: ../src/extension.js:394
+#: ../src/extension.js:122
+#, c-format
+msgid "Schema \"%s\" not found."
+msgstr ""
+
+#: ../src/extension.js:347
+msgid "by"
+msgstr ""
+
+#: ../src/extension.js:349
+msgid "from"
+msgstr ""
+
+#: ../src/extension.js:391
 msgid "Volume"
 msgstr "Głośność"
 
-#: ../src/extension.js:476
+#: ../src/extension.js:472
 msgid "Unknown Artist"
 msgstr "Nieznany wykonawca"
 
-#: ../src/extension.js:480
+#: ../src/extension.js:478
 msgid "Unknown Album"
 msgstr "Nieznany album"
 

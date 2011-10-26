@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-30 09:37+0200\n"
+"POT-Creation-Date: 2011-10-26 21:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Aries-Soft Roman aries-soft@mail.ru\n"
 "Language-Team: Aries-Soft Roman aries-soft@mail.ru\n"
@@ -12,27 +12,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:109
+#: ../src/extension.js:116
 msgid "Playing"
 msgstr "Проигрывается"
 
-#: ../src/extension.js:110
+#: ../src/extension.js:117
 msgid "Paused"
 msgstr "Пауза"
 
-#: ../src/extension.js:111
+#: ../src/extension.js:118
 msgid "Stopped"
 msgstr "Остановлено"
 
-#: ../src/extension.js:394
+#: ../src/extension.js:122
+#, c-format
+msgid "Schema \"%s\" not found."
+msgstr ""
+
+#: ../src/extension.js:347
+msgid "by"
+msgstr ""
+
+#: ../src/extension.js:349
+msgid "from"
+msgstr ""
+
+#: ../src/extension.js:391
 msgid "Volume"
 msgstr "Громкость"
 
-#: ../src/extension.js:476
+#: ../src/extension.js:472
 msgid "Unknown Artist"
 msgstr "Неизвестный артист"
 
-#: ../src/extension.js:480
+#: ../src/extension.js:478
 msgid "Unknown Album"
 msgstr "Неизвестный альбом"
 

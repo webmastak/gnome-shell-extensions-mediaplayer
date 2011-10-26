@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-30 09:37+0200\n"
+"POT-Creation-Date: 2011-10-26 21:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Jean-Philippe Braun <eon@patapon.info>\n"
 "Language-Team: Jean-Philippe Braun <eon@patapon.info>\n"
@@ -12,27 +12,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:109
+#: ../src/extension.js:116
 msgid "Playing"
 msgstr "En cours"
 
-#: ../src/extension.js:110
+#: ../src/extension.js:117
 msgid "Paused"
 msgstr "En pause"
 
-#: ../src/extension.js:111
+#: ../src/extension.js:118
 msgid "Stopped"
 msgstr "Stoppé"
 
-#: ../src/extension.js:394
+#: ../src/extension.js:122
+#, c-format
+msgid "Schema \"%s\" not found."
+msgstr "Schéma \"%s\" non trouvé."
+
+#: ../src/extension.js:347
+msgid "by"
+msgstr "par"
+
+#: ../src/extension.js:349
+msgid "from"
+msgstr "sur"
+
+#: ../src/extension.js:391
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:476
+#: ../src/extension.js:472
 msgid "Unknown Artist"
 msgstr "Artiste inconnu"
 
-#: ../src/extension.js:480
+#: ../src/extension.js:478
 msgid "Unknown Album"
 msgstr "Album inconnu"
 
