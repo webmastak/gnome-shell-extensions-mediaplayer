@@ -3,7 +3,7 @@
 gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRIS v2.1 capable Mediaplayer.
 
 This extension will monitor DBus to look for active players automatically (player names are referenced in the 
-metadata.json file). All active players are shown in the gnome-shell volume menu.
+metadata.json file). All active players are shown in the gnome-shell volume menu by default.
 
 Tested players :
 
@@ -20,14 +20,15 @@ Tested players :
 
 ### Gnome Shell support
 
-* master supports gnome-shell 3.2.X
+* master (stable branch)
+* devel (unstable branch)
 * branch gnome-shell-3.0 supports gnome-shell 3.0.X
 
 ----
 
 ### Screenshots
 
-![Screenshot](gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
+![Screenshot](gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
 
 ----
 
@@ -43,6 +44,18 @@ Manual installation :
     sudo make install
   
 That's it!
+
+----
+
+### Settings
+
+To show the extention in its own menu instead of the volume menu:
+
+```gsettings set org.gnome.shell.extensions.mediaplayer volumemenu false```
+
+To show the volume slider of the media player:
+
+```gsettings set org.gnome.shell.extensions.mediaplayer volume true```
 
 ----
 
