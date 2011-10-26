@@ -7,11 +7,12 @@ const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
 const Main = imports.ui.main;
+const Pango = imports.gi.Pango;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
-//const Tweener = imports.tweener.tweener;
+const Tweener = imports.ui.tweener;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -220,35 +221,6 @@ MediaServer2Player.prototype = {
 }
 DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
 
-function TrackInfo() {
-    this._init.apply(this, arguments);
-}
-
-TrackInfo.prototype = {
-    _init: function(label, icon) {
-        this.actor = new St.BoxLayout({vertical: false, style_class: 'track-info'});
-        this.label = new St.Label({text: label.toString()});
-        this.icon = new St.Icon({icon_name: icon.toString()});
-        this.actor.add(this.icon, {y_align: St.Align.MIDDLE, y_fill: false});
-        this.actor.add(this.label, {y_align: St.Align.MIDDLE, y_fill: false});
-    },
-    getActor: function() {
-        return this.actor;
-    },
-    setLabel: function(label) {
-        this.label.text = label;
-    },
-    getLabel: function() {
-        return this.label.text.toString();
-    },
-    hide: function() {
-        this.actor.hide();
-    },
-    show: function() {
-        this.actor.show();
-    },
-};
-
 function ControlButton() {
     this._init.apply(this, arguments);
 }
@@ -313,6 +285,27 @@ TextImageMenuItem.prototype = {
     },
 }
 
+function TrackTitle() {
+    this._init.apply(this, arguments);
+}
+
+TrackTitle.prototype = {
+    _init: function(pattern, style) {
+        this.label = new St.Label({style_class: style});
+        this.label.clutter_text.line_wrap = true;
+        this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.text = pattern;
+    },
+
+    format: function(values) {
+        for (let i=0; i<values.length; i++) {
+            values[i] = GLib.markup_escape_text(values[i].toString(), -1);
+        }
+        this.label.clutter_text.set_markup(this.text.format(values));
+    }
+}
+
 function Player() {
     this._init.apply(this, arguments);
 }
@@ -334,25 +327,28 @@ Player.prototype = {
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
         this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
-        this._trackInfos = new St.Bin({style_class: 'track-infos'});
+        this._trackInfos = new St.Bin({style_class: 'track-infos', x_align: St.Align.START, y_align: St.Align.START, y_fill: true});
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         this._mainBox = new St.BoxLayout({style_class: 'track-box'});
         this._mainBox.add_actor(this._trackCover);
+
+        this.trackTitle = new TrackTitle('%s', 'track-title');
+        this.trackTitle.format([_('Unknown Title')]);
+        this.trackArtist = new TrackTitle('<span foreground="#ccc">' + _('by') +'</span> %s', 'track-artist');
+        this.trackArtist.format([_('Unknown Artist')]);
+        this.trackAlbum = new TrackTitle('<span foreground="#ccc">' + _('from') + '</span> %s', 'track-album');
+        this.trackAlbum.format([_('Unknown Album')]);
+
+        /*this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");*/
+        this.infos = new St.BoxLayout({vertical: true, style_class: "infos"});
+        this.infos.add(this.trackTitle.label);
+        this.infos.add(this.trackArtist.label);
+        this.infos.add(this.trackAlbum.label);
+        this._trackInfos.set_child(this.infos);
         this._mainBox.add_actor(this._trackInfos);
 
         this.addActor(this._mainBox);
-
-        this.infos = new St.BoxLayout({vertical: true});
-        this._artist = new TrackInfo(_('Unknown Artist'), "system-users");
-        this._album = new TrackInfo(_('Unknown Album'), "media-optical");
-        this._title = new TrackInfo(_('Unknown Title'), "audio-x-generic");
-        this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");
-        this.infos.add(this._artist.getActor());
-        this.infos.add(this._album.getActor());
-        this.infos.add(this._title.getActor());
-        this.infos.add(this._time.getActor());
-        this._trackInfos.set_child(this.infos);
 
         this._prevButton = new ControlButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
@@ -374,7 +370,11 @@ Player.prototype = {
         this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
             if (raise) {
                 this._raiseButton = new ControlButton('go-up',
-                    Lang.bind(this, function () { this._mediaServer.RaiseRemote(); }));
+                    Lang.bind(this, function () { 
+                        this._mediaServer.RaiseRemote();
+                        volumeMenu.close();
+                    })
+                );
                 this.controls.add_actor(this._raiseButton.getActor());
             }
         }));
@@ -394,8 +394,8 @@ Player.prototype = {
         /*this.addMenuItem(this._trackPosition);*/
 
         /* this players don't support seek */
-        //if (support_seek.indexOf(this._name) == -1)
-            this._time.hide();
+        /*if (support_seek.indexOf(this._name) == -1)
+            this._time.hide();*/
         this._getStatus();
         this._trackId = {};
         this._getMetadata();
@@ -424,14 +424,6 @@ Player.prototype = {
 
     _setName: function(status) {
         this._playerInfo.setText(this._getName() + " - " + _(status));
-    },
-
-    _formatTrackInfo: function(text) {
-        text = text.toString();
-        if (text.length > 25) {
-            text = text.substr(0, 25) + "...";
-        }
-        return text;
     },
 
     _setPosition: function(sender, value) {
@@ -463,18 +455,24 @@ Player.prototype = {
             this._songLength = 0;
             this._stopTimer();
         }
-        if (metadata["xesam:artist"])
-            this._artist.setLabel(this._formatTrackInfo(metadata["xesam:artist"]));
-        else
-            this._artist.setLabel(_("Unknown Artist"));
-        if (metadata["xesam:album"])
-            this._album.setLabel(this._formatTrackInfo(metadata["xesam:album"]));
-        else
-            this._album.setLabel(_("Unknown Album"));
-        if (metadata["xesam:title"])
-            this._title.setLabel(this._formatTrackInfo(metadata["xesam:title"]));
-        else
-            this._title.setLabel(_("Unknown Title"));
+        if (metadata["xesam:artist"]) {
+            this.trackArtist.format([metadata["xesam:artist"]]);
+        }
+        else {
+            this.trackArtist.format([_("Unknown Artist")]);
+        }
+        if (metadata["xesam:album"]) {
+            this.trackAlbum.format([metadata["xesam:album"]]);
+        }
+        else {
+            this.trackAlbum.format([_("Unknown Album")]);
+        }
+        if (metadata["xesam:title"]) {
+            this.trackTitle.format([metadata["xesam:title"]]);
+        }
+        else {
+            this.trackTitle.format([_("Unknown Title")]);
+        }
         /*if (metadata["mpris:trackid"]) {
             this._trackId = {
                 _init: function() {
@@ -487,20 +485,23 @@ Player.prototype = {
             let cover = metadata["mpris:artUrl"].toString();
             cover = decodeURIComponent(cover.substr(7));
             if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
-                this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
+                this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
             else {
                 let l = new Clutter.BinLayout();
                 let b = new Clutter.Box();
-                let c = new Clutter.Texture({height: 100, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
+                let c = new Clutter.Texture({height: 70, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
                 b.set_layout_manager(l);
                 b.set_width(120);
                 b.add_actor(c);
                 this._trackCover.set_child(b);
-                /*this._trackCover.set_style('background-image: url("' + cover + '");');*/
+                Tweener.addTween(this._trackCover, { opacity: 255,
+                    time: 1,
+                    transition: 'easeOutQuad'
+                });
             }
         }
         else
-            this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
+            this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
     },
 
     _getMetadata: function() {
@@ -572,7 +573,7 @@ Player.prototype = {
     },
 
     _updateTimer: function() {
-        this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));
+        /*this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
         /*if (this._currentTime > 0)
             this._trackPosition.setValue(this._currentTime / this._songLength);
         else
