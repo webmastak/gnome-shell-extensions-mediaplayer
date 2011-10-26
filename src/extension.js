@@ -17,6 +17,10 @@ const Tweener = imports.ui.tweener;
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
 
+const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
+const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
+const MEDIAPLAYER_VOLUME_KEY = 'volume';
+
 const PropIFace = {
     name: 'org.freedesktop.DBus.Properties',
     signals: [{ name: 'PropertiesChanged',
@@ -103,15 +107,21 @@ const MediaServer2PlayerIFace = {
 };
 
 /* global values */
+let settings;
 let compatible_players;
 let support_seek;
 let playerManager;
-let volumeMenu;
+let mediaplayerMenu;
 /* dummy vars for translation */
 let x = _("Playing");
 x = _("Paused");
 x = _("Stopped");
 
+function getSettings(schema) {
+    if (Gio.Settings.list_schemas().indexOf(schema) == -1)
+        throw _("Schema \"%s\" not found.").format(schema);
+    return new Gio.Settings({ schema: schema });
+}
 
 function Prop() {
     this._init.apply(this, arguments);
@@ -262,7 +272,6 @@ TextImageMenuItem.prototype = {
 
     _init: function(text, icon, type, align, style) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
-
         this.actor = new St.BoxLayout({style_class: style});
         this.icon = new St.Icon({icon_name: icon, icon_type: type});
         this.text = new St.Label({text: text});
@@ -275,14 +284,12 @@ TextImageMenuItem.prototype = {
             this.actor.add_actor(this.icon, { span: -1 });
         }
     },
-
     setText: function(text) {
         this.text.text = text;
     },
-
     setIcon: function(icon) {
         this.icon.icon_name = icon;
-    },
+    }
 }
 
 function TrackTitle() {
@@ -321,6 +328,9 @@ Player.prototype = {
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
+        this._settings = settings;
+        
+        this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
 
         this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
@@ -372,20 +382,22 @@ Player.prototype = {
                 this._raiseButton = new ControlButton('go-up',
                     Lang.bind(this, function () { 
                         this._mediaServer.RaiseRemote();
-                        volumeMenu.close();
+                        mediaplayerMenu.menu.close();
                     })
                 );
                 this.controls.add_actor(this._raiseButton.getActor());
             }
         }));
 
-        /*this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
-        this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
-        this._volume.connect('value-changed', Lang.bind(this, function(item) {
-            this._mediaServerPlayer.setVolume(item._value);
-        }));
-        this.addMenuItem(this._volumeInfo);
-        this.addMenuItem(this._volume);*/
+        if (this.showVolume) {
+            this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
+            this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
+            this._volume.connect('value-changed', Lang.bind(this, function(item) {
+                this._mediaServerPlayer.setVolume(item._value);
+            }));
+            this.addMenuItem(this._volumeInfo);
+            this.addMenuItem(this._volume);
+        }
 
         /*this._trackPosition = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'position-slider'});
         this._trackPosition.connect('value-changed', Lang.bind(this, function(item) {
@@ -399,13 +411,13 @@ Player.prototype = {
         this._getStatus();
         this._trackId = {};
         this._getMetadata();
-        /*this._getVolume();*/
+        this._getVolume();
         this._currentTime = 0;
         this._getPosition();
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(sender, iface, value) {
-            /*if (value["Volume"])
-                this._setVolume(iface, value["Volume"]);*/
+            if (value["Volume"])
+                this._setVolume(iface, value["Volume"]);
             if (value["PlaybackStatus"])
                 this._setStatus(iface, value["PlaybackStatus"]);
             if (value["Metadata"])
@@ -511,15 +523,17 @@ Player.prototype = {
     },
 
     _setVolume: function(sender, value) {
-        if (value === 0)
-            this._volumeInfo.setIcon("audio-volume-muted");
-        if (value > 0)
-            this._volumeInfo.setIcon("audio-volume-low");
-        if (value > 0.30)
-            this._volumeInfo.setIcon("audio-volume-medium");
-        if (value > 0.80)
-            this._volumeInfo.setIcon("audio-volume-high");
-        this._volume.setValue(value);
+        if (this.showVolume) {
+            if (value === 0)
+                this._volumeInfo.setIcon("audio-volume-muted");
+            if (value > 0)
+                this._volumeInfo.setIcon("audio-volume-low");
+            if (value > 0.30)
+                this._volumeInfo.setIcon("audio-volume-medium");
+            if (value > 0.80)
+                this._volumeInfo.setIcon("audio-volume-high");
+            this._volume.setValue(value);
+        }
     },
 
     _getVolume: function() {
@@ -629,7 +643,7 @@ PlayerManager.prototype = {
 
     _init: function(menu) {
         // the volume menu
-        this.menu = menu
+        this.menu = menu.menu
         this._players = {};
         // watch players
         for (var p=0; p<compatible_players.length; p++) {
@@ -641,10 +655,14 @@ PlayerManager.prototype = {
     },
 
     _addPlayer: function(owner) {
+        let position;
         this._players[owner] = new Player(owner);
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), this.menu.numMenuItems - 2)
-        this.menu.addMenuItem(this._players[owner], this.menu.numMenuItems - 2);
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), this.menu.numMenuItems - 2)
+        if (this.menu.numMenuItems > 2)
+            position = this.menu.numMenuItems - 2;
+        else
+            position = 0;
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
+        this.menu.addMenuItem(this._players[owner], position);
     },
 
     _removePlayer: function(owner) {
@@ -657,23 +675,46 @@ PlayerManager.prototype = {
             this._players[owner].destroy();
         }
     }
-};
+}
+
+function PlayerMenu() {
+    this._init.apply(this, arguments);
+}
+
+PlayerMenu.prototype = {
+    __proto__: PanelMenu.SystemStatusButton.prototype,
+
+    _init: function() {
+        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
+    }
+}
 
 function init(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
+    settings = getSettings(MEDIAPLAYER_SETTINGS_SCHEMA);
     compatible_players = metadata.players;
     support_seek = metadata.support_seek;
 }
 
 function enable() {
-    // wait for the volume menu
-    while(Main.panel._statusArea['volume']) {
-        volumeMenu = Main.panel._statusArea['volume'].menu;
-        playerManager = new PlayerManager(volumeMenu);
-        break;
+    if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY)) {
+        // wait for the volume menu
+        while(Main.panel._statusArea['volume']) {
+            mediaplayerMenu = Main.panel._statusArea['volume'];
+            break;
+        }
     }
+    else {
+        mediaplayerMenu = new PlayerMenu();
+        Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
+    }    
+    playerManager = new PlayerManager(mediaplayerMenu);
 }
 
 function disable() {
     playerManager.destroy();
+    if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY)) {
+        mediaplayerMenu.destroy();
+    }
 }
+

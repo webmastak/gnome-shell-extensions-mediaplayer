@@ -1,0 +1,14 @@
+<schemalist gettext-domain="gnome-shell-extension-mediaplayer">
+  <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
+    <key name="volumemenu" type="b">
+        <default>true</default>
+        <_summary>Whether to show the mediaplayer controls in the volume menu</_summary>
+        <_description>Whether to show the mediaplayer controls in the volume menu (requires restart).</_description>
+    </key>
+    <key name="volume" type="b">
+        <default>false</default>
+        <_summary>Whether to show the volume control of the mediaplayers</_summary>
+        <_description>Whether to show the volume control of the mediaplayers (requires mediaplayer restart).</_description>
+    </key>
+  </schema>
+</schemalist>
