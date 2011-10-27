@@ -335,12 +335,12 @@ Player.prototype = {
         this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
-        this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE, y_align: St.Align.START});
-        this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
+        this.trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE, y_align: St.Align.START});
+        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         this._mainBox = new St.BoxLayout({style_class: 'track-box'});
-        this._mainBox.add_actor(this._trackCover);
+        this._mainBox.add_actor(this.trackCover);
 
         this.trackTitle = new TrackTitle('%s', 'track-title');
         this.trackTitle.format([_('Unknown Title')]);
@@ -491,27 +491,36 @@ Player.prototype = {
             }
         }*/
 
-        if (metadata["mpris:artUrl"]) {
-            let cover = metadata["mpris:artUrl"].toString();
-            cover = decodeURIComponent(cover.substr(7));
-            if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
-                this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
-            else {
-                let l = new Clutter.BinLayout();
-                let b = new Clutter.Box();
-                let c = new Clutter.Texture({height: 70, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
-                b.set_layout_manager(l);
-                b.set_width(120);
-                b.add_actor(c);
-                this._trackCover.set_child(b);
-                Tweener.addTween(this._trackCover, { opacity: 255,
-                    time: 1,
-                    transition: 'easeOutQuad'
+        // Hide the old cover
+        Tweener.addTween(this.trackCover, { opacity: 0,
+            time: 0.3,
+            transition: 'easeOutCubic',
+            onComplete: Lang.bind(this, function() {
+                // Change cover
+                if (metadata["mpris:artUrl"]) {
+                    let cover = metadata["mpris:artUrl"].toString();
+                    cover = decodeURIComponent(cover.substr(7));
+                    if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
+                        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
+                    else {
+                        let l = new Clutter.BinLayout();
+                        let b = new Clutter.Box();
+                        let c = new Clutter.Texture({height: 70, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
+                        b.set_layout_manager(l);
+                        b.set_width(80);
+                        b.add_actor(c);
+                        this.trackCover.set_child(b);
+                    }
+                }
+                else
+                    this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
+                // Show the new cover
+                Tweener.addTween(this.trackCover, { opacity: 255,
+                    time: 0.3,
+                    transition: 'easeInCubic'
                 });
-            }
-        }
-        else
-            this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
+            })
+        });
     },
 
     _getMetadata: function() {
