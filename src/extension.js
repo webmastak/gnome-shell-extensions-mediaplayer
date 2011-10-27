@@ -299,9 +299,9 @@ function TrackTitle() {
 TrackTitle.prototype = {
     _init: function(pattern, style) {
         this.label = new St.Label({style_class: style});
-        /*this.label.clutter_text.line_wrap = true;
+        this.label.clutter_text.line_wrap = true;
         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;*/
+        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.text = pattern;
     },
 
@@ -335,7 +335,7 @@ Player.prototype = {
         this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
-        this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
+        this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE, y_align: St.Align.START});
         this._trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
@@ -350,10 +350,10 @@ Player.prototype = {
         this.trackAlbum.format([_('Unknown Album')]);
 
         /*this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");*/
-        this.trackInfos = new St.BoxLayout({vertical: true, style_class: "track-infos"});
-        this.trackInfos.add(this.trackTitle.label);
-        this.trackInfos.add(this.trackArtist.label);
-        this.trackInfos.add(this.trackAlbum.label);
+        this.trackInfos = new St.Table({style_class: "track-infos"});
+        this.trackInfos.add(this.trackTitle.label, {row: 0, col: 1, y_expand: false});
+        this.trackInfos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
+        this.trackInfos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
         this._mainBox.add(this.trackInfos);
 
         this.addActor(this._mainBox);

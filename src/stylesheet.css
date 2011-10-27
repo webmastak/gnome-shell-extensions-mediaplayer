@@ -19,26 +19,28 @@
 
 .track-cover {
     width: 80px;
+    padding-top: 3px;
 }
 
 .track-infos {
     width: 15em;
-    padding-left: 5px;
+    padding-left: 7px;
 }
 
 .track-title {
+    padding: 0;
     font-weight: bold;
     font-size: 1.1em;
 }
 
 .track-artist {
-    padding-top: 3px;
+    padding-top: 2px;
     font-size: 0.9em;
 }
 
 .track-album {
-    padding-top: 3px;
-    font-size: 0.8em;
+    padding-top: 2px;
+    font-size: 0.9em;
 }
 
 .track-box {
