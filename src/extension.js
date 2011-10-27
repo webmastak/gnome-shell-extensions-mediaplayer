@@ -13,6 +13,7 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
+const LoginDialog = imports.gdm.loginDialog;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -20,6 +21,8 @@ const _ = Gettext.gettext;
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
+
+const COVER_SIZE = 70;
 
 const PropIFace = {
     name: 'org.freedesktop.DBus.Properties',
@@ -336,10 +339,12 @@ Player.prototype = {
         this.addMenuItem(this._playerInfo);
 
         this.trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE, y_align: St.Align.START});
-        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 100, icon_type: St.IconType.FULLCOLOR}));
+        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE, icon_type: St.IconType.FULLCOLOR}));
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         this._mainBox = new St.BoxLayout({style_class: 'track-box'});
+        this._mainBox.opacity = 0;
+        this._mainBox.set_height(0);
         this._mainBox.add_actor(this.trackCover);
 
         this.trackTitle = new TrackTitle('%s', 'track-title');
@@ -364,6 +369,7 @@ Player.prototype = {
             Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
         this._stopButton = new ControlButton('media-playback-stop',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
+        this._stopButton.hide();
         this._nextButton = new ControlButton('media-skip-forward',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
 
@@ -450,77 +456,79 @@ Player.prototype = {
     },
 
     _setMetadata: function(sender, metadata) {
-        if (metadata["mpris:length"]) {
-            // song length in secs
-            this._songLength = metadata["mpris:length"] / 1000000;
-            // FIXME upstream
-            if (this._name == "quodlibet")
-                this._songLength = metadata["mpris:length"] / 1000;
-            // reset timer
-            this._stopTimer();
-            if (this._playerStatus == "Playing")
-                this._runTimer();
-        }
-        else {
-            this._songLength = 0;
-            this._stopTimer();
-        }
-        if (metadata["xesam:artist"]) {
-            this.trackArtist.format([metadata["xesam:artist"]]);
-        }
-        else {
-            this.trackArtist.format([_("Unknown Artist")]);
-        }
-        if (metadata["xesam:album"]) {
-            this.trackAlbum.format([metadata["xesam:album"]]);
-        }
-        else {
-            this.trackAlbum.format([_("Unknown Album")]);
-        }
-        if (metadata["xesam:title"]) {
-            this.trackTitle.format([metadata["xesam:title"]]);
-        }
-        else {
-            this.trackTitle.format([_("Unknown Title")]);
-        }
-        /*if (metadata["mpris:trackid"]) {
-            this._trackId = {
-                _init: function() {
-                    DBus.session.proxifyObject(this, this._owner, metadata["mpris:trackid"]);
-                }
+        if (Object.keys(metadata).length > 0) {
+            if (metadata["mpris:length"]) {
+                // song length in secs
+                this._songLength = metadata["mpris:length"] / 1000000;
+                // FIXME upstream
+                if (this._name == "quodlibet")
+                    this._songLength = metadata["mpris:length"] / 1000;
+                // reset timer
+                this._stopTimer();
+                if (this._playerStatus == "Playing")
+                    this._runTimer();
             }
-        }*/
-
-        // Hide the old cover
-        Tweener.addTween(this.trackCover, { opacity: 0,
-            time: 0.3,
-            transition: 'easeOutCubic',
-            onComplete: Lang.bind(this, function() {
-                // Change cover
-                if (metadata["mpris:artUrl"]) {
-                    let cover = metadata["mpris:artUrl"].toString();
-                    cover = decodeURIComponent(cover.substr(7));
-                    if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
-                        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
-                    else {
-                        let l = new Clutter.BinLayout();
-                        let b = new Clutter.Box();
-                        let c = new Clutter.Texture({height: 70, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
-                        b.set_layout_manager(l);
-                        b.set_width(80);
-                        b.add_actor(c);
-                        this.trackCover.set_child(b);
+            else {
+                this._songLength = 0;
+                this._stopTimer();
+            }
+            if (metadata["xesam:artist"]) {
+                this.trackArtist.format([metadata["xesam:artist"]]);
+            }
+            else {
+                this.trackArtist.format([_("Unknown Artist")]);
+            }
+            if (metadata["xesam:album"]) {
+                this.trackAlbum.format([metadata["xesam:album"]]);
+            }
+            else {
+                this.trackAlbum.format([_("Unknown Album")]);
+            }
+            if (metadata["xesam:title"]) {
+                this.trackTitle.format([metadata["xesam:title"]]);
+            }
+            else {
+                this.trackTitle.format([_("Unknown Title")]);
+            }
+            /*if (metadata["mpris:trackid"]) {
+                this._trackId = {
+                    _init: function() {
+                        DBus.session.proxifyObject(this, this._owner, metadata["mpris:trackid"]);
                     }
                 }
-                else
-                    this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 70, icon_type: St.IconType.FULLCOLOR}));
-                // Show the new cover
-                Tweener.addTween(this.trackCover, { opacity: 255,
-                    time: 0.3,
-                    transition: 'easeInCubic'
-                });
-            })
-        });
+            }*/
+
+            // Hide the old cover
+            Tweener.addTween(this.trackCover, { opacity: 0,
+                time: 0.3,
+                transition: 'easeOutCubic',
+                onComplete: Lang.bind(this, function() {
+                    // Change cover
+                    if (metadata["mpris:artUrl"]) {
+                        let cover = metadata["mpris:artUrl"].toString();
+                        cover = decodeURIComponent(cover.substr(7));
+                        if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
+                            this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE, icon_type: St.IconType.FULLCOLOR}));
+                        else {
+                            let l = new Clutter.BinLayout();
+                            let b = new Clutter.Box();
+                            let c = new Clutter.Texture({height: COVER_SIZE, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
+                            b.set_layout_manager(l);
+                            b.set_width(COVER_SIZE + 10);
+                            b.add_actor(c);
+                            this.trackCover.set_child(b);
+                        }
+                    }
+                    else
+                        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE, icon_type: St.IconType.FULLCOLOR}));
+                    // Show the new cover
+                    Tweener.addTween(this.trackCover, { opacity: 255,
+                        time: 0.3,
+                        transition: 'easeInCubic'
+                    });
+                })
+            });
+        }
     },
 
     _getMetadata: function() {
@@ -571,11 +579,11 @@ Player.prototype = {
 
     _refreshStatus: function() {
         if (this._playerStatus == "Playing") {
-            this._mainBox.show();
+            LoginDialog._fadeInActor(this._mainBox);
             this._stopButton.show()
         }
         else if (this._playerStatus == "Stopped") {
-            this._mainBox.hide();
+            LoginDialog._fadeOutActor(this._mainBox);
             this._stopButton.hide();
         }
         this._setName(this._playerStatus);
