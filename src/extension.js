@@ -178,13 +178,6 @@ MediaServer2Player.prototype = {
                     callback(this, status);
             }));
     },
-    getRate: function(callback) {
-        this.GetRemote('Rate', Lang.bind(this,
-            function(rate, ex) {
-                if (!ex)
-                    callback(this, rate);
-            }));
-    },
     getPosition: function(callback) {
         this.GetRemote('Position', Lang.bind(this,
             function(position, ex) {
@@ -595,12 +588,6 @@ Player.prototype = {
         ));
     },
 
-    _updateRate: function() {
-        this._mediaServerPlayer.getRate(Lang.bind(this, function(sender, rate) {
-            this._rate = rate;
-        }));
-    },
-
     _updateTimer: function() {
         /*this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
         /*if (this._currentTime > 0)
@@ -657,9 +644,13 @@ function PlayerManager() {
 PlayerManager.prototype = {
 
     _init: function(menu) {
-        // the volume menu
-        this.menu = menu.menu
+        // the menu
+        this.menu = menu;
+        // players list
         this._players = {};
+        // hide the menu by default
+        if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
+           this.menu.actor.hide();
         // watch players
         for (var p=0; p<compatible_players.length; p++) {
             DBus.session.watch_name('org.mpris.MediaPlayer2.'+compatible_players[p], false,
@@ -672,17 +663,24 @@ PlayerManager.prototype = {
     _addPlayer: function(owner) {
         let position;
         this._players[owner] = new Player(owner);
-        if (this.menu.numMenuItems > 2)
-            position = this.menu.numMenuItems - 2;
+        if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
+            position = this.menu.menu.numMenuItems - 2;
         else
             position = 0;
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
-        this.menu.addMenuItem(this._players[owner], position);
+        this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
+        this.menu.menu.addMenuItem(this._players[owner], position);
+        this.menu.actor.show();
     },
 
     _removePlayer: function(owner) {
         this._players[owner].destroy();
         delete this._players[owner];
+        if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) && this._nbPlayers() == 0)
+            this.menu.actor.hide();
+    },
+
+    _nbPlayers: function() {
+        return Object.keys(this._players).length;
     },
 
     destroy: function() {
