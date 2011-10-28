@@ -325,6 +325,7 @@ Player.prototype = {
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
         this._settings = settings;
+        this._status = "";
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
 
@@ -438,7 +439,7 @@ Player.prototype = {
     _setPosition: function(sender, value) {
         this._stopTimer();
         this._currentTime = value / 1000000;
-        if (this._playerStatus == "Playing")
+        if (this._status == "Playing")
             this._runTimer();
     },
 
@@ -458,7 +459,7 @@ Player.prototype = {
                     this._songLength = metadata["mpris:length"] / 1000;
                 // reset timer
                 this._stopTimer();
-                if (this._playerStatus == "Playing")
+                if (this._status == "Playing")
                     this._runTimer();
             }
             else {
@@ -551,35 +552,37 @@ Player.prototype = {
     },
 
     _setStatus: function(sender, status) {
-        this._playerStatus = status;
-        if (status == "Playing") {
-            this._playButton.setIcon("media-playback-pause");
-            this._runTimer();
+        if (status != this._status) {
+            this._status = status;
+            if (this._status == "Playing") {
+                this._playButton.setIcon("media-playback-pause");
+                this._runTimer();
+            }
+            else if (this._status == "Paused") {
+                this._playButton.setIcon("media-playback-start");
+                this._pauseTimer();
+            }
+            else if (this._status == "Stopped") {
+                this._playButton.setIcon("media-playback-start");
+                this._stopTimer();
+            }
+            // Wait a little before changing the state
+            // Some players are sending the stopped signal
+            // when changing tracks
+            Mainloop.timeout_add(1000, Lang.bind(this, this._refreshStatus));
         }
-        else if (status == "Paused") {
-            this._playButton.setIcon("media-playback-start");
-            this._pauseTimer();
-        }
-        else if (status == "Stopped") {
-            this._playButton.setIcon("media-playback-start");
-            this._stopTimer();
-        }
-        // Wait a little before changing the state
-        // Some players are sending the stopped signal
-        // when changing tracks
-        Mainloop.timeout_add(1000, Lang.bind(this, this._refreshStatus));
     },
 
     _refreshStatus: function() {
-        if (this._playerStatus == "Playing") {
+        if (this._status == "Playing") {
             LoginDialog._fadeInActor(this._mainBox);
             this._stopButton.show()
         }
-        else if (this._playerStatus == "Stopped") {
+        else if (this._status == "Stopped") {
             LoginDialog._fadeOutActor(this._mainBox);
             this._stopButton.hide();
         }
-        this._setName(this._playerStatus);
+        this._setName(this._status);
     },
 
     _getStatus: function() {
