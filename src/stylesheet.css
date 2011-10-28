@@ -18,8 +18,8 @@
 }
 
 .track-cover {
-    width: 80px;
-    padding-top: 3px;
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 2px;
 }
 
 .track-infos {

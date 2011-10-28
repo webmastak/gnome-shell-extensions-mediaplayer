@@ -21,8 +21,7 @@ const _ = Gettext.gettext;
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
-
-const COVER_SIZE = 70;
+const MEDIAPLAYER_COVER_SIZE = 'coversize';
 
 const PropIFace = {
     name: 'org.freedesktop.DBus.Properties',
@@ -328,18 +327,21 @@ Player.prototype = {
         this._status = "";
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
+        this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
-        this.trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE, y_align: St.Align.START});
-        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE, icon_type: St.IconType.FULLCOLOR}));
+        this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
+        this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
+        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
+        this.trackCoverContainer.set_child(this.trackCover);
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         this._mainBox = new St.BoxLayout({style_class: 'track-box'});
         this._mainBox.opacity = 0;
         this._mainBox.set_height(0);
-        this._mainBox.add_actor(this.trackCover);
+        this._mainBox.add_actor(this.trackCoverContainer);
 
         this.trackTitle = new TrackTitle('%s', 'track-title');
         this.trackTitle.format([_('Unknown Title')]);
@@ -493,7 +495,7 @@ Player.prototype = {
             }*/
 
             // Hide the old cover
-            Tweener.addTween(this.trackCover, { opacity: 0,
+            Tweener.addTween(this.trackCoverContainer, { opacity: 0,
                 time: 0.3,
                 transition: 'easeOutCubic',
                 onComplete: Lang.bind(this, function() {
@@ -501,22 +503,23 @@ Player.prototype = {
                     if (metadata["mpris:artUrl"]) {
                         let cover = metadata["mpris:artUrl"].toString();
                         cover = decodeURIComponent(cover.substr(7));
-                        if (! GLib.file_test(cover, GLib.FileTest.EXISTS))
-                            this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE, icon_type: St.IconType.FULLCOLOR}));
+                        if (! GLib.file_test(cover, GLib.FileTest.EXISTS)) {
+                            this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
+                        }
                         else {
-                            let l = new Clutter.BinLayout();
-                            let b = new Clutter.Box();
-                            let c = new Clutter.Texture({height: COVER_SIZE, keep_aspect_ratio: true, filter_quality: 2, filename: cover});
-                            b.set_layout_manager(l);
-                            b.set_width(COVER_SIZE + 10);
-                            b.add_actor(c);
-                            this.trackCover.set_child(b);
+                            this.trackCover = new St.Bin({style_class: 'track-cover'});
+                            cover = new Clutter.Texture({filter_quality: 2, filename: cover});
+                            let [coverWidth, coverHeight] = cover.get_base_size();
+                            this.trackCover.width = this.coverSize;
+                            this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
+                            this.trackCover.set_child(cover);
+                            this.trackCoverContainer.set_child(this.trackCover);
                         }
                     }
                     else
-                        this.trackCover.set_child(new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE, icon_type: St.IconType.FULLCOLOR}));
+                        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
                     // Show the new cover
-                    Tweener.addTween(this.trackCover, { opacity: 255,
+                    Tweener.addTween(this.trackCoverContainer, { opacity: 255,
                         time: 0.3,
                         transition: 'easeInCubic'
                     });
@@ -589,6 +592,17 @@ Player.prototype = {
         this._mediaServerPlayer.getPlaybackStatus(Lang.bind(this,
             this._setStatus
         ));
+    },
+
+    _toggleCover: function() {        
+        let factor = 2;
+        let [coverWidth, coverHeight] = this.trackCover.get_size();
+        if (coverWidth > this.coverSize)
+            factor = 0.5;
+        Tweener.addTween(this.trackCover, { height: coverHeight * factor, width: coverWidth * factor,
+            time: 0.3,
+            transition: 'easeInCubic'
+        });
     },
 
     _updateTimer: function() {

@@ -10,5 +10,10 @@
         <_summary>Whether to show the volume control of the mediaplayers</_summary>
         <_description>Whether to show the volume control of the mediaplayers (requires mediaplayer restart).</_description>
     </key>
+    <key name="coversize" type="i">
+        <default>80</default>
+        <_summary>The size of the cover</_summary>
+        <_description>The size of the cover displayed in the menu. Default is 80px width. (requires mediaplayer restart).</_description>
+    </key>
   </schema>
 </schemalist>
