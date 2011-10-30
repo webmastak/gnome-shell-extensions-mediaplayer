@@ -5,6 +5,7 @@ const Gio = imports.gi.Gio;
 const DBus = imports.dbus;
 const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Main = imports.ui.main;
 const Panel = imports.ui.panel;
@@ -37,6 +38,9 @@ const MediaServer2IFace = {
                    signature: 'b',
                    access: 'read'},
                  { name: 'Identity',
+                   signature: 's',
+                   access: 'read'},
+                 { name: 'DesktopEntry',
                    signature: 's',
                    access: 'read'}],
 };
@@ -139,6 +143,13 @@ MediaServer2.prototype = {
             function(identity, ex) {
                 if (!ex)
                     callback(this, identity);
+            }));
+    },
+    getDesktopEntry: function(callback) {
+        this.GetRemote('DesktopEntry', Lang.bind(this,
+            function(entry, ex) {
+                if (!ex)
+                    callback(this, entry);
             }));
     },
     getRaise: function(callback) {
@@ -302,7 +313,7 @@ TextImageMenuItem.prototype = {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.actor = new St.BoxLayout({style_class: style});
-        this.icon = new St.Icon({icon_name: icon, icon_type: type});
+        this.icon = new St.Icon({style_class: "menu-item-icon", icon_name: icon, icon_type: type});
         this.text = new St.Label({text: text});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
@@ -323,6 +334,38 @@ TextImageMenuItem.prototype = {
     },
 }
 
+function TextIconMenuItem() {
+    this._init.apply(this, arguments);
+}
+
+TextIconMenuItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function(text, icon, align, style) {
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
+
+        this.actor = new St.BoxLayout({style_class: style});
+        this.icon = new St.Bin({style_class: "menu-item-icon", child: icon});
+        this.text = new St.Label({text: text});
+        if (align === "left") {
+            this.actor.add_actor(this.icon, { span: 0 });
+            this.actor.add_actor(this.text, { span: -1 });
+        }
+        else {
+            this.actor.add_actor(this.text, { span: 0 });
+            this.actor.add_actor(this.icon, { span: -1 });
+        }
+    },
+
+    setText: function(text) {
+        this.text.text = text;
+    },
+
+    setIcon: function(icon) {
+        this.icon.set_child(icon);
+    },
+}
+
 function Player() {
     this._init.apply(this, arguments);
 }
@@ -336,11 +379,13 @@ Player.prototype = {
         this._owner = owner;
         this._name = this._owner.split('.')[3];
         this._identity = this._name.charAt(0).toUpperCase() + this._name.slice(1);
+        this._app = null;
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
 
-        this._playerInfo = new TextImageMenuItem(this._name, this._name, St.IconType.FULLCOLOR, "left", "player-title");
+        let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
+        this._playerInfo = new TextIconMenuItem(this._name, genericIcon, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
@@ -405,6 +450,7 @@ Player.prototype = {
         /*this.addMenuItem(this._trackPosition);*/
 
         this._getIdentity();
+        this._getDesktopEntry();
 
         /* this players don't support seek */
         //if (support_seek.indexOf(this._name) == -1)
@@ -435,6 +481,16 @@ Player.prototype = {
             function(sender, identity) {
                 this._identity = identity;
                 this._refreshStatus();
+            }));
+    },
+
+    _getDesktopEntry: function() {
+        this._mediaServer.getDesktopEntry(Lang.bind(this,
+            function(sender, entry) {
+                let appSys = Shell.AppSystem.get_default();
+                this._app = appSys.lookup_app(entry+".desktop");
+                let icon = this._app.create_icon_texture(16);
+                this._playerInfo.setIcon(icon);
             }));
     },
 
