@@ -35,6 +35,9 @@ const MediaServer2IFace = {
                    access: 'read'},
                  { name: 'CanQuit',
                    signature: 'b',
+                   access: 'read'},
+                 { name: 'Identity',
+                   signature: 's',
                    access: 'read'}],
 };
 
@@ -130,6 +133,13 @@ function MediaServer2() {
 MediaServer2.prototype = {
     _init: function(owner) {
         DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
+    },
+    getIdentity: function(callback) {
+        this.GetRemote('Identity', Lang.bind(this,
+            function(identity, ex) {
+                if (!ex)
+                    callback(this, identity);
+            }));
     },
     getRaise: function(callback) {
         this.GetRemote('CanRaise', Lang.bind(this,
@@ -325,11 +335,12 @@ Player.prototype = {
 
         this._owner = owner;
         this._name = this._owner.split('.')[3];
+        this._identity = this._name.charAt(0).toUpperCase() + this._name.slice(1);
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
+        this._playerInfo = new TextImageMenuItem(this._name, this._name, St.IconType.FULLCOLOR, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this._trackCover = new St.Bin({style_class: 'track-cover', x_align: St.Align.MIDDLE});
@@ -393,6 +404,8 @@ Player.prototype = {
         }));*/
         /*this.addMenuItem(this._trackPosition);*/
 
+        this._getIdentity();
+
         /* this players don't support seek */
         //if (support_seek.indexOf(this._name) == -1)
             this._time.hide();
@@ -417,13 +430,16 @@ Player.prototype = {
         }));
     },
 
-    _getName: function() {
-        return this._name.charAt(0).toUpperCase() + this._name.slice(1);
+    _getIdentity: function() {
+        this._mediaServer.getIdentity(Lang.bind(this,
+            function(sender, identity) {
+                this._identity = identity;
+                this._refreshStatus();
+            }));
     },
 
-
     _setName: function(status) {
-        this._playerInfo.setText(this._getName() + " - " + _(status));
+        this._playerInfo.setText(this._identity + " - " + _(status));
     },
 
     _formatTrackInfo: function(text) {
