@@ -1,13 +1,37 @@
 {
 "uuid": "@UUID@",
 "name": "Media player indicator",
-"description": "Control MPRIS capable media players",
+"description": "Control MPRIS2 capable media players",
 "original-author": "eon@patapon.info",
 "shell-version": [ "3.1.90", "3.1.91", "3.1.92", "3.2" ],
-"players": [ "clementine", "mpd", "banshee", "rhythmbox", "rhythmbox3", "pragha", "quodlibet", "guayadeque", "amarok", "googlemusicframe", "xbmc", "pithos" ],
-"support_seek": [ "clementine", "banshee", "rhythmbox", "rhythmbox3", "quodlibet", "amarok" ],
 "locale": "@LOCALEDIR@",
 "path": "@EXTENSIONDIR@",
-"url": "@URL@"
+"url": "@URL@",
+"players": [
+    "amarok",
+    "banshee",
+    "clementine",
+    "deadbeef",
+    "googlemusicframe",
+    "guayadeque",
+    "mpd",
+    "pithos",
+    "pragha",
+    "quodlibet",
+    "rhythmbox",
+    "rhythmbox3",
+    "totem",
+    "xbmc"
+],
+"support_seek": [
+    "amarok",
+    "banshee",
+    "clementine",
+    "deadbeef",
+    "quodlibet",
+    "rhythmbox",
+    "rhythmbox3",
+    "totem"
+]
 }
 
