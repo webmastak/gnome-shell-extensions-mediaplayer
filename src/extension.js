@@ -392,7 +392,7 @@ Player.prototype = {
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
-        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
+        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
         this.trackCoverContainer.set_child(this.trackCover);
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
@@ -578,7 +578,7 @@ Player.prototype = {
                         let cover = metadata["mpris:artUrl"].toString();
                         cover = decodeURIComponent(cover.substr(7));
                         if (! GLib.file_test(cover, GLib.FileTest.EXISTS)) {
-                            this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
+                            this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
                         }
                         else {
                             this.trackCover = new St.Bin({style_class: 'track-cover'});
@@ -590,7 +590,7 @@ Player.prototype = {
                         }
                     }
                     else
-                        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
+                        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
                     this.trackCoverContainer.set_child(this.trackCover);
                     // Show the new cover
                     Tweener.addTween(this.trackCoverContainer, { opacity: 255,
