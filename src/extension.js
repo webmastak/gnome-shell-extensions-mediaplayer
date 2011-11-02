@@ -14,7 +14,6 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
-const LoginDialog = imports.gdm.loginDialog;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -23,6 +22,8 @@ const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
+
+const FADE_ANIMATION_TIME = 0.16; 
 
 const PropIFace = {
     name: 'org.freedesktop.DBus.Properties',
@@ -411,10 +412,12 @@ Player.prototype = {
         this.trackInfos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
         this.trackInfos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
         this.trackBox.add(this.trackInfos);
-        this.trackBox.opacity = 0;
-        this.trackBox.set_height(0);
 
         this.addActor(this.trackBox);
+                           
+        this.trackBox.hide();
+        this.trackBox.opacity = 0;
+        this.trackBox.set_height(-1);
 
         this._prevButton = new ControlButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
@@ -493,7 +496,7 @@ Player.prototype = {
         this._mediaServer.getIdentity(Lang.bind(this,
             function(sender, identity) {
                 this._identity = identity;
-                this._refreshStatus();
+                this._setName();
             }));
     },
 
@@ -507,8 +510,11 @@ Player.prototype = {
             }));
     },
 
-    _setName: function(status) {
-        this._playerInfo.setText(this._identity + " - " + _(status));
+    _setName: function() {
+        if (this._status)
+            this._playerInfo.setText(this._identity + " - " + _(this._status));
+        else
+            this._playerInfo.setText(this._identity);
     },
 
     _setPosition: function(sender, value) {
@@ -646,14 +652,41 @@ Player.prototype = {
 
     _refreshStatus: function() {
         if (this._status == "Playing") {
-            LoginDialog._fadeInActor(this.trackBox);
-            this._stopButton.show()
+            if (this.trackBox.opacity == 0) {
+                this.trackBox.show();
+                let [minHeight, naturalHeight] = this.trackBox.get_preferred_height(-1);
+                this.trackBox.opacity = 0;
+                this.trackBox.set_height(0);
+                Tweener.addTween(this.trackBox,
+                    { opacity: 255,
+                      height: naturalHeight,
+                      time: FADE_ANIMATION_TIME,
+                      transition: 'easeOutQuad',
+                      onComplete: function() {
+                           this.trackBox.set_height(-1);
+                      },
+                      onCompleteScope: this
+                    });
+            }
+            this._stopButton.show();
         }
         else if (this._status == "Stopped") {
-            LoginDialog._fadeOutActor(this.trackBox);
+            if (this.trackBox.opacity == 255) {
+                Tweener.addTween(this.trackBox,
+                    { opacity: 0,
+                      height: 0,
+                      time: FADE_ANIMATION_TIME,
+                      transition: 'easeOutQuad',
+                      onComplete: function() {
+                           this.trackBox.hide();
+                           this.trackBox.set_height(-1);
+                      },
+                      onCompleteScope: this
+                    });
+            }
             this._stopButton.hide();
         }
-        this._setName(this._status);
+        this._setName();
     },
 
     _getStatus: function() {
