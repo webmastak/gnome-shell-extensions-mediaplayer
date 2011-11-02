@@ -293,7 +293,7 @@ function TrackTitle() {
 
 TrackTitle.prototype = {
     _init: function(pattern, style) {
-        this.label = new St.Label({style_class: style});
+        this.label = new St.Label({style_class: style, text: " "});
         this.label.clutter_text.line_wrap = true;
         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
         this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
@@ -513,11 +513,11 @@ Player.prototype = {
                             this.trackCover.width = this.coverSize;
                             this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
                             this.trackCover.set_child(cover);
-                            this.trackCoverContainer.set_child(this.trackCover);
                         }
                     }
                     else
                         this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR, style_class: 'track-cover'});
+                    this.trackCoverContainer.set_child(this.trackCover);
                     // Show the new cover
                     Tweener.addTween(this.trackCoverContainer, { opacity: 255,
                         time: 0.3,
