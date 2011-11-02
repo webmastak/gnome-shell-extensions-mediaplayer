@@ -28,6 +28,12 @@ Tested players :
 
 ### Screenshots
 
+By default, media players shows up in the volume menu:
+
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer2.png) 
+
+But you can have the media players in a separate menu (see settings):
+
 ![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
 
 ----
@@ -49,11 +55,11 @@ That's it!
 
 ### Settings
 
-To show the extention in its own menu instead of the volume menu:
+To show the extension in its own menu instead of the volume menu:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volumemenu false```
 
-To show the volume slider of the media player:
+To show the volume control slider of the media player:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volume true```
 
