@@ -314,7 +314,7 @@ function TrackTitle() {
 
 TrackTitle.prototype = {
     _init: function(pattern, style) {
-        this.label = new St.Label({style_class: style, text: " "});
+        this.label = new St.Label({style_class: style, text: ""});
         this.label.clutter_text.line_wrap = true;
         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
         this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
@@ -325,7 +325,8 @@ TrackTitle.prototype = {
         for (let i=0; i<values.length; i++) {
             values[i] = GLib.markup_escape_text(values[i].toString(), -1);
         }
-        this.label.clutter_text.set_markup(this.text.format(values));
+        if (this.label.clutter_text)
+            this.label.clutter_text.set_markup(this.text.format(values));
     }
 }
 
@@ -385,7 +386,7 @@ Player.prototype = {
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
-        this._playerInfo = new TextIconMenuItem(this._name, genericIcon, "left", "player-title");
+        this._playerInfo = new TextIconMenuItem(this._identity, genericIcon, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
@@ -394,10 +395,8 @@ Player.prototype = {
         this.trackCoverContainer.set_child(this.trackCover);
         this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
-        this._mainBox = new St.BoxLayout({style_class: 'track-box'});
-        this._mainBox.opacity = 0;
-        this._mainBox.set_height(0);
-        this._mainBox.add_actor(this.trackCoverContainer);
+        this.trackBox = new St.BoxLayout({style_class: 'track-box'});
+        this.trackBox.add_actor(this.trackCoverContainer);
 
         this.trackTitle = new TrackTitle('%s', 'track-title');
         this.trackTitle.format([_('Unknown Title')]);
@@ -411,9 +410,11 @@ Player.prototype = {
         this.trackInfos.add(this.trackTitle.label, {row: 0, col: 1, y_expand: false});
         this.trackInfos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
         this.trackInfos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
-        this._mainBox.add(this.trackInfos);
+        this.trackBox.add(this.trackInfos);
+        this.trackBox.opacity = 0;
+        this.trackBox.set_height(0);
 
-        this.addActor(this._mainBox);
+        this.addActor(this.trackBox);
 
         this._prevButton = new ControlButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
@@ -540,24 +541,19 @@ Player.prototype = {
                 this._songLength = 0;
                 this._stopTimer();
             }
-            if (metadata["xesam:artist"]) {
-                this.trackArtist.format([metadata["xesam:artist"]]);
-            }
-            else {
+            if (metadata["xesam:artist"])
+                this.trackArtist.format([metadata["xesam:artist"].toString()]);
+            else 
                 this.trackArtist.format([_("Unknown Artist")]);
-            }
-            if (metadata["xesam:album"]) {
-                this.trackAlbum.format([metadata["xesam:album"]]);
-            }
-            else {
+            if (metadata["xesam:album"])
+                this.trackAlbum.format([metadata["xesam:album"].toString()]);
+            else
                 this.trackAlbum.format([_("Unknown Album")]);
-            }
-            if (metadata["xesam:title"]) {
-                this.trackTitle.format([metadata["xesam:title"]]);
-            }
-            else {
+            if (metadata["xesam:title"])
+                this.trackTitle.format([metadata["xesam:title"].toString()]);
+            else
                 this.trackTitle.format([_("Unknown Title")]);
-            }
+
             /*if (metadata["mpris:trackid"]) {
                 this._trackId = {
                     _init: function() {
@@ -650,11 +646,11 @@ Player.prototype = {
 
     _refreshStatus: function() {
         if (this._status == "Playing") {
-            LoginDialog._fadeInActor(this._mainBox);
+            LoginDialog._fadeInActor(this.trackBox);
             this._stopButton.show()
         }
         else if (this._status == "Stopped") {
-            LoginDialog._fadeOutActor(this._mainBox);
+            LoginDialog._fadeOutActor(this.trackBox);
             this._stopButton.hide();
         }
         this._setName(this._status);
