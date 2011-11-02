@@ -1,0 +1,40 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-08-30 09:37+0200\n"
+"PO-Revision-Date: 2011-10-31 15:10+0200\n"
+"Last-Translator: Mantas Mikulėnas <grawity@gmail.com>\n"
+"Language-Team: Mantas Mikulėnas <grawity@gmail.com>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/extension.js:109
+msgid "Playing"
+msgstr "Atkuriama"
+
+#: ../src/extension.js:110
+msgid "Paused"
+msgstr "Pristabdyta"
+
+#: ../src/extension.js:111
+msgid "Stopped"
+msgstr "Sustabdyta"
+
+#: ../src/extension.js:394
+msgid "Volume"
+msgstr "Garsumas"
+
+#: ../src/extension.js:476
+msgid "Unknown Artist"
+msgstr "Nežinomas atlikėjas"
+
+#: ../src/extension.js:480
+msgid "Unknown Album"
+msgstr "Nežinomas albumas"
+
+#: ../src/extension.js:484
+msgid "Unknown Title"
+msgstr "Nežinomas pavadinimas"
