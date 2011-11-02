@@ -696,14 +696,16 @@ Player.prototype = {
     },
 
     _toggleCover: function() {        
-        let factor = 2;
-        let [coverWidth, coverHeight] = this.trackCover.get_size();
-        if (coverWidth > this.coverSize)
-            factor = 0.5;
-        Tweener.addTween(this.trackCover, { height: coverHeight * factor, width: coverWidth * factor,
-            time: 0.3,
-            transition: 'easeInCubic'
-        });
+        if (this.trackCover.has_style_class_name('track-cover')) {
+            let factor = 2;
+            let [coverWidth, coverHeight] = this.trackCover.get_size();
+            if (coverWidth > this.coverSize)
+                factor = 0.5;
+            Tweener.addTween(this.trackCover, { height: coverHeight * factor, width: coverWidth * factor,
+                time: 0.3,
+                transition: 'easeInCubic'
+            });
+        }
     },
 
     _updateTimer: function() {
