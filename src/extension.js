@@ -5,6 +5,7 @@ const Gio = imports.gi.Gio;
 const DBus = imports.dbus;
 const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Main = imports.ui.main;
 const Pango = imports.gi.Pango;
@@ -42,6 +43,12 @@ const MediaServer2IFace = {
                    access: 'read'},
                  { name: 'CanQuit',
                    signature: 'b',
+                   access: 'read'},
+                 { name: 'Identity',
+                   signature: 's',
+                   access: 'read'},
+                 { name: 'DesktopEntry',
+                   signature: 's',
                    access: 'read'}],
 };
 
@@ -143,6 +150,20 @@ function MediaServer2() {
 MediaServer2.prototype = {
     _init: function(owner) {
         DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
+    },
+    getIdentity: function(callback) {
+        this.GetRemote('Identity', Lang.bind(this,
+            function(identity, ex) {
+                if (!ex)
+                    callback(this, identity);
+            }));
+    },
+    getDesktopEntry: function(callback) {
+        this.GetRemote('DesktopEntry', Lang.bind(this,
+            function(entry, ex) {
+                if (!ex)
+                    callback(this, entry);
+            }));
     },
     getRaise: function(callback) {
         this.GetRemote('CanRaise', Lang.bind(this,
@@ -268,7 +289,7 @@ TextImageMenuItem.prototype = {
     _init: function(text, icon, type, align, style) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
         this.actor = new St.BoxLayout({style_class: style});
-        this.icon = new St.Icon({icon_name: icon, icon_type: type});
+        this.icon = new St.Icon({style_class: "menu-item-icon", icon_name: icon, icon_type: type});
         this.text = new St.Label({text: text});
         if (align === "left") {
             this.actor.add_actor(this.icon, { span: 0 });
@@ -308,6 +329,38 @@ TrackTitle.prototype = {
     }
 }
 
+function TextIconMenuItem() {
+    this._init.apply(this, arguments);
+}
+
+TextIconMenuItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function(text, icon, align, style) {
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
+
+        this.actor = new St.BoxLayout({style_class: style});
+        this.icon = new St.Bin({style_class: "menu-item-icon", child: icon});
+        this.text = new St.Label({text: text});
+        if (align === "left") {
+            this.actor.add_actor(this.icon, { span: 0 });
+            this.actor.add_actor(this.text, { span: -1 });
+        }
+        else {
+            this.actor.add_actor(this.text, { span: 0 });
+            this.actor.add_actor(this.icon, { span: -1 });
+        }
+    },
+
+    setText: function(text) {
+        this.text.text = text;
+    },
+
+    setIcon: function(icon) {
+        this.icon.set_child(icon);
+    },
+}
+
 function Player() {
     this._init.apply(this, arguments);
 }
@@ -320,6 +373,8 @@ Player.prototype = {
 
         this._owner = owner;
         this._name = this._owner.split('.')[3];
+        this._identity = this._name.charAt(0).toUpperCase() + this._name.slice(1);
+        this._app = null;
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
@@ -329,7 +384,8 @@ Player.prototype = {
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
-        this._playerInfo = new TextImageMenuItem(this._getName(), this._name, St.IconType.FULLCOLOR, "left", "player-title");
+        let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
+        this._playerInfo = new TextIconMenuItem(this._name, genericIcon, "left", "player-title");
         this.addMenuItem(this._playerInfo);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
@@ -405,6 +461,9 @@ Player.prototype = {
         }));*/
         /*this.addMenuItem(this._trackPosition);*/
 
+        this._getIdentity();
+        this._getDesktopEntry();
+
         /* this players don't support seek */
         /*if (support_seek.indexOf(this._name) == -1)
             this._time.hide();*/
@@ -429,13 +488,26 @@ Player.prototype = {
         }));
     },
 
-    _getName: function() {
-        return this._name.charAt(0).toUpperCase() + this._name.slice(1);
+    _getIdentity: function() {
+        this._mediaServer.getIdentity(Lang.bind(this,
+            function(sender, identity) {
+                this._identity = identity;
+                this._refreshStatus();
+            }));
     },
 
+    _getDesktopEntry: function() {
+        this._mediaServer.getDesktopEntry(Lang.bind(this,
+            function(sender, entry) {
+                let appSys = Shell.AppSystem.get_default();
+                this._app = appSys.lookup_app(entry+".desktop");
+                let icon = this._app.create_icon_texture(16);
+                this._playerInfo.setIcon(icon);
+            }));
+    },
 
     _setName: function(status) {
-        this._playerInfo.setText(this._getName() + " - " + _(status));
+        this._playerInfo.setText(this._identity + " - " + _(status));
     },
 
     _setPosition: function(sender, value) {
