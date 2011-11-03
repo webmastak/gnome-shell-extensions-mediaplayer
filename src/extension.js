@@ -376,7 +376,6 @@ Player.prototype = {
         this._owner = owner;
         this._name = this._owner.split('.')[3];
         this._identity = this._name.charAt(0).toUpperCase() + this._name.slice(1);
-        this._app = null;
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
@@ -387,8 +386,8 @@ Player.prototype = {
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
-        this._playerInfo = new TextIconMenuItem(this._identity, genericIcon, "left", "player-title");
-        this.addMenuItem(this._playerInfo);
+        this.playerTitle = new TextIconMenuItem(this._identity, genericIcon, "left", "player-title");
+        this.addMenuItem(this.playerTitle);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
@@ -504,17 +503,19 @@ Player.prototype = {
         this._mediaServer.getDesktopEntry(Lang.bind(this,
             function(sender, entry) {
                 let appSys = Shell.AppSystem.get_default();
-                this._app = appSys.lookup_app(entry+".desktop");
-                let icon = this._app.create_icon_texture(16);
-                this._playerInfo.setIcon(icon);
+                let app = appSys.lookup_app(entry+".desktop");
+                if (app) {
+                    let icon = app.create_icon_texture(16);
+                    this.playerTitle.setIcon(icon);
+                }
             }));
     },
 
     _setName: function() {
         if (this._status)
-            this._playerInfo.setText(this._identity + " - " + _(this._status));
+            this.playerTitle.setText(this._identity + " - " + _(this._status));
         else
-            this._playerInfo.setText(this._identity);
+            this.playerTitle.setText(this._identity);
     },
 
     _setPosition: function(sender, value) {
