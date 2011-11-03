@@ -255,12 +255,12 @@ function ControlButton() {
 ControlButton.prototype = {
     _init: function(icon, callback) {
         this.actor = new St.Bin({style_class: 'button-container'});
-        this.button = new St.Button({ style_class: 'button' });
+        this.button = new St.Button({ style_class: 'notification-icon-button' });
         this.button.connect('clicked', callback);
         this.icon = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,
             icon_name: icon,
-            style_class: 'button-icon',
+            icon_size: 20
         });
         this.button.set_child(this.icon);
         this.actor.add_actor(this.button);

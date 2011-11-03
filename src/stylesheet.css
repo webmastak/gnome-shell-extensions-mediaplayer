@@ -2,21 +2,6 @@
     padding-right: 5px;
 }
 
-.button {
-    width: 22px;
-    height: 13px;
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 6px;
-}
-.button:hover {
-    border: 1px solid #eee;
-}
-
-.button StIcon {
-    icon-size: 20px;
-}
-
 .track-cover {
     border: 2px solid rgba(255,255,255,0.8);
     border-radius: 2px;
