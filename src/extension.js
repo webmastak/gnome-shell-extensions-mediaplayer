@@ -532,7 +532,9 @@ Player.prototype = {
     },
 
     _setMetadata: function(sender, metadata) {
-        if (Object.keys(metadata).length > 0) {
+        // Pragha sends a metadata dict with one
+        // value on stop
+        if (Object.keys(metadata).length > 1) {
             if (metadata["mpris:length"]) {
                 // song length in secs
                 this._songLength = metadata["mpris:length"] / 1000000;
