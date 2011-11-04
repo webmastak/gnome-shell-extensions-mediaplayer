@@ -65,7 +65,7 @@ To show the volume control slider of the media player:
 
 Set the size of the cover (default 80):
 
-```gsettings set org.gnome.shell.extensions.mediaplayer coversize 100
+```gsettings set org.gnome.shell.extensions.mediaplayer coversize 100```
 
 ----
 
