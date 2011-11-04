@@ -788,6 +788,7 @@ PlayerManager.prototype = {
             position = this.menu.menu.numMenuItems - 2;
         else
             position = 0;
+        this.menu.menu.addMenuItem(this._players[owner], position);
         this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
         this.menu.menu.addMenuItem(this._players[owner], position);
         this.menu.actor.show();
