@@ -792,6 +792,7 @@ PlayerManager.prototype = {
             position = 0;
         this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
         this.menu.menu.addMenuItem(this._players[owner], position);
+        this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
         this.menu.actor.show();
     },
 
