@@ -655,7 +655,7 @@ Player.prototype = {
 
     _refreshStatus: function() {
         if (this._status == "Playing") {
-            if (this.trackBox.opacity == 0) {
+            if (this.trackBox.get_stage() && this.trackBox.opacity == 0) {
                 this.trackBox.show();
                 let [minHeight, naturalHeight] = this.trackBox.get_preferred_height(-1);
                 this.trackBox.opacity = 0;
