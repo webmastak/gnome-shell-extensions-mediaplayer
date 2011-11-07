@@ -316,9 +316,6 @@ function TrackTitle() {
 TrackTitle.prototype = {
     _init: function(pattern, style) {
         this.label = new St.Label({style_class: style, text: ""});
-        this.label.clutter_text.line_wrap = true;
-        this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.text = pattern;
     },
 
@@ -326,8 +323,12 @@ TrackTitle.prototype = {
         for (let i=0; i<values.length; i++) {
             values[i] = GLib.markup_escape_text(values[i].toString(), -1);
         }
-        if (this.label.clutter_text)
+        if (this.label.clutter_text) {
+            this.label.clutter_text.line_wrap = true;
+            this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+            this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
             this.label.clutter_text.set_markup(this.text.format(values));
+        }
     }
 }
 
