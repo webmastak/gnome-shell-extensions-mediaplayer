@@ -30,11 +30,11 @@ Tested players :
 
 By default, media players shows up in the volume menu:
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer2.png) 
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
 
 But you can have the media players in a separate menu (see settings):
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
 ----
 
@@ -42,6 +42,7 @@ But you can have the media players in a separate menu (see settings):
 
 * Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=49367) by Alucryd
 * Ubuntu [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
+* Frugalware [package](http://www.frugalware.org/packages/136448) by Baste
 
 Manual installation :
 
