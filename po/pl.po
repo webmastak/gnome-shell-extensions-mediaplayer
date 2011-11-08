@@ -1,5 +1,5 @@
 # Polish translation for gnome-shell-extension-mediaplayer.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2011 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
 # Piotr Sokół <psokol@jabster.pl>, 2011.
 #
@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-10-26 21:31+0200\n"
-"PO-Revision-Date: 2011-10-21 00:04+0200\n"
+"PO-Revision-Date: 2011-11-07 19:11+0100\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
 "Language: \n"
@@ -34,15 +34,15 @@ msgstr "Zatrzymano"
 #: ../src/extension.js:122
 #, c-format
 msgid "Schema \"%s\" not found."
-msgstr ""
+msgstr "Nie odnaleziono schematu \"%s\"."
 
 #: ../src/extension.js:347
 msgid "by"
-msgstr ""
+msgstr "w wykonaniu"
 
 #: ../src/extension.js:349
 msgid "from"
-msgstr ""
+msgstr "z albumu"
 
 #: ../src/extension.js:391
 msgid "Volume"
