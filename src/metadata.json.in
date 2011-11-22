@@ -10,9 +10,11 @@
 "players": [
     "amarok",
     "banshee",
+    "beatbox",
     "clementine",
     "deadbeef",
     "googlemusicframe",
+	 "nuvolaplayer",
     "guayadeque",
     "mpd",
     "pithos",
@@ -26,6 +28,7 @@
 "support_seek": [
     "amarok",
     "banshee",
+    "beatbox",
     "clementine",
     "deadbeef",
     "quodlibet",
