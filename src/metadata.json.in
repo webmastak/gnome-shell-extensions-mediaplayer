@@ -24,6 +24,7 @@
     "rhythmbox",
     "rhythmbox3",
     "spotify",
+    "tomahawk",
     "totem",
     "xbmc"
 ],
@@ -36,6 +37,7 @@
     "quodlibet",
     "rhythmbox",
     "rhythmbox3",
+    "tomahawk",
     "totem"
 ]
 }
