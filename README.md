@@ -36,6 +36,10 @@ But you can have the media players in a separate menu (see settings):
 
 ![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
+Support for playlists in Banshee (MPRIS 2.1 player interface):
+
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer3.png)
+
 ----
 
 ### Installation
