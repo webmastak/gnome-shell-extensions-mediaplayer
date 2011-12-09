@@ -10,27 +10,34 @@
 "players": [
     "amarok",
     "banshee",
+    "beatbox",
     "clementine",
     "deadbeef",
     "googlemusicframe",
+    "nuvolaplayer",
     "guayadeque",
+    "gmusicbrowser",
     "mpd",
     "pithos",
     "pragha",
     "quodlibet",
     "rhythmbox",
     "rhythmbox3",
+    "spotify",
+    "tomahawk",
     "totem",
     "xbmc"
 ],
 "support_seek": [
     "amarok",
     "banshee",
+    "beatbox",
     "clementine",
     "deadbeef",
     "quodlibet",
     "rhythmbox",
     "rhythmbox3",
+    "tomahawk",
     "totem"
 ]
 }

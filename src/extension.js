@@ -375,13 +375,13 @@ Player.prototype = {
         PopupMenu.PopupMenuSection.prototype._init.call(this);
 
         this._owner = owner;
-        this._name = this._owner.split('.')[3];
-        this._identity = this._name.charAt(0).toUpperCase() + this._name.slice(1);
+        this._app = "";
+        this._status = "";
+        this._identity = "";
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
         this._settings = settings;
-        this._status = "";
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
@@ -437,18 +437,6 @@ Player.prototype = {
         this._trackControls.set_child(this.controls);
         this.addActor(this._trackControls);
 
-        this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
-            if (raise) {
-                this._raiseButton = new ControlButton('go-up',
-                    Lang.bind(this, function () { 
-                        this._mediaServer.RaiseRemote();
-                        mediaplayerMenu.menu.close();
-                    })
-                );
-                this.controls.add_actor(this._raiseButton.getActor());
-            }
-        }));
-
         if (this.showVolume) {
             this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
             this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
@@ -467,8 +455,6 @@ Player.prototype = {
 
         this._getIdentity();
         this._getDesktopEntry();
-
-        /* this players don't support seek */
         /*if (support_seek.indexOf(this._name) == -1)
             this._time.hide();*/
         this._getStatus();
@@ -477,6 +463,26 @@ Player.prototype = {
         this._getVolume();
         this._currentTime = 0;
         this._getPosition();
+
+        this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
+            if (raise) {
+                this._raiseButton = new ControlButton('go-up',
+                    Lang.bind(this, function () { 
+                        // If we have an application in the appSystem
+                        // Bring it to the front
+                        // else let the play decide
+                        if (this._app) {
+                            this._app.activate_full(-1, 0);
+                        }
+                        else
+                            this._mediaServer.RaiseRemote();
+                        // Close the indicator
+                        mediaplayerMenu.menu.close();
+                    })
+                );
+                this.controls.add_actor(this._raiseButton.getActor());
+            }
+        }));
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(sender, iface, value) {
             if (value["Volume"])
@@ -496,7 +502,7 @@ Player.prototype = {
         this._mediaServer.getIdentity(Lang.bind(this,
             function(sender, identity) {
                 this._identity = identity;
-                this._setName();
+                this._setIdentity();
             }));
     },
 
@@ -504,15 +510,15 @@ Player.prototype = {
         this._mediaServer.getDesktopEntry(Lang.bind(this,
             function(sender, entry) {
                 let appSys = Shell.AppSystem.get_default();
-                let app = appSys.lookup_app(entry+".desktop");
-                if (app) {
-                    let icon = app.create_icon_texture(16);
+                this._app = appSys.lookup_app(entry+".desktop");
+                if (this._app) {
+                    let icon = this._app.create_icon_texture(16);
                     this.playerTitle.setIcon(icon);
                 }
             }));
     },
 
-    _setName: function() {
+    _setIdentity: function() {
         if (this._status)
             this.playerTitle.setText(this._identity + " - " + _(this._status));
         else
@@ -539,9 +545,6 @@ Player.prototype = {
             if (metadata["mpris:length"]) {
                 // song length in secs
                 this._songLength = metadata["mpris:length"] / 1000000;
-                // FIXME upstream
-                if (this._name == "quodlibet")
-                    this._songLength = metadata["mpris:length"] / 1000;
                 // reset timer
                 this._stopTimer();
                 if (this._status == "Playing")
@@ -690,7 +693,7 @@ Player.prototype = {
             }
             this._stopButton.hide();
         }
-        this._setName();
+        this._setIdentity();
     },
 
     _getStatus: function() {
