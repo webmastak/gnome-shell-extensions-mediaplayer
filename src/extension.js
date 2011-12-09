@@ -596,7 +596,7 @@ Player.prototype = {
     },
 
     _setPlaylists: function(playlists) {
-        if (playlists.length > 0) {
+        if (playlists && playlists.length > 0) {
             let add = false;
             if (!this.playlists) {
                 this.playlists = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
