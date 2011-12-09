@@ -429,11 +429,10 @@ PlaylistItem.prototype = {
     _init: function (text, obj, icon, params) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
         this.obj = obj;
-        this.box = new St.BoxLayout();
+        this.box = new St.BoxLayout({style_class: 'playlist-item'});
         this.addActor(this.box, { align: St.Align.START });
         this.label = new St.Label({ text: text });
-        this.icon = new St.Icon({ icon_name: 'audio-x-generic',
-                                  style_class: 'popup-menu-icon' });
+        this.icon = St.TextureCache.get_default().load_uri_sync(1, icon, 16, 16);
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
     }
@@ -599,8 +598,9 @@ Player.prototype = {
     _setPlaylists: function(playlists) {
         if (playlists.length > 0) {
             let add = false;
-            if (!this.playlists)
+            if (!this.playlists) {
                 this.playlists = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
+            }
             for (let i=0; i<playlists.length; i++) {
                 global.log(playlists[i]);
                 let obj = playlists[i][0];

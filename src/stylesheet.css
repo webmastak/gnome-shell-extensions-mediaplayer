@@ -35,6 +35,14 @@
     padding-bottom: 5px;
 }
 
+.playlist-item {
+    width: 15em;
+}
+
+.playlist-item StLabel {
+    padding-left: 0.5em;
+}
+
 .volume-menu-item {
     padding: .4em 1.75em;
 }
