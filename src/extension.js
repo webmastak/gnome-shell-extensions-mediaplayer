@@ -573,6 +573,8 @@ Player.prototype = {
                 this._setMetadata(iface, value["Metadata"]);
             if (value["ActivePlaylist"])
                 this._setActivePlaylist(iface, value["ActivePlaylist"]);
+            if (value["PlaylistCount"])
+                this._getPlaylists();
         }));
 
         this._mediaServerPlayer.connect('Seeked', Lang.bind(this, function(sender, value) {
