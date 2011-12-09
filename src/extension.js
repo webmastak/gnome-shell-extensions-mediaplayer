@@ -116,6 +116,28 @@ const MediaServer2PlayerIFace = {
                 inSignature: 'x' }]
 };
 
+const MediaServer2PlaylistsIFace = {
+    name: 'org.mpris.MediaPlayer2.Playlists',
+    methods: [{ name: 'ActivatePlaylist',
+                inSignature: 'o', 
+                outSignature: '' },
+              { name: 'GetPlaylists',
+                inSignature: 'uusb',
+                outSignature: 'a{oss}' }],
+    signals: [{ name: 'PlaylistChanged',
+                inSignature: '',
+                outSignature: 'oss' }],
+    properties: [{ name: 'PlaylistCount',
+                   signature: 'u',
+                   access: 'read'},
+                 { name: 'Orderings',
+                   signature: 'as',
+                   access: 'read' },
+                 { name: 'ActivePlaylist',
+                   signature: 'b{oss}',
+                   access: 'read' }]
+};
+
 /* global values */
 let settings;
 let compatible_players;
@@ -248,6 +270,39 @@ MediaServer2Player.prototype = {
 }
 DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
 
+function MediaServer2Playlists() {
+    this._init.apply(this, arguments);
+}
+
+MediaServer2Playlists.prototype = {
+    _init: function(owner) {
+        this._owner = owner;
+        DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
+    },
+    getPlaylistCount: function(callback) {
+        this.GetRemote('PlaylistCount', Lang.bind(this,
+            function(count, ex) {
+                if (!ex)
+                    callback(this, count);
+            }));
+    },
+    getOrderings: function(callback) {
+        this.GetRemote('Orderings', Lang.bind(this,
+            function(orderings, ex) {
+                if (!ex)
+                    callback(this, orderings);
+            }));
+    },
+    getActivePlaylist: function(callback) {
+        this.GetRemote('ActivePlaylist', Lang.bind(this,
+            function(active, ex) {
+                if (!ex)
+                    callback(this, active);
+            }));
+    }
+}
+DBus.proxifyPrototype(MediaServer2Playlists.prototype, MediaServer2PlaylistsIFace)
+
 function ControlButton() {
     this._init.apply(this, arguments);
 }
@@ -364,6 +419,26 @@ TextIconMenuItem.prototype = {
     },
 }
 
+function PlaylistItem() {
+    this._init.apply(this, arguments);
+}
+
+PlaylistItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function (text, obj, icon, params) {
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+        this.obj = obj;
+        this.box = new St.BoxLayout();
+        this.addActor(this.box, { align: St.Align.START });
+        this.label = new St.Label({ text: text });
+        this.icon = new St.Icon({ icon_name: 'audio-x-generic',
+                                  style_class: 'popup-menu-icon' });
+        this.box.add_actor(this.icon);
+        this.box.add_actor(this.label);
+    }
+};
+
 function Player() {
     this._init.apply(this, arguments);
 }
@@ -378,8 +453,9 @@ Player.prototype = {
         this._app = "";
         this._status = "";
         this._identity = "";
-        this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
+        this._mediaServerPlayer = new MediaServer2Player(owner);
+        this._mediaServerPlaylists = new MediaServer2Playlists(owner);
         this._prop = new Prop(owner);
         this._settings = settings;
         
@@ -436,6 +512,8 @@ Player.prototype = {
         this.controls.add_actor(this._nextButton.getActor());
         this._trackControls.set_child(this.controls);
         this.addActor(this._trackControls);
+
+        this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, this._setPlaylists));
 
         if (this.showVolume) {
             this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
@@ -516,6 +594,30 @@ Player.prototype = {
                     this.playerTitle.setIcon(icon);
                 }
             }));
+    },
+
+    _setPlaylists: function(playlists) {
+        if (playlists.length > 0) {
+            let add = false;
+            if (!this.playlists)
+                this.playlists = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
+            for (let i=0; i<playlists.length; i++) {
+                global.log(playlists[i]);
+                let obj = playlists[i][0];
+                let name = playlists[i][1];
+                let icon = playlists[i][2];
+                if (obj.toString().search('Video') == -1) {
+                    let playlist = new PlaylistItem(name, obj, icon);
+                    playlist.connect('activate', Lang.bind(this, function(playlist) {
+                        this._mediaServerPlaylists.ActivatePlaylistRemote(playlist.obj);
+                    }));
+                    this.playlists.menu.addMenuItem(playlist);
+                    add = true;
+                }
+            }
+            if (add)
+                this.addMenuItem(this.playlists);
+        }
     },
 
     _setIdentity: function() {
