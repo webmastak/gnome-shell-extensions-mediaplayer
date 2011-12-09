@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-26 21:31+0200\n"
+"POT-Creation-Date: 2011-12-09 20:36+0100\n"
 "PO-Revision-Date: 2011-10-08 23:02-0000\n"
 "Last-Translator: Yakir Sitbon <kingyes1@gmail.com>\n"
 "Language-Team: Yakir Sitbon <kingyes1@gmail.com>\n"
@@ -17,43 +17,48 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:116
+#: ../src/extension.js:148
 msgid "Playing"
 msgstr "מתנגן"
 
-#: ../src/extension.js:117
+#: ../src/extension.js:149
 msgid "Paused"
 msgstr "הושהה"
 
-#: ../src/extension.js:118
+#: ../src/extension.js:150
 msgid "Stopped"
 msgstr "נעצר"
 
-#: ../src/extension.js:122
+#: ../src/extension.js:154
 #, c-format
 msgid "Schema \"%s\" not found."
 msgstr ""
 
-#: ../src/extension.js:347
+#: ../src/extension.js:482
 msgid "by"
 msgstr ""
 
-#: ../src/extension.js:349
+#: ../src/extension.js:484
 msgid "from"
 msgstr ""
 
-#: ../src/extension.js:391
+#: ../src/extension.js:519
 msgid "Volume"
 msgstr "עוצמת קול"
 
-#: ../src/extension.js:472
+#: ../src/extension.js:626
+#, fuzzy
+msgid "Playlists"
+msgstr "מתנגן"
+
+#: ../src/extension.js:696
 msgid "Unknown Artist"
 msgstr "אומן לא ידוע"
 
-#: ../src/extension.js:478
+#: ../src/extension.js:700
 msgid "Unknown Album"
 msgstr "אלבום לא ידוע"
 
-#: ../src/extension.js:484
+#: ../src/extension.js:704
 msgid "Unknown Title"
 msgstr "שיר לא ידוע"
