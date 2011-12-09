@@ -375,10 +375,9 @@ Player.prototype = {
         PopupMenu.PopupMenuSection.prototype._init.call(this);
 
         this._owner = owner;
-        this._name = this._owner.split('.')[3];
         this._app = "";
         this._status = "";
-        this._identity = this._name.charAt(0).toUpperCase() + this._name.slice(1);
+        this._identity = "";
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServer = new MediaServer2(owner);
         this._prop = new Prop(owner);
@@ -503,7 +502,7 @@ Player.prototype = {
         this._mediaServer.getIdentity(Lang.bind(this,
             function(sender, identity) {
                 this._identity = identity;
-                this._setName();
+                this._setIdentity();
             }));
     },
 
@@ -519,7 +518,7 @@ Player.prototype = {
             }));
     },
 
-    _setName: function() {
+    _setIdentity: function() {
         if (this._status)
             this.playerTitle.setText(this._identity + " - " + _(this._status));
         else
@@ -694,7 +693,7 @@ Player.prototype = {
             }
             this._stopButton.hide();
         }
-        this._setName();
+        this._setIdentity();
     },
 
     _getStatus: function() {
