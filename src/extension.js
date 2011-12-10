@@ -21,6 +21,7 @@ const _ = Gettext.gettext;
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
+const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 
 const FADE_ANIMATION_TIME = 0.16; 
@@ -487,6 +488,7 @@ Player.prototype = {
         this._settings = settings;
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
+        this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
@@ -539,13 +541,15 @@ Player.prototype = {
         this.controls.add_actor(this._nextButton.getActor());
         this._trackControls.set_child(this.controls);
         this.addActor(this._trackControls);
-        
-        this._position = new SliderItem(_("Position"), "document-open-recent", 0);
-        this._position.connect('value-changed', Lang.bind(this, function(item) {
-            this._mediaServerPlayer.SetPositionRemote(this.trackObj, item._value * this._songLength * 1000000);
-        }));
-        this.addMenuItem(this._position);
-        this._position.actor.hide();
+       
+        if (this.showPosition) {
+            this._position = new SliderItem(_("Position"), "document-open-recent", 0);
+            this._position.connect('value-changed', Lang.bind(this, function(item) {
+                this._mediaServerPlayer.SetPositionRemote(this.trackObj, item._value * this._songLength * 1000000);
+            }));
+            this.addMenuItem(this._position);
+            this._position.actor.hide();
+        }
 
         if (this.showVolume) {
             this._volume = new SliderItem(_("Volume"), "audio-volume-high", 0);
@@ -688,7 +692,8 @@ Player.prototype = {
         this._currentTime = value / 1000000;
         if (this._status == "Playing")
             this._runTimer();
-        this._position.setValue(value / this._songLength);
+        if (this.showPosition)
+            this._position.setValue(value / this._songLength);
     },
 
     _getPosition: function() {
@@ -835,7 +840,8 @@ Player.prototype = {
             this._stopButton.show();
             if (this.showVolume)
                 this._volume.actor.show();
-            this._position.actor.show();
+            if (this.showPosition)
+                this._position.actor.show();
         }
         else if (this._status == "Stopped") {
             if (this.trackBox.opacity == 255) {
@@ -854,7 +860,8 @@ Player.prototype = {
             this._stopButton.hide();
             if (this.showVolume)
                 this._volume.actor.hide();
-            this._position.actor.hide();
+            if (this.showPosition)
+                this._position.actor.hide();
         }
         this._setIdentity();
     },
@@ -880,10 +887,12 @@ Player.prototype = {
 
     _updateTimer: function() {
         //this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
-        if (this._currentTime > 0)
-            this._position.setValue(this._currentTime / this._songLength);
-        else
-            this._position.setValue(0);
+        if (this.showPosition) {
+            if (this._currentTime > 0)
+                this._position.setValue(this._currentTime / this._songLength);
+            else
+                this._position.setValue(0);
+        }
     },
 
     _runTimer: function() {
