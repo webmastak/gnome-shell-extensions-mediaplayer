@@ -540,12 +540,12 @@ Player.prototype = {
         this._trackControls.set_child(this.controls);
         this.addActor(this._trackControls);
         
-        this.trackPosition = new SliderItem(_("Position"), "document-open-recent", 0);
-        this.trackPosition.connect('value-changed', Lang.bind(this, function(item) {
+        this._position = new SliderItem(_("Position"), "document-open-recent", 0);
+        this._position.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.SetPositionRemote(this.trackObj, item._value * this._songLength * 1000000);
         }));
-        this.addMenuItem(this.trackPosition);
-        this.trackPosition.actor.hide();
+        this.addMenuItem(this._position);
+        this._position.actor.hide();
 
         if (this.showVolume) {
             this._volume = new SliderItem(_("Volume"), "audio-volume-high", 0);
@@ -553,6 +553,7 @@ Player.prototype = {
                 this._mediaServerPlayer.setVolume(item._value);
             }));
             this.addMenuItem(this._volume);
+            this._volume.actor.hide();
         }
 
         this._getIdentity();
@@ -687,7 +688,7 @@ Player.prototype = {
         this._currentTime = value / 1000000;
         if (this._status == "Playing")
             this._runTimer();
-        this.trackPosition.setValue(value / this._songLength);
+        this._position.setValue(value / this._songLength);
     },
 
     _getPosition: function() {
@@ -832,7 +833,9 @@ Player.prototype = {
                     });
             }
             this._stopButton.show();
-            this.trackPosition.actor.show();
+            if (this.showVolume)
+                this._volume.actor.show();
+            this._position.actor.show();
         }
         else if (this._status == "Stopped") {
             if (this.trackBox.opacity == 255) {
@@ -849,7 +852,9 @@ Player.prototype = {
                     });
             }
             this._stopButton.hide();
-            this.trackPosition.actor.hide();
+            if (this.showVolume)
+                this._volume.actor.hide();
+            this._position.actor.hide();
         }
         this._setIdentity();
     },
@@ -876,9 +881,9 @@ Player.prototype = {
     _updateTimer: function() {
         //this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
         if (this._currentTime > 0)
-            this.trackPosition.setValue(this._currentTime / this._songLength);
+            this._position.setValue(this._currentTime / this._songLength);
         else
-            this.trackPosition.setValue(0);
+            this._position.setValue(0);
     },
 
     _runTimer: function() {
