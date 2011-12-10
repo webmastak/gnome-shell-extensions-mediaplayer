@@ -74,7 +74,7 @@ const MediaServer2PlayerIFace = {
                 inSignature: '',
                 outSignature: '' },
               { name: 'SetPosition',
-                inSignature: 'a{ov}',
+                inSignature: 'ox',
                 outSignature: '' }],
     properties: [{ name: 'Metadata',
                    signature: 'a{sv}',
@@ -335,6 +335,31 @@ ControlButton.prototype = {
     },
 }
 
+function SliderItem() {
+    this._init.apply(this, arguments);
+}
+
+SliderItem.prototype = {
+    __proto__: PopupMenu.PopupSliderMenuItem.prototype,
+
+    _init: function(text, icon, value) {
+        PopupMenu.PopupSliderMenuItem.prototype._init.call(this, value);
+
+        this.removeActor(this._slider);
+        this._holder = new St.BoxLayout({style_class: 'slider-item'});
+        this._icon = new St.Icon({icon_name: icon});
+        this._holder.add_actor(this._icon);
+        this._label = new St.Label({text: text});
+        this._holder.add_actor(this._label);
+        this.addActor(this._holder);
+        this.addActor(this._slider, { span: -1, expand: false, align: St.Align.END });
+    },
+
+    setIcon: function(icon) {
+        this._icon.icon_name = icon;
+    }
+}
+
 function TextImageMenuItem() {
     this._init.apply(this, arguments);
 }
@@ -514,29 +539,25 @@ Player.prototype = {
         this.controls.add_actor(this._nextButton.getActor());
         this._trackControls.set_child(this.controls);
         this.addActor(this._trackControls);
+        
+        this.trackPosition = new SliderItem(_("Position"), "document-open-recent", 0);
+        this.trackPosition.connect('value-changed', Lang.bind(this, function(item) {
+            this._mediaServerPlayer.SetPositionRemote(this.trackObj, item._value * this._songLength * 1000000);
+        }));
+        this.addMenuItem(this.trackPosition);
+        this.trackPosition.actor.hide();
 
         if (this.showVolume) {
-            this._volumeInfo = new TextImageMenuItem(_("Volume"), "audio-volume-high", St.IconType.SYMBOLIC, "right", "volume-menu-item");
-            this._volume = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'volume-slider'});
+            this._volume = new SliderItem(_("Volume"), "audio-volume-high", 0);
             this._volume.connect('value-changed', Lang.bind(this, function(item) {
                 this._mediaServerPlayer.setVolume(item._value);
             }));
-            this.addMenuItem(this._volumeInfo);
             this.addMenuItem(this._volume);
         }
 
-        /*this._trackPosition = new PopupMenu.PopupSliderMenuItem(0, {style_class: 'position-slider'});
-        this._trackPosition.connect('value-changed', Lang.bind(this, function(item) {
-            this._mediaServerPlayer.SetPositionRemote(this._trackId, item._value * this._songLength);
-        }));*/
-        /*this.addMenuItem(this._trackPosition);*/
-
         this._getIdentity();
         this._getDesktopEntry();
-        /*if (support_seek.indexOf(this._name) == -1)
-            this._time.hide();*/
         this._getStatus();
-        this._trackId = {};
         this._getMetadata();
         this._getActivePlaylist();
         this._getPlaylists();
@@ -604,7 +625,6 @@ Player.prototype = {
 
     _setActivePlaylist: function(sender, playlist) {
         // Is there an active playlist ?
-        global.log(playlist);
         if (playlist[0]) {
             this._currentPlaylist = playlist[1][0];
         }
@@ -612,7 +632,6 @@ Player.prototype = {
     },
 
     _getActivePlaylist: function() {
-        global.log("get list");
         this._mediaServerPlaylists.getActivePlaylist(Lang.bind(this,
             this._setActivePlaylist
         ));
@@ -630,11 +649,11 @@ Player.prototype = {
             }
             let show = false;
             this._playlistsMenu.menu.removeAll();
-            global.log(this._currentPlaylist);
             for (let i=0; i<this._playlists.length; i++) {
                 let obj = this._playlists[i][0];
                 let name = this._playlists[i][1];
                 let icon = this._playlists[i][2];
+                global.log(typeof(obj));
                 if (obj.toString().search('Video') == -1) {
                     let playlist = new PlaylistItem(name, obj, icon);
                     playlist.connect('activate', Lang.bind(this, function(playlist) {
@@ -668,6 +687,7 @@ Player.prototype = {
         this._currentTime = value / 1000000;
         if (this._status == "Playing")
             this._runTimer();
+        this.trackPosition.setValue(value / this._songLength);
     },
 
     _getPosition: function() {
@@ -681,7 +701,7 @@ Player.prototype = {
         // value on stop
         if (Object.keys(metadata).length > 1) {
             if (metadata["mpris:length"]) {
-                // song length in secs
+                // song length in sec
                 this._songLength = metadata["mpris:length"] / 1000000;
                 // reset timer
                 this._stopTimer();
@@ -705,13 +725,11 @@ Player.prototype = {
             else
                 this.trackTitle.format([_("Unknown Title")]);
 
-            /*if (metadata["mpris:trackid"]) {
-                this._trackId = {
-                    _init: function() {
-                        DBus.session.proxifyObject(this, this._owner, metadata["mpris:trackid"]);
-                    }
-                }
-            }*/
+            if (metadata["mpris:trackid"]) {
+                this.trackObj = metadata["mpris:trackid"];
+                global.log(this.trackObj);
+                global.log(typeof(this.trackObj));
+            }
 
             // Hide the old cover
             Tweener.addTween(this.trackCoverContainer, { opacity: 0,
@@ -756,13 +774,13 @@ Player.prototype = {
     _setVolume: function(sender, value) {
         if (this.showVolume) {
             if (value === 0)
-                this._volumeInfo.setIcon("audio-volume-muted");
+                this._volume.setIcon("audio-volume-muted");
             if (value > 0)
-                this._volumeInfo.setIcon("audio-volume-low");
+                this._volume.setIcon("audio-volume-low");
             if (value > 0.30)
-                this._volumeInfo.setIcon("audio-volume-medium");
+                this._volume.setIcon("audio-volume-medium");
             if (value > 0.80)
-                this._volumeInfo.setIcon("audio-volume-high");
+                this._volume.setIcon("audio-volume-high");
             this._volume.setValue(value);
         }
     },
@@ -814,6 +832,7 @@ Player.prototype = {
                     });
             }
             this._stopButton.show();
+            this.trackPosition.actor.show();
         }
         else if (this._status == "Stopped") {
             if (this.trackBox.opacity == 255) {
@@ -830,6 +849,7 @@ Player.prototype = {
                     });
             }
             this._stopButton.hide();
+            this.trackPosition.actor.hide();
         }
         this._setIdentity();
     },
@@ -854,29 +874,29 @@ Player.prototype = {
     },
 
     _updateTimer: function() {
-        /*this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
-        /*if (this._currentTime > 0)
-            this._trackPosition.setValue(this._currentTime / this._songLength);
+        //this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
+        if (this._currentTime > 0)
+            this.trackPosition.setValue(this._currentTime / this._songLength);
         else
-            this._trackPosition.setValue(0);*/
+            this.trackPosition.setValue(0);
     },
 
     _runTimer: function() {
-        /*if (!Tweener.resumeTweens(this)) {
+        if (!Tweener.resumeTweens(this)) {
             Tweener.addTween(this,
                 { _currentTime: this._songLength,
                   time: this._songLength - this._currentTime,
                   transition: 'linear',
                   onUpdate: Lang.bind(this, this._updateTimer) });
-        }*/
+        }
     },
 
     _pauseTimer: function() {
-        //Tweener.pauseTweens(this);
+        Tweener.pauseTweens(this);
     },
 
     _stopTimer: function() {
-        //Tweener.removeTweens(this);
+        Tweener.removeTweens(this);
         this._currentTime = 0;
         this._updateTimer();
     },

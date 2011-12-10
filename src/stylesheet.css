@@ -35,21 +35,13 @@
     padding-bottom: 5px;
 }
 
-.playlist-item {
-    width: 15em;
-}
-
 .playlist-item StLabel {
     padding-left: 0.4em;
 }
 
-.volume-menu-item {
-    padding: .4em 1.75em;
-}
-
-.volume-menu-item StIcon {
+.slider-item StIcon {
     icon-size: 1.14em;
-    padding-left: 8px;
+    padding-right: 0.3em;
 }
 
 .playback-control {
