@@ -488,6 +488,8 @@ Player.prototype = {
         this._playlists = "";
         this._playlistsMenu = "";
         this._currentPlaylist = "";
+        this._currentTime = 0;
+        this._timeoutId = 0;
         this._mediaServer = new MediaServer2(owner);
         this._mediaServerPlayer = new MediaServer2Player(owner);
         this._mediaServerPlaylists = new MediaServer2Playlists(owner);
@@ -573,7 +575,6 @@ Player.prototype = {
         this._getActivePlaylist();
         this._getPlaylists();
         this._getVolume();
-        this._currentTime = 0;
         this._getPosition();
 
         this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
@@ -706,7 +707,7 @@ Player.prototype = {
         // Pragha sends a metadata dict with one
         // value on stop
         if (Object.keys(metadata).length > 1) {
-            this._currentTime = 0;
+            this._currentTime = -1;
             if (metadata["mpris:length"])
                 this._songLength = metadata["mpris:length"] / 1000000;
             else
@@ -793,10 +794,12 @@ Player.prototype = {
             this._status = status;
             if (this._status == "Playing") {
                 this._playButton.setIcon("media-playback-pause");
-                this._runTimer();
+                this._getPosition();
+                this._startTimer();
             }
             else if (this._status == "Paused") {
                 this._playButton.setIcon("media-playback-start");
+                this._pauseTimer();
             }
             else if (this._status == "Stopped") {
                 this._playButton.setIcon("media-playback-start");
@@ -885,16 +888,24 @@ Player.prototype = {
         }
     },
 
-    _runTimer: function() {
+    _startTimer: function() {
         if (this._status == "Playing") {
-            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._runTimer));
+            this._timeoutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
             this._currentTime += 1;
             this._updateTimer();
         }
     },
 
+    _pauseTimer: function() {
+        if (this._timeoutId != 0) {
+            Mainloop.source_remove(this._timeoutId);
+            this._timeoutId = 0;
+        }
+    },
+
     _stopTimer: function() {
         this._currentTime = 0;
+        this._pauseTimer();
         this._updateTimer();
     },
 
