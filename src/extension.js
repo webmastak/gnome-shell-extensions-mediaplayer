@@ -688,12 +688,7 @@ Player.prototype = {
     },
 
     _setPosition: function(sender, value) {
-        this._stopTimer();
         this._currentTime = value / 1000000;
-        if (this._status == "Playing")
-            this._runTimer();
-        if (this.showPosition)
-            this._position.setValue(value / this._songLength);
     },
 
     _getPosition: function() {
@@ -706,18 +701,11 @@ Player.prototype = {
         // Pragha sends a metadata dict with one
         // value on stop
         if (Object.keys(metadata).length > 1) {
-            if (metadata["mpris:length"]) {
-                // song length in sec
+            this._currentTime = 0;
+            if (metadata["mpris:length"])
                 this._songLength = metadata["mpris:length"] / 1000000;
-                // reset timer
-                this._stopTimer();
-                if (this._status == "Playing")
-                    this._runTimer();
-            }
-            else {
+            else
                 this._songLength = 0;
-                this._stopTimer();
-            }
             if (metadata["xesam:artist"])
                 this.trackArtist.format([metadata["xesam:artist"].toString()]);
             else 
@@ -733,8 +721,6 @@ Player.prototype = {
 
             if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"];
-                global.log(this.trackObj);
-                global.log(typeof(this.trackObj));
             }
 
             // Hide the old cover
@@ -806,7 +792,6 @@ Player.prototype = {
             }
             else if (this._status == "Paused") {
                 this._playButton.setIcon("media-playback-start");
-                this._pauseTimer();
             }
             else if (this._status == "Stopped") {
                 this._playButton.setIcon("media-playback-start");
@@ -888,7 +873,7 @@ Player.prototype = {
     _updateTimer: function() {
         //this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
         if (this.showPosition) {
-            if (this._currentTime > 0)
+            if (!isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0)
                 this._position.setValue(this._currentTime / this._songLength);
             else
                 this._position.setValue(0);
@@ -896,21 +881,14 @@ Player.prototype = {
     },
 
     _runTimer: function() {
-        if (!Tweener.resumeTweens(this)) {
-            Tweener.addTween(this,
-                { _currentTime: this._songLength,
-                  time: this._songLength - this._currentTime,
-                  transition: 'linear',
-                  onUpdate: Lang.bind(this, this._updateTimer) });
+        if (this._status == "Playing") {
+            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._runTimer));
+            this._currentTime += 1;
+            this._updateTimer();
         }
     },
 
-    _pauseTimer: function() {
-        Tweener.pauseTweens(this);
-    },
-
     _stopTimer: function() {
-        Tweener.removeTweens(this);
         this._currentTime = 0;
         this._updateTimer();
     },
