@@ -347,17 +347,24 @@ SliderItem.prototype = {
         PopupMenu.PopupSliderMenuItem.prototype._init.call(this, value);
 
         this.removeActor(this._slider);
+
         this._holder = new St.BoxLayout({style_class: 'slider-item'});
+
         this._icon = new St.Icon({icon_name: icon});
-        this._holder.add_actor(this._icon);
         this._label = new St.Label({text: text});
+        this._holder.add_actor(this._icon);
         this._holder.add_actor(this._label);
+        this._holder.add_actor(this._slider);
+
         this.addActor(this._holder);
-        this.addActor(this._slider, { span: -1, expand: false, align: St.Align.END });
     },
 
     setIcon: function(icon) {
         this._icon.icon_name = icon;
+    },
+
+    setLabel: function(text) {
+        this._label.text = text;
     }
 }
 
@@ -511,7 +518,6 @@ Player.prototype = {
         this.trackAlbum = new TrackTitle('<span foreground="#ccc">' + _("from") + '</span> %s', 'track-album');
         this.trackAlbum.format([_('Unknown Album')]);
 
-        /*this._time = new TrackInfo("0:00 / 0:00", "document-open-recent");*/
         this.trackInfos = new St.Table({style_class: "track-infos"});
         this.trackInfos.add(this.trackTitle.label, {row: 0, col: 1, y_expand: false});
         this.trackInfos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
@@ -543,7 +549,7 @@ Player.prototype = {
         this.addActor(this._trackControls);
        
         if (this.showPosition) {
-            this._position = new SliderItem(_("Position"), "document-open-recent", 0);
+            this._position = new SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
             this._position.connect('value-changed', Lang.bind(this, function(item) {
                 this._mediaServerPlayer.SetPositionRemote(this.trackObj, item._value * this._songLength * 1000000);
             }));
@@ -658,7 +664,6 @@ Player.prototype = {
                 let obj = this._playlists[i][0];
                 let name = this._playlists[i][1];
                 let icon = this._playlists[i][2];
-                global.log(typeof(obj));
                 if (obj.toString().search('Video') == -1) {
                     let playlist = new PlaylistItem(name, obj, icon);
                     playlist.connect('activate', Lang.bind(this, function(playlist) {
@@ -871,12 +876,12 @@ Player.prototype = {
     },
 
     _updateTimer: function() {
-        //this._time.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));*/
         if (this.showPosition) {
             if (!isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0)
                 this._position.setValue(this._currentTime / this._songLength);
             else
                 this._position.setValue(0);
+            this._position.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));
         }
     },
 

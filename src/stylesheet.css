@@ -31,12 +31,17 @@
 .track-box {
     padding-top: 10px;
     padding-left: 30px;
-    padding-right: 30px;
+    padding-right: 15px;
     padding-bottom: 5px;
 }
 
 .playlist-item StLabel {
     padding-left: 0.4em;
+}
+
+.slider-item StLabel {
+    width: 6em;
+    font-size: 0.9em;
 }
 
 .slider-item StIcon {
