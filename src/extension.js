@@ -553,7 +553,9 @@ Player.prototype = {
         if (this.showPosition) {
             this._position = new SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
             this._position.connect('value-changed', Lang.bind(this, function(item) {
-                this._mediaServerPlayer.SetPositionRemote(this.trackObj, item._value * this._songLength * 1000000);
+                let time = item._value * this._songLength;
+                this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
+                this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
             }));
             this.addMenuItem(this._position);
             this._position.actor.hide();
