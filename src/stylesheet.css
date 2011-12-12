@@ -39,6 +39,10 @@
     padding-left: 0.4em;
 }
 
+.playlist-item StIcon {
+    icon-size: 16px;
+}
+
 .slider-item StLabel {
     width: 6em;
     font-size: 0.9em;

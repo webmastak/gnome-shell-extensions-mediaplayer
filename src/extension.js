@@ -465,7 +465,7 @@ PlaylistItem.prototype = {
         this.box = new St.BoxLayout({style_class: 'playlist-item'});
         this.addActor(this.box, { align: St.Align.START });
         this.label = new St.Label({ text: text });
-        this.icon = St.TextureCache.get_default().load_uri_sync(1, icon, 16, 16);
+        this.icon = new St.Icon({icon_name: 'view-list'});
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
     }
@@ -666,9 +666,8 @@ Player.prototype = {
             for (let i=0; i<this._playlists.length; i++) {
                 let obj = this._playlists[i][0];
                 let name = this._playlists[i][1];
-                let icon = this._playlists[i][2];
                 if (obj.toString().search('Video') == -1) {
-                    let playlist = new PlaylistItem(name, obj, icon);
+                    let playlist = new PlaylistItem(name, obj);
                     playlist.connect('activate', Lang.bind(this, function(playlist) {
                         this._mediaServerPlaylists.ActivatePlaylistRemote(playlist.obj);
                     }));
