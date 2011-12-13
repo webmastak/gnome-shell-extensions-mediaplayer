@@ -346,17 +346,13 @@ SliderItem.prototype = {
 
     _init: function(text, icon, value) {
         PopupMenu.PopupSliderMenuItem.prototype._init.call(this, value);
-
         this.removeActor(this._slider);
-
         this._holder = new St.BoxLayout({style_class: 'slider-item'});
-
-        this._icon = new St.Icon({icon_name: icon});
+        this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon});
         this._label = new St.Label({text: text});
         this._holder.add_actor(this._icon);
         this._holder.add_actor(this._label);
         this._holder.add_actor(this._slider);
-
         this.addActor(this._holder);
     },
 
@@ -421,31 +417,26 @@ TrackTitle.prototype = {
     }
 }
 
-function TextIconMenuItem() {
+function IconItem() {
     this._init.apply(this, arguments);
 }
 
-TextIconMenuItem.prototype = {
+IconItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function(text, icon, align, style) {
+    _init: function(text, icon) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
-        this.actor = new St.BoxLayout({style_class: style});
-        this.icon = new St.Bin({style_class: "menu-item-icon", child: icon});
-        this.text = new St.Label({text: text});
-        if (align === "left") {
-            this.actor.add_actor(this.icon, { span: 0 });
-            this.actor.add_actor(this.text, { span: -1 });
-        }
-        else {
-            this.actor.add_actor(this.text, { span: 0 });
-            this.actor.add_actor(this.icon, { span: -1 });
-        }
+        this.box = new St.BoxLayout();
+        this.addActor(this.box);
+        this.label = new St.Label({text: text});
+        this.icon = new St.Bin({style_class: "menu-icon", child: icon});
+        this.box.add_actor(this.icon);
+        this.box.add_actor(this.label);
     },
 
-    setText: function(text) {
-        this.text.text = text;
+    setLabel: function(text) {
+        this.label.text = text;
     },
 
     setIcon: function(icon) {
@@ -463,10 +454,10 @@ PlaylistItem.prototype = {
     _init: function (text, obj, icon) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
         this.obj = obj;
-        this.box = new St.BoxLayout({style_class: 'playlist-item'});
-        this.addActor(this.box, { align: St.Align.START });
+        this.box = new St.BoxLayout();
+        this.addActor(this.box);
         this.label = new St.Label({ text: text });
-        this.icon = new St.Icon({icon_name: 'view-list'});
+        this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list'});
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
     }
@@ -503,7 +494,7 @@ Player.prototype = {
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
-        this.playerTitle = new TextIconMenuItem(this._identity, genericIcon, "left", "player-title");
+        this.playerTitle = new IconItem(this._identity, genericIcon);
         this.addMenuItem(this.playerTitle);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
@@ -693,9 +684,9 @@ Player.prototype = {
 
     _setIdentity: function() {
         if (this._status)
-            this.playerTitle.setText(this._identity + " - " + _(this._status));
+            this.playerTitle.setLabel(this._identity + " - " + _(this._status));
         else
-            this.playerTitle.setText(this._identity);
+            this.playerTitle.setLabel(this._identity);
     },
 
     _setPosition: function(sender, value) {
