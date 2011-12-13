@@ -22,6 +22,7 @@ const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
+const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 
 const FADE_ANIMATION_TIME = 0.16; 
@@ -498,6 +499,7 @@ Player.prototype = {
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
         this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
+        this.showPlaylists = this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY);
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
@@ -574,8 +576,10 @@ Player.prototype = {
         this._getDesktopEntry();
         this._getStatus();
         this._getMetadata();
-        this._getActivePlaylist();
-        this._getPlaylists();
+        if (this.showPlaylists) {
+            this._getActivePlaylist();
+            this._getPlaylists();
+        }
         this._getVolume();
         this._getPosition();
 
@@ -608,7 +612,7 @@ Player.prototype = {
                 this._setMetadata(iface, value["Metadata"]);
             if (value["ActivePlaylist"])
                 this._setActivePlaylist(iface, value["ActivePlaylist"]);
-            if (value["PlaylistCount"])
+            if (this.showPlaylists && value["PlaylistCount"])
                 this._getPlaylists();
         }));
 

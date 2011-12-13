@@ -15,6 +15,11 @@
         <_summary>Whether to show the position slider of the mediaplayers</_summary>
         <_description>Whether to show the position slider of the mediaplayers (requires mediaplayer restart).</_description>
     </key>
+    <key name="playlists" type="b">
+        <default>false</default>
+        <_summary>Whether to show the playlists (if supported) of the mediaplayers</_summary>
+        <_description>Whether to show the playlists of the mediaplayers (requires mediaplayer restart).</_description>
+    </key>
     <key name="coversize" type="i">
         <default>80</default>
         <_summary>The size of the cover</_summary>
