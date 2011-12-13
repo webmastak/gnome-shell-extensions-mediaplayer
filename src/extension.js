@@ -576,21 +576,23 @@ Player.prototype = {
 
         this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
             if (raise) {
-                this._raiseButton = new ControlButton('go-up',
+                this.playerTitle.connect('activate',
                     Lang.bind(this, function () { 
                         // If we have an application in the appSystem
-                        // Bring it to the front
-                        // else let the play decide
-                        if (this._app) {
+                        // Bring it to the front else let the player  decide
+                        if (this._app)
                             this._app.activate_full(-1, 0);
-                        }
                         else
                             this._mediaServer.RaiseRemote();
                         // Close the indicator
                         mediaplayerMenu.menu.close();
                     })
                 );
-                this.controls.add_actor(this._raiseButton.getActor());
+            }
+            else {
+                // Make the player title insensitive
+                this.playerTitle.setSensitive(false);
+                this.playerTitle.actor.remove_style_pseudo_class('insensitive');
             }
         }));
 
