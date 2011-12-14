@@ -1,11 +1,11 @@
-## gnome-shell-extension-mediaplayer
+# gnome-shell-extension-mediaplayer
 
 gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRIS v2.1 capable Mediaplayer.
 
 This extension will monitor DBus to look for active players automatically (player names are referenced in the 
 metadata.json file). All active players are shown in the gnome-shell volume menu by default.
 
-Tested players :
+Compatible players :
 
 * Clementine
 * Banshee (with MPRIS D-Bus interface plugin)
@@ -19,17 +19,7 @@ Tested players :
 * Nuvola
 * and more...
 
-----
-
-### Gnome Shell support
-
-* master (stable branch)
-* devel (unstable branch)
-* branch gnome-shell-3.0 supports gnome-shell 3.0.X
-
-----
-
-### Screenshots
+# Screenshots
 
 By default, media players shows up in the volume menu:
 
@@ -41,9 +31,13 @@ But you can have the media players in a separate menu (see settings):
 
 Notice the support of playlists in Banshee (MPRIS 2.1 player interface).
 
-----
+# Gnome Shell support
 
-### Installation
+* master (stable branch)
+* devel (unstable branch)
+* branch gnome-shell-3.0 supports gnome-shell 3.0.X
+
+# Installation
 
 ## Via extensions.gnome.org
 
@@ -63,9 +57,8 @@ Note that this version does not include gsettings options.
     make
     sudo make install
   
-----
 
-### Settings
+## Settings
 
 To show the extension in its own menu instead of the volume menu:
 
@@ -87,10 +80,7 @@ To set the size of the cover (default 80):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer coversize 100```
 
-
-----
-
-### Authors
+# Authors
 
 * eonpatapon (Jean-Philippe Braun)
 * grawity (Mantas Mikulėnas)
