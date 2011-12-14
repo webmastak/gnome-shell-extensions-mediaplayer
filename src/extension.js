@@ -835,7 +835,7 @@ Player.prototype = {
                 this._position.actor.show();
         }
         else if (this._status == "Stopped") {
-            if (this.trackBox.opacity == 255) {
+            if (this.trackBox.get_stage() && this.trackBox.opacity == 255) {
                 Tweener.addTween(this.trackBox,
                     { opacity: 0,
                       height: 0,
