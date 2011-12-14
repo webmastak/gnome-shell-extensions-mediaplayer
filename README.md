@@ -15,6 +15,9 @@ Tested players :
 * Quod Libet (with MPRIS D-Bus interface plugin)
 * Guayadeque 0.3.2
 * Amarok
+* Spotify
+* Nuvola
+* and more...
 
 ----
 
@@ -30,32 +33,36 @@ Tested players :
 
 By default, media players shows up in the volume menu:
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer2.png) 
 
 But you can have the media players in a separate menu (see settings):
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
 
-Support for playlists in Banshee (MPRIS 2.1 player interface):
-
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer3.png)
+Notice the support of playlists in Banshee (MPRIS 2.1 player interface).
 
 ----
 
 ### Installation
 
+## Via extensions.gnome.org
+
+* https://extensions.gnome.org/extension/55/media-player-indicator/
+
+Note that this version does not include gsettings options.
+
+## Packages
+
 * Archlinux [AUR package](http://aur.archlinux.org/packages.php?ID=49367) by Alucryd
 * Ubuntu [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
 * Frugalware [package](http://www.frugalware.org/packages/136448) by Baste
 
-Manual installation :
+## Manual installation
 
-    ./autogen.sh --prefix=/usr
+    ./autogen.sh
     make
     sudo make install
   
-That's it!
-
 ----
 
 ### Settings
@@ -68,14 +75,24 @@ To show the volume control slider of the media player:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volume true```
 
-Set the size of the cover (default 80):
+To show the playlists of the media player:
+
+```gsettings set org.gnome.shell.extensions.mediaplayer playlists true```
+
+To hide the position slider:
+
+```gsettings set org.gnome.shell.extensions.mediaplayer position false```
+
+To set the size of the cover (default 80):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer coversize 100```
+
 
 ----
 
 ### Authors
 
-* eon@patapon.info - Jean-Philippe Braun
-* Based on the work of j.wielicki@sotecware.net (https://github.com/horazont/gnome-shell-extensions-mediaplayer)
-* Some bits taken from Freddy Cornil (https://github.com/Caccc/Gnome-shell-extension-Mediasplayers)
+* eonpatapon (Jean-Philippe Braun)
+* grawity (Mantas Mikulėnas)
+
+Based on the work of horazont (Jonas Wielicki)
