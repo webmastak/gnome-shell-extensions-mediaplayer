@@ -476,7 +476,9 @@ Player.prototype = {
         this._owner = owner;
         this._app = "";
         this._status = "";
-        this._identity = "";
+        // Guess the name based on the dbus path
+        // Should be overriden by the Identity property
+        this._identity = this._owner.split('.')[3].charAt(0).toUpperCase() + this._owner.split('.')[3].slice(1);
         this._playlists = "";
         this._playlistsMenu = "";
         this._currentPlaylist = "";
