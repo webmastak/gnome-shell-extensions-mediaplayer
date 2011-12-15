@@ -23,11 +23,11 @@ Compatible players :
 
 By default, media players shows up in the volume menu:
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer2.png) 
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
 
 But you can have the media players in a separate menu (see settings):
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/devel/data/mediaplayer1.png)
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
 Notice the support of playlists in Banshee (MPRIS 2.1 player interface).
 
