@@ -53,12 +53,11 @@ Note that this version does not include gsettings options.
 
 ## Manual installation
 
-* Prerequisites: automake, gettext, glib2 devel files
+Prerequisites: automake, gettext, glib2 devel files
 
     ./autogen.sh
     make
     sudo make install
-  
 
 ## Settings
 
