@@ -245,6 +245,8 @@ MediaServer2Player.prototype = {
             function(volume, ex) {
                 if (!ex)
                     callback(this, volume);
+                else
+                    callback(this, null);
             }));
     },
     setVolume: function(value) {
@@ -555,6 +557,10 @@ Player.prototype = {
             this.addMenuItem(this._position);
             this._position.actor.hide();
         }
+       
+        // Get the current volume
+        // If the player has no Volume property, this.showVolume will be set to false
+        this._getVolume();
 
         if (this.showVolume) {
             this._volume = new SliderItem(_("Volume"), "audio-volume-high", 0);
@@ -573,7 +579,6 @@ Player.prototype = {
             this._getActivePlaylist();
             this._getPlaylists();
         }
-        this._getVolume();
         this._getPosition();
 
         this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
@@ -770,6 +775,10 @@ Player.prototype = {
     },
 
     _setVolume: function(sender, value) {
+        // Player does not have a volume property
+        if (value == null) 
+            this.showVolume = false;
+
         if (this.showVolume) {
             if (value === 0)
                 this._volume.setIcon("audio-volume-muted");
