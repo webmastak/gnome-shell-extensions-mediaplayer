@@ -367,35 +367,6 @@ SliderItem.prototype = {
     }
 }
 
-function TextImageMenuItem() {
-    this._init.apply(this, arguments);
-}
-
-TextImageMenuItem.prototype = {
-    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
-
-    _init: function(text, icon, type, align, style) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
-        this.actor = new St.BoxLayout({style_class: style});
-        this.icon = new St.Icon({style_class: "menu-item-icon", icon_name: icon, icon_type: type});
-        this.text = new St.Label({text: text});
-        if (align === "left") {
-            this.actor.add_actor(this.icon, { span: 0 });
-            this.actor.add_actor(this.text, { span: -1 });
-        }
-        else {
-            this.actor.add_actor(this.text, { span: 0 });
-            this.actor.add_actor(this.icon, { span: -1 });
-        }
-    },
-    setText: function(text) {
-        this.text.text = text;
-    },
-    setIcon: function(icon) {
-        this.icon.icon_name = icon;
-    }
-}
-
 function TrackTitle() {
     this._init.apply(this, arguments);
 }
@@ -505,7 +476,7 @@ Player.prototype = {
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
         this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
         this.trackCoverContainer.set_child(this.trackCover);
-        this._trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
+        this.trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
 
         this.trackBox = new St.BoxLayout({style_class: 'track-box'});
         this.trackBox.add_actor(this.trackCoverContainer);
@@ -544,8 +515,8 @@ Player.prototype = {
         this.controls.add_actor(this._playButton.getActor());
         this.controls.add_actor(this._stopButton.getActor());
         this.controls.add_actor(this._nextButton.getActor());
-        this._trackControls.set_child(this.controls);
-        this.addActor(this._trackControls);
+        this.trackControls.set_child(this.controls);
+        this.addActor(this.trackControls);
        
         if (this.showPosition) {
             this._position = new SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
