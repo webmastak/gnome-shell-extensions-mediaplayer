@@ -142,8 +142,7 @@ const MediaServer2PlaylistsIFace = {
 
 /* global values */
 let settings;
-let compatible_players;
-let support_seek;
+let players;
 let playerManager;
 let mediaplayerMenu;
 /* dummy vars for translation */
@@ -429,7 +428,7 @@ PlaylistItem.prototype = {
         this.obj = obj;
         this.box = new St.BoxLayout();
         this.addActor(this.box);
-        this.label = new St.Label({ text: text });
+        this.label = new St.Label({text: text});
         this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list'});
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
@@ -925,8 +924,8 @@ PlayerManager.prototype = {
         if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
            this.menu.actor.hide();
         // watch players
-        for (var p=0; p<compatible_players.length; p++) {
-            DBus.session.watch_name('org.mpris.MediaPlayer2.'+compatible_players[p], false,
+        for (var p=0; p<players.length; p++) {
+            DBus.session.watch_name('org.mpris.MediaPlayer2.'+players[p], false,
                 Lang.bind(this, this._addPlayer),
                 Lang.bind(this, this._removePlayer)
             );
@@ -979,8 +978,7 @@ PlayerMenu.prototype = {
 function init(metadata) {
     imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
     settings = getSettings(MEDIAPLAYER_SETTINGS_SCHEMA);
-    compatible_players = metadata.players;
-    support_seek = metadata.support_seek;
+    players = metadata.players;
 }
 
 function enable() {

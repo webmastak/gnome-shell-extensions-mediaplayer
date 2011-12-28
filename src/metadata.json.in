@@ -4,10 +4,10 @@
 "description": "Control MPRIS2 capable media players",
 "original-author": "eon@patapon.info",
 "shell-version": [ "3.1.90", "3.1.91", "3.1.92", "3.2" ],
-"locale": "@LOCALEDIR@",
-"path": "@EXTENSIONDIR@",
 "url": "@URL@",
+"locale": "@LOCALEDIR@",
 "players": [
+    "audacious",
     "amarok",
     "banshee",
     "beatbox",
@@ -16,7 +16,6 @@
     "googlemusicframe",
     "nuvolaplayer",
     "guayadeque",
-    "gmusicbrowser",
     "mpd",
     "pithos",
     "pragha",
@@ -27,18 +26,6 @@
     "tomahawk",
     "totem",
     "xbmc"
-],
-"support_seek": [
-    "amarok",
-    "banshee",
-    "beatbox",
-    "clementine",
-    "deadbeef",
-    "quodlibet",
-    "rhythmbox",
-    "rhythmbox3",
-    "tomahawk",
-    "totem"
 ]
 }
 
