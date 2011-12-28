@@ -8,12 +8,13 @@ const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Main = imports.ui.main;
-const Pango = imports.gi.Pango;
-const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
+const Me = imports.ui.extensionSystem.extensions['mediaplayer@patapon.info'];
+const Widget = Me.widget;
+const DBusIface = Me.dbus;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
 const _ = Gettext.gettext;
@@ -26,119 +27,6 @@ const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 
 const FADE_ANIMATION_TIME = 0.16; 
-
-const PropIFace = {
-    name: 'org.freedesktop.DBus.Properties',
-    signals: [{ name: 'PropertiesChanged',
-                inSignature: 'a{sv}'}]
-};
-
-const MediaServer2IFace = {
-    name: 'org.mpris.MediaPlayer2',
-    methods: [{ name: 'Raise',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'Quit',
-                inSignature: '',
-                outSignature: '' }],
-    properties: [{ name: 'CanRaise',
-                   signature: 'b',
-                   access: 'read'},
-                 { name: 'CanQuit',
-                   signature: 'b',
-                   access: 'read'},
-                 { name: 'Identity',
-                   signature: 's',
-                   access: 'read'},
-                 { name: 'DesktopEntry',
-                   signature: 's',
-                   access: 'read'}],
-};
-
-const MediaServer2PlayerIFace = {
-    name: 'org.mpris.MediaPlayer2.Player',
-    methods: [{ name: 'PlayPause',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'Pause',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'Play',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'Stop',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'Next',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'Previous',
-                inSignature: '',
-                outSignature: '' },
-              { name: 'SetPosition',
-                inSignature: 'ox',
-                outSignature: '' }],
-    properties: [{ name: 'Metadata',
-                   signature: 'a{sv}',
-                   access: 'read'},
-                 { name: 'Shuffle',
-                   signature: 'b',
-                   access: 'readwrite'},
-                 { name: 'Rate',
-                   signature: 'd',
-                   access: 'readwrite'},
-                 { name: 'LoopStatus',
-                   signature: 'b',
-                   access: 'readwrite'},
-                 { name: 'Volume',
-                   signature: 'd',
-                   access: 'readwrite'},
-                 { name: 'PlaybackStatus',
-                   signature: 's',
-                   access: 'read'},
-                 { name: 'Position',
-                   signature: 'x',
-                   access: 'read'},
-                 { name: 'CanGoNext',
-                   signature: 'b',
-                   access: 'read'},
-                 { name: 'CanGoPrevious',
-                   signature: 'b',
-                   access: 'read'},
-                 { name: 'CanPlay',
-                   signature: 'b',
-                   access: 'read'},
-                 { name: 'CanPause',
-                   signature: 'b',
-                   access: 'read'},
-                 { name: 'CanSeek',
-                   signature: 'b',
-                   access: 'read'}],
-    signals: [{ name: 'Seeked',
-                inSignature: 'x' }]
-};
-
-const MediaServer2PlaylistsIFace = {
-    name: 'org.mpris.MediaPlayer2.Playlists',
-    methods: [{ name: 'ActivatePlaylist',
-                inSignature: 'o', 
-                outSignature: '' },
-              { name: 'GetPlaylists',
-                inSignature: 'uusb',
-                outSignature: 'a{oss}' }],
-    signals: [{ name: 'PlaylistChanged',
-                inSignature: '',
-                outSignature: 'oss' }],
-    properties: [{ name: 'PlaylistCount',
-                   signature: 'u',
-                   access: 'read'},
-                 { name: 'Orderings',
-                   signature: 'as',
-                   access: 'read' },
-                 { name: 'ActivePlaylist',
-                   signature: 'b{oss}',
-                   access: 'read' }]
-};
 
 /* global values */
 let settings;
@@ -155,285 +43,6 @@ function getSettings(schema) {
         throw _("Schema \"%s\" not found.").format(schema);
     return new Gio.Settings({ schema: schema });
 }
-
-function Prop() {
-    this._init.apply(this, arguments);
-}
-
-Prop.prototype = {
-    _init: function(owner) {
-        DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
-    }
-}
-DBus.proxifyPrototype(Prop.prototype, PropIFace)
-
-function MediaServer2() {
-    this._init.apply(this, arguments);
-}
-
-MediaServer2.prototype = {
-    _init: function(owner) {
-        DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
-    },
-    getIdentity: function(callback) {
-        this.GetRemote('Identity', Lang.bind(this,
-            function(identity, ex) {
-                if (!ex)
-                    callback(this, identity);
-            }));
-    },
-    getDesktopEntry: function(callback) {
-        this.GetRemote('DesktopEntry', Lang.bind(this,
-            function(entry, ex) {
-                if (!ex)
-                    callback(this, entry);
-            }));
-    },
-    getRaise: function(callback) {
-        this.GetRemote('CanRaise', Lang.bind(this,
-            function(raise, ex) {
-                if (!ex)
-                    callback(this, raise);
-            }));
-    }
-}
-DBus.proxifyPrototype(MediaServer2.prototype, MediaServer2IFace)
-
-function MediaServer2Player() {
-    this._init.apply(this, arguments);
-}
-
-MediaServer2Player.prototype = {
-    _init: function(owner) {
-        this._owner = owner;
-        DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
-    },
-    getMetadata: function(callback) {
-        this.GetRemote('Metadata', Lang.bind(this,
-            function(metadata, ex) {
-                if (!ex)
-                    callback(this, metadata);
-            }));
-    },
-    getPlaybackStatus: function(callback) {
-        this.GetRemote('PlaybackStatus', Lang.bind(this,
-            function(status, ex) {
-                if (!ex)
-                    callback(this, status);
-            }));
-    },
-    getPosition: function(callback) {
-        this.GetRemote('Position', Lang.bind(this,
-            function(position, ex) {
-                if (!ex)
-                    callback(this, position);
-            }));
-    },
-    getShuffle: function(callback) {
-        this.GetRemote('Shuffle', Lang.bind(this,
-            function(shuffle, ex) {
-                if (!ex)
-                    callback(this, shuffle);
-            }));
-    },
-    setShuffle: function(value) {
-        this.SetRemote('Shuffle', value);
-    },
-    getVolume: function(callback) {
-        this.GetRemote('Volume', Lang.bind(this,
-            function(volume, ex) {
-                if (!ex)
-                    callback(this, volume);
-                else
-                    callback(this, null);
-            }));
-    },
-    setVolume: function(value) {
-        this.SetRemote('Volume', parseFloat(value));
-    },
-    getRepeat: function(callback) {
-        this.GetRemote('LoopStatus', Lang.bind(this,
-            function(repeat, ex) {
-                if (!ex) {
-                    if (repeat == "None")
-                        repeat = false
-                    else
-                        repeat = true
-                    callback(this, repeat);
-                }
-            }));
-    },
-    setRepeat: function(value) {
-        if (value)
-            value = "Playlist"
-        else
-            value = "None"
-        this.SetRemote('LoopStatus', value);
-    }
-}
-DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
-
-function MediaServer2Playlists() {
-    this._init.apply(this, arguments);
-}
-
-MediaServer2Playlists.prototype = {
-    _init: function(owner) {
-        this._owner = owner;
-        DBus.session.proxifyObject(this, owner, '/org/mpris/MediaPlayer2', this);
-    },
-    getPlaylistCount: function(callback) {
-        this.GetRemote('PlaylistCount', Lang.bind(this,
-            function(count, ex) {
-                if (!ex)
-                    callback(this, count);
-            }));
-    },
-    getOrderings: function(callback) {
-        this.GetRemote('Orderings', Lang.bind(this,
-            function(orderings, ex) {
-                if (!ex)
-                    callback(this, orderings);
-            }));
-    },
-    getActivePlaylist: function(callback) {
-        this.GetRemote('ActivePlaylist', Lang.bind(this,
-            function(active, ex) {
-                if (!ex)
-                    callback(this, active);
-            }));
-    }
-}
-DBus.proxifyPrototype(MediaServer2Playlists.prototype, MediaServer2PlaylistsIFace)
-
-function ControlButton() {
-    this._init.apply(this, arguments);
-}
-
-ControlButton.prototype = {
-    _init: function(icon, callback) {
-        this.actor = new St.Bin({style_class: 'button-container'});
-        this.button = new St.Button({ style_class: 'notification-icon-button' });
-        this.button.connect('clicked', callback);
-        this.icon = new St.Icon({
-            icon_type: St.IconType.SYMBOLIC,
-            icon_name: icon,
-            icon_size: 20
-        });
-        this.button.set_child(this.icon);
-        this.actor.add_actor(this.button);
-
-    },
-    getActor: function() {
-        return this.actor;
-    },
-    setIcon: function(icon) {
-        this.icon.icon_name = icon;
-    },
-    hide: function() {
-        this.actor.hide();
-    },
-    show: function() {
-        this.actor.show();
-    },
-}
-
-function SliderItem() {
-    this._init.apply(this, arguments);
-}
-
-SliderItem.prototype = {
-    __proto__: PopupMenu.PopupSliderMenuItem.prototype,
-
-    _init: function(text, icon, value) {
-        PopupMenu.PopupSliderMenuItem.prototype._init.call(this, value);
-        this.removeActor(this._slider);
-        this._holder = new St.BoxLayout({style_class: 'slider-item'});
-        this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon});
-        this._label = new St.Label({text: text});
-        this._holder.add_actor(this._icon);
-        this._holder.add_actor(this._label);
-        this._holder.add_actor(this._slider);
-        this.addActor(this._holder);
-    },
-
-    setIcon: function(icon) {
-        this._icon.icon_name = icon;
-    },
-
-    setLabel: function(text) {
-        this._label.text = text;
-    }
-}
-
-function TrackTitle() {
-    this._init.apply(this, arguments);
-}
-
-TrackTitle.prototype = {
-    _init: function(pattern, style) {
-        this.label = new St.Label({style_class: style, text: ""});
-        this.text = pattern;
-    },
-
-    format: function(values) {
-        for (let i=0; i<values.length; i++) {
-            values[i] = GLib.markup_escape_text(values[i].toString(), -1);
-        }
-        if (this.label.clutter_text) {
-            this.label.clutter_text.line_wrap = true;
-            this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-            this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.label.clutter_text.set_markup(this.text.format(values));
-        }
-    }
-}
-
-function IconItem() {
-    this._init.apply(this, arguments);
-}
-
-IconItem.prototype = {
-    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
-
-    _init: function(text, icon) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
-
-        this.box = new St.BoxLayout();
-        this.addActor(this.box);
-        this.label = new St.Label({text: text});
-        this.icon = new St.Bin({style_class: "menu-icon", child: icon});
-        this.box.add_actor(this.icon);
-        this.box.add_actor(this.label);
-    },
-
-    setLabel: function(text) {
-        this.label.text = text;
-    },
-
-    setIcon: function(icon) {
-        this.icon.set_child(icon);
-    },
-}
-
-function PlaylistItem() {
-    this._init.apply(this, arguments);
-}
-
-PlaylistItem.prototype = {
-    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
-
-    _init: function (text, obj, icon) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
-        this.obj = obj;
-        this.box = new St.BoxLayout();
-        this.addActor(this.box);
-        this.label = new St.Label({text: text});
-        this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list'});
-        this.box.add_actor(this.icon);
-        this.box.add_actor(this.label);
-    }
-};
 
 function Player() {
     this._init.apply(this, arguments);
@@ -456,10 +65,10 @@ Player.prototype = {
         this._currentPlaylist = "";
         this._currentTime = 0;
         this._timeoutId = 0;
-        this._mediaServer = new MediaServer2(owner);
-        this._mediaServerPlayer = new MediaServer2Player(owner);
-        this._mediaServerPlaylists = new MediaServer2Playlists(owner);
-        this._prop = new Prop(owner);
+        this._mediaServer = new DBusIface.MediaServer2(owner);
+        this._mediaServerPlayer = new DBusIface.MediaServer2Player(owner);
+        this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(owner);
+        this._prop = new DBusIface.Prop(owner);
         this._settings = settings;
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
@@ -468,7 +77,7 @@ Player.prototype = {
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
-        this.playerTitle = new IconItem(this._identity, genericIcon);
+        this.playerTitle = new Widget.IconItem(this._identity, genericIcon);
         this.addMenuItem(this.playerTitle);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
@@ -480,11 +89,11 @@ Player.prototype = {
         this.trackBox = new St.BoxLayout({style_class: 'track-box'});
         this.trackBox.add_actor(this.trackCoverContainer);
 
-        this.trackTitle = new TrackTitle('%s', 'track-title');
+        this.trackTitle = new Widget.TrackTitle('%s', 'track-title');
         this.trackTitle.format([_('Unknown Title')]);
-        this.trackArtist = new TrackTitle('<span foreground="#ccc">' + _("by") +'</span> %s', 'track-artist');
+        this.trackArtist = new Widget.TrackTitle('<span foreground="#ccc">' + _("by") +'</span> %s', 'track-artist');
         this.trackArtist.format([_('Unknown Artist')]);
-        this.trackAlbum = new TrackTitle('<span foreground="#ccc">' + _("from") + '</span> %s', 'track-album');
+        this.trackAlbum = new Widget.TrackTitle('<span foreground="#ccc">' + _("from") + '</span> %s', 'track-album');
         this.trackAlbum.format([_('Unknown Album')]);
 
         this.trackInfos = new St.Table({style_class: "track-infos"});
@@ -499,14 +108,14 @@ Player.prototype = {
         this.trackBox.opacity = 0;
         this.trackBox.set_height(-1);
 
-        this._prevButton = new ControlButton('media-skip-backward',
+        this._prevButton = new Widget.ControlButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
-        this._playButton = new ControlButton('media-playback-start',
+        this._playButton = new Widget.ControlButton('media-playback-start',
             Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
-        this._stopButton = new ControlButton('media-playback-stop',
+        this._stopButton = new Widget.ControlButton('media-playback-stop',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._stopButton.hide();
-        this._nextButton = new ControlButton('media-skip-forward',
+        this._nextButton = new Widget.ControlButton('media-skip-forward',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
 
         this.controls = new St.BoxLayout();
@@ -518,7 +127,7 @@ Player.prototype = {
         this.addActor(this.trackControls);
        
         if (this.showPosition) {
-            this._position = new SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
+            this._position = new Widget.SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
             this._position.connect('value-changed', Lang.bind(this, function(item) {
                 let time = item._value * this._songLength;
                 this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
@@ -533,7 +142,7 @@ Player.prototype = {
         this._getVolume();
 
         if (this.showVolume) {
-            this._volume = new SliderItem(_("Volume"), "audio-volume-high", 0);
+            this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high", 0);
             this._volume.connect('value-changed', Lang.bind(this, function(item) {
                 this._mediaServerPlayer.setVolume(item._value);
             }));
@@ -641,7 +250,7 @@ Player.prototype = {
                 let obj = this._playlists[i][0];
                 let name = this._playlists[i][1];
                 if (obj.toString().search('Video') == -1) {
-                    let playlist = new PlaylistItem(name, obj);
+                    let playlist = new Widget.PlaylistItem(name, obj);
                     playlist.connect('activate', Lang.bind(this, function(playlist) {
                         this._mediaServerPlaylists.ActivatePlaylistRemote(playlist.obj);
                     }));
