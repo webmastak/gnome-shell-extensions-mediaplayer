@@ -152,8 +152,8 @@ Player.prototype = {
 
         this._getIdentity();
         this._getDesktopEntry();
-        this._getStatus();
         this._getMetadata();
+        this._getStatus();
         if (this.showPlaylists) {
             this._getActivePlaylist();
             this._getPlaylists();
@@ -278,7 +278,15 @@ Player.prototype = {
     },
 
     _setPosition: function(sender, value) {
-        this._currentTime = value / 1000000;
+        // Player does not have a position property
+        if (value == null) {
+            if (this.showPosition) {
+                this._position.actor.hide();
+                this.showPosition = false;
+            }
+        }
+        else
+            this._currentTime = value / 1000000;
     },
 
     _getPosition: function() {
@@ -292,10 +300,16 @@ Player.prototype = {
         // value on stop
         if (Object.keys(metadata).length > 1) {
             this._currentTime = -1;
-            if (metadata["mpris:length"])
+            if (metadata["mpris:length"]) {
                 this._songLength = metadata["mpris:length"] / 1000000;
-            else
+            }
+            else {
                 this._songLength = 0;
+                if (this.showPosition) {
+                    this._position.actor.hide();
+                    this.showPosition = false;
+                }
+            }
             if (metadata["xesam:artist"])
                 this.trackArtist.format([metadata["xesam:artist"].toString()]);
             else 

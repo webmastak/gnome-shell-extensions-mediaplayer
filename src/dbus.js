@@ -187,6 +187,8 @@ MediaServer2Player.prototype = {
             function(position, ex) {
                 if (!ex)
                     callback(this, position);
+                else
+                    callback(this, null);
             }));
     },
     getShuffle: function(callback) {
