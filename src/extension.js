@@ -279,7 +279,7 @@ Player.prototype = {
 
     _setPosition: function(sender, value) {
         // Player does not have a position property
-        if (value == null) {
+        if (value == null && this._status != "Stopped") {
             if (this.showPosition) {
                 this._position.actor.hide();
                 this.showPosition = false;
