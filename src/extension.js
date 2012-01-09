@@ -543,19 +543,22 @@ PlayerManager.prototype = {
         this.menu = menu;
         // players list
         this._players = {};
+        // watch list
+        this._watch = [];
         // hide the menu by default
         if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
            this.menu.actor.hide();
         // watch players
         for (var p=0; p<players.length; p++) {
-            DBus.session.watch_name('org.mpris.MediaPlayer2.'+players[p], false,
+            this._watch.push(Gio.DBus.session.watch_name('org.mpris.MediaPlayer2.'+players[p], 
+                Gio.BusNameWatcherFlags.NONE,
                 Lang.bind(this, this._addPlayer),
                 Lang.bind(this, this._removePlayer)
-            );
+            ));
         }
     },
 
-    _addPlayer: function(owner) {
+    _addPlayer: function(conn, owner) {
         let position;
         this._players[owner] = new Player(owner);
         if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
@@ -568,11 +571,13 @@ PlayerManager.prototype = {
         this.menu.actor.show();
     },
 
-    _removePlayer: function(owner) {
-        this._players[owner].destroy();
-        delete this._players[owner];
-        if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) && this._nbPlayers() == 0)
-            this.menu.actor.hide();
+    _removePlayer: function(conn, owner) {
+        if (this._players[owner]) {
+            this._players[owner].destroy();
+            delete this._players[owner];
+            if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) && this._nbPlayers() == 0)
+                this.menu.actor.hide();
+        }
     },
 
     _nbPlayers: function() {
@@ -580,7 +585,10 @@ PlayerManager.prototype = {
     },
 
     destroy: function() {
-        for (owner in this._players) {
+        for (let w = 0; w<this._watch.length; w++) {
+            Gio.DBus.session.unwatch_name(this._watch[w]);
+        }
+        for (let owner in this._players) {
             this._players[owner].destroy();
         }
     }
