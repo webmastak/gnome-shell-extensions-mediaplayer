@@ -82,7 +82,7 @@ Player.prototype = {
         this._mediaServer = new DBusIface.MediaServer2(owner);
         this._mediaServerPlayer = new DBusIface.MediaServer2Player(owner);
         this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(owner);
-        this._prop = new DBusIface.Prop(owner);
+        this._prop = new DBusIface.Properties(owner);
         this._settings = settings;
         
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
@@ -148,106 +148,91 @@ Player.prototype = {
             this._position.actor.hide();
         }
        
-        // Get the current volume
-        // If the player has no Volume property, this.showVolume will be set to false
-        this._getVolume();
-
         if (this.showVolume) {
             this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high", 0);
             this._volume.connect('value-changed', Lang.bind(this, function(item) {
-                this._mediaServerPlayer.setVolume(item._value);
+                this._mediaServerPlayer.Volume = item._value;
             }));
             this.addMenuItem(this._volume);
             this._volume.actor.hide();
         }
 
+        this._getVolume();
         this._getIdentity();
         this._getDesktopEntry();
         this._getMetadata();
         this._getStatus();
         if (this.showPlaylists) {
-            this._getActivePlaylist();
             this._getPlaylists();
+            this._getActivePlaylist();
         }
         this._getPosition();
 
-        this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
-            if (raise) {
-                this.playerTitle.connect('activate',
-                    Lang.bind(this, function () { 
-                        // If we have an application in the appSystem
-                        // Bring it to the front else let the player  decide
-                        if (this._app)
-                            this._app.activate_full(-1, 0);
-                        else
-                            this._mediaServer.RaiseRemote();
-                        // Close the indicator
-                        mediaplayerMenu.menu.close();
-                    })
-                );
-            }
-            else {
-                // Make the player title insensitive
-                this.playerTitle.setSensitive(false);
-                this.playerTitle.actor.remove_style_pseudo_class('insensitive');
-            }
+        if (this._mediaServer.CanRaise) {
+            this.playerTitle.connect('activate',
+                Lang.bind(this, function () { 
+                    // If we have an application in the appSystem
+                    // Bring it to the front else let the player  decide
+                    if (this._app)
+                        this._app.activate_full(-1, 0);
+                    else
+                        this._mediaServer.RaiseRemote();
+                    // Close the indicator
+                    mediaplayerMenu.menu.close();
+                })
+            );
+        }
+        else {
+            // Make the player title insensitive
+            this.playerTitle.setSensitive(false);
+            this.playerTitle.actor.remove_style_pseudo_class('insensitive');
+        }
+        
+        if (this._mediaServer.CanQuit) {
+            this.playerTitle.showButton();
+        }
+
+        this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
+            if (props.Volume)
+                this._setVolume(props.Volume.unpack());
+            if (props.PlaybackStatus)
+                this._setStatus(props.PlaybackStatus.unpack());
+            if (props.Metadata)
+                this._setMetadata(props.Metadata.deep_unpack());
+            if (props.ActivePlaylist)
+                this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
         }));
 
-        this._mediaServer.getQuit(Lang.bind(this, function(sender, quit) {
-            if (quit)
-                this.playerTitle.showButton();
-        }));
-
-        this._prop.connect('PropertiesChanged', Lang.bind(this, function(sender, iface, value) {
-            if (value["Volume"])
-                this._setVolume(iface, value["Volume"]);
-            if (value["PlaybackStatus"])
-                this._setStatus(iface, value["PlaybackStatus"]);
-            if (value["Metadata"])
-                this._setMetadata(iface, value["Metadata"]);
-            if (value["ActivePlaylist"])
-                this._setActivePlaylist(iface, value["ActivePlaylist"]);
-            if (this.showPlaylists && value["PlaylistCount"])
-                this._getPlaylists();
-        }));
-
-        this._mediaServerPlayer.connect('Seeked', Lang.bind(this, function(sender, value) {
-            this._setPosition(sender, value);
+        this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
+            this._setPosition(value);
         }));
     },
 
     _getIdentity: function() {
-        this._mediaServer.getIdentity(Lang.bind(this,
-            function(sender, identity) {
-                this._identity = identity;
-                this._setIdentity();
-            }));
+        this._identity = this._mediaServer.Identity;
+        this._setIdentity();
     },
 
     _getDesktopEntry: function() {
-        this._mediaServer.getDesktopEntry(Lang.bind(this,
-            function(sender, entry) {
-                let appSys = Shell.AppSystem.get_default();
-                this._app = appSys.lookup_app(entry+".desktop");
-                if (this._app) {
-                    let icon = this._app.create_icon_texture(16);
-                    this.playerTitle.setIcon(icon);
-                }
-            }));
+        let entry = this._mediaServer.DesktopEntry;
+        let appSys = Shell.AppSystem.get_default();
+        this._app = appSys.lookup_app(entry+".desktop");
+        if (this._app) {
+            let icon = this._app.create_icon_texture(16);
+            this.playerTitle.setIcon(icon);
+        }
     },
 
-    _setActivePlaylist: function(sender, playlist) {
+    _setActivePlaylist: function(playlist) {
         // Is there an active playlist ?
-        if (playlist[0]) {
+        if (playlist && playlist[0]) {
             this._currentPlaylist = playlist[1][0];
         }
         this._setPlaylists(null);
     },
 
     _getActivePlaylist: function() {
-        this._mediaServerPlaylists.getActivePlaylist(Lang.bind(this,
-            this._setActivePlaylist
-        ));
+        this._setActivePlaylist(this._mediaServerPlaylists.ActivePlaylist);
     },
 
     _setPlaylists: function(playlists) {
@@ -262,9 +247,9 @@ Player.prototype = {
             }
             let show = false;
             this._playlistsMenu.menu.removeAll();
-            for (let i=0; i<this._playlists.length; i++) {
-                let obj = this._playlists[i][0];
-                let name = this._playlists[i][1];
+            for (let p in this._playlists[0]) {
+                let obj = this._playlists[0][p][0];
+                let name = this._playlists[0][p][1];
                 if (obj.toString().search('Video') == -1) {
                     let playlist = new Widget.PlaylistItem(name, obj);
                     playlist.connect('activate', Lang.bind(this, function(playlist) {
@@ -293,7 +278,7 @@ Player.prototype = {
             this.playerTitle.setLabel(this._identity);
     },
 
-    _setPosition: function(sender, value) {
+    _setPosition: function(value) {
         // Player does not have a position property
         if (value == null && this._status != "Stopped") {
             if (this.showPosition) {
@@ -306,18 +291,16 @@ Player.prototype = {
     },
 
     _getPosition: function() {
-        this._mediaServerPlayer.getPosition(Lang.bind(this,
-            this._setPosition
-        ));
+        this._setPosition(this._mediaServerPlayer.Position);
     },
 
-    _setMetadata: function(sender, metadata) {
+    _setMetadata: function(metadata) {
         // Pragha sends a metadata dict with one
         // value on stop
         if (Object.keys(metadata).length > 1) {
             this._currentTime = -1;
             if (metadata["mpris:length"]) {
-                this._songLength = metadata["mpris:length"] / 1000000;
+                this._songLength = metadata["mpris:length"].unpack() / 1000000;
             }
             else {
                 this._songLength = 0;
@@ -326,27 +309,29 @@ Player.prototype = {
                     this.showPosition = false;
                 }
             }
-            if (metadata["xesam:artist"])
-                this.trackArtist.format([metadata["xesam:artist"].toString()]);
+            if (metadata["xesam:artist"]) {
+                this.trackArtist.format([metadata["xesam:artist"].deep_unpack()]);
+            }
             else 
                 this.trackArtist.format([_("Unknown Artist")]);
             if (metadata["xesam:album"])
-                this.trackAlbum.format([metadata["xesam:album"].toString()]);
+                this.trackAlbum.format([metadata["xesam:album"].unpack()]);
             else
                 this.trackAlbum.format([_("Unknown Album")]);
-            if (metadata["xesam:title"])
-                this.trackTitle.format([metadata["xesam:title"].toString()]);
+            if (metadata["xesam:title"]) {
+                this.trackTitle.format([metadata["xesam:title"].unpack()]);
+            }
             else
                 this.trackTitle.format([_("Unknown Title")]);
 
             if (metadata["mpris:trackid"]) {
-                this.trackObj = metadata["mpris:trackid"];
+                this.trackObj = metadata["mpris:trackid"].unpack();
             }
 
             let animate = false;
             if (metadata["mpris:artUrl"]) {
-                if (this.trackCoverFile != metadata["mpris:artUrl"].toString()) {
-                    this.trackCoverFile = metadata["mpris:artUrl"].toString();
+                if (this.trackCoverFile != metadata["mpris:artUrl"].unpack()) {
+                    this.trackCoverFile = metadata["mpris:artUrl"].unpack();
                     animate = true;
                 }
             }
@@ -394,18 +379,16 @@ Player.prototype = {
     },
 
     _getMetadata: function() {
-        this._mediaServerPlayer.getMetadata(Lang.bind(this,
-            this._setMetadata
-        ));
+        this._setMetadata(this._mediaServerPlayer.Metadata);
     },
 
-    _setVolume: function(sender, value) {
+    _setVolume: function(value) {
         // Player does not have a volume property
         if (value == null) 
             this.showVolume = false;
 
         if (this.showVolume) {
-            if (value === 0)
+            if (value == 0)
                 this._volume.setIcon("audio-volume-muted");
             if (value > 0)
                 this._volume.setIcon("audio-volume-low");
@@ -418,12 +401,10 @@ Player.prototype = {
     },
 
     _getVolume: function() {
-        this._mediaServerPlayer.getVolume(Lang.bind(this,
-            this._setVolume
-        ));
+        this._setVolume(this._mediaServerPlayer.Volume);
     },
 
-    _setStatus: function(sender, status) {
+    _setStatus: function(status) {
         if (status != this._status) {
             this._status = status;
             if (this._status == "Playing") {
@@ -494,9 +475,7 @@ Player.prototype = {
     },
 
     _getStatus: function() {
-        this._mediaServerPlayer.getPlaybackStatus(Lang.bind(this,
-            this._setStatus
-        ));
+        this._setStatus(this._mediaServerPlayer.PlaybackStatus);
     },
 
     _toggleCover: function() {        
