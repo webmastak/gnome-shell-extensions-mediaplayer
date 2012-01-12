@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-12-09 20:36+0100\n"
-"PO-Revision-Date: 2011-12-22 20:17+0100\n"
+"PO-Revision-Date: 2012-01-12 20:17+0100\n"
 "Last-Translator: Fabio <fbmail74-abc@yahoo.it>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -27,7 +27,7 @@ msgstr "In Pausa"
 
 #: ../src/extension.js:150
 msgid "Stopped"
-msgstr "Arrestata"
+msgstr "Arrestato"
 
 #: ../src/extension.js:154
 #, c-format
