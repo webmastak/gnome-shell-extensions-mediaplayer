@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-12-09 20:36+0100\n"
-"PO-Revision-Date: 2011-10-08 23:02-0000\n"
+"PO-Revision-Date: 2012-01-16 09:24+0200\n"
 "Last-Translator: Yakir Sitbon <kingyes1@gmail.com>\n"
 "Language-Team: Yakir Sitbon <kingyes1@gmail.com>\n"
 "Language: Hebrew\n"
@@ -36,11 +36,11 @@ msgstr ""
 
 #: ../src/extension.js:482
 msgid "by"
-msgstr ""
+msgstr "על ידי"
 
 #: ../src/extension.js:484
 msgid "from"
-msgstr ""
+msgstr "מאת"
 
 #: ../src/extension.js:519
 msgid "Volume"
@@ -62,3 +62,4 @@ msgstr "אלבום לא ידוע"
 #: ../src/extension.js:704
 msgid "Unknown Title"
 msgstr "שיר לא ידוע"
+
