@@ -155,6 +155,13 @@ MediaServer2.prototype = {
                 if (!ex)
                     callback(this, raise);
             }));
+    },
+    getQuit: function(callback) {
+        this.GetRemote('CanQuit', Lang.bind(this,
+            function(quit, ex) {
+                if (!ex)
+                    callback(this, quit);
+            }));
     }
 }
 DBus.proxifyPrototype(MediaServer2.prototype, MediaServer2IFace)

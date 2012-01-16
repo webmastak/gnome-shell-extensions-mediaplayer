@@ -88,22 +88,32 @@ TrackTitle.prototype = {
     }
 }
 
-function IconItem() {
+function TitleItem() {
     this._init.apply(this, arguments);
 }
 
-IconItem.prototype = {
+TitleItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function(text, icon) {
+    _init: function(text, icon, callback) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
 
         this.box = new St.BoxLayout();
         this.addActor(this.box);
         this.label = new St.Label({text: text});
         this.icon = new St.Bin({style_class: "menu-icon", child: icon});
+        this.button = new St.Button();
+        this.button.connect('clicked', callback);
+        this.button_icon = new St.Icon({
+            icon_type: St.IconType.SYMBOLIC,
+            icon_name: 'window-close',
+            icon_size: 16
+        });
+        this.button.set_child(this.button_icon);
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
+        this.addActor(this.button, {align: St.Align.END});
+        this.hideButton();
     },
 
     setLabel: function(text) {
@@ -113,6 +123,14 @@ IconItem.prototype = {
     setIcon: function(icon) {
         this.icon.set_child(icon);
     },
+
+    hideButton: function() {
+        this.button.hide();
+    },
+
+    showButton: function() {
+        this.button.show();
+    }
 }
 
 function PlaylistItem() {

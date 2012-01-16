@@ -77,7 +77,7 @@ Player.prototype = {
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
-        this.playerTitle = new Widget.IconItem(this._identity, genericIcon);
+        this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
         this.addMenuItem(this.playerTitle);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
@@ -180,6 +180,11 @@ Player.prototype = {
                 this.playerTitle.setSensitive(false);
                 this.playerTitle.actor.remove_style_pseudo_class('insensitive');
             }
+        }));
+
+        this._mediaServer.getQuit(Lang.bind(this, function(sender, quit) {
+            if (quit)
+                this.playerTitle.showButton();
         }));
 
         this._prop.connect('PropertiesChanged', Lang.bind(this, function(sender, iface, value) {
