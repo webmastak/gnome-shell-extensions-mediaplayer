@@ -14,12 +14,12 @@ TrackBox.prototype = {
 
     _init: function(cover) {
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {reactive: false});
-        this.box = new St.BoxLayout();
+        this.box = new St.Table();
         this._cover = cover;
         this._infos = new St.Table({style_class: "track-infos"});
         this.addActor(this.box, {span: -1, expand: true});
-        this.box.add_actor(this._cover);
-        this.box.add_actor(this._infos);
+        this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
+        this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
     }
 }
 
