@@ -448,7 +448,7 @@ Player.prototype = {
 
     _refreshStatus: function() {
         if (this._status == "Playing") {
-            if (this.trackBox.box.opacity == 0) {
+            if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
                 this.trackBox.box.show();
                 this.trackBox.box.set_height(-1);
                 let [minHeight, naturalHeight] = this.trackBox.box.get_preferred_height(-1);
@@ -472,7 +472,7 @@ Player.prototype = {
                 this._position.actor.show();
         }
         else if (this._status == "Stopped") {
-            if (this.trackBox.box.opacity == 255) {
+            if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {
                 Tweener.addTween(this.trackBox.box,
                     { opacity: 0,
                       height: 0,
