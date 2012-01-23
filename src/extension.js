@@ -83,6 +83,7 @@ Player.prototype = {
         
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
+        this.trackCoverFile = false;
         this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
         this.trackCoverContainer.set_child(this.trackCover);
 
@@ -328,37 +329,53 @@ Player.prototype = {
                 this.trackObj = metadata["mpris:trackid"];
             }
 
-            // Hide the old cover
-            Tweener.addTween(this.trackCoverContainer, { opacity: 0,
-                time: 0.3,
-                transition: 'easeOutCubic',
-                onComplete: Lang.bind(this, function() {
-                    // Change cover
-                    if (metadata["mpris:artUrl"]) {
-                        let cover = metadata["mpris:artUrl"].toString();
-                        cover = decodeURIComponent(cover.substr(7));
-                        if (! GLib.file_test(cover, GLib.FileTest.EXISTS)) {
-                            this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
+            let animate = false;
+            if (metadata["mpris:artUrl"]) {
+                if (this.trackCoverFile != metadata["mpris:artUrl"].toString()) {
+                    this.trackCoverFile = metadata["mpris:artUrl"].toString();
+                    animate = true;
+                }
+            }
+            else {
+                if (this.trackCoverFile != false) {
+                    this.trackCoverFile = false;
+                    animate = true;
+                }
+            }
+
+            if (animate) {
+                // Hide the old cover
+                Tweener.addTween(this.trackCoverContainer, { opacity: 0,
+                    time: 0.3,
+                    transition: 'easeOutCubic',
+                    onComplete: Lang.bind(this, function() {
+                        // Change cover
+                        if (this.trackCoverFile) {
+                            let cover = decodeURIComponent(this.trackCoverFile.substr(7));
+                            if (! GLib.file_test(cover, GLib.FileTest.EXISTS)) {
+                                this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
+                            }
+                            else {
+                                this.trackCover = new St.Bin({style_class: 'track-cover'});
+                                cover = new Clutter.Texture({filter_quality: 2, filename: cover});
+                                let [coverWidth, coverHeight] = cover.get_base_size();
+                                this.trackCover.width = this.coverSize;
+                                this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
+                                this.trackCover.set_child(cover);
+                            }
                         }
                         else {
-                            this.trackCover = new St.Bin({style_class: 'track-cover'});
-                            cover = new Clutter.Texture({filter_quality: 2, filename: cover});
-                            let [coverWidth, coverHeight] = cover.get_base_size();
-                            this.trackCover.width = this.coverSize;
-                            this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
-                            this.trackCover.set_child(cover);
+                            this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
                         }
-                    }
-                    else
-                        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
-                    this.trackCoverContainer.set_child(this.trackCover);
-                    // Show the new cover
-                    Tweener.addTween(this.trackCoverContainer, { opacity: 255,
-                        time: 0.3,
-                        transition: 'easeInCubic'
-                    });
-                })
-            });
+                        this.trackCoverContainer.set_child(this.trackCover);
+                        // Show the new cover
+                        Tweener.addTween(this.trackCoverContainer, { opacity: 255,
+                            time: 0.3,
+                            transition: 'easeInCubic'
+                        });
+                    })
+                });
+            }
         }
     },
 
