@@ -1,5 +1,6 @@
 .button-container {
-    padding-right: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
 }
 
 .track-cover {
@@ -8,8 +9,8 @@
 }
 
 .track-infos {
-    width: 15em;
-    padding-left: 7px;
+    padding-left: 1em;
+    width: 14em;
 }
 
 .track-title {
@@ -28,25 +29,12 @@
     font-size: 0.9em;
 }
 
-.track-box {
-    padding-top: 10px;
-    padding-left: 30px;
-    padding-right: 15px;
-    padding-bottom: 5px;
-}
-
 .menu-icon {
     icon-size: 1.14em;
     padding-right: .4em;
 }
 
 .slider-item StLabel {
-    width: 6em;
     font-size: 0.9em;
-}
-
-.playback-control {
-    width: 26em;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    width: 6em;
 }

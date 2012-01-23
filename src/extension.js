@@ -78,16 +78,13 @@ Player.prototype = {
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
         this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
-        this.addMenuItem(this.playerTitle);
 
+        this.addMenuItem(this.playerTitle);
+        
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
         this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
         this.trackCoverContainer.set_child(this.trackCover);
-        this.trackControls = new St.Bin({style_class: 'playback-control', x_align: St.Align.MIDDLE});
-
-        this.trackBox = new St.BoxLayout({style_class: 'track-box'});
-        this.trackBox.add_actor(this.trackCoverContainer);
 
         this.trackTitle = new Widget.TrackTitle('%s', 'track-title');
         this.trackTitle.format([_('Unknown Title')]);
@@ -96,17 +93,16 @@ Player.prototype = {
         this.trackAlbum = new Widget.TrackTitle('<span foreground="#ccc">' + _("from") + '</span> %s', 'track-album');
         this.trackAlbum.format([_('Unknown Album')]);
 
-        this.trackInfos = new St.Table({style_class: "track-infos"});
-        this.trackInfos.add(this.trackTitle.label, {row: 0, col: 1, y_expand: false});
-        this.trackInfos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
-        this.trackInfos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
-        this.trackBox.add(this.trackInfos);
+        this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
+        this.trackBox._infos.add(this.trackTitle.label, {row: 0, col: 1, y_expand: false});
+        this.trackBox._infos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
+        this.trackBox._infos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
 
-        this.addActor(this.trackBox);
+        this.addMenuItem(this.trackBox);
                            
-        this.trackBox.hide();
-        this.trackBox.opacity = 0;
-        this.trackBox.set_height(-1);
+        this.trackBox.box.hide();
+        this.trackBox.box.opacity = 0;
+        this.trackBox.box.set_height(0);
 
         this._prevButton = new Widget.ControlButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
@@ -117,14 +113,14 @@ Player.prototype = {
         this._stopButton.hide();
         this._nextButton = new Widget.ControlButton('media-skip-forward',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
+        
+        this.trackControls = new Widget.ControlButtons();
+        this.trackControls.addButton(this._prevButton.actor);
+        this.trackControls.addButton(this._playButton.actor);
+        this.trackControls.addButton(this._stopButton.actor);
+        this.trackControls.addButton(this._nextButton.actor);
 
-        this.controls = new St.BoxLayout();
-        this.controls.add_actor(this._prevButton.getActor());
-        this.controls.add_actor(this._playButton.getActor());
-        this.controls.add_actor(this._stopButton.getActor());
-        this.controls.add_actor(this._nextButton.getActor());
-        this.trackControls.set_child(this.controls);
-        this.addActor(this.trackControls);
+        this.addMenuItem(this.trackControls);
        
         if (this.showPosition) {
             this._position = new Widget.SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
@@ -421,18 +417,19 @@ Player.prototype = {
 
     _refreshStatus: function() {
         if (this._status == "Playing") {
-            if (this.trackBox.get_stage() && this.trackBox.opacity == 0) {
-                this.trackBox.show();
-                let [minHeight, naturalHeight] = this.trackBox.get_preferred_height(-1);
-                this.trackBox.opacity = 0;
-                this.trackBox.set_height(0);
-                Tweener.addTween(this.trackBox,
+            if (this.trackBox.box.opacity == 0) {
+                this.trackBox.box.show();
+                this.trackBox.box.set_height(-1);
+                let [minHeight, naturalHeight] = this.trackBox.box.get_preferred_height(-1);
+                this.trackBox.box.opacity = 0;
+                this.trackBox.box.set_height(0);
+                Tweener.addTween(this.trackBox.box,
                     { opacity: 255,
                       height: naturalHeight,
                       time: FADE_ANIMATION_TIME,
                       transition: 'easeOutQuad',
                       onComplete: function() {
-                           this.trackBox.set_height(-1);
+                           this.trackBox.box.set_height(-1);
                       },
                       onCompleteScope: this
                     });
@@ -444,15 +441,14 @@ Player.prototype = {
                 this._position.actor.show();
         }
         else if (this._status == "Stopped") {
-            if (this.trackBox.get_stage() && this.trackBox.opacity == 255) {
-                Tweener.addTween(this.trackBox,
+            if (this.trackBox.box.opacity == 255) {
+                Tweener.addTween(this.trackBox.box,
                     { opacity: 0,
                       height: 0,
                       time: FADE_ANIMATION_TIME,
                       transition: 'easeOutQuad',
                       onComplete: function() {
-                           this.trackBox.hide();
-                           this.trackBox.set_height(-1);
+                           this.trackBox.box.hide();
                       },
                       onCompleteScope: this
                     });
