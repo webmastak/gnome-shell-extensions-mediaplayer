@@ -562,6 +562,10 @@ Player.prototype = {
         return numHours + numMins.toString() + ":" + numSecs.toString();
     },
 
+    destroy: function() {
+        this._stopTimer();
+        PopupMenu.PopupMenuSection.prototype.destroy.call(this);
+    }
 }
 
 function PlayerManager() {
