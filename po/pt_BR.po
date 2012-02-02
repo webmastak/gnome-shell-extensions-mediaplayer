@@ -1,0 +1,67 @@
+# Brazilian Portuguese Translation for gnome-shell-extension-mediaplayer.
+# Copyright (C) 2012 - gnome-shell-extension-mediaplayer
+# This file is distributed under the same license as the
+# gnome-shell-extension-mediaplayer package.
+# Elder Marco <eldermarco@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-09 20:36+0100\n"
+"PO-Revision-Date: 2012-02-01 17:03-0300\n"
+"Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Portuguese\n"
+"X-Poedit-Country: BRAZIL\n"
+
+#. dummy vars for translation
+#: ../src/extension.js:148
+msgid "Playing"
+msgstr "Tocando"
+
+#: ../src/extension.js:149
+msgid "Paused"
+msgstr "Em pausa"
+
+#: ../src/extension.js:150
+msgid "Stopped"
+msgstr "Parado"
+
+#: ../src/extension.js:154
+#, c-format
+msgid "Schema \"%s\" not found."
+msgstr "Esquema \"%s\" não encontrado."
+
+#: ../src/extension.js:482
+msgid "by"
+msgstr "por"
+
+#: ../src/extension.js:484
+msgid "from"
+msgstr "de"
+
+#: ../src/extension.js:519
+msgid "Volume"
+msgstr "Volume"
+
+#: ../src/extension.js:626
+msgid "Playlists"
+msgstr "Playlists"
+
+#: ../src/extension.js:696
+msgid "Unknown Artist"
+msgstr "Artista Deconhecido"
+
+#: ../src/extension.js:700
+msgid "Unknown Album"
+msgstr "Álbum Desconhecido"
+
+#: ../src/extension.js:704
+msgid "Unknown Title"
+msgstr "Título Desconhecido"
+
