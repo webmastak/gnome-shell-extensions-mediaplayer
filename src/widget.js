@@ -147,7 +147,7 @@ TitleItem.prototype = {
         this.addActor(this.box);
         this.label = new St.Label({text: text});
         this.icon = new St.Bin({style_class: "menu-icon", child: icon});
-        this.button = new St.Button();
+        this.button = new St.Button({style_class: "button-quit"});
         this.button.connect('clicked', callback);
         this.button_icon = new St.Icon({
             icon_type: St.IconType.SYMBOLIC,

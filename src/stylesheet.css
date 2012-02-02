@@ -4,7 +4,7 @@
 }
 
 .track-cover {
-    border: 2px solid rgba(255,255,255,0.8);
+    border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 2px;
 }
 
@@ -37,4 +37,14 @@
 .slider-item StLabel {
     font-size: 0.9em;
     width: 6em;
+}
+
+.button-quit {
+    border: 1px solid rgba(150, 150, 150, 0.5);
+    border-radius: 3px;
+}
+
+.button-quit:hover {
+    border: 1px solid white;
+    background: 1px solid rgba(150, 150, 150, 0.5);
 }
