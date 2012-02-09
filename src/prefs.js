@@ -22,8 +22,6 @@ const _ = Gettext.gettext;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Lib = Me.imports.lib;
 
-const SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
-
 let settings;
 let settings_bool;
 let settings_range;
