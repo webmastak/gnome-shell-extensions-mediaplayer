@@ -75,28 +75,6 @@ const MediaServer2PlaylistsIface = <interface name="org.mpris.MediaPlayer2.Playl
 </interface>
 const MediaServer2PlaylistsProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlaylistsIface);
 
-const MediaServer2PlaylistsIFace = {
-    name: 'org.mpris.MediaPlayer2.Playlists',
-    methods: [{ name: 'ActivatePlaylist',
-                inSignature: 'o', 
-                outSignature: '' },
-              { name: 'GetPlaylists',
-                inSignature: 'uusb',
-                outSignature: 'a{oss}' }],
-    signals: [{ name: 'PlaylistChanged',
-                inSignature: '',
-                outSignature: 'oss' }],
-    properties: [{ name: 'PlaylistCount',
-                   signature: 'u',
-                   access: 'read'},
-                 { name: 'Orderings',
-                   signature: 'as',
-                   access: 'read' },
-                 { name: 'ActivePlaylist',
-                   signature: 'b{oss}',
-                   access: 'read' }]
-};
-
 function Properties(owner) {
     return new PropertiesProxy(Gio.DBus.session, owner,
                                '/org/mpris/MediaPlayer2');
