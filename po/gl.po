@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-09 20:36+0100\n"
+"POT-Creation-Date: 2012-02-09 13:45+0100\n"
 "PO-Revision-Date: 2011-12-06 04:37+0100\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: Galician <gnome-l10n-gl@gnome.org>\n"
@@ -18,48 +18,69 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:148
+#: ../src/extension.js:53
 msgid "Playing"
 msgstr "Reproducindo"
 
-#: ../src/extension.js:149
+#: ../src/extension.js:54
 msgid "Paused"
 msgstr "Pausado"
 
-#: ../src/extension.js:150
+#: ../src/extension.js:55
 msgid "Stopped"
 msgstr "Detido"
 
-#: ../src/extension.js:154
-#, c-format
-msgid "Schema \"%s\" not found."
-msgstr "Non foi posíbel atopar o esquema «%s»"
-
-#: ../src/extension.js:482
+#: ../src/extension.js:103
 msgid "by"
 msgstr "por"
 
-#: ../src/extension.js:484
+#: ../src/extension.js:105
 msgid "from"
 msgstr "de"
 
-#: ../src/extension.js:519
+#: ../src/extension.js:149
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:626
+#: ../src/extension.js:242
 #, fuzzy
 msgid "Playlists"
 msgstr "Reproducindo"
 
-#: ../src/extension.js:696
+#: ../src/extension.js:313
 msgid "Unknown Artist"
 msgstr "Artista descoñecido"
 
-#: ../src/extension.js:700
+#: ../src/extension.js:317
 msgid "Unknown Album"
 msgstr "Álbum descoñecido"
 
-#: ../src/extension.js:704
+#: ../src/extension.js:322
 msgid "Unknown Title"
 msgstr "Título descoñecido"
+
+#: ../src/prefs.js:29
+msgid "Show the media player in the volume menu"
+msgstr ""
+
+#: ../src/prefs.js:30
+#, fuzzy
+msgid "Show the media player volume slider"
+msgstr "Reproducindo"
+
+#: ../src/prefs.js:31
+#, fuzzy
+msgid "Show the media player position slider"
+msgstr "Reproducindo"
+
+#: ../src/prefs.js:32
+#, fuzzy
+msgid "Show media player playlists"
+msgstr "Reproducindo"
+
+#: ../src/prefs.js:35
+msgid "Album cover size"
+msgstr ""
+
+#~ msgid "Schema \"%s\" not found."
+#~ msgstr "Non foi posíbel atopar o esquema «%s»"

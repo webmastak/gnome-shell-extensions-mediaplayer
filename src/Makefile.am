@@ -1,15 +1,12 @@
-extensionurl = https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer
-uuid = mediaplayer@patapon.info
-topextensiondir = $(datadir)/gnome-shell/extensions
-extensiondir = $(topextensiondir)/$(uuid)
+include ../include.mk
 
-dist_extension_DATA = extension.js widget.js dbus.js stylesheet.css
+dist_extension_DATA = extension.js widget.js dbus.js lib.js prefs.js stylesheet.css
 nodist_extension_DATA = metadata.json
 
 EXTRA_DIST = metadata.json.in
 CLEANFILES = metadata.json
 
-gschemas_in = org.gnome.shell.extensions.mediaplayer.gschema.xml.in
+gschemas_in = $(gschemabase).$(extensionname).gschema.xml.in
 
 @INTLTOOL_XML_NOMERGE_RULE@
 
