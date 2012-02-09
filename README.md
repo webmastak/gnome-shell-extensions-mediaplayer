@@ -1,12 +1,15 @@
-# gnome-shell-extension-mediaplayer
+# gnome-shell-extensions-mediaplayer
 
-gnome-shell-extension-mediaplayer is a simple extension for controlling any MPRIS2 capable Mediaplayer.
+gnome-shell-extensions-mediaplayer is a simple extension for controlling any 
+MPRIS v2.1 capable Mediaplayer.
 
-This extension will monitor DBus to look for active players automatically (see "Compatible players" below for details). All active players are shown in the GNOME Shell volume menu by default.
+This extension will monitor DBus to look for active players automatically 
+(player names are referenced in the metadata.json file). All active players 
+are shown in the gnome-shell volume menu by default.
 
-## Screenshots
+# Screenshots
 
-By default, media players show up in the volume menu:
+By default, media players shows up in the volume menu:
 
 ![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
 
@@ -16,6 +19,10 @@ But you can have the media players in a separate menu (see settings):
 
 Notice the support of playlists in Banshee (MPRIS 2.1 player interface).
 
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/prefs.png)
+
+gnome-shell-extensions-mediaplayer can be easily configured through http://extensions.gnome.org
+
 ## Installation
 
 ### Via extensions.gnome.org
@@ -24,7 +31,7 @@ Notice the support of playlists in Banshee (MPRIS 2.1 player interface).
 
 Note that this version does not include GSettings options yet.
 
-### Distribution packages
+## Packages
 
 * ArchLinux - [AUR package](https://aur.archlinux.org/packages.php?ID=49367) by Alucryd
 * Ubuntu - [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
@@ -32,13 +39,25 @@ Note that this version does not include GSettings options yet.
 
 ## Manual installation
 
-Prerequisites: automake, gettext, glib2 devel files
+Prerequisites: automake, gnome-common, gettext, glib2 devel files
+
+### System wide:
 
     ./autogen.sh
     make
     sudo make install
 
+### In your .local directory:
+
+    ./autogen.sh
+    make install-zip
+
+Restart the shell and then enable the extension.
+
 ## Settings
+
+Settings can be set with the gnome-shell-extension-prefs tool or via the
+command line.
 
 To show the extension in its own menu instead of the volume menu:
 
@@ -92,6 +111,7 @@ This extension has been tested with:
 Branches `master` and `devel` work with the current stable release of GNOME Shell (currently 3.2).
 
 Branch `gnome-shell-3.0` supports GNOME Shell 3.0.
+Branch `gnome-shell-3.4` supports GNOME Shell >= 3.3.5
 
 ## Authors
 
