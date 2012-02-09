@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-09 20:36+0100\n"
+"POT-Creation-Date: 2012-02-09 13:45+0100\n"
 "PO-Revision-Date: 2011-10-21 00:04+0200\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
@@ -19,48 +19,69 @@ msgstr ""
 "%100<10 || n%100>=20)) ? 1 : 2));\n"
 
 #. dummy vars for translation
-#: ../src/extension.js:148
+#: ../src/extension.js:53
 msgid "Playing"
 msgstr "Odtwarzanie"
 
-#: ../src/extension.js:149
+#: ../src/extension.js:54
 msgid "Paused"
 msgstr "Wstrzymano"
 
-#: ../src/extension.js:150
+#: ../src/extension.js:55
 msgid "Stopped"
 msgstr "Zatrzymano"
 
-#: ../src/extension.js:154
-#, c-format
-msgid "Schema \"%s\" not found."
-msgstr "Nie odnaleziono schematu \"%s\"."
-
-#: ../src/extension.js:482
+#: ../src/extension.js:103
 msgid "by"
 msgstr "w wykonaniu"
 
-#: ../src/extension.js:484
+#: ../src/extension.js:105
 msgid "from"
 msgstr "z albumu"
 
-#: ../src/extension.js:519
+#: ../src/extension.js:149
 msgid "Volume"
 msgstr "Głośność"
 
-#: ../src/extension.js:626
+#: ../src/extension.js:242
 #, fuzzy
 msgid "Playlists"
 msgstr "Odtwarzanie"
 
-#: ../src/extension.js:696
+#: ../src/extension.js:313
 msgid "Unknown Artist"
 msgstr "Nieznany wykonawca"
 
-#: ../src/extension.js:700
+#: ../src/extension.js:317
 msgid "Unknown Album"
 msgstr "Nieznany album"
 
-#: ../src/extension.js:704
+#: ../src/extension.js:322
 msgid "Unknown Title"
 msgstr "Nieznany tytuł"
+
+#: ../src/prefs.js:29
+msgid "Show the media player in the volume menu"
+msgstr ""
+
+#: ../src/prefs.js:30
+#, fuzzy
+msgid "Show the media player volume slider"
+msgstr "Odtwarzanie"
+
+#: ../src/prefs.js:31
+#, fuzzy
+msgid "Show the media player position slider"
+msgstr "Odtwarzanie"
+
+#: ../src/prefs.js:32
+#, fuzzy
+msgid "Show media player playlists"
+msgstr "Odtwarzanie"
+
+#: ../src/prefs.js:35
+msgid "Album cover size"
+msgstr ""
+
+#~ msgid "Schema \"%s\" not found."
+#~ msgstr "Nie odnaleziono schematu \"%s\"."

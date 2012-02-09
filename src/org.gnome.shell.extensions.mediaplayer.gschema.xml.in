@@ -1,4 +1,4 @@
-<schemalist gettext-domain="gnome-shell-extension-mediaplayer">
+<schemalist gettext-domain="gnome-shell-extensions-mediaplayer">
   <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
     <key name="volumemenu" type="b">
         <default>true</default>

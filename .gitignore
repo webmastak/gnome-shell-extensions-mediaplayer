@@ -14,3 +14,5 @@ po/stamp-it
 metadata.json
 *.gschema.xml
 *.gschema.valid
+_build
+zip-files

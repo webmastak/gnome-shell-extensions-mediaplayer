@@ -26,11 +26,8 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
-const Me = imports.ui.extensionSystem.extensions['mediaplayer@patapon.info'];
-const Widget = Me.widget;
-const DBusIface = Me.dbus;
 
-const Gettext = imports.gettext.domain('gnome-shell-extension-mediaplayer');
+const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
 
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
@@ -40,11 +37,16 @@ const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 
-const FADE_ANIMATION_TIME = 0.16; 
+const FADE_ANIMATION_TIME = 0.16;
+
+const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Widget = Me.imports.widget;
+const DBusIface = Me.imports.dbus;
+const Lib = Me.imports.lib;
 
 /* global values */
+let metadata = Me.metadata;
 let settings;
-let players;
 let playerManager;
 let mediaplayerMenu;
 /* dummy vars for translation */
@@ -52,11 +54,6 @@ let x = _("Playing");
 x = _("Paused");
 x = _("Stopped");
 
-function getSettings(schema) {
-    if (Gio.Settings.list_schemas().indexOf(schema) == -1)
-        throw _("Schema \"%s\" not found.").format(schema);
-    return new Gio.Settings({ schema: schema });
-}
 
 function Player() {
     this._init.apply(this, arguments);
@@ -84,7 +81,7 @@ Player.prototype = {
         this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(owner);
         this._prop = new DBusIface.Properties(owner);
         this._settings = settings;
-        
+
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
         this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
         this.showPlaylists = this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY);
@@ -94,7 +91,7 @@ Player.prototype = {
         this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
 
         this.addMenuItem(this.playerTitle);
-        
+
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
         this.trackCoverFile = false;
@@ -114,7 +111,7 @@ Player.prototype = {
         this.trackBox._infos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
 
         this.addMenuItem(this.trackBox);
-                           
+
         this.trackBox.box.hide();
         this.trackBox.box.opacity = 0;
         this.trackBox.box.set_height(0);
@@ -128,7 +125,7 @@ Player.prototype = {
         this._stopButton.hide();
         this._nextButton = new Widget.ControlButton('media-skip-forward',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
-        
+
         this.trackControls = new Widget.ControlButtons();
         this.trackControls.addButton(this._prevButton.actor);
         this.trackControls.addButton(this._playButton.actor);
@@ -136,9 +133,9 @@ Player.prototype = {
         this.trackControls.addButton(this._nextButton.actor);
 
         this.addMenuItem(this.trackControls);
-       
+
         if (this.showPosition) {
-            this._position = new Widget.SliderItem(_("0:00 / 0:00"), "document-open-recent", 0);
+            this._position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
             this._position.connect('value-changed', Lang.bind(this, function(item) {
                 let time = item._value * this._songLength;
                 this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
@@ -147,7 +144,7 @@ Player.prototype = {
             this.addMenuItem(this._position);
             this._position.actor.hide();
         }
-       
+
         if (this.showVolume) {
             this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high", 0);
             this._volume.connect('value-changed', Lang.bind(this, function(item) {
@@ -170,7 +167,7 @@ Player.prototype = {
 
         if (this._mediaServer.CanRaise) {
             this.playerTitle.connect('activate',
-                Lang.bind(this, function () { 
+                Lang.bind(this, function () {
                     // If we have an application in the appSystem
                     // Bring it to the front else let the player  decide
                     if (this._app)
@@ -187,7 +184,7 @@ Player.prototype = {
             this.playerTitle.setSensitive(false);
             this.playerTitle.actor.remove_style_pseudo_class('insensitive');
         }
-        
+
         if (this._mediaServer.CanQuit) {
             this.playerTitle.showButton();
         }
@@ -312,7 +309,7 @@ Player.prototype = {
             if (metadata["xesam:artist"]) {
                 this.trackArtist.format([metadata["xesam:artist"].deep_unpack()]);
             }
-            else 
+            else
                 this.trackArtist.format([_("Unknown Artist")]);
             if (metadata["xesam:album"])
                 this.trackAlbum.format([metadata["xesam:album"].unpack()]);
@@ -384,7 +381,7 @@ Player.prototype = {
 
     _setVolume: function(value) {
         // Player does not have a volume property
-        if (value == null) 
+        if (value == null)
             this.showVolume = false;
 
         if (this.showVolume) {
@@ -478,7 +475,7 @@ Player.prototype = {
         this._setStatus(this._mediaServerPlayer.PlaybackStatus);
     },
 
-    _toggleCover: function() {        
+    _toggleCover: function() {
         if (this.trackCover.has_style_class_name('track-cover')) {
             let factor = 2;
             let [coverWidth, coverHeight] = this.trackCover.get_size();
@@ -564,8 +561,8 @@ PlayerManager.prototype = {
         if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
            this.menu.actor.hide();
         // watch players
-        for (var p=0; p<players.length; p++) {
-            this._watch.push(Gio.DBus.session.watch_name('org.mpris.MediaPlayer2.'+players[p], 
+        for (var p=0; p<metadata.players.length; p++) {
+            this._watch.push(Gio.DBus.session.watch_name('org.mpris.MediaPlayer2.'+metadata.players[p],
                 Gio.BusNameWatcherFlags.NONE,
                 Lang.bind(this, this._addPlayer),
                 Lang.bind(this, this._removePlayer)
@@ -621,10 +618,9 @@ PlayerMenu.prototype = {
     }
 }
 
-function init(metadata) {
-    imports.gettext.bindtextdomain('gnome-shell-extension-mediaplayer', metadata.locale);
-    settings = getSettings(MEDIAPLAYER_SETTINGS_SCHEMA);
-    players = metadata.players;
+function init() {
+    Lib.initTranslations(Me);
+    settings = Lib.getSettings(Me);
 }
 
 function enable() {
@@ -638,7 +634,7 @@ function enable() {
     else {
         mediaplayerMenu = new PlayerMenu();
         Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
-    }    
+    }
     playerManager = new PlayerManager(mediaplayerMenu);
 }
 
