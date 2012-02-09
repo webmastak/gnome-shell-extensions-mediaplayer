@@ -236,7 +236,7 @@ Player.prototype = {
         if (!playlists && this._playlists)
             playlists = this._playlists;
 
-        if (playlists && playlists.length > 0) {
+        if (playlists && playlists[0].length > 0) {
             this._playlists = playlists;
             if (!this._playlistsMenu) {
                 this._playlistsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
