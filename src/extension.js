@@ -74,7 +74,7 @@ Player.prototype = {
         this._playlists = "";
         this._playlistsMenu = "";
         this._currentPlaylist = "";
-        this._currentTime = 0;
+        this._currentTime = -1;
         this._timeoutId = 0;
         this._mediaServer = new DBusIface.MediaServer2(owner);
         this._mediaServerPlayer = new DBusIface.MediaServer2Player(owner);
@@ -406,7 +406,6 @@ Player.prototype = {
             this._status = status;
             if (this._status == "Playing") {
                 this._playButton.setIcon("media-playback-pause");
-                this._getPosition();
                 this._startTimer();
             }
             else if (this._status == "Paused") {
@@ -514,7 +513,7 @@ Player.prototype = {
     },
 
     _stopTimer: function() {
-        this._currentTime = 0;
+        this._currentTime = -1;
         this._pauseTimer();
         this._updateTimer();
     },
