@@ -83,9 +83,46 @@ Player.prototype = {
         this._settings = settings;
 
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
+        this._settings.connect("changed::" + MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
+            if (this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY)) {
+                this.showVolume = true;
+                if (this._status != "Stopped")
+                    this._volume.actor.show();
+            }
+            else {
+                this.showVolume = false;
+                this._volume.actor.hide();
+            }
+        }));
         this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
+        this._settings.connect("changed::" + MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
+            if (this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY)) {
+                this.showPosition = true;
+                if (this._status != "Stopped")
+                    this._position.actor.show();
+            }
+            else {
+                this.showPosition = false;
+                this._position.actor.hide();
+            }
+        }));
         this.showPlaylists = this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY);
+        this._settings.connect("changed::" + MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
+            if (this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY)) {
+                this.showPlaylists = true;
+                this._getPlaylists();
+                this._getActivePlaylist();
+            }
+            else {
+                this.showPlaylists = false;
+                if (this._playlistsMenu)
+                    this._playlistsMenu.destroy();
+            }
+        }));
         this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
+        this._settings.connect("changed::" + MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
+            this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
+        }));
 
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
         this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
@@ -134,25 +171,21 @@ Player.prototype = {
 
         this.addMenuItem(this.trackControls);
 
-        if (this.showPosition) {
-            this._position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
-            this._position.connect('value-changed', Lang.bind(this, function(item) {
-                let time = item._value * this._songLength;
-                this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
-                this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
-            }));
-            this.addMenuItem(this._position);
-            this._position.actor.hide();
-        }
+        this._position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
+        this._position.connect('value-changed', Lang.bind(this, function(item) {
+            let time = item._value * this._songLength;
+            this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
+            this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
+        }));
+        this.addMenuItem(this._position);
+        this._position.actor.hide();
 
-        if (this.showVolume) {
-            this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high", 0);
-            this._volume.connect('value-changed', Lang.bind(this, function(item) {
-                this._mediaServerPlayer.Volume = item._value;
-            }));
-            this.addMenuItem(this._volume);
-            this._volume.actor.hide();
-        }
+        this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high", 0);
+        this._volume.connect('value-changed', Lang.bind(this, function(item) {
+            this._mediaServerPlayer.Volume = item._value;
+        }));
+        this.addMenuItem(this._volume);
+        this._volume.actor.hide();
 
         this._getVolume();
         this._getIdentity();
@@ -259,7 +292,7 @@ Player.prototype = {
                 }
             }
             if (!show)
-                this._playListsMenu.destroy();
+                this._playlistsMenu.destroy();
 
         }
     },
@@ -294,7 +327,7 @@ Player.prototype = {
     _setMetadata: function(metadata) {
         // Pragha sends a metadata dict with one
         // value on stop
-        if (Object.keys(metadata).length > 1) {
+        if (metadata != null && Object.keys(metadata).length > 1) {
             this._currentTime = -1;
             if (metadata["mpris:length"]) {
                 this._songLength = metadata["mpris:length"].unpack() / 1000000;
@@ -635,11 +668,16 @@ function enable() {
         Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
     }
     playerManager = new PlayerManager(mediaplayerMenu);
+
+    settings.connect("changed::" + MEDIAPLAYER_VOLUME_MENU_KEY, function() {
+        disable();
+        enable();
+    });
 }
 
 function disable() {
     playerManager.destroy();
-    if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY)) {
+    if (Main.panel._statusArea['mediaplayer']) {
         mediaplayerMenu.destroy();
     }
 }
