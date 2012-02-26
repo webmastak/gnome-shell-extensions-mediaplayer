@@ -20,7 +20,7 @@ msgstr ""
 #. dummy vars for translation
 #: ../src/extension.js:53
 msgid "Playing"
-msgstr "Spielt"
+msgstr "Spielt gerade"
 
 #: ../src/extension.js:54
 msgid "Paused"
