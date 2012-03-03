@@ -1,0 +1,79 @@
+# German Translation for gnome-shell-extension-mediaplayer package.
+# Copyright (C) 2012 gnome-shell-extension-mediaplayer package.
+# This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
+# Frederik Hahne <frederik.hahne@googlemail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-09 20:36+0100\n"
+"PO-Revision-Date: 2012-02-26 21:06+0100\n"
+"Last-Translator: Frederik Hahne <frederik.hahne@googlemail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: German\n"
+
+#. dummy vars for translation
+#: ../src/extension.js:53
+msgid "Playing"
+msgstr "Spielt gerade"
+
+#: ../src/extension.js:54
+msgid "Paused"
+msgstr "Pausiert"
+
+#: ../src/extension.js:55
+msgid "Stopped"
+msgstr "Angehalten"
+
+#: ../src/extension.js:103
+msgid "by"
+msgstr "von"
+
+#: ../src/extension.js:105
+msgid "from"
+msgstr "aus"
+
+#: ../src/extension.js:149
+msgid "Volume"
+msgstr "Lautstärke"
+
+#: ../src/extension.js:242
+msgid "Playlists"
+msgstr "Playlists"
+
+#: ../src/extension.js:313
+msgid "Unknown Artist"
+msgstr "Unbekannter Interpret"
+
+#: ../src/extension.js:317
+msgid "Unknown Album"
+msgstr "Unbekanntes Album"
+
+#: ../src/extension.js:322
+msgid "Unknown Title"
+msgstr "Unbekannter Titel"
+
+#: ../src/prefs.js:29
+msgid "Show the media player in the volume menu"
+msgstr "Media Player im Lautstärkemenu anzeigen"
+
+#: ../src/prefs.js:30
+msgid "Show the media player volume slider"
+msgstr "Lautstärkeregler anzeigen"
+
+#: ../src/prefs.js:31
+msgid "Show the media player position slider"
+msgstr "Slider anzeigen"
+
+#: ../src/prefs.js:32
+msgid "Show media player playlists"
+msgstr "Playlists anzeigen"
+
+#: ../src/prefs.js:35
+msgid "Album cover size"
+msgstr "Größe der Albumcover"
