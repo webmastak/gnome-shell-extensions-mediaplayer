@@ -95,10 +95,11 @@ Player.prototype = {
             }
         }));
         this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
+        this.supportPosition = true;
         this._settings.connect("changed::" + MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY)) {
                 this.showPosition = true;
-                if (this._status != "Stopped")
+                if (this._status != "Stopped" && this.supportPosition)
                     this._position.actor.show();
             }
             else {
@@ -308,10 +309,8 @@ Player.prototype = {
     _setPosition: function(value) {
         // Player does not have a position property
         if (value == null && this._status != "Stopped") {
-            if (this.showPosition) {
-                this._position.actor.hide();
-                this.showPosition = false;
-            }
+            this.supportPosition = false;
+            this._position.actor.hide();
         }
         else
             this._currentTime = value / 1000000;
@@ -328,13 +327,14 @@ Player.prototype = {
             this._currentTime = -1;
             if (metadata["mpris:length"]) {
                 this._songLength = metadata["mpris:length"].unpack() / 1000000;
+                this.supportPosition = true;
+                if (this.showPosition)
+                    this._position.actor.show();
             }
             else {
                 this._songLength = 0;
-                if (this.showPosition) {
-                    this._position.actor.hide();
-                    this.showPosition = false;
-                }
+                this.supportPosition = false;
+                this._position.actor.hide();
             }
             if (metadata["xesam:artist"])
                 this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
@@ -473,7 +473,7 @@ Player.prototype = {
             this._stopButton.show();
             if (this.showVolume)
                 this._volume.actor.show();
-            if (this.showPosition)
+            if (this.showPosition && this.supportPosition)
                 this._position.actor.show();
         }
         else if (this._status == "Stopped") {
@@ -490,10 +490,8 @@ Player.prototype = {
                     });
             }
             this._stopButton.hide();
-            if (this.showVolume)
-                this._volume.actor.hide();
-            if (this.showPosition)
-                this._position.actor.hide();
+            this._volume.actor.hide();
+            this._position.actor.hide();
         }
         this._setIdentity();
     },
@@ -516,7 +514,7 @@ Player.prototype = {
     },
 
     _updateTimer: function() {
-        if (this.showPosition) {
+        if (this.showPosition && this.supportPosition) {
             if (!isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0)
                 this._position.setValue(this._currentTime / this._songLength);
             else
