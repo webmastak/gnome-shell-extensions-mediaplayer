@@ -61,16 +61,15 @@ function ControlButton() {
 ControlButton.prototype = {
     _init: function(icon, callback) {
         this.actor = new St.Bin({style_class: 'button-container'});
-        this.button = new St.Button({ style_class: 'notification-icon-button' });
-        this.button.connect('clicked', callback);
         this.icon = new St.Icon({
+            style_class: 'button-icon',
             icon_type: St.IconType.SYMBOLIC,
             icon_name: icon,
-            icon_size: 20
         });
-        this.button.set_child(this.icon);
+        this.button = new St.Button({style_class: 'hotplug-resident-eject-button',
+                                     child: this.icon});
+        this.button.connect('clicked', callback);
         this.actor.add_actor(this.button);
-
     },
     setIcon: function(icon) {
         this.icon.icon_name = icon;

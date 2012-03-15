@@ -3,6 +3,12 @@
     padding-right: 3px;
 }
 
+.button-icon {
+   color: #fff;
+   icon-size: 20px;
+   padding: 2px;
+}
+
 .track-cover {
     border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 2px;
