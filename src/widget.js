@@ -96,9 +96,9 @@ SliderItem.prototype = {
         this._holder = new St.Table({style_class: 'slider-item'});
         this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon});
         this._label = new St.Label({text: text});
-        this._holder.add(this._icon, {row: 0, col: 1, x_expand: false})
-        this._holder.add(this._label, {row: 0, col: 2, x_expand: false})
-        this._holder.add(this._slider, {row: 0, col: 3, x_expand: true})
+        this._holder.add(this._icon, {row: 0, col: 0, x_expand: false})
+        this._holder.add(this._label, {row: 0, col: 1, x_expand: false})
+        this._holder.add(this._slider, {row: 0, col: 2, x_expand: true})
         this.addActor(this._holder, {span: -1, expand: true});
     },
 
@@ -116,19 +116,27 @@ function TrackTitle() {
 }
 
 TrackTitle.prototype = {
-    _init: function(pattern, style) {
-        this.label = new St.Label({style_class: style, text: ""});
-        this.text = pattern;
-    },
-    format: function(values) {
-        for (let i=0; i<values.length; i++) {
-            values[i] = GLib.markup_escape_text(values[i].toString(), -1);
+    _init: function(prepend, text, style) {
+        this.box = new St.Table({style_class: style});
+        this._label = new St.Label();
+        if (prepend) {
+            this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + " "});
+            this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+            this.box.add(this._prepend, {row: 0, col: 0, x_fill: true, x_expand: false});
+            this.box.add(this._label, {row: 0, col: 1});
         }
-        if (this.label.clutter_text) {
-            this.label.clutter_text.line_wrap = true;
-            this.label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-            this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.label.clutter_text.set_markup(this.text.format(values));
+        else
+            this.box.add(this._label, {row: 0, col: 0});
+
+        this.setText(text);
+    },
+
+    setText: function(text) {
+        if (this._label.clutter_text) {
+            this._label.clutter_text.line_wrap = true;
+            this._label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+            this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+            this._label.clutter_text.set_text(text.toString());
         }
     }
 }

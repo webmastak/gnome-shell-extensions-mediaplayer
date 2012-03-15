@@ -135,17 +135,14 @@ Player.prototype = {
         this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
         this.trackCoverContainer.set_child(this.trackCover);
 
-        this.trackTitle = new Widget.TrackTitle('%s', 'track-title');
-        this.trackTitle.format([_('Unknown Title')]);
-        this.trackArtist = new Widget.TrackTitle('<span foreground="#ccc">' + _("by") +'</span> %s', 'track-artist');
-        this.trackArtist.format([_('Unknown Artist')]);
-        this.trackAlbum = new Widget.TrackTitle('<span foreground="#ccc">' + _("from") + '</span> %s', 'track-album');
-        this.trackAlbum.format([_('Unknown Album')]);
+        this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
+        this.trackArtist = new Widget.TrackTitle(_("by"), _('Unknown Artist'), 'track-artist');
+        this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
-        this.trackBox._infos.add(this.trackTitle.label, {row: 0, col: 1, y_expand: false});
-        this.trackBox._infos.add(this.trackArtist.label, {row: 1, col: 1, y_expand: false});
-        this.trackBox._infos.add(this.trackAlbum.label, {row: 2, col: 1, y_expand: false});
+        this.trackBox._infos.add(this.trackTitle.box, {row: 0, col: 1, y_expand: false});
+        this.trackBox._infos.add(this.trackArtist.box, {row: 1, col: 1, y_expand: false});
+        this.trackBox._infos.add(this.trackAlbum.box, {row: 2, col: 1, y_expand: false});
 
         this.addMenuItem(this.trackBox);
 
@@ -202,7 +199,7 @@ Player.prototype = {
             this.playerTitle.connect('activate',
                 Lang.bind(this, function () {
                     // If we have an application in the appSystem
-                    // Bring it to the front else let the player  decide
+                    // Bring it to the front else let the player decide
                     if (this._app)
                         this._app.activate_full(-1, 0);
                     else
@@ -339,20 +336,18 @@ Player.prototype = {
                     this.showPosition = false;
                 }
             }
-            if (metadata["xesam:artist"]) {
-                this.trackArtist.format([metadata["xesam:artist"].deep_unpack()]);
-            }
+            if (metadata["xesam:artist"])
+                this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
             else
-                this.trackArtist.format([_("Unknown Artist")]);
+                this.trackArtist.setText(_("Unknown Artist"));
             if (metadata["xesam:album"])
-                this.trackAlbum.format([metadata["xesam:album"].unpack()]);
+                this.trackAlbum.setText(metadata["xesam:album"].unpack());
             else
-                this.trackAlbum.format([_("Unknown Album")]);
-            if (metadata["xesam:title"]) {
-                this.trackTitle.format([metadata["xesam:title"].unpack()]);
-            }
+                this.trackAlbum.setText(_("Unknown Album"));
+            if (metadata["xesam:title"])
+                this.trackTitle.setText(metadata["xesam:title"].unpack());
             else
-                this.trackTitle.format([_("Unknown Title")]);
+                this.trackTitle.setText(_("Unknown Title"));
 
             if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"].unpack();
