@@ -107,7 +107,8 @@ SliderItem.prototype = {
     },
 
     setLabel: function(text) {
-        this._label.text = text;
+        if (this._label.clutter_text)
+            this._label.text = text;
     }
 }
 
