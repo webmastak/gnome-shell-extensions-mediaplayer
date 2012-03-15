@@ -9,6 +9,10 @@
    padding: 2px;
 }
 
+.status-icon {
+    icon-size: 10px;
+}
+
 .track-cover {
     border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 2px;

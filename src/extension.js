@@ -55,15 +55,12 @@ x = _("Paused");
 x = _("Stopped");
 
 
-function Player() {
-    this._init.apply(this, arguments);
-}
-
-Player.prototype = {
-    __proto__: PopupMenu.PopupMenuSection.prototype,
+const Player = new Lang.Class({
+    Name: 'Player',
+    Extends: PopupMenu.PopupMenuSection,
 
     _init: function(owner) {
-        PopupMenu.PopupMenuSection.prototype._init.call(this);
+        this.parent();
 
         this._owner = owner;
         this._app = "";
@@ -446,6 +443,7 @@ Player.prototype = {
                 this._playButton.setIcon("media-playback-start");
                 this._stopTimer();
             }
+
             // Wait a little before changing the state
             // Some players are sending the stopped signal
             // when changing tracks
@@ -496,6 +494,7 @@ Player.prototype = {
             this._position.actor.hide();
         }
         this._setIdentity();
+        this.emit('status-changed');
     },
 
     _getStatus: function() {
@@ -569,13 +568,10 @@ Player.prototype = {
         this._stopTimer();
         PopupMenu.PopupMenuSection.prototype.destroy.call(this);
     }
-}
+});
 
-function PlayerManager() {
-    this._init.apply(this, arguments);
-}
-
-PlayerManager.prototype = {
+const PlayerManager = new Lang.Class({
+    Name: 'PlayerManager',
 
     _init: function(menu) {
         // the menu
@@ -599,20 +595,21 @@ PlayerManager.prototype = {
 
     _addPlayer: function(conn, owner) {
         let position;
-        this._players[owner] = new Player(owner);
+        this._players[owner] = {player: new Player(owner)};
+        this._players[owner].player.connect('status-changed', Lang.bind(this, this._statusChanged));
         if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
             position = this.menu.menu.numMenuItems - 2;
         else
             position = 0;
         this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
-        this.menu.menu.addMenuItem(this._players[owner], position);
+        this.menu.menu.addMenuItem(this._players[owner].player, position);
         this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
         this.menu.actor.show();
     },
 
     _removePlayer: function(conn, owner) {
         if (this._players[owner]) {
-            this._players[owner].destroy();
+            this._players[owner].player.destroy();
             delete this._players[owner];
             if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) && this._nbPlayers() == 0)
                 this.menu.actor.hide();
@@ -623,27 +620,65 @@ PlayerManager.prototype = {
         return Object.keys(this._players).length;
     },
 
+    _statusChanged: function(player) {
+        let owner = player._owner;
+        let status = player._status;
+        this._players[owner].status = status;
+        // Display current status in the top panel
+        if (mediaplayerMenu instanceof MediaplayerStatusButton) {
+            let globalStatus = false;
+            for (let owner in this._players) {
+                if (this._players[owner].status == "Playing")
+                    globalStatus = this._players[owner].status;
+                if (this._players[owner].status == "Paused" && !globalStatus)
+                    globalStatus = this._players[owner].status;
+            }
+            if (!globalStatus)
+                globalStatus = "Stopped";
+            mediaplayerMenu.setState(globalStatus);
+        }
+    },
+
     destroy: function() {
         for (let w = 0; w<this._watch.length; w++) {
             Gio.DBus.session.unwatch_name(this._watch[w]);
         }
         for (let owner in this._players) {
-            this._players[owner].destroy();
+            this._players[owner].player.destroy();
         }
     }
-}
+});
 
-function PlayerMenu() {
-    this._init.apply(this, arguments);
-}
-
-PlayerMenu.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
+const MediaplayerStatusButton = new Lang.Class({
+    Name: 'MediaplayerStatusButton',
+    Extends: PanelMenu.Button,
 
     _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'audio-x-generic', null);
+        this.parent(0.0, "mediaplayer");
+
+        this._iconBox = new St.BoxLayout();
+        this._iconIndicator = new St.Icon({icon_name: 'audio-x-generic',
+                                           style_class: 'system-status-icon'});
+        this._iconState = new St.Icon({icon_name: 'view-refresh',
+                                       style_class: 'status-icon'})
+        this._iconStateBin = new St.Bin({child: this._iconState,
+                                         y_align: St.Align.END});
+
+        this._iconBox.add(this._iconIndicator);
+        this._iconBox.add(this._iconStateBin);
+        this.actor.add_actor(this._iconBox);
+        this.actor.add_style_class_name('panel-status-button');
+    },
+
+    setState: function(state) {
+        if (state == "Playing")
+            this._iconState.icon_name = "media-playback-start";
+        else if (state == "Paused")
+            this._iconState.icon_name = "media-playback-pause";
+        else if (state == "Stopped")
+            this._iconState.icon_name = "media-playback-stop";
     }
-}
+});
 
 function init() {
     Lib.initTranslations(Me);
@@ -659,7 +694,7 @@ function enable() {
         }
     }
     else {
-        mediaplayerMenu = new PlayerMenu();
+        mediaplayerMenu = new MediaplayerStatusButton();
         Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
     }
     playerManager = new PlayerManager(mediaplayerMenu);
@@ -672,8 +707,7 @@ function enable() {
 
 function disable() {
     playerManager.destroy();
-    if (Main.panel._statusArea['mediaplayer']) {
+    if (mediaplayerMenu instanceof MediaplayerStatusButton)
         mediaplayerMenu.destroy();
-    }
 }
 
