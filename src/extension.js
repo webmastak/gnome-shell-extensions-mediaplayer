@@ -190,11 +190,11 @@ Player.prototype = {
         this._getDesktopEntry();
         this._getMetadata();
         this._getStatus();
+        this._getPosition();
         if (this.showPlaylists) {
             this._getPlaylists();
             this._getActivePlaylist();
         }
-        this._getPosition();
 
         if (this._mediaServer.CanRaise) {
             this.playerTitle.connect('activate',
@@ -312,8 +312,10 @@ Player.prototype = {
             this.supportPosition = false;
             this._position.actor.hide();
         }
-        else
+        else {
             this._currentTime = value / 1000000;
+            this._updateTimer();
+        }
     },
 
     _getPosition: function() {
@@ -452,7 +454,7 @@ Player.prototype = {
     },
 
     _refreshStatus: function() {
-        if (this._status == "Playing") {
+        if (this._status != "Stopped") {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
                 this.trackBox.box.show();
                 this.trackBox.box.set_height(-1);
@@ -476,7 +478,7 @@ Player.prototype = {
             if (this.showPosition && this.supportPosition)
                 this._position.actor.show();
         }
-        else if (this._status == "Stopped") {
+        else {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {
                 Tweener.addTween(this.trackBox.box,
                     { opacity: 0,
@@ -539,7 +541,7 @@ Player.prototype = {
     },
 
     _stopTimer: function() {
-        this._currentTime = -1;
+        this._currentTime = 0;
         this._pauseTimer();
         this._updateTimer();
     },
