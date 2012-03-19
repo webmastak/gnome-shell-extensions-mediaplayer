@@ -11,15 +11,15 @@ are shown in the gnome-shell volume menu by default.
 
 By default, media players shows up in the volume menu:
 
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/mediaplayer2.png) 
+
+Notice the support of playlists in Banshee (MPRIS 2.1 playlist interface).
 
 But you can have the media players in a separate menu (see settings):
 
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/mediaplayer1.png)
 
-Notice the support of playlists in Banshee (MPRIS 2.1 player interface).
-
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/prefs.png)
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/prefs.png)
 
 gnome-shell-extensions-mediaplayer can be easily configured through http://extensions.gnome.org
 
@@ -28,8 +28,6 @@ gnome-shell-extensions-mediaplayer can be easily configured through http://exten
 ### Via extensions.gnome.org
 
 * https://extensions.gnome.org/extension/55/media-player-indicator/
-
-Note that this version does not include GSettings options yet.
 
 ## Packages
 
