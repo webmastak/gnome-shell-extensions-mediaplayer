@@ -639,6 +639,32 @@ const PlayerManager = new Lang.Class({
         }
     },
 
+    next: function() {
+        // Ignore stopped or paused players
+        for (let owner in this._players) {
+            if (this._players[owner].status == "Playing")
+                this._players[owner].player._mediaServerPlayer.NextRemote();
+        }
+    },
+
+    previous: function() {
+        // Ignore stopped or paused players
+        for (let owner in this._players) {
+            if (this._players[owner].status == "Playing")
+                this._players[owner].player._mediaServerPlayer.PreviousRemote();
+        }
+    },
+
+    playPause: function() {
+        // Ignore stopped players
+        for (let owner in this._players) {
+            if (this._players[owner].status == "Playing" ||
+                this._players[owner].status == "Paused")
+                this._players[owner].player._mediaServerPlayer.PlayPauseRemote();
+        }
+
+    },
+
     destroy: function() {
         for (let w = 0; w<this._watch.length; w++) {
             Gio.DBus.session.unwatch_name(this._watch[w]);
@@ -668,6 +694,30 @@ const MediaplayerStatusButton = new Lang.Class({
         this._iconBox.add(this._iconStateBin);
         this.actor.add_actor(this._iconBox);
         this.actor.add_style_class_name('panel-status-button');
+        this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
+    },
+
+    _onScrollEvent: function(actor, event) {
+        let direction = event.get_scroll_direction();
+
+        if (direction == Clutter.ScrollDirection.DOWN)
+            playerManager.previous();
+        else if (direction == Clutter.ScrollDirection.UP)
+            playerManager.next();
+    },
+
+    // Override PanelMenu.Button._onButtonPress
+    _onButtonPress: function(actor, event) {
+        let button = event.get_button();
+
+        if (button == 2)
+            playerManager.playPause();
+        else {
+            if (!this.menu)
+                return;
+
+            this.menu.toggle();
+        }
     },
 
     setState: function(state) {
