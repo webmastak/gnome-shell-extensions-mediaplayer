@@ -44,15 +44,21 @@ const Widget = Me.imports.widget;
 const DBusIface = Me.imports.dbus;
 const Lib = Me.imports.lib;
 
+const Status = {
+    STOP: "Stopped",
+    PLAY: "Playing",
+    PAUSE: "Paused"
+};
+
 /* global values */
 let metadata = Me.metadata;
 let settings;
 let playerManager;
 let mediaplayerMenu;
 /* dummy vars for translation */
-let x = _("Playing");
-x = _("Paused");
-x = _("Stopped");
+let x = _(Status.PLAY);
+x = _(Status.PAUSE);
+x = _(Status.STOP);
 
 
 const Player = new Lang.Class({
@@ -83,7 +89,7 @@ const Player = new Lang.Class({
         this._settings.connect("changed::" + MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY)) {
                 this.showVolume = true;
-                if (this._status != "Stopped")
+                if (this._status != Status.STOP)
                     this._volume.actor.show();
             }
             else {
@@ -96,7 +102,7 @@ const Player = new Lang.Class({
         this._settings.connect("changed::" + MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY)) {
                 this.showPosition = true;
-                if (this._status != "Stopped" && this.supportPosition)
+                if (this._status != Status.STOP && this.supportPosition)
                     this._position.actor.show();
             }
             else {
@@ -305,7 +311,7 @@ const Player = new Lang.Class({
 
     _setPosition: function(value) {
         // Player does not have a position property
-        if (value == null && this._status != "Stopped") {
+        if (value == null && this._status != Status.STOP) {
             this.supportPosition = false;
             this._position.actor.hide();
         }
@@ -327,7 +333,7 @@ const Player = new Lang.Class({
             if (metadata["mpris:length"]) {
                 this._songLength = metadata["mpris:length"].unpack() / 1000000;
                 this.supportPosition = true;
-                if (this.showPosition)
+                if (this.showPosition && this._status != Status.STOP)
                     this._position.actor.show();
             }
             else {
@@ -431,15 +437,15 @@ const Player = new Lang.Class({
     _setStatus: function(status) {
         if (status != this._status) {
             this._status = status;
-            if (this._status == "Playing") {
+            if (this._status == Status.PLAY) {
                 this._playButton.setIcon("media-playback-pause");
                 this._startTimer();
             }
-            else if (this._status == "Paused") {
+            else if (this._status == Status.PAUSE) {
                 this._playButton.setIcon("media-playback-start");
                 this._pauseTimer();
             }
-            else if (this._status == "Stopped") {
+            else if (this._status == Status.STOP) {
                 this._playButton.setIcon("media-playback-start");
                 this._stopTimer();
             }
@@ -452,7 +458,7 @@ const Player = new Lang.Class({
     },
 
     _refreshStatus: function() {
-        if (this._status != "Stopped") {
+        if (this._status != Status.STOP) {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
                 this.trackBox.box.show();
                 this.trackBox.box.set_height(-1);
@@ -525,7 +531,7 @@ const Player = new Lang.Class({
     },
 
     _startTimer: function() {
-        if (this._status == "Playing") {
+        if (this._status == Status.PLAY) {
             this._timeoutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
             this._currentTime += 1;
             this._updateTimer();
@@ -633,13 +639,13 @@ const PlayerManager = new Lang.Class({
         if (mediaplayerMenu instanceof MediaplayerStatusButton) {
             let globalStatus = false;
             for (let owner in this._players) {
-                if (this._players[owner].status == "Playing")
+                if (this._players[owner].status == Status.PLAY)
                     globalStatus = this._players[owner].status;
-                if (this._players[owner].status == "Paused" && !globalStatus)
+                if (this._players[owner].status == Status.PAUSE && !globalStatus)
                     globalStatus = this._players[owner].status;
             }
             if (!globalStatus)
-                globalStatus = "Stopped";
+                globalStatus = Status.STOP;
             mediaplayerMenu.setState(globalStatus);
         }
     },
@@ -647,7 +653,7 @@ const PlayerManager = new Lang.Class({
     next: function() {
         // Ignore stopped or paused players
         for (let owner in this._players) {
-            if (this._players[owner].status == "Playing")
+            if (this._players[owner].status == Status.PLAY)
                 this._players[owner].player._mediaServerPlayer.NextRemote();
         }
     },
@@ -655,7 +661,7 @@ const PlayerManager = new Lang.Class({
     previous: function() {
         // Ignore stopped or paused players
         for (let owner in this._players) {
-            if (this._players[owner].status == "Playing")
+            if (this._players[owner].status == Status.PLAY)
                 this._players[owner].player._mediaServerPlayer.PreviousRemote();
         }
     },
@@ -663,8 +669,8 @@ const PlayerManager = new Lang.Class({
     playPause: function() {
         // Ignore stopped players
         for (let owner in this._players) {
-            if (this._players[owner].status == "Playing" ||
-                this._players[owner].status == "Paused")
+            if (this._players[owner].status == Status.PLAY ||
+                this._players[owner].status == Status.PAUSE)
                 this._players[owner].player._mediaServerPlayer.PlayPauseRemote();
         }
 
@@ -726,11 +732,11 @@ const MediaplayerStatusButton = new Lang.Class({
     },
 
     setState: function(state) {
-        if (state == "Playing")
+        if (state == Status.PLAY)
             this._iconState.icon_name = "media-playback-start";
-        else if (state == "Paused")
+        else if (state == Status.PAUSE)
             this._iconState.icon_name = "media-playback-pause";
-        else if (state == "Stopped")
+        else if (state == Status.STOP)
             this._iconState.icon_name = "media-playback-stop";
     }
 });
