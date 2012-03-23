@@ -614,6 +614,7 @@ const PlayerManager = new Lang.Class({
             if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) && this._nbPlayers() == 0)
                 this.menu.actor.hide();
         }
+        this._refreshStatus();
     },
 
     _nbPlayers: function() {
@@ -624,6 +625,10 @@ const PlayerManager = new Lang.Class({
         let owner = player._owner;
         let status = player._status;
         this._players[owner].status = status;
+        this._refreshStatus();
+    },
+
+    _refreshStatus: function() {
         // Display current status in the top panel
         if (mediaplayerMenu instanceof MediaplayerStatusButton) {
             let globalStatus = false;
