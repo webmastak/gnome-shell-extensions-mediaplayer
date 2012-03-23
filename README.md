@@ -15,13 +15,20 @@ By default, media players shows up in the volume menu:
 
 Notice the support of playlists in Banshee (MPRIS 2.1 playlist interface).
 
+- - -
+
 But you can have the media players in a separate menu (see settings):
 
 ![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/mediaplayer1.png)
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/prefs.png)
+You can go to the next or previous track by using the mouse wheel on the statuc icon. 
+You can also play or pause the player by clicking with the middle button on the status icon.
+
+- - -
 
 gnome-shell-extensions-mediaplayer can be easily configured through http://extensions.gnome.org
+
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/prefs.png)
 
 ## Installation
 
