@@ -11,7 +11,7 @@ are shown in the gnome-shell volume menu by default.
 
 By default, media players shows up in the volume menu:
 
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/mediaplayer2.png) 
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
 
 Notice the support of playlists in Banshee (MPRIS 2.1 playlist interface).
 
@@ -19,7 +19,7 @@ Notice the support of playlists in Banshee (MPRIS 2.1 playlist interface).
 
 But you can have the media players in a separate menu (see settings):
 
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/mediaplayer1.png)
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
 You can go to the next or previous track by using the mouse wheel on the statuc icon. 
 You can also play or pause the player by clicking with the middle button on the status icon.
@@ -28,7 +28,7 @@ You can also play or pause the player by clicking with the middle button on the 
 
 gnome-shell-extensions-mediaplayer can be easily configured through http://extensions.gnome.org
 
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/gnome-shell-3.4/data/prefs.png)
+![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/prefs.png)
 
 ## Installation
 
@@ -113,10 +113,10 @@ This extension has been tested with:
 
 ## GNOME Shell support
 
-Branches `master` and `devel` work with the current stable release of GNOME Shell (currently 3.2).
+Branches `master` and `devel` work with the current stable release of GNOME Shell (currently 3.4).
 
-Branch `gnome-shell-3.0` supports GNOME Shell 3.0.
-Branch `gnome-shell-3.4` supports GNOME Shell >= 3.3.5
+* branch `gnome-shell-3.0` supports GNOME Shell 3.0.X
+* branch `gnome-shell-3.2` supports GNOME Shell 3.2.X
 
 ## Authors
 
