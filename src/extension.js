@@ -16,7 +16,6 @@
 
 const Mainloop = imports.mainloop;
 const Gio = imports.gi.Gio;
-const DBus = imports.dbus;
 const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
