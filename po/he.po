@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-09 13:45+0100\n"
+"POT-Creation-Date: 2012-03-31 11:21+0200\n"
 "PO-Revision-Date: 2012-01-16 09:24+0200\n"
 "Last-Translator: Yakir Sitbon <kingyes1@gmail.com>\n"
 "Language-Team: Yakir Sitbon <kingyes1@gmail.com>\n"
@@ -16,67 +16,79 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. dummy vars for translation
-#: ../src/extension.js:53
-msgid "Playing"
-msgstr "מתנגן"
-
-#: ../src/extension.js:54
-msgid "Paused"
-msgstr "הושהה"
-
-#: ../src/extension.js:55
+#: ../src/extension.js:50
 msgid "Stopped"
 msgstr "נעצר"
 
-#: ../src/extension.js:103
+#: ../src/extension.js:51
+msgid "Playing"
+msgstr "מתנגן"
+
+#: ../src/extension.js:52
+msgid "Paused"
+msgstr "הושהה"
+
+#: ../src/extension.js:142
 msgid "by"
 msgstr "על ידי"
 
-#: ../src/extension.js:105
+#: ../src/extension.js:143
 msgid "from"
 msgstr "מאת"
 
-#: ../src/extension.js:149
+#: ../src/extension.js:183
 msgid "Volume"
 msgstr "עוצמת קול"
 
-#: ../src/extension.js:242
+#: ../src/extension.js:275
 #, fuzzy
 msgid "Playlists"
 msgstr "מתנגן"
 
-#: ../src/extension.js:313
+#: ../src/extension.js:346
 msgid "Unknown Artist"
 msgstr "אומן לא ידוע"
 
-#: ../src/extension.js:317
+#: ../src/extension.js:350
 msgid "Unknown Album"
 msgstr "אלבום לא ידוע"
 
-#: ../src/extension.js:322
+#: ../src/extension.js:354
 msgid "Unknown Title"
 msgstr "שיר לא ידוע"
 
-#: ../src/prefs.js:29
+#: ../src/prefs.js:33
 msgid "Show the media player in the volume menu"
 msgstr ""
 
-#: ../src/prefs.js:30
+#: ../src/prefs.js:34
+msgid "Allow to start the default media player"
+msgstr ""
+
+#: ../src/prefs.js:35
+msgid ""
+"Runs the default mediaplayer by clicking on the media player status icon."
+msgstr ""
+
+#: ../src/prefs.js:36
 #, fuzzy
 msgid "Show the media player volume slider"
 msgstr "מתנגן"
 
-#: ../src/prefs.js:31
+#: ../src/prefs.js:37
 #, fuzzy
 msgid "Show the media player position slider"
 msgstr "מתנגן"
 
-#: ../src/prefs.js:32
+#: ../src/prefs.js:38
 #, fuzzy
 msgid "Show media player playlists"
 msgstr "מתנגן"
 
-#: ../src/prefs.js:35
+#: ../src/prefs.js:41
 msgid "Album cover size"
+msgstr ""
+
+#: ../src/prefs.js:42
+msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr ""
