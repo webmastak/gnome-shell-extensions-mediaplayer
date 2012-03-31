@@ -30,13 +30,17 @@ function init() {
     Lib.initTranslations(Me);
     settings = Lib.getSettings(Me);
     settings_bool = {
-        volumemenu: _("Show the media player in the volume menu"),
-        volume: _("Show the media player volume slider"),
-        position: _("Show the media player position slider"),
-        playlists: _("Show media player playlists")
+        volumemenu: {label: _("Show the media player in the volume menu")},
+        rundefault: {label: _("Allow to start the default media player"),
+                     help: _("Runs the default mediaplayer by clicking on the media player status icon.")},
+        volume: {label: _("Show the media player volume slider")},
+        position: {label: _("Show the media player position slider")},
+        playlists: {label: _("Show media player playlists")}
     };
     settings_range = {
-        coversize: { label: _("Album cover size"), min: 50, max: 110, step: 5, default: 80 }
+        coversize: {label: _("Album cover size"),
+                    help: _("The size of the cover displayed in the menu. Default is 80px width."),
+                    min: 50, max: 110, step: 5, default: 80}
     };
 }
 
@@ -59,6 +63,10 @@ function createRangeSetting(setting) {
         settings.set_int(setting, slider.get_value());
     });
 
+    if (settings_range[setting].help) {
+        setting_label.set_tooltip_text(settings_range[setting].help)
+    }
+
     hbox.pack_start(setting_label, true, true, 0);
     hbox.add(setting_range);
 
@@ -69,13 +77,17 @@ function createBoolSetting(setting) {
 
     let hbox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
 
-    let setting_label = new Gtk.Label({ label: settings_bool[setting],
-                                        xalign: 0 });
+    let setting_label = new Gtk.Label({label: settings_bool[setting].label,
+                                       xalign: 0 });
 
     let setting_switch = new Gtk.Switch({active: settings.get_boolean(setting)});
     setting_switch.connect('notify::active', function(button) {
         settings.set_boolean(setting, button.active);
     });
+
+    if (settings_bool[setting].help) {
+        setting_label.set_tooltip_text(settings_bool[setting].help)
+    }
 
     hbox.pack_start(setting_label, true, true, 0);
     hbox.add(setting_switch);

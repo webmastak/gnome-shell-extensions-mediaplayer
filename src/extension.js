@@ -29,6 +29,7 @@ const Tweener = imports.ui.tweener;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
+const N_ = function(t) { return t };
 
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
@@ -36,6 +37,7 @@ const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
+const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 
 const FADE_ANIMATION_TIME = 0.16;
 
@@ -45,9 +47,10 @@ const DBusIface = Me.imports.dbus;
 const Lib = Me.imports.lib;
 
 const Status = {
-    STOP: "Stopped",
-    PLAY: "Playing",
-    PAUSE: "Paused"
+    STOP: N_("Stopped"),
+    PLAY: N_("Playing"),
+    PAUSE: N_("Paused"),
+    RUN: "Run"
 };
 
 /* global values */
@@ -55,10 +58,6 @@ let metadata = Me.metadata;
 let settings;
 let playerManager;
 let mediaplayerMenu;
-/* dummy vars for translation */
-let x = _(Status.PLAY);
-x = _(Status.PAUSE);
-x = _(Status.STOP);
 
 
 const Player = new Lang.Class({
@@ -587,8 +586,9 @@ const PlayerManager = new Lang.Class({
         // watch list
         this._watch = [];
         // hide the menu by default
-        if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
-           this.menu.actor.hide();
+        if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) &&
+            !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT))
+                this.menu.actor.hide();
         // watch players
         for (var p=0; p<metadata.players.length; p++) {
             this._watch.push(Gio.DBus.session.watch_name('org.mpris.MediaPlayer2.'+metadata.players[p],
@@ -602,7 +602,8 @@ const PlayerManager = new Lang.Class({
     _addPlayer: function(conn, owner) {
         let position;
         this._players[owner] = {player: new Player(owner)};
-        this._players[owner].player.connect('status-changed', Lang.bind(this, this._statusChanged));
+        this._players[owner].signal = this._players[owner].player.connect('status-changed',
+            Lang.bind(this, this._statusChanged));
         if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
             position = this.menu.menu.numMenuItems - 2;
         else
@@ -615,10 +616,13 @@ const PlayerManager = new Lang.Class({
 
     _removePlayer: function(conn, owner) {
         if (this._players[owner]) {
+            this._players[owner].player.disconnect(this._players[owner].signal);
             this._players[owner].player.destroy();
             delete this._players[owner];
-            if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) && this._nbPlayers() == 0)
-                this.menu.actor.hide();
+            if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) &&
+                !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
+                this._nbPlayers() == 0)
+                    this.menu.actor.hide();
         }
         this._refreshStatus();
     },
@@ -638,14 +642,19 @@ const PlayerManager = new Lang.Class({
         // Display current status in the top panel
         if (mediaplayerMenu instanceof MediaplayerStatusButton) {
             let globalStatus = false;
-            for (let owner in this._players) {
-                if (this._players[owner].status == Status.PLAY)
-                    globalStatus = this._players[owner].status;
-                if (this._players[owner].status == Status.PAUSE && !globalStatus)
-                    globalStatus = this._players[owner].status;
+            if (this._nbPlayers() == 0) {
+                globalStatus = Status.RUN;
             }
-            if (!globalStatus)
-                globalStatus = Status.STOP;
+            else {
+                for (let owner in this._players) {
+                    if (this._players[owner].status == Status.PLAY)
+                        globalStatus = this._players[owner].status;
+                    if (this._players[owner].status == Status.PAUSE && !globalStatus)
+                        globalStatus = this._players[owner].status;
+                }
+                if (!globalStatus)
+                    globalStatus = Status.STOP;
+            }
             mediaplayerMenu.setState(globalStatus);
         }
     },
@@ -693,10 +702,23 @@ const MediaplayerStatusButton = new Lang.Class({
     _init: function() {
         this.parent(0.0, "mediaplayer");
 
+        // get the default player
+        this._default = Shell.AppSystem.get_default().lookup_app(
+            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
+        );
+        settings.connect("changed::" + MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
+            if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT)) {
+                this.actor.show();
+            }
+            else if (playerManager._nbPlayers() == 0) {
+                this.actor.hide();
+            }
+        }));
+
         this._iconBox = new St.BoxLayout();
         this._iconIndicator = new St.Icon({icon_name: 'audio-x-generic',
                                            style_class: 'system-status-icon'});
-        this._iconState = new St.Icon({icon_name: 'view-refresh',
+        this._iconState = new St.Icon({icon_name: 'system-run',
                                        style_class: 'status-icon'})
         this._iconStateBin = new St.Bin({child: this._iconState,
                                          y_align: St.Align.END});
@@ -724,6 +746,12 @@ const MediaplayerStatusButton = new Lang.Class({
         if (button == 2)
             playerManager.playPause();
         else {
+            if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
+                this._default && playerManager._nbPlayers() == 0) {
+                    this._default.activate_full(-1, 0);
+                    return;
+            }
+
             if (!this.menu)
                 return;
 
@@ -738,6 +766,8 @@ const MediaplayerStatusButton = new Lang.Class({
             this._iconState.icon_name = "media-playback-pause";
         else if (state == Status.STOP)
             this._iconState.icon_name = "media-playback-stop";
+        else if (state == Status.RUN)
+            this._iconState.icon_name = "system-run";
     }
 });
 
