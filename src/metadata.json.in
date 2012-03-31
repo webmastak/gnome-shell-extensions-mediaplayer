@@ -5,30 +5,6 @@
 "original-author": "eon@patapon.info",
 "shell-version": [ "3.3.5", "3.3.90", "3.3.91", "3.3.92", "3.4.0" ],
 "url": "@URL@",
-"locale": "@LOCALEDIR@",
-"players": [
-    "amarok",
-    "audacious",
-    "banshee",
-    "beatbox",
-    "clementine",
-    "deadbeef",
-    "gmusicbrowser",
-    "googlemusicframe",
-    "guayadeque",
-    "mpd",
-    "nuvolaplayer",
-    "pithos",
-    "pragha",
-    "quodlibet",
-    "rhythmbox",
-    "rhythmbox3",
-    "spotify",
-    "tomahawk",
-    "totem",
-    "vlc",
-    "xbmc",
-    "xnoise"
-]
+"locale": "@LOCALEDIR@"
 }
 

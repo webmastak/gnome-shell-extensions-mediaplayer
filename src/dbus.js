@@ -14,9 +14,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
-const DBus = imports.dbus;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
+
+const DBusIface = <interface name="org.freedesktop.DBus">
+<method name="ListNames">
+    <arg type="as" direction="out" />
+</method>
+<signal name="NameOwnerChanged">
+    <arg type="s" direction="out" />
+    <arg type="s" direction="out" />
+    <arg type="s" direction="out" />
+</signal>
+</interface>;
+const DBusProxy = Gio.DBusProxy.makeProxyWrapper(DBusIface);
 
 const PropertiesIface = <interface name="org.freedesktop.DBus.Properties">
 <signal name="PropertiesChanged">
@@ -74,6 +85,11 @@ const MediaServer2PlaylistsIface = <interface name="org.mpris.MediaPlayer2.Playl
 <property name="ActivePlaylist" type="(b(oss))" access="read" />
 </interface>
 const MediaServer2PlaylistsProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlaylistsIface);
+
+function DBus() {
+    return new DBusProxy(Gio.DBus.session, 'org.freedesktop.DBus',
+                         '/org/freedesktop/DBus');
+}
 
 function Properties(owner) {
     return new PropertiesProxy(Gio.DBus.session, owner,

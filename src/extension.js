@@ -54,7 +54,6 @@ const Status = {
 };
 
 /* global values */
-let metadata = Me.metadata;
 let settings;
 let playerManager;
 let mediaplayerMenu;
@@ -583,23 +582,34 @@ const PlayerManager = new Lang.Class({
         this.menu = menu;
         // players list
         this._players = {};
-        // watch list
-        this._watch = [];
+        // the DBus interface
+        this._dbus = new DBusIface.DBus();
         // hide the menu by default
         if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) &&
             !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT))
                 this.menu.actor.hide();
+        // load players
+        this._dbus.ListNamesRemote(Lang.bind(this, 
+            function(names) {
+                for (n in names[0]) {
+                    let name = names[0][n];
+                    if (name.match('^org.mpris.MediaPlayer2'))
+                        this._addPlayer(name);
+                }
+            }
+        ));
         // watch players
-        for (var p=0; p<metadata.players.length; p++) {
-            this._watch.push(Gio.DBus.session.watch_name('org.mpris.MediaPlayer2.'+metadata.players[p],
-                Gio.BusNameWatcherFlags.NONE,
-                Lang.bind(this, this._addPlayer),
-                Lang.bind(this, this._removePlayer)
-            ));
-        }
+        this._dbus.connectSignal('NameOwnerChanged', Lang.bind(this,
+            function(proxy, sender, [name, old_owner, new_owner]) {
+                if (name.match('^org.mpris.MediaPlayer2') && new_owner)
+                    this._addPlayer(name);
+                if (name.match('^org.mpris.MediaPlayer2') && old_owner)
+                    this._removePlayer(name);
+            }
+        ));
     },
 
-    _addPlayer: function(conn, owner) {
+    _addPlayer: function(owner) {
         let position;
         this._players[owner] = {player: new Player(owner)};
         this._players[owner].signal = this._players[owner].player.connect('status-changed',
@@ -614,7 +624,7 @@ const PlayerManager = new Lang.Class({
         this.menu.actor.show();
     },
 
-    _removePlayer: function(conn, owner) {
+    _removePlayer: function(owner) {
         if (this._players[owner]) {
             this._players[owner].player.disconnect(this._players[owner].signal);
             this._players[owner].player.destroy();
@@ -686,12 +696,8 @@ const PlayerManager = new Lang.Class({
     },
 
     destroy: function() {
-        for (let w = 0; w<this._watch.length; w++) {
-            Gio.DBus.session.unwatch_name(this._watch[w]);
-        }
-        for (let owner in this._players) {
+        for (let owner in this._players)
             this._players[owner].player.destroy();
-        }
     }
 });
 
