@@ -3,9 +3,8 @@
 gnome-shell-extensions-mediaplayer is a simple extension for controlling any 
 MPRIS v2.1 capable Mediaplayer.
 
-This extension will monitor DBus to look for active players automatically 
-(player names are referenced in the metadata.json file). All active players 
-are shown in the gnome-shell volume menu by default.
+This extension will monitor DBus to look for active players automatically. 
+All active players are shown in the gnome-shell volume menu by default.
 
 # Screenshots
 
@@ -21,8 +20,11 @@ But you can have the media players in a separate menu (see settings):
 
 ![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
-You can go to the next or previous track by using the mouse wheel on the statuc icon. 
+You can go to the next or previous track by using the mouse wheel on the status icon. 
 You can also play or pause the player by clicking with the middle button on the status icon.
+
+You may also use the status icon to run your favorite media player if no player is running 
+(see the ```rundefault``` setting below).
 
 - - -
 
@@ -64,29 +66,37 @@ Restart the shell and then enable the extension.
 Settings can be set with the gnome-shell-extension-prefs tool or via the
 command line.
 
-To show the extension in its own menu instead of the volume menu:
+To show the extension in its own menu instead of the volume menu (default: true):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volumemenu false```
 
-To show the volume control slider of the media player:
+To start the default media player by clicking on the status icon if no 
+player is running (has no effect if the extension is shown in the volume 
+menu). You can configure the default media player in the details section 
+of the gnome control center (default: false):
+
+```gsettings set org.gnome.shell.extensions.mediaplayer rundefault true```
+
+To show the volume control slider of the media player (default: false):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volume true```
 
-To show the playlists of the media player:
+To show the playlists of the media player (default: false):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer playlists true```
 
-To hide the position slider:
+To hide the position slider (default: true):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer position false```
 
-To set the size of the cover (default 80):
+To set the size of the cover (default: 80):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer coversize 100```
 
 ## Compatible players
 
-Any player that supports the [MPRIS v2](http://www.mpris.org/2.1/spec/) spec can be supported; however, due to certain limitations, players must be added to `metadata.json`.
+Any player that supports the [MPRIS v2](http://www.mpris.org/2.1/spec/) 
+spec can be supported.
 
 This extension has been tested with:
 
