@@ -65,6 +65,7 @@ function createRangeSetting(setting) {
 
     if (settings_range[setting].help) {
         setting_label.set_tooltip_text(settings_range[setting].help)
+        setting_range.set_tooltip_text(settings_range[setting].help)
     }
 
     hbox.pack_start(setting_label, true, true, 0);
@@ -87,6 +88,7 @@ function createBoolSetting(setting) {
 
     if (settings_bool[setting].help) {
         setting_label.set_tooltip_text(settings_bool[setting].help)
+        setting_switch.set_tooltip_text(settings_bool[setting].help)
     }
 
     hbox.pack_start(setting_label, true, true, 0);
