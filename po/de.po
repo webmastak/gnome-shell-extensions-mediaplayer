@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-31 11:21+0200\n"
-"PO-Revision-Date: 2012-02-26 21:06+0100\n"
+"PO-Revision-Date: 2012-04-04 09:00+0200\n"
 "Last-Translator: Frederik Hahne <frederik.hahne@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
@@ -58,16 +58,16 @@ msgstr "Unbekannter Titel"
 
 #: ../src/prefs.js:33
 msgid "Show the media player in the volume menu"
-msgstr "Media Player im Lautstärkemenu anzeigen"
+msgstr "Mediaplayer im Lautstärkemenu anzeigen"
 
 #: ../src/prefs.js:34
 msgid "Allow to start the default media player"
-msgstr ""
+msgstr "Erlauben den Standard-Mediaplayer zu starten"
 
 #: ../src/prefs.js:35
 msgid ""
 "Runs the default mediaplayer by clicking on the media player status icon."
-msgstr ""
+msgstr "Den Standard-Mediaplayer beim klick auf das Status Icon starten"
 
 #: ../src/prefs.js:36
 msgid "Show the media player volume slider"
@@ -87,4 +87,4 @@ msgstr "Größe der Albumcover"
 
 #: ../src/prefs.js:42
 msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr ""
+msgstr "Größe der Albumcover im Menu. Standard ist eine Breite von 80px."
