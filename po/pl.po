@@ -1,14 +1,14 @@
 # Polish translation for gnome-shell-extension-mediaplayer.
 # Copyright (C) 2011 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
-# Piotr Sokół <psokol@jabster.pl>, 2011.
+# Piotr Sokół <psokol@jabster.pl>, 2011, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-31 11:21+0200\n"
-"PO-Revision-Date: 2011-10-21 00:04+0200\n"
+"PO-Revision-Date: 2012-04-08 11:54+0200\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
 "Language: \n"
@@ -43,9 +43,8 @@ msgid "Volume"
 msgstr "Głośność"
 
 #: ../src/extension.js:275
-#, fuzzy
 msgid "Playlists"
-msgstr "Odtwarzanie"
+msgstr "Listy odtwarzania"
 
 #: ../src/extension.js:346
 msgid "Unknown Artist"
@@ -61,39 +60,37 @@ msgstr "Nieznany tytuł"
 
 #: ../src/prefs.js:33
 msgid "Show the media player in the volume menu"
-msgstr ""
+msgstr "Wyświetlanie rozszerzenia w menu głośności"
 
 #: ../src/prefs.js:34
 msgid "Allow to start the default media player"
-msgstr ""
+msgstr "Uruchamianie domyślnego odtwarzacza"
 
 #: ../src/prefs.js:35
 msgid ""
 "Runs the default mediaplayer by clicking on the media player status icon."
 msgstr ""
+"Uruchamia domyślny odtwarzacz multimediów po kliknięciu w ikonę stanu "
+"rozszerzenia"
 
 #: ../src/prefs.js:36
-#, fuzzy
 msgid "Show the media player volume slider"
-msgstr "Odtwarzanie"
+msgstr "Wyświetlanie suwaka głośności odtwarzacza"
 
 #: ../src/prefs.js:37
-#, fuzzy
 msgid "Show the media player position slider"
-msgstr "Odtwarzanie"
+msgstr "Wyświetlanie suwaka pozycji odtwarzania"
 
 #: ../src/prefs.js:38
-#, fuzzy
 msgid "Show media player playlists"
-msgstr "Odtwarzanie"
+msgstr "Wyświetlanie list odtwarzania"
 
 #: ../src/prefs.js:41
 msgid "Album cover size"
-msgstr ""
+msgstr "Rozmiar okładki albumu"
 
 #: ../src/prefs.js:42
 msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr ""
-
-#~ msgid "Schema \"%s\" not found."
-#~ msgstr "Nie odnaleziono schematu \"%s\"."
+"Określa rozmiar okładki wyświetlanej w menu. Domyślna szerokość obrazu "
+"wynosi 80 pikseli."
