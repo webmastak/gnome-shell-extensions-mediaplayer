@@ -237,8 +237,10 @@ const Player = new Lang.Class({
     },
 
     _getIdentity: function() {
-        this._identity = this._mediaServer.Identity;
-        this._setIdentity();
+        if (this._mediaServer.Identity) {
+            this._identity = this._mediaServer.Identity;
+            this._setIdentity();
+        }
     },
 
     _getDesktopEntry: function() {
