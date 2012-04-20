@@ -587,12 +587,14 @@ const PlayerManager = new Lang.Class({
         if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) &&
             !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT))
                 this.menu.actor.hide();
+        // player DBus name pattern
+        let name_regex = /^org\.mpris\.MediaPlayer2\./;
         // load players
         this._dbus.ListNamesRemote(Lang.bind(this, 
             function(names) {
                 for (n in names[0]) {
                     let name = names[0][n];
-                    if (name.match('^org.mpris.MediaPlayer2'))
+                    if (name_regex.test(name))
                         this._addPlayer(name);
                 }
             }
@@ -600,10 +602,12 @@ const PlayerManager = new Lang.Class({
         // watch players
         this._dbus.connectSignal('NameOwnerChanged', Lang.bind(this,
             function(proxy, sender, [name, old_owner, new_owner]) {
-                if (name.match('^org.mpris.MediaPlayer2') && new_owner)
-                    this._addPlayer(name);
-                if (name.match('^org.mpris.MediaPlayer2') && old_owner)
-                    this._removePlayer(name);
+                if (name_regex.test(name)) {
+                    if (new_owner && !old_owner)
+                        this._addPlayer(name);
+                    else if (old_owner && !new_owner)
+                        this._removePlayer(name);
+                }
             }
         ));
     },
