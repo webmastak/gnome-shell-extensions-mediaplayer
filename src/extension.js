@@ -56,6 +56,7 @@ const Status = {
 let settings;
 let playerManager;
 let mediaplayerMenu;
+let tmpCover;
 
 
 const Player = new Lang.Class({
@@ -379,17 +380,31 @@ const Player = new Lang.Class({
                     onComplete: Lang.bind(this, function() {
                         // Change cover
                         if (this.trackCoverFile) {
-                            let cover = decodeURIComponent(this.trackCoverFile.substr(7));
-                            if (! GLib.file_test(cover, GLib.FileTest.EXISTS)) {
+                            let cover_path = "";
+                            // Distant cover
+                            if (this.trackCoverFile.match(/^http/)) {
+                                // Copy the cover to a tmp local file
+                                let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
+                                // Don't create multiple tmp files
+                                if (!tmpCover)
+                                    tmpCover = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
+                                cover.copy(tmpCover, Gio.FileCopyFlags.OVERWRITE, null, null);
+                                cover_path = tmpCover.get_path();
+                            }
+                            // Local cover
+                            else if (this.trackCoverFile.match(/^file/)) {
+                                cover_path = decodeURIComponent(this.trackCoverFile.substr(7));
+                            }
+                            if (! GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
                                 this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
                             }
                             else {
                                 this.trackCover = new St.Bin({style_class: 'track-cover'});
-                                cover = new Clutter.Texture({filter_quality: 2, filename: cover});
-                                let [coverWidth, coverHeight] = cover.get_base_size();
+                                let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
+                                let [coverWidth, coverHeight] = coverTexture.get_base_size();
                                 this.trackCover.width = this.coverSize;
                                 this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
-                                this.trackCover.set_child(cover);
+                                this.trackCover.set_child(coverTexture);
                             }
                         }
                         else {
