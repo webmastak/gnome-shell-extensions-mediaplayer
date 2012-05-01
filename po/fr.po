@@ -87,3 +87,11 @@ msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr ""
 "La taille de la pochette affichée dans le menu. La largeur par défaut est de "
 "80px."
+
+#: ../src/prefs/js:39
+msgid "Display song rating"
+msgstr "Afficher le classement de la chanson"
+
+#: ../src/prefs/js:40
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Afficher le classement de la chason en lecture sur une échelle de 0 à 5"
