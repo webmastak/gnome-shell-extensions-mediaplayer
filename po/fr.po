@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-31 11:21+0200\n"
-"PO-Revision-Date: 2012-02-09 13:26+0100\n"
-"Last-Translator: Jean-Philippe Braun <eon@patapon.info>\n"
+"PO-Revision-Date: 2012-05-01 20:02-0500\n"
+"Last-Translator: Charles Brière <charlesbriere.flatzo@gmail.com>\n"
 "Language-Team: Jean-Philippe Braun <eon@patapon.info>\n"
 "Language: French\n"
 "MIME-Version: 1.0\n"
@@ -60,11 +60,8 @@ msgid "Allow to start the default media player"
 msgstr "Permettre de lancer le lecteur multimédia par défaut"
 
 #: ../src/prefs.js:35
-msgid ""
-"Runs the default mediaplayer by clicking on the media player status icon."
-msgstr ""
-"Lance le lecteur multimédia par défaut en cliquant sur l'icone de "
-"l'extension."
+msgid "Runs the default mediaplayer by clicking on the media player status icon."
+msgstr "Lance le lecteur multimédia par défaut en cliquant sur l'icone de l'extension."
 
 #: ../src/prefs.js:36
 msgid "Show the media player volume slider"
@@ -84,6 +81,13 @@ msgstr "Taille de la pochette de l'album"
 
 #: ../src/prefs.js:42
 msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr ""
-"La taille de la pochette affichée dans le menu. La largeur par défaut est de "
-"80px."
+msgstr "La taille de la pochette affichée dans le menu. La largeur par défaut est de 80px."
+
+#: ../src/prefs/js:39
+msgid "Display song rating"
+msgstr "Afficher le classement de la chanson"
+
+#: ../src/prefs/js:40
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Afficher le classement de la chanson en lecture sur une échelle de 0 à 5"
+
