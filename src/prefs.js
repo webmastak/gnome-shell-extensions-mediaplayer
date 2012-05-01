@@ -35,7 +35,9 @@ function init() {
                      help: _("Runs the default mediaplayer by clicking on the media player status icon.")},
         volume: {label: _("Show the media player volume slider")},
         position: {label: _("Show the media player position slider")},
-        playlists: {label: _("Show media player playlists")}
+        playlists: {label: _("Show media player playlists")},
+        rating: {label: _("Display song rating"),
+                 help: _("Display the currently playing song on a 0 to 5 rating scale")}
     };
     settings_range = {
         coversize: {label: _("Album cover size"),

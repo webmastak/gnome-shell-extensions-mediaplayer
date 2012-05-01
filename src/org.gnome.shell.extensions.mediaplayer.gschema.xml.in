@@ -30,5 +30,10 @@
         <_summary>Allow to start the default media player</_summary>
         <_description>Starts the default mediaplayer by clicking on the media player status icon.</_description>
     </key>
+    <key type="b" name="rating">
+	<default>false</default>
+	<summary>Display song rating</summary>
+	<description>Display the currently playing song on a 0 to 5 rating scale</description>
+    </key>
   </schema>
 </schemalist>
