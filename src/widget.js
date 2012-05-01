@@ -191,42 +191,29 @@ function TrackRating() {
 TrackRating.prototype = {
     _init: function(prepend, value, style, icon_path) {
         this.box = new St.Table({style_class: style});
-        this._label = new St.Label();
-this._starImage = new Array();
-this._starTexture = new Array();
-this._starButton = new Array();
-this._star       = new Array();
-for(i=0; i < 5; i++) {
-        this._starImage[i]      = new St.Bin({style_class: 'track-rating'});
-        this._starTexture[i]         = new Clutter.Texture({filter_quality: 2, filename: icon_path});
-        this._star[i] = new St.Button({style_class: 'button-star', x_align: St.Align.START, y_align: St.Align.START});
 
-        this._starImage[i].width = 20;
-        this._starImage[i].height = 20;  
-        this._starImage[i].set_child(this._starTexture[i])
-       
-        this._star[i].set_child(this._starImage[i]);
-}
+        this._starImage = new Array();
+        this._starTexture = new Array();
+        this._starButton = new Array();
+        this._star       = new Array();
+        for(i=0; i < 5; i++) {
+                this._starImage[i]      = new St.Bin({style_class: 'track-rating'});
+                this._starTexture[i]         = new Clutter.Texture({filter_quality: 2, filename: icon_path});
+                this._star[i] = new St.Button({style_class: 'button-star', x_align: St.Align.START, y_align: St.Align.START});
 
-        if (prepend) {
-            this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + " "});
-            this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.box.add(this._prepend, {row: 0, col: 0, x_fill: true, x_expand: false});
-            this.box.add(this._label, {row: 0, col: 1});
-                this.box.add(this._star[0], {row: 0, col: 2});
-                this.box.add(this._star[1], {row: 0, col: 3});
-                this.box.add(this._star[2], {row: 0, col: 4});
-                this.box.add(this._star[3], {row: 0, col: 5});
-                this.box.add(this._star[4], {row: 0, col: 6});
+                this._starImage[i].width = 20;
+                this._starImage[i].height = 20;  
+                this._starImage[i].set_child(this._starTexture[i])
+               
+                this._star[i].set_child(this._starImage[i]);
         }
-        else {
-            this.box.add(this._label, {row: 0, col: 0});
-                this.box.add(this._star[0], {row: 0, col: 1});
-                this.box.add(this._star[1], {row: 0, col: 2});
-                this.box.add(this._star[2], {row: 0, col: 3});
-                this.box.add(this._star[3], {row: 0, col: 4});
-                this.box.add(this._star[4], {row: 0, col: 5});
-        }
+
+        this.box.add(this._star[0], {row: 0, col: 2});
+        this.box.add(this._star[1], {row: 0, col: 3});
+        this.box.add(this._star[2], {row: 0, col: 4});
+        this.box.add(this._star[3], {row: 0, col: 5});
+        this.box.add(this._star[4], {row: 0, col: 6});
+    
 
         this.setValue(value);
     },
