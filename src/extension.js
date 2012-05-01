@@ -140,7 +140,7 @@ const Player = new Lang.Class({
         this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
         this.trackArtist = new Widget.TrackTitle(_("by"), _('Unknown Artist'), 'track-artist');
         this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
-        this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', Me.dir.get_path() + "/star.png");
+        this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', Me.dir.get_path() + "/star.png", Me.dir.get_path() + "/star_disabled.png");
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
         this.trackBox._infos.add(this.trackTitle.box, {row: 0, col: 1, y_expand: false});

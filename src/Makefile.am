@@ -1,6 +1,6 @@
 include ../include.mk
 
-dist_extension_DATA = extension.js widget.js dbus.js lib.js prefs.js stylesheet.css star.png
+dist_extension_DATA = extension.js widget.js dbus.js lib.js prefs.js stylesheet.css star.png star_disabled.png
 nodist_extension_DATA = metadata.json
 
 EXTRA_DIST = metadata.json.in

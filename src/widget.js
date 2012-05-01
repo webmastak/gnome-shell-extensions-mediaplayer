@@ -189,21 +189,30 @@ function TrackRating() {
 }
 
 TrackRating.prototype = {
-    _init: function(prepend, value, style, icon_path) {
+    _init: function(prepend, value, style, icon_path, icon_path_disabled) {
         this.box = new St.Table({style_class: style});
 
         this._starImage = new Array();
         this._starTexture = new Array();
-        this._starButton = new Array();
+        this._starDisabledImage = new Array();
+        this._starDisabledTexture = new Array();
         this._star       = new Array();
         for(i=0; i < 5; i++) {
                 this._starImage[i]      = new St.Bin({style_class: 'track-rating'});
                 this._starTexture[i]         = new Clutter.Texture({filter_quality: 2, filename: icon_path});
+
+                this._starDisabledImage[i]      = new St.Bin({style_class: 'track-rating'});
+                this._starDisabledTexture[i]         = new Clutter.Texture({filter_quality: 2, filename: icon_path_disabled});
+
                 this._star[i] = new St.Button({style_class: 'button-star', x_align: St.Align.START, y_align: St.Align.START});
 
                 this._starImage[i].width = 20;
                 this._starImage[i].height = 20;  
                 this._starImage[i].set_child(this._starTexture[i])
+
+                this._starDisabledImage[i].width = 20;
+                this._starDisabledImage[i].height = 20;  
+                this._starDisabledImage[i].set_child(this._starDisabledTexture[i])
                
                 this._star[i].set_child(this._starImage[i]);
         }
@@ -219,21 +228,20 @@ TrackRating.prototype = {
     },
 
     setValue: function(value) {
-        this._star[0].show();
-        this._star[1].show();
-        this._star[2].show();
-        this._star[3].show();
-        this._star[4].show();
+        for (i = 0; i < 5; i++) {
+                this._star[i].set_child(this._starImage[i]);
+        }
+
         if (value < 0.2)
-                        this._star[0].hide();
+                        this._star[0].set_child(this._starDisabledImage[0]);
         if (value < 0.4)
-                        this._star[1].hide();
+                        this._star[1].set_child(this._starDisabledImage[1]);
         if (value < 0.6)
-                        this._star[2].hide();
+                        this._star[2].set_child(this._starDisabledImage[2]);
         if (value < 0.8)
-                        this._star[3].hide();
+                        this._star[3].set_child(this._starDisabledImage[3]);
         if (value < 1.0)
-                        this._star[4].hide();
+                        this._star[4].set_child(this._starDisabledImage[4]);
             }
 }
 
