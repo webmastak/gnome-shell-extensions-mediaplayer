@@ -192,57 +192,58 @@ TrackRating.prototype = {
     _init: function(prepend, value, style, icon_path, icon_path_disabled) {
         this.box = new St.Table({style_class: style});
 
-        this._starImage = new Array();
-        this._starTexture = new Array();
-        this._starDisabledImage = new Array();
-        this._starDisabledTexture = new Array();
-        this._star       = new Array();
+        this._starredIcon       = new Array();
+        this._nonStarredIcon    = new Array();
+        this._starButton        = new Array();
         for(i=0; i < 5; i++) {
-                this._starImage[i]      = new St.Bin({style_class: 'track-rating'});
-                this._starTexture[i]         = new Clutter.Texture({filter_quality: 2, filename: icon_path});
+                // Create starred icons
+                this._starredIcon[i]   = new St.Icon({
+                                                        style_class: 'button-star', 
+                                                        icon_size: 20, 
+                                                        icon_type: St.IconType.SYMBOLIC, 
+                                                        icon_name: 'starred'
+                                                });
+                // Create non-starred icons                
+                this._nonStarredIcon[i]   = new St.Icon({
+                                                        style_class: 'button-star', 
+                                                        icon_size: 20, 
+                                                        icon_type: St.IconType.SYMBOLIC, 
+                                                        icon_name: 'non-starred'
+                                                });
+                // Create the button with starred icon
+                this._starButton[i]    = new St.Button({
+                                                        style_class: 'button-star',
+                                                        x_align: St.Align.START,
+                                                        y_align: St.Align.START,
+                                                        child: this._starredIcon[i]
 
-                this._starDisabledImage[i]      = new St.Bin({style_class: 'track-rating'});
-                this._starDisabledTexture[i]         = new Clutter.Texture({filter_quality: 2, filename: icon_path_disabled});
-
-                this._star[i] = new St.Button({style_class: 'button-star', x_align: St.Align.START, y_align: St.Align.START});
-
-                this._starImage[i].width = 20;
-                this._starImage[i].height = 20;  
-                this._starImage[i].set_child(this._starTexture[i])
-
-                this._starDisabledImage[i].width = 20;
-                this._starDisabledImage[i].height = 20;  
-                this._starDisabledImage[i].set_child(this._starDisabledTexture[i])
-               
-                this._star[i].set_child(this._starImage[i]);
+                                                });
+                // Put the button in the table
+                this.box.add(this._starButton[i], {row: 0, col: i + 2});
         }
-
-        this.box.add(this._star[0], {row: 0, col: 2});
-        this.box.add(this._star[1], {row: 0, col: 3});
-        this.box.add(this._star[2], {row: 0, col: 4});
-        this.box.add(this._star[3], {row: 0, col: 5});
-        this.box.add(this._star[4], {row: 0, col: 6});
-    
 
         this.setValue(value);
     },
 
     setValue: function(value) {
+
         for (i = 0; i < 5; i++) {
-                this._star[i].set_child(this._starImage[i]);
+                this._starButton[i].set_child(this._starredIcon[i]);
         }
 
         if (value < 0.2)
-                        this._star[0].set_child(this._starDisabledImage[0]);
+                        this._starButton[0].set_child(this._nonStarredIcon[0]);
         if (value < 0.4)
-                        this._star[1].set_child(this._starDisabledImage[1]);
+                        this._starButton[1].set_child(this._nonStarredIcon[1]);
         if (value < 0.6)
-                        this._star[2].set_child(this._starDisabledImage[2]);
+                        this._starButton[2].set_child(this._nonStarredIcon[2]);
         if (value < 0.8)
-                        this._star[3].set_child(this._starDisabledImage[3]);
+                        this._starButton[3].set_child(this._nonStarredIcon[3]);
         if (value < 1.0)
-                        this._star[4].set_child(this._starDisabledImage[4]);
-            }
+                        this._starButton[4].set_child(this._nonStarredIcon[4]);
+
+    }
+
 }
 
 function PlaylistItem() {
