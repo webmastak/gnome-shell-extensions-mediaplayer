@@ -37,6 +37,7 @@ const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
+const MEDIAPLAYER_RATING_KEY = 'rating';
 
 const FADE_ANIMATION_TIME = 0.16;
 
@@ -125,7 +126,18 @@ const Player = new Lang.Class({
         this._settings.connect("changed::" + MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
             this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
         }));
-
+        this.showRating    = this._settings.get_boolean(MEDIAPLAYER_RATING_KEY); 
+        this._settings.connect("changed::" + MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
+            if (this._settings.get_boolean(MEDIAPLAYER_RATING_KEY)) {
+                this.showRating = true;
+                this.trackRating.showRating();
+            }
+            else {
+                this.showRating = false;
+                this.trackRating.hideRating();
+            
+            }
+        }));
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
         this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
 
@@ -140,13 +152,14 @@ const Player = new Lang.Class({
         this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
         this.trackArtist = new Widget.TrackTitle(_("by"), _('Unknown Artist'), 'track-artist');
         this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
-        this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', Me.dir.get_path() + "/star.png", Me.dir.get_path() + "/star_disabled.png");
+        this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating');
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
         this.trackBox._infos.add(this.trackTitle.box, {row: 0, col: 1, y_expand: false});
         this.trackBox._infos.add(this.trackArtist.box, {row: 1, col: 1, y_expand: false});
         this.trackBox._infos.add(this.trackAlbum.box, {row: 2, col: 1, y_expand: false});
         this.trackBox._infos.add(this.trackRating.box, {row: 3, col: 1, y_expand: false});
+        this.trackRating.hideRating();
 
         this.addMenuItem(this.trackBox);
 
@@ -359,11 +372,13 @@ const Player = new Lang.Class({
             if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"].unpack();
             }
-            if (metadata["xesam:userRating"]) {
-                this.trackRating.setValue(metadata["xesam:userRating"].deep_unpack());
+            if (this.showRating) {
+                    if (metadata["xesam:userRating"]) {
+                        this.trackRating.setValue(metadata["xesam:userRating"].deep_unpack());
+                    }
+                    else
+                        this.trackRating.setValue(0);
             }
-            else
-                this.trackRating.setValue(0);
 
             let animate = false;
             if (metadata["mpris:artUrl"]) {
@@ -502,6 +517,8 @@ const Player = new Lang.Class({
                 this._volume.actor.show();
             if (this.showPosition && this.supportPosition)
                 this._position.actor.show();
+            if (this.showRating)
+                this.trackRating.hideRating();
         }
         else {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {

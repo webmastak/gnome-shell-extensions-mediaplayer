@@ -189,7 +189,7 @@ function TrackRating() {
 }
 
 TrackRating.prototype = {
-    _init: function(prepend, value, style, icon_path, icon_path_disabled) {
+    _init: function(prepend, value, style) {
         this.box = new St.Table({style_class: style});
 
         this._starredIcon       = new Array();
@@ -242,8 +242,17 @@ TrackRating.prototype = {
         if (value < 1.0)
                         this._starButton[4].set_child(this._nonStarredIcon[4]);
 
+    },
+    showRating: function() {
+        for (i = 0; i < 5; i++) {
+                this._starButton[i].show();
+        }
+    },
+    hideRating: function() {
+        for (i = 0; i < 5; i++) {
+                this._starButton[i].hide();
+        }
     }
-
 }
 
 function PlaylistItem() {
