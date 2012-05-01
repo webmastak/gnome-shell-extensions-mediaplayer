@@ -140,11 +140,13 @@ const Player = new Lang.Class({
         this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
         this.trackArtist = new Widget.TrackTitle(_("by"), _('Unknown Artist'), 'track-artist');
         this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
+        this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', Me.dir.get_path() + "/star.png");
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
         this.trackBox._infos.add(this.trackTitle.box, {row: 0, col: 1, y_expand: false});
         this.trackBox._infos.add(this.trackArtist.box, {row: 1, col: 1, y_expand: false});
         this.trackBox._infos.add(this.trackAlbum.box, {row: 2, col: 1, y_expand: false});
+        this.trackBox._infos.add(this.trackRating.box, {row: 3, col: 1, y_expand: false});
 
         this.addMenuItem(this.trackBox);
 
@@ -357,6 +359,11 @@ const Player = new Lang.Class({
             if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"].unpack();
             }
+            if (metadata["xesam:userRating"]) {
+                this.trackRating.setValue(metadata["xesam:userRating"].deep_unpack());
+            }
+            else
+                this.trackRating.setValue(0);
 
             let animate = false;
             if (metadata["mpris:artUrl"]) {
