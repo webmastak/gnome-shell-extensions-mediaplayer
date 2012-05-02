@@ -518,7 +518,7 @@ const Player = new Lang.Class({
             if (this.showPosition && this.supportPosition)
                 this._position.actor.show();
             if (this.showRating)
-                this.trackRating.hideRating();
+                this.trackRating.showRating();
         }
         else {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {
