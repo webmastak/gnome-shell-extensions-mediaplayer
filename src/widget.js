@@ -15,7 +15,6 @@
 **/
 
 const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
 const PopupMenu = imports.ui.popupMenu;
 const Pango = imports.gi.Pango;
 const GLib = imports.gi.GLib;

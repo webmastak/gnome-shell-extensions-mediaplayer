@@ -10,10 +10,10 @@
 }
 
 .button-star {
-	padding: 0px;
-	margin: 0px;
-	height: 20px;
-	width:20px;
+    padding: 0px;
+    margin: 0px;
+    height: 20px;
+    width:20px;
 }
 
 .status-icon {
@@ -47,9 +47,9 @@
 }
 
 .track-rating {
-	border: 0px;
-	padding: 0px;
-	margin: 0px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .menu-icon {

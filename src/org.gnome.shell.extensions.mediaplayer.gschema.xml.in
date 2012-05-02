@@ -32,8 +32,8 @@
     </key>
     <key type="b" name="rating">
 	<default>false</default>
-	<summary>Display song rating</summary>
-	<description>Display the currently playing song's rating on a 0 to 5 scale</description>
+	<_summary>Display song rating</_summary>
+	<_description>Display the currently playing song's rating on a 0 to 5 scale</_description>
     </key>
   </schema>
 </schemalist>
