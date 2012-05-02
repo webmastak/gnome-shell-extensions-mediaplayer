@@ -9,6 +9,13 @@
    padding: 2px;
 }
 
+.button-star {
+    padding: 0px;
+    margin: 0px;
+    height: 20px;
+    width:20px;
+}
+
 .status-icon {
     icon-size: 10px;
 }
@@ -37,6 +44,12 @@
 .track-album {
     padding-top: 2px;
     font-size: 0.9em;
+}
+
+.track-rating {
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .menu-icon {
