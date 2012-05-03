@@ -84,12 +84,12 @@ msgstr "Afficher les listes de lecture du lecteur multimédia"
 
 #: ../src/prefs.js:39
 msgid "Display song rating"
-msgstr "Afficher le classement de la chanson"
+msgstr "Afficher la note de la chanson"
 
 #: ../src/prefs.js:40
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr ""
-"Afficher le classement de la chanson en lecture sur une échelle de 0 à 5"
+"Afficher la note de la chanson en lecture sur une échelle de 0 à 5"
 
 #: ../src/prefs.js:43
 msgid "Album cover size"
