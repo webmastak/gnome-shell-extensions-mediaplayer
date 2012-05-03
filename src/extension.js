@@ -372,10 +372,13 @@ const Player = new Lang.Class({
                 this.trackObj = metadata["mpris:trackid"].unpack();
             }
             if (this.showRating) {
+                let rating = 0;
                 if (metadata["xesam:userRating"])
-                    this.trackRating.setValue(metadata["xesam:userRating"].deep_unpack());
-                else
-                    this.trackRating.setValue(0);
+                    rating = metadata["xesam:userRating"].deep_unpack();
+                // Clementine
+                if (metadata["rating"])
+                    rating = metadata["rating"].deep_unpack() / 5;
+                this.trackRating.setValue(rating);
             }
 
             let animate = false;
