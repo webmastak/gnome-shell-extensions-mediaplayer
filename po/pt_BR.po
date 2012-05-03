@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-31 11:21+0200\n"
+"POT-Creation-Date: 2012-05-03 10:26+0200\n"
 "PO-Revision-Date: 2012-04-04 14:31-0300\n"
 "Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
 "Language-Team: \n"
@@ -31,31 +31,35 @@ msgstr "Tocando"
 msgid "Paused"
 msgstr "Em pausa"
 
-#: ../src/extension.js:142
+#: ../src/extension.js:152
 msgid "by"
 msgstr "por"
 
-#: ../src/extension.js:143
+#: ../src/extension.js:153
 msgid "from"
 msgstr "de"
 
-#: ../src/extension.js:183
+#: ../src/extension.js:154
+msgid "rating"
+msgstr ""
+
+#: ../src/extension.js:196
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:275
+#: ../src/extension.js:290
 msgid "Playlists"
 msgstr "Playlists"
 
-#: ../src/extension.js:346
+#: ../src/extension.js:361
 msgid "Unknown Artist"
 msgstr "Artista Deconhecido"
 
-#: ../src/extension.js:350
+#: ../src/extension.js:365
 msgid "Unknown Album"
 msgstr "Álbum Desconhecido"
 
-#: ../src/extension.js:354
+#: ../src/extension.js:369
 msgid "Unknown Title"
 msgstr "Título Desconhecido"
 
@@ -68,8 +72,10 @@ msgid "Allow to start the default media player"
 msgstr "Permitir iniciar o media player padrão"
 
 #: ../src/prefs.js:35
-msgid "Runs the default mediaplayer by clicking on the media player status icon."
-msgstr "Executa o media player padrão clicando no ícone de status do media player"
+msgid ""
+"Runs the default mediaplayer by clicking on the media player status icon."
+msgstr ""
+"Executa o media player padrão clicando no ícone de status do media player"
 
 #: ../src/prefs.js:36
 msgid "Show the media player volume slider"
@@ -83,11 +89,19 @@ msgstr "Exibir o controle de posição do media player"
 msgid "Show media player playlists"
 msgstr "Exibir playlists do media player"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:39
+msgid "Display song rating"
+msgstr ""
+
+#: ../src/prefs.js:40
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr ""
+
+#: ../src/prefs.js:43
 msgid "Album cover size"
 msgstr "Tamanho da capa do álbum"
 
-#: ../src/prefs.js:42
+#: ../src/prefs.js:44
 msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr "O tamanho da capa exibida no menu. Por padrão, 80 pixels de largura."
 

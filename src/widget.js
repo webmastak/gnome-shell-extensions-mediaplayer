@@ -189,68 +189,61 @@ function TrackRating() {
 
 TrackRating.prototype = {
     _init: function(prepend, value, style) {
-        this.box = new St.Table({style_class: style});
-
-        this._starredIcon       = new Array();
-        this._nonStarredIcon    = new Array();
-        this._starButton        = new Array();
-        for(i=0; i < 5; i++) {
-                // Create starred icons
-                this._starredIcon[i]   = new St.Icon({
-                                                        style_class: 'button-star', 
-                                                        icon_size: 20, 
-                                                        icon_type: St.IconType.SYMBOLIC, 
-                                                        icon_name: 'starred'
-                                                });
-                // Create non-starred icons                
-                this._nonStarredIcon[i]   = new St.Icon({
-                                                        style_class: 'button-star', 
-                                                        icon_size: 20, 
-                                                        icon_type: St.IconType.SYMBOLIC, 
-                                                        icon_name: 'non-starred'
-                                                });
-                // Create the button with starred icon
-                this._starButton[i]    = new St.Button({
-                                                        style_class: 'button-star',
-                                                        x_align: St.Align.START,
-                                                        y_align: St.Align.START,
-                                                        child: this._starredIcon[i]
-
-                                                });
-                // Put the button in the table
-                this.box.add(this._starButton[i], {row: 0, col: i + 2});
+        this.box = new St.BoxLayout({style_class: style});
+        if (prepend) {
+            this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + ": "});
+            this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+            this.box.add(this._prepend);
         }
-
+        this._starredIcon = [];
+        this._nonStarredIcon = [];
+        this._starButton = [];
+        for(let i=0; i < 5; i++) {
+            // Create starred icons
+            this._starredIcon[i] = new St.Icon({style_class: 'button-star',
+                                                icon_size: 18,
+                                                icon_type: St.IconType.SYMBOLIC,
+                                                icon_name: 'starred'
+                                               });
+            // Create non-starred icons
+            this._nonStarredIcon[i] = new St.Icon({style_class: 'button-star',
+                                                   icon_size: 18,
+                                                   icon_type: St.IconType.SYMBOLIC,
+                                                   icon_name: 'non-starred'
+                                                  });
+            // Create the button with starred icon
+            this._starButton[i] = new St.Button({style_class: 'button-star',
+                                                 x_align: St.Align.START,
+                                                 y_align: St.Align.MIDDLE,
+                                                 child: this._starredIcon[i]
+                                                });
+            // Put the button in the box
+            this.box.add(this._starButton[i]);
+        }
         this.setValue(value);
     },
 
     setValue: function(value) {
-
-        for (i = 0; i < 5; i++) {
-                this._starButton[i].set_child(this._starredIcon[i]);
-        }
-
+        for (let i = 0; i < 5; i++)
+            this._starButton[i].set_child(this._starredIcon[i]);
         if (value < 0.2)
-                        this._starButton[0].set_child(this._nonStarredIcon[0]);
+            this._starButton[0].set_child(this._nonStarredIcon[0]);
         if (value < 0.4)
-                        this._starButton[1].set_child(this._nonStarredIcon[1]);
+            this._starButton[1].set_child(this._nonStarredIcon[1]);
         if (value < 0.6)
-                        this._starButton[2].set_child(this._nonStarredIcon[2]);
+            this._starButton[2].set_child(this._nonStarredIcon[2]);
         if (value < 0.8)
-                        this._starButton[3].set_child(this._nonStarredIcon[3]);
+            this._starButton[3].set_child(this._nonStarredIcon[3]);
         if (value < 1.0)
-                        this._starButton[4].set_child(this._nonStarredIcon[4]);
+            this._starButton[4].set_child(this._nonStarredIcon[4]);
+    },
 
-    },
     showRating: function() {
-        for (i = 0; i < 5; i++) {
-                this._starButton[i].show();
-        }
+        this.box.show();
     },
+
     hideRating: function() {
-        for (i = 0; i < 5; i++) {
-                this._starButton[i].hide();
-        }
+        this.box.hide();
     }
 }
 

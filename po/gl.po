@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-31 11:21+0200\n"
+"POT-Creation-Date: 2012-05-03 10:26+0200\n"
 "PO-Revision-Date: 2011-12-06 04:37+0100\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: Galician <gnome-l10n-gl@gnome.org>\n"
@@ -29,32 +29,36 @@ msgstr "Reproducindo"
 msgid "Paused"
 msgstr "Pausado"
 
-#: ../src/extension.js:142
+#: ../src/extension.js:152
 msgid "by"
 msgstr "por"
 
-#: ../src/extension.js:143
+#: ../src/extension.js:153
 msgid "from"
 msgstr "de"
 
-#: ../src/extension.js:183
+#: ../src/extension.js:154
+msgid "rating"
+msgstr ""
+
+#: ../src/extension.js:196
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:275
+#: ../src/extension.js:290
 #, fuzzy
 msgid "Playlists"
 msgstr "Reproducindo"
 
-#: ../src/extension.js:346
+#: ../src/extension.js:361
 msgid "Unknown Artist"
 msgstr "Artista descoñecido"
 
-#: ../src/extension.js:350
+#: ../src/extension.js:365
 msgid "Unknown Album"
 msgstr "Álbum descoñecido"
 
-#: ../src/extension.js:354
+#: ../src/extension.js:369
 msgid "Unknown Title"
 msgstr "Título descoñecido"
 
@@ -86,11 +90,19 @@ msgstr "Reproducindo"
 msgid "Show media player playlists"
 msgstr "Reproducindo"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:39
+msgid "Display song rating"
+msgstr ""
+
+#: ../src/prefs.js:40
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr ""
+
+#: ../src/prefs.js:43
 msgid "Album cover size"
 msgstr ""
 
-#: ../src/prefs.js:42
+#: ../src/prefs.js:44
 msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr ""
 

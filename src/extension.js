@@ -126,7 +126,7 @@ const Player = new Lang.Class({
         this._settings.connect("changed::" + MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
             this.coverSize = this._settings.get_int(MEDIAPLAYER_COVER_SIZE);
         }));
-        this.showRating    = this._settings.get_boolean(MEDIAPLAYER_RATING_KEY); 
+        this.showRating = this._settings.get_boolean(MEDIAPLAYER_RATING_KEY);
         this._settings.connect("changed::" + MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_RATING_KEY)) {
                 this.showRating = true;
@@ -135,7 +135,6 @@ const Player = new Lang.Class({
             else {
                 this.showRating = false;
                 this.trackRating.hideRating();
-            
             }
         }));
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
@@ -373,9 +372,8 @@ const Player = new Lang.Class({
                 this.trackObj = metadata["mpris:trackid"].unpack();
             }
             if (this.showRating) {
-                if (metadata["xesam:userRating"]) {
+                if (metadata["xesam:userRating"])
                     this.trackRating.setValue(metadata["xesam:userRating"].deep_unpack());
-                }
                 else
                     this.trackRating.setValue(0);
             }
@@ -631,7 +629,7 @@ const PlayerManager = new Lang.Class({
         // player DBus name pattern
         let name_regex = /^org\.mpris\.MediaPlayer2\./;
         // load players
-        this._dbus.ListNamesRemote(Lang.bind(this, 
+        this._dbus.ListNamesRemote(Lang.bind(this,
             function(names) {
                 for (n in names[0]) {
                     let name = names[0][n];

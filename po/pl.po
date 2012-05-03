@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-31 11:21+0200\n"
+"POT-Creation-Date: 2012-05-03 10:26+0200\n"
 "PO-Revision-Date: 2012-04-08 11:54+0200\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
@@ -30,31 +30,35 @@ msgstr "Odtwarzanie"
 msgid "Paused"
 msgstr "Wstrzymano"
 
-#: ../src/extension.js:142
+#: ../src/extension.js:152
 msgid "by"
 msgstr "w wykonaniu"
 
-#: ../src/extension.js:143
+#: ../src/extension.js:153
 msgid "from"
 msgstr "z albumu"
 
-#: ../src/extension.js:183
+#: ../src/extension.js:154
+msgid "rating"
+msgstr ""
+
+#: ../src/extension.js:196
 msgid "Volume"
 msgstr "Głośność"
 
-#: ../src/extension.js:275
+#: ../src/extension.js:290
 msgid "Playlists"
 msgstr "Listy odtwarzania"
 
-#: ../src/extension.js:346
+#: ../src/extension.js:361
 msgid "Unknown Artist"
 msgstr "Nieznany wykonawca"
 
-#: ../src/extension.js:350
+#: ../src/extension.js:365
 msgid "Unknown Album"
 msgstr "Nieznany album"
 
-#: ../src/extension.js:354
+#: ../src/extension.js:369
 msgid "Unknown Title"
 msgstr "Nieznany tytuł"
 
@@ -85,11 +89,19 @@ msgstr "Wyświetlanie suwaka pozycji odtwarzania"
 msgid "Show media player playlists"
 msgstr "Wyświetlanie list odtwarzania"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:39
+msgid "Display song rating"
+msgstr ""
+
+#: ../src/prefs.js:40
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr ""
+
+#: ../src/prefs.js:43
 msgid "Album cover size"
 msgstr "Rozmiar okładki albumu"
 
-#: ../src/prefs.js:42
+#: ../src/prefs.js:44
 msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr ""
 "Określa rozmiar okładki wyświetlanej w menu. Domyślna szerokość obrazu "
