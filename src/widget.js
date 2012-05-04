@@ -218,13 +218,13 @@ TrackRating.prototype = {
         for(let i=0; i < 5; i++) {
             // Create starred icons
             this._starredIcon[i] = new St.Icon({style_class: 'star-icon',
-                                                icon_size: 18,
+                                                icon_size: 16,
                                                 icon_type: St.IconType.SYMBOLIC,
                                                 icon_name: 'starred'
                                                });
             // Create non-starred icons
             this._nonStarredIcon[i] = new St.Icon({style_class: 'star-icon',
-                                                   icon_size: 18,
+                                                   icon_size: 16,
                                                    icon_type: St.IconType.SYMBOLIC,
                                                    icon_name: 'non-starred'
                                                   });
