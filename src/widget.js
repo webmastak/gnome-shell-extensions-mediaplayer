@@ -19,6 +19,7 @@ const St = imports.gi.St;
 const PopupMenu = imports.ui.popupMenu;
 const Pango = imports.gi.Pango;
 const GLib = imports.gi.GLib;
+const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 
 function TrackBox() {
@@ -207,7 +208,8 @@ TrackRating.prototype = {
         this._value = value;
         // Supported players
         this._supported = {
-            "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating
+            "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
+            "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
         };
         // Icons
         this._starredIcon = [];
@@ -267,7 +269,8 @@ TrackRating.prototype = {
         // Apply the rating in the player
         let applied = false;
         if (this._supported[this._player._owner]) {
-            applied = this._supported[this._player._owner](button._rateValue);
+            let applyFunc = Lang.bind(this, this._supported[this._player._owner]);
+            applied = applyFunc(button._rateValue);
         }
         if (applied) {
             this.setRating(button._rateValue);
@@ -278,6 +281,25 @@ TrackRating.prototype = {
     applyBansheeRating: function(value) {
         GLib.spawn_command_line_async("banshee --set-rating=%s".format(value));
         return true;
+    },
+
+    applyRhythmbox3Rating: function(value) {
+        const Rhythmbox3Iface = <interface name="org.gnome.Rhythmbox3.RhythmDB">
+        <method name="SetEntryProperties">
+            <arg type="s" direction="in" />
+            <arg type="a{sv}" direction="in" />
+        </method>
+        </interface>;
+        const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
+
+        if (this._player.trackUrl) {
+            let proxy = new Rhythmbox3Proxy(Gio.DBus.session, "org.gnome.Rhythmbox3",
+                                            "/org/gnome/Rhythmbox3/RhythmDB");
+            proxy.SetEntryPropertiesRemote(this._player.trackUrl, {rating: GLib.Variant.new_double(value)});
+            return true;
+        }
+
+        return false;
     },
 
     destroy: function() {

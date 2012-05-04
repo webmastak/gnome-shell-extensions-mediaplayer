@@ -370,6 +370,11 @@ const Player = new Lang.Class({
             else
                 this.trackTitle.setText(_("Unknown Title"));
 
+            if (metadata["xesam:url"])
+                this.trackUrl = metadata["xesam:url"].unpack();
+            else
+                this.trackUrl = false;
+
             if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"].unpack();
             }
