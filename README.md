@@ -97,6 +97,7 @@ Players supported (get: show the rating, set: set a rating):
 * Banshee (get/set)
 * Rhythmbox (get/set)
 * Clementine (get)
+* Amarok (get)
 
 To hide the position slider (default: true):
 
