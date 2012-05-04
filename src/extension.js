@@ -130,7 +130,7 @@ const Player = new Lang.Class({
         this._settings.connect("changed::" + MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_RATING_KEY)) {
                 this.showRating = true;
-                this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating');
+                this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
                 this.trackBox.addInfo(this.trackRating.box, 3);
             }
             else {
@@ -158,7 +158,7 @@ const Player = new Lang.Class({
         this.trackBox.addInfo(this.trackArtist.box, 1);
         this.trackBox.addInfo(this.trackAlbum.box, 2);
         if (this.showRating) {
-            this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating');
+            this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
             this.trackBox.addInfo(this.trackRating.box, 3);
         }
 
@@ -377,11 +377,12 @@ const Player = new Lang.Class({
             if (this.showRating) {
                 let rating = 0;
                 if (metadata["xesam:userRating"])
-                    rating = metadata["xesam:userRating"].deep_unpack();
+                    rating = (metadata["xesam:userRating"].deep_unpack() * 5);
                 // Clementine
                 if (metadata["rating"])
-                    rating = metadata["rating"].deep_unpack() / 5;
-                this.trackRating.setValue(rating);
+                    rating = metadata["rating"].deep_unpack();
+                this.trackRating.setRating(rating);
+                this.trackRating.showRating(rating);
             }
 
             let animate = false;

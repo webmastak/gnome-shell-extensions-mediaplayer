@@ -14,10 +14,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
+const Mainloop = imports.mainloop;
 const St = imports.gi.St;
 const PopupMenu = imports.ui.popupMenu;
 const Pango = imports.gi.Pango;
 const GLib = imports.gi.GLib;
+const Lang = imports.lang;
 
 function TrackBox() {
     this._init.apply(this, arguments);
@@ -192,25 +194,34 @@ function TrackRating() {
 }
 
 TrackRating.prototype = {
-    _init: function(prepend, value, style) {
+    _init: function(prepend, value, style, player) {
         this.box = new St.BoxLayout({style_class: style});
         if (prepend) {
             this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + ": "});
             this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
             this.box.add(this._prepend);
         }
+        // Reference to our player
+        this._player = player;
+        // Current value
+        this._value = value;
+        // Supported players
+        this._supported = {
+            "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating
+        };
+        // Icons
         this._starredIcon = [];
         this._nonStarredIcon = [];
         this._starButton = [];
         for(let i=0; i < 5; i++) {
             // Create starred icons
-            this._starredIcon[i] = new St.Icon({style_class: 'button-star',
+            this._starredIcon[i] = new St.Icon({style_class: 'star-icon',
                                                 icon_size: 18,
                                                 icon_type: St.IconType.SYMBOLIC,
                                                 icon_name: 'starred'
                                                });
             // Create non-starred icons
-            this._nonStarredIcon[i] = new St.Icon({style_class: 'button-star',
+            this._nonStarredIcon[i] = new St.Icon({style_class: 'star-icon',
                                                    icon_size: 18,
                                                    icon_type: St.IconType.SYMBOLIC,
                                                    icon_name: 'non-starred'
@@ -219,27 +230,54 @@ TrackRating.prototype = {
             this._starButton[i] = new St.Button({style_class: 'button-star',
                                                  x_align: St.Align.START,
                                                  y_align: St.Align.MIDDLE,
+                                                 track_hover: true,
                                                  child: this._starredIcon[i]
                                                 });
+            this._starButton[i]._rateValue = i + 1;
+            this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
+            this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
+
             // Put the button in the box
             this.box.add(this._starButton[i]);
         }
-        this.setValue(value);
+        this.showRating(this._value);
     },
 
-    setValue: function(value) {
+    newRating: function(button) {
+        if (this._supported[this._player._owner]) {
+            if (button.hover)
+                this.showRating(button._rateValue);
+            else
+                this.showRating(this._value);
+        }
+    },
+
+    showRating: function(value) {
         for (let i = 0; i < 5; i++)
+            this._starButton[i].set_child(this._nonStarredIcon[i]);
+        for (let i = 0; i < value; i++)
             this._starButton[i].set_child(this._starredIcon[i]);
-        if (value < 0.2)
-            this._starButton[0].set_child(this._nonStarredIcon[0]);
-        if (value < 0.4)
-            this._starButton[1].set_child(this._nonStarredIcon[1]);
-        if (value < 0.6)
-            this._starButton[2].set_child(this._nonStarredIcon[2]);
-        if (value < 0.8)
-            this._starButton[3].set_child(this._nonStarredIcon[3]);
-        if (value < 1.0)
-            this._starButton[4].set_child(this._nonStarredIcon[4]);
+    },
+
+    setRating: function(value) {
+        this._value = value;
+    },
+
+    applyRating: function(button) {
+        // Apply the rating in the player
+        let applied = false;
+        if (this._supported[this._player._owner]) {
+            applied = this._supported[this._player._owner](button._rateValue);
+        }
+        if (applied) {
+            this.setRating(button._rateValue);
+            this.showRating(button._rateValue);
+        }
+    },
+
+    applyBansheeRating: function(value) {
+        GLib.spawn_command_line_async("banshee --set-rating=%s".format(value));
+        return true;
     },
 
     destroy: function() {
