@@ -26,6 +26,9 @@ You can also play or pause the player by clicking with the middle button on the 
 You may also use the status icon to run your favorite media player if no player is running 
 (see the ```rundefault``` setting below).
 
+The current track rating can also be displayed and changed depending of the
+player you are using (see the ```rating``` setting below).
+
 - - -
 
 gnome-shell-extensions-mediaplayer can be easily configured through http://extensions.gnome.org
@@ -84,6 +87,16 @@ To show the volume control slider of the media player (default: false):
 To show the playlists of the media player (default: false):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer playlists true```
+
+To show the rating of the current track (default: false):
+
+```gsettings set org.gnome.shell.extensions.mediaplayer rating true```
+
+Players supported (get: show the rating, set: set a rating):
+
+* Banshee (get/set)
+* Rhythmbox (get/set)
+* Clementine (get)
 
 To hide the position slider (default: true):
 
