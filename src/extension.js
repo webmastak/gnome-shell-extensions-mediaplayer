@@ -130,11 +130,12 @@ const Player = new Lang.Class({
         this._settings.connect("changed::" + MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_RATING_KEY)) {
                 this.showRating = true;
-                this.trackRating.showRating();
+                this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating');
+                this.trackBox.addInfo(this.trackRating.box, 3);
             }
             else {
                 this.showRating = false;
-                this.trackRating.hideRating();
+                this.trackRating.destroy();
             }
         }));
         let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
@@ -151,14 +152,15 @@ const Player = new Lang.Class({
         this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
         this.trackArtist = new Widget.TrackTitle(_("by"), _('Unknown Artist'), 'track-artist');
         this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
-        this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating');
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
-        this.trackBox._infos.add(this.trackTitle.box, {row: 0, col: 1, y_expand: false});
-        this.trackBox._infos.add(this.trackArtist.box, {row: 1, col: 1, y_expand: false});
-        this.trackBox._infos.add(this.trackAlbum.box, {row: 2, col: 1, y_expand: false});
-        this.trackBox._infos.add(this.trackRating.box, {row: 3, col: 1, y_expand: false});
-        this.trackRating.hideRating();
+        this.trackBox.addInfo(this.trackTitle.box, 0);
+        this.trackBox.addInfo(this.trackArtist.box, 1);
+        this.trackBox.addInfo(this.trackAlbum.box, 2);
+        if (this.showRating) {
+            this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating');
+            this.trackBox.addInfo(this.trackRating.box, 3);
+        }
 
         this.addMenuItem(this.trackBox);
 
@@ -371,6 +373,7 @@ const Player = new Lang.Class({
             if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"].unpack();
             }
+
             if (this.showRating) {
                 let rating = 0;
                 if (metadata["xesam:userRating"])
@@ -518,8 +521,6 @@ const Player = new Lang.Class({
                 this._volume.actor.show();
             if (this.showPosition && this.supportPosition)
                 this._position.actor.show();
-            if (this.showRating)
-                this.trackRating.showRating();
         }
         else {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {

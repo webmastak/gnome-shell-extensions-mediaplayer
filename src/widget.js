@@ -34,6 +34,10 @@ TrackBox.prototype = {
         this.addActor(this.box, {span: -1, expand: true});
         this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
         this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
+    },
+
+    addInfo: function(item, row) {
+        this._infos.add(item, {row: row, col: 1, y_expand: false});
     }
 }
 
@@ -238,13 +242,9 @@ TrackRating.prototype = {
             this._starButton[4].set_child(this._nonStarredIcon[4]);
     },
 
-    showRating: function() {
-        this.box.show();
+    destroy: function() {
+        this.box.destroy();
     },
-
-    hideRating: function() {
-        this.box.hide();
-    }
 }
 
 function PlaylistItem() {
