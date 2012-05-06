@@ -99,6 +99,11 @@ Players supported (get: show the rating, set: set a rating):
 * Clementine (get)
 * Amarok (get)
 
+Warning: ratings are not part of the MPRIS specification thus specific code must be written
+for each player to set or get the current track rating. Note that for some players there will 
+be no support to get/set the rating from this extension. For example Clementine does not offer any
+way to set the rating of a song except from the Clementine GUI (http://bit.ly/INFEon).
+
 To hide the position slider (default: true):
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer position false```
