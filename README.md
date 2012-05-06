@@ -64,6 +64,12 @@ Prerequisites: automake, gnome-common, gettext, glib2 devel files
 
 Restart the shell and then enable the extension.
 
+## Known bugs
+
+### Banshee
+
+Seek the song moves the slider position to 0 (https://bugzilla.gnome.org/show_bug.cgi?id=654524)
+
 ## Settings
 
 Settings can be set with the gnome-shell-extension-prefs tool or via the
