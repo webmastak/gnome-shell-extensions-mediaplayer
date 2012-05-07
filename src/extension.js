@@ -64,25 +64,32 @@ const Player = new Lang.Class({
     Name: 'Player',
     Extends: PopupMenu.PopupMenuSection,
 
-    _init: function(owner) {
+    _init: function(busName) {
         this.parent();
 
-        this._owner = owner;
+        let baseName = busName.split('.')[3];
+
+        /// HACK TO SUPPORT BROKEN VLC INSTANCE NAMES
+        if (let m = baseName.match(/^(.+)-\d+$/))
+            baseName = m[1];
+        /// HACK TO SUPPORT BROKEN VLC INSTANCE NAMES
+
+        this.busName = busName;
         this._app = "";
         this._status = "";
         // Guess the name based on the dbus path
         // Should be overriden by the Identity property
-        this._identity = this._owner.split('.')[3].charAt(0).toUpperCase() + this._owner.split('.')[3].slice(1);
+        this._identity = baseName.charAt(0).toUpperCase() + baseName.slice(1);
         this._playlists = "";
         this._playlistsMenu = "";
         this._currentPlaylist = "";
         this._currentTime = -1;
         this._wantedSeekValue = 0;
         this._timeoutId = 0;
-        this._mediaServer = new DBusIface.MediaServer2(owner);
-        this._mediaServerPlayer = new DBusIface.MediaServer2Player(owner);
-        this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(owner);
-        this._prop = new DBusIface.Properties(owner);
+        this._mediaServer = new DBusIface.MediaServer2(busName);
+        this._mediaServerPlayer = new DBusIface.MediaServer2Player(busName);
+        this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(busName);
+        this._prop = new DBusIface.Properties(busName);
         this._settings = settings;
 
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
