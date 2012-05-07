@@ -18,6 +18,10 @@ const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 
 const DBusIface = <interface name="org.freedesktop.DBus">
+<method name="GetNameOwner">
+    <arg type="s" direction="in" />
+    <arg type="s" direction="out" />
+</method>
 <method name="ListNames">
     <arg type="as" direction="out" />
 </method>

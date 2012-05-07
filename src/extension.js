@@ -666,8 +666,13 @@ const PlayerManager = new Lang.Class({
             function(names) {
                 for (n in names[0]) {
                     let name = names[0][n];
-                    if (name_regex.test(name))
-                        this._addPlayer(name);
+                    if (name_regex.test(name)) {
+                        this._dbus.GetNameOwner(name, Lang.bind(this,
+                            function(owner) {
+                                this._addPlayer(name, owner);
+                            }
+                        ));
+                    }
                 }
             }
         ));
@@ -676,30 +681,50 @@ const PlayerManager = new Lang.Class({
             function(proxy, sender, [name, old_owner, new_owner]) {
                 if (name_regex.test(name)) {
                     if (new_owner && !old_owner)
-                        this._addPlayer(name);
+                        this._addPlayer(name, new_owner);
                     else if (old_owner && !new_owner)
-                        this._removePlayer(name);
+                        this._removePlayer(name, old_owner);
+                    else
+                        this._changePlayerOwner(name, old_owner, new_owner);
                 }
             }
         ));
     },
 
-    _addPlayer: function(owner) {
-        let position;
-        this._players[owner] = {player: new Player(owner)};
-        this._players[owner].signal = this._players[owner].player.connect('status-changed',
-            Lang.bind(this, this._statusChanged));
-        if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
-            position = this.menu.menu.numMenuItems - 2;
-        else
-            position = 0;
-        this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
-        this.menu.menu.addMenuItem(this._players[owner].player, position);
-        this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
-        this.menu.actor.show();
+    // TODO: move to proper place
+    _isInstance: function(busName) {
+        return busName.split('.').length > 4;
     },
 
-    _removePlayer: function(owner) {
+    _addPlayer: function(busName, owner) {
+        let position;
+        if (this._players[owner]) {
+            let prevName = this._players[owner].busName;
+            // HAVE:       ADDING:     ACTION:
+            // master      master      reject, cannot happen
+            // master      instance    upgrade to instance
+            // instance    master      reject, duplicate
+            // instance    instance    reject, cannot happen
+            if (this._isInstance(busName) && !this._isInstance(prevName))
+                this._players[owner].busName = busName;
+            else
+                return;
+        } else {
+            this._players[owner] = {player: new Player(busName)};
+            this._players[owner].signal = this._players[owner].player.connect('status-changed',
+                Lang.bind(this, this._statusChanged));
+            if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
+                position = this.menu.menu.numMenuItems - 2;
+            else
+                position = 0;
+            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
+            this.menu.menu.addMenuItem(this._players[owner].player, position);
+            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
+            this.menu.actor.show();
+        }
+    },
+
+    _removePlayer: function(busName, owner) {
         if (this._players[owner]) {
             this._players[owner].player.disconnect(this._players[owner].signal);
             this._players[owner].player.destroy();
@@ -708,6 +733,14 @@ const PlayerManager = new Lang.Class({
                 !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
                 this._nbPlayers() == 0)
                     this.menu.actor.hide();
+        }
+        this._refreshStatus();
+    },
+
+    _changePlayerOwner: function(busName, oldOwner, newOwner) {
+        if (this._players[oldOwner]) {
+            this._players[newOwner] = this._players[oldOwner];
+            delete this._players[oldOwner];
         }
         this._refreshStatus();
     },
