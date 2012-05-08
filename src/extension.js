@@ -64,16 +64,12 @@ const Player = new Lang.Class({
     Name: 'Player',
     Extends: PopupMenu.PopupMenuSection,
 
-    _init: function(busName) {
+    _init: function(busName, owner) {
         this.parent();
 
         let baseName = busName.split('.')[3];
 
-        /// HACK TO SUPPORT BROKEN VLC INSTANCE NAMES
-        if (let m = baseName.match(/^(.+)-\d+$/))
-            baseName = m[1];
-        /// HACK TO SUPPORT BROKEN VLC INSTANCE NAMES
-
+        this.owner = owner;
         this.busName = busName;
         this._app = "";
         this._status = "";
@@ -667,7 +663,7 @@ const PlayerManager = new Lang.Class({
                 for (n in names[0]) {
                     let name = names[0][n];
                     if (name_regex.test(name)) {
-                        this._dbus.GetNameOwner(name, Lang.bind(this,
+                        this._dbus.GetNameOwnerRemote(name, Lang.bind(this,
                             function(owner) {
                                 this._addPlayer(name, owner);
                             }
@@ -709,8 +705,8 @@ const PlayerManager = new Lang.Class({
                 this._players[owner].busName = busName;
             else
                 return;
-        } else {
-            this._players[owner] = {player: new Player(busName)};
+        } else if (owner) {
+            this._players[owner] = {player: new Player(busName, owner)};
             this._players[owner].signal = this._players[owner].player.connect('status-changed',
                 Lang.bind(this, this._statusChanged));
             if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
@@ -750,7 +746,7 @@ const PlayerManager = new Lang.Class({
     },
 
     _statusChanged: function(player) {
-        let owner = player._owner;
+        let owner = player.owner;
         let status = player._status;
         this._players[owner].status = status;
         this._refreshStatus();
