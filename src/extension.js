@@ -77,6 +77,7 @@ const Player = new Lang.Class({
         this._playlistsMenu = "";
         this._currentPlaylist = "";
         this._currentTime = -1;
+        this._wantedSeekValue = 0;
         this._timeoutId = 0;
         this._mediaServer = new DBusIface.MediaServer2(owner);
         this._mediaServerPlayer = new DBusIface.MediaServer2Player(owner);
@@ -190,6 +191,7 @@ const Player = new Lang.Class({
         this._position.connect('value-changed', Lang.bind(this, function(item) {
             let time = item._value * this._songLength;
             this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
+            this._wantedSeekValue = Math.round(time * 1000000);
             this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
         }));
         this.addMenuItem(this._position);
@@ -249,7 +251,21 @@ const Player = new Lang.Class({
         }));
 
         this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
-            this._setPosition(value);
+            if (value > 0) {
+                this._setPosition(value);
+            }
+            // Seek initiated by the position slider
+            else if (this._wantedSeekValue > 0) {
+                // Some broken gstreamer players (Banshee) reports always 0
+                // when the track is seeked so we set the position at the
+                // value we set on the slider
+                this._setPosition(this._wantedSeekValue);
+            }
+            // Seek value send by the player
+            else
+                this._setPosition(value);
+
+            this._wantedSeekValue = 0;
         }));
     },
 
