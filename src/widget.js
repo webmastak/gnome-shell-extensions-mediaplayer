@@ -246,7 +246,7 @@ TrackRating.prototype = {
     },
 
     newRating: function(button) {
-        if (this._supported[this._player._owner]) {
+        if (this._supported[this._player._busName]) {
             if (button.hover)
                 this.showRating(button._rateValue);
             else
@@ -268,8 +268,8 @@ TrackRating.prototype = {
     applyRating: function(button) {
         // Apply the rating in the player
         let applied = false;
-        if (this._supported[this._player._owner]) {
-            let applyFunc = Lang.bind(this, this._supported[this._player._owner]);
+        if (this._supported[this._player._busName]) {
+            let applyFunc = Lang.bind(this, this._supported[this._player._busName]);
             applied = applyFunc(button._rateValue);
         }
         if (applied) {
