@@ -75,28 +75,27 @@ Seek the song moves the slider position to 0 (https://bugzilla.gnome.org/show_bu
 Settings can be set with the gnome-shell-extension-prefs tool or via the
 command line.
 
-To show the extension in its own menu instead of the volume menu (default: true):
+**Show the extension in its own menu instead of the volume menu (default: true)**:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volumemenu false```
 
-To start the default media player by clicking on the status icon if no 
-player is running (has no effect if the extension is shown in the volume 
-menu). You can configure the default media player in the details section 
-of the gnome control center (default: false):
+**Start the default media player by clicking on the status icon if no player is running (default: false)**:
+
+You can configure the default media player in the details section of the 
+gnome control center. (has no effect if the extension is shown in the volume 
+menu)
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer rundefault true```
 
-To show the volume control slider of the media player (default: false):
+**Show the volume control slider of the media player (default: false)**:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer volume true```
 
-To show the playlists of the media player (default: false):
+**Show the playlists of the media player (default: false)**:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer playlists true```
 
-To show the rating of the current track (default: false):
-
-```gsettings set org.gnome.shell.extensions.mediaplayer rating true```
+**Show the rating of the current track (default: false)**:
 
 Players supported (get: show the rating, set: set a rating):
 
@@ -110,11 +109,13 @@ for each player to set or get the current track rating. Note that for some playe
 be no support to get/set the rating from this extension. For example Clementine does not offer any
 way to set the rating of a song except from the Clementine GUI (http://bit.ly/INFEon).
 
-To hide the position slider (default: true):
+```gsettings set org.gnome.shell.extensions.mediaplayer rating true```
+
+**Hide the position slider (default: true)**:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer position false```
 
-To set the size of the cover (default: 80):
+**Set the size of the cover (default: 80)**:
 
 ```gsettings set org.gnome.shell.extensions.mediaplayer coversize 100```
 
