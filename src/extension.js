@@ -150,6 +150,7 @@ const Player = new Lang.Class({
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
         this.trackCoverFile = false;
+        this.trackCoverFileTmp = false;
         this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
         this.trackCoverContainer.set_child(this.trackCover);
 
@@ -409,67 +410,103 @@ const Player = new Lang.Class({
                 this.trackRating.showRating(rating);
             }
 
-            let animate = false;
+            let change = false;
             if (metadata["mpris:artUrl"]) {
                 if (this.trackCoverFile != metadata["mpris:artUrl"].unpack()) {
                     this.trackCoverFile = metadata["mpris:artUrl"].unpack();
-                    animate = true;
+                    change = true;
                 }
             }
             else {
                 if (this.trackCoverFile != false) {
                     this.trackCoverFile = false;
-                    animate = true;
+                    change = true;
                 }
             }
 
-            if (animate) {
-                // Hide the old cover
-                Tweener.addTween(this.trackCoverContainer, { opacity: 0,
-                    time: 0.3,
-                    transition: 'easeOutCubic',
-                    onComplete: Lang.bind(this, function() {
-                        // Change cover
-                        if (this.trackCoverFile) {
-                            let cover_path = "";
-                            // Distant cover
-                            /*if (this.trackCoverFile.match(/^http/)) {
-                                // Copy the cover to a tmp local file
-                                let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
-                                // Don't create multiple tmp files
-                                if (!tmpCover)
-                                    tmpCover = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
-                                cover.copy(tmpCover, Gio.FileCopyFlags.OVERWRITE, null, null);
-                                cover_path = tmpCover.get_path();
-                            }*/
-                            // Local cover
-                            if (this.trackCoverFile.match(/^file/)) {
-                                cover_path = decodeURIComponent(this.trackCoverFile.substr(7));
-                            }
-                            if (! GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
-                                this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
-                            }
-                            else {
-                                this.trackCover = new St.Bin({style_class: 'track-cover'});
-                                let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
-                                let [coverWidth, coverHeight] = coverTexture.get_base_size();
-                                this.trackCover.width = this.coverSize;
-                                this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
-                                this.trackCover.set_child(coverTexture);
-                            }
-                        }
-                        else {
-                            this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
-                        }
-                        this.trackCoverContainer.set_child(this.trackCover);
-                        // Show the new cover
-                        Tweener.addTween(this.trackCoverContainer, { opacity: 255,
-                            time: 0.3,
-                            transition: 'easeInCubic'
-                        });
-                    })
-                });
+            if (change) {
+                if (this.trackCoverFile) {
+                    let cover_path = "";
+                    // Distant cover
+                    if (this.trackCoverFile.match(/^http/)) {
+                        // hide current cover
+                        this._hideCover();
+                        // Copy the cover to a tmp local file
+                        let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
+                        // Don't create multiple tmp files
+                        if (!this.trackCoverFileTmp)
+                            this.trackCoverFileTmp = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
+                        // asynchronous copy
+                        cover.read_async(null, null, Lang.bind(this, this._onReadCover));
+                    }
+                    // Local cover
+                    else if (this.trackCoverFile.match(/^file/)) {
+                        cover_path = decodeURIComponent(this.trackCoverFile.substr(7));
+                        this._showCover(cover_path);
+                    }
+                }
+                else
+                    this._showCover(false);
             }
+        }
+    },
+
+    _onReadCover: function(cover, result) {
+        let inStream = cover.read_finish(result);
+        let outStream = this.trackCoverFileTmp.replace(null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null, null);
+        outStream.splice_async(inStream, Gio.OutputStreamSpliceFlags.CLOSE_TARGET, 0, null, Lang.bind(this, this._onSavedCover));
+    },
+
+    _onSavedCover: function(outStream, result) {
+        outStream.splice_finish(result, null);
+        let cover_path = this.trackCoverFileTmp.get_path();
+        this._showCover(cover_path);
+    },
+
+    _hideCover: function() {
+        Tweener.addTween(this.trackCoverContainer, { opacity: 0,
+            time: 0.3,
+            transition: 'easeOutCubic',
+        });
+    },
+
+    _showCover: function(cover_path) {
+        Tweener.addTween(this.trackCoverContainer, { opacity: 0,
+            time: 0.3,
+            transition: 'easeOutCubic',
+            onComplete: Lang.bind(this, function() {
+                // Change cover
+                if (! cover_path || ! GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
+                    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
+                }
+                else {
+                    this.trackCover = new St.Bin({style_class: 'track-cover'});
+                    let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
+                    let [coverWidth, coverHeight] = coverTexture.get_base_size();
+                    this.trackCover.width = this.coverSize;
+                    this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
+                    this.trackCover.set_child(coverTexture);
+                }
+                this.trackCoverContainer.set_child(this.trackCover);
+                // Show the new cover
+                Tweener.addTween(this.trackCoverContainer, { opacity: 255,
+                    time: 0.3,
+                    transition: 'easeInCubic'
+                });
+            })
+        });
+    },
+
+    _toggleCover: function() {
+        if (this.trackCover.has_style_class_name('track-cover')) {
+            let factor = 2;
+            let [coverWidth, coverHeight] = this.trackCover.get_size();
+            if (coverWidth > this.coverSize)
+                factor = 0.5;
+            Tweener.addTween(this.trackCover, { height: coverHeight * factor, width: coverWidth * factor,
+                time: 0.3,
+                transition: 'easeInCubic'
+            });
         }
     },
 
@@ -572,19 +609,6 @@ const Player = new Lang.Class({
         this._setStatus(this._mediaServerPlayer.PlaybackStatus);
     },
 
-    _toggleCover: function() {
-        if (this.trackCover.has_style_class_name('track-cover')) {
-            let factor = 2;
-            let [coverWidth, coverHeight] = this.trackCover.get_size();
-            if (coverWidth > this.coverSize)
-                factor = 0.5;
-            Tweener.addTween(this.trackCover, { height: coverHeight * factor, width: coverWidth * factor,
-                time: 0.3,
-                transition: 'easeInCubic'
-            });
-        }
-    },
-
     _updateTimer: function() {
         if (this.showPosition && this.supportPosition) {
             if (!isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0)
@@ -608,6 +632,7 @@ const Player = new Lang.Class({
             Mainloop.source_remove(this._timeoutId);
             this._timeoutId = 0;
         }
+        this._updateTimer();
     },
 
     _stopTimer: function() {
