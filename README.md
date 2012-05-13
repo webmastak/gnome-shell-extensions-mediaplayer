@@ -66,9 +66,13 @@ Restart the shell and then enable the extension.
 
 ## Known bugs
 
-### Banshee
+### Track position is not updated correctly
 
-Seek the song moves the slider position to 0 (https://bugzilla.gnome.org/show_bug.cgi?id=654524)
+The MPRIS seeked signal is not sent so the extension can't update the position
+slider when the song is seeked from the extension or the player
+
+* VLC: https://trac.videolan.org/vlc/ticket/6802
+* Banshee: https://bugzilla.gnome.org/show_bug.cgi?id=654524
 
 ## Settings
 
