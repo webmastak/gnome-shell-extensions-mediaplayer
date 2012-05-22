@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-03 10:26+0200\n"
-"PO-Revision-Date: 2012-04-04 14:31-0300\n"
+"PO-Revision-Date: 2012-05-21 23:10-0300\n"
 "Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -41,7 +41,7 @@ msgstr "de"
 
 #: ../src/extension.js:154
 msgid "rating"
-msgstr ""
+msgstr "avaliação"
 
 #: ../src/extension.js:196
 msgid "Volume"
@@ -91,11 +91,11 @@ msgstr "Exibir playlists do media player"
 
 #: ../src/prefs.js:39
 msgid "Display song rating"
-msgstr ""
+msgstr "Mostrar a avaliação da música"
 
 #: ../src/prefs.js:40
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr ""
+msgstr "Mostra a avaliação da música que está tocando em uma escala de 0 a 5"
 
 #: ../src/prefs.js:43
 msgid "Album cover size"
