@@ -433,7 +433,7 @@ const Player = new Lang.Class({
                         if (this.trackCoverFile) {
                             let cover_path = "";
                             // Distant cover
-                            if (this.trackCoverFile.match(/^http/)) {
+                            /*if (this.trackCoverFile.match(/^http/)) {
                                 // Copy the cover to a tmp local file
                                 let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
                                 // Don't create multiple tmp files
@@ -441,9 +441,9 @@ const Player = new Lang.Class({
                                     tmpCover = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
                                 cover.copy(tmpCover, Gio.FileCopyFlags.OVERWRITE, null, null);
                                 cover_path = tmpCover.get_path();
-                            }
+                            }*/
                             // Local cover
-                            else if (this.trackCoverFile.match(/^file/)) {
+                            if (this.trackCoverFile.match(/^file/)) {
                                 cover_path = decodeURIComponent(this.trackCoverFile.substr(7));
                             }
                             if (! GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
