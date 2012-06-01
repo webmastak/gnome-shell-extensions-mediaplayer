@@ -803,7 +803,7 @@ const PlayerManager = new Lang.Class({
 
     destroy: function() {
         for (let owner in this._players)
-            this._players[owner].player.destroy();
+            this._removePlayer(null, owner);
     }
 });
 
