@@ -69,8 +69,7 @@ msgid "Allow to start the default media player"
 msgstr "Erlauben den Standard-Mediaplayer zu starten"
 
 #: ../src/prefs.js:35
-msgid ""
-"Runs the default mediaplayer by clicking on the media player status icon."
+msgid "Runs the default mediaplayer by clicking on the media player status icon."
 msgstr "Den Standard-Mediaplayer beim klick auf das Status Icon starten"
 
 #: ../src/prefs.js:36
@@ -87,11 +86,11 @@ msgstr "Playlists anzeigen"
 
 #: ../src/prefs.js:39
 msgid "Display song rating"
-msgstr ""
+msgstr "Bewertung anzeigen"
 
 #: ../src/prefs.js:40
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr ""
+msgstr "Zeigt eine Bewertungsskala von 0 bis 5 für das aktuelle Lied an"
 
 #: ../src/prefs.js:43
 msgid "Album cover size"
