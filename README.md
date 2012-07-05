@@ -158,6 +158,11 @@ Branches `master` and `devel` work with the current stable release of GNOME Shel
 * branch `gnome-shell-3.0` supports GNOME Shell 3.0.X
 * branch `gnome-shell-3.2` supports GNOME Shell 3.2.X
 
+## *Not* supported players
+
+  * Exaile 0.3.2 – only supports MPRIS v1, not v2
+  * Nightingale 1.11 – no native MPRIS support, only a third-party v1 plugin
+
 ## Authors
 
 * eonpatapon (Jean-Philippe Braun)
