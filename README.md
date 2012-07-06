@@ -132,6 +132,7 @@ This extension has been tested with:
   * BeatBox
   * Clementine
   * DeaDBeeF (with third-party DeaDBeeF-MPRIS plugin)
+  * Exaile (with third-party [Sound Menu](https://github.com/grawity/Exaile-Soundmenu-Indicator) plugin)
   * GMusicBrowser
   * Guayadeque (0.3.2)
   * mpd (with [mpDris2](https://github.com/eonpatapon/mpDris2) daemon)
@@ -154,12 +155,12 @@ This extension has been tested with:
 Some players do not send the MPRIS "Seeked" signal so the extension can't update
 the position slider when the song is seeked from the extension or the player.
 
-* VLC: https://trac.videolan.org/vlc/ticket/6802
 * Banshee: https://bugzilla.gnome.org/show_bug.cgi?id=654524
+* Exaile: https://bugs.launchpad.net/exaile/+bug/1021645
+* VLC: https://trac.videolan.org/vlc/ticket/6802
 
 ## *Not* supported players
 
-  * Exaile 0.3.2 – only supports MPRIS v1, not v2
   * Nightingale 1.11 – no native MPRIS support, only a third-party v1 plugin
 
 ## Authors
