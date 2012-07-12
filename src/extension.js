@@ -159,12 +159,12 @@ const Player = new Lang.Class({
         this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
-        this.trackBox.addInfo(this.trackTitle.box, 0);
-        this.trackBox.addInfo(this.trackArtist.box, 1);
-        this.trackBox.addInfo(this.trackAlbum.box, 2);
+        this.trackBox.addInfo(this.trackTitle, 0);
+        this.trackBox.addInfo(this.trackArtist, 1);
+        this.trackBox.addInfo(this.trackAlbum, 2);
         if (this.showRating) {
             this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
-            this.trackBox.addInfo(this.trackRating.box, 3);
+            this.trackBox.addInfo(this.trackRating, 3);
         }
 
         this.addMenuItem(this.trackBox);
