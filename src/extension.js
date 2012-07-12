@@ -173,21 +173,21 @@ const Player = new Lang.Class({
         this.trackBox.box.opacity = 0;
         this.trackBox.box.set_height(0);
 
-        this._prevButton = new Widget.ControlButton('media-skip-backward',
+        this._prevButton = new Widget.PlayerButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
-        this._playButton = new Widget.ControlButton('media-playback-start',
+        this._playButton = new Widget.PlayerButton('media-playback-start',
             Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
-        this._stopButton = new Widget.ControlButton('media-playback-stop',
+        this._stopButton = new Widget.PlayerButton('media-playback-stop',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._stopButton.hide();
-        this._nextButton = new Widget.ControlButton('media-skip-forward',
+        this._nextButton = new Widget.PlayerButton('media-skip-forward',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
 
-        this.trackControls = new Widget.ControlButtons();
-        this.trackControls.addButton(this._prevButton.actor);
-        this.trackControls.addButton(this._playButton.actor);
-        this.trackControls.addButton(this._stopButton.actor);
-        this.trackControls.addButton(this._nextButton.actor);
+        this.trackControls = new Widget.PlayerButtons();
+        this.trackControls.addButton(this._prevButton);
+        this.trackControls.addButton(this._playButton);
+        this.trackControls.addButton(this._stopButton);
+        this.trackControls.addButton(this._nextButton);
 
         this.addMenuItem(this.trackControls);
 

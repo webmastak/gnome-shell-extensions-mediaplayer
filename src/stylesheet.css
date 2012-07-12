@@ -1,12 +1,5 @@
-.button-container {
-    padding-left: 3px;
-    padding-right: 3px;
-}
-
-.button-icon {
-   color: #fff;
-   icon-size: 20px;
-   padding: 2px;
+.controls {
+    spacing: 5px;
 }
 
 .status-icon {

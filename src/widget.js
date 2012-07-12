@@ -44,50 +44,45 @@ TrackBox.prototype = {
     }
 }
 
-function ControlButtons() {
-    this._init.apply(this, arguments);
-}
-
-ControlButtons.prototype = {
-    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+const PlayerButtons = new Lang.Class({
+    Name: 'PlayerButtons',
+    Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function() {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {reactive: false});
-        this.box = new St.BoxLayout();
+        this.parent({reactive: false});
+        this.box = new St.BoxLayout({style_class: 'controls'});
         this.addActor(this.box, {span: -1, align: St.Align.MIDDLE});
     },
     addButton: function(button) {
         this.box.add_actor(button);
     }
-}
+});
 
-function ControlButton() {
-    this._init.apply(this, arguments);
-}
+const PlayerButton = new Lang.Class({
+    Name: "PlayerButton",
+    Extends: St.Button,
 
-ControlButton.prototype = {
     _init: function(icon, callback) {
-        this.actor = new St.Bin({style_class: 'button-container'});
         this.icon = new St.Icon({
-            style_class: 'button-icon',
             icon_type: St.IconType.SYMBOLIC,
             icon_name: icon,
+            icon_size: 20
         });
-        this.button = new St.Button({style_class: 'hotplug-resident-eject-button',
-                                     child: this.icon});
-        this.button.connect('clicked', callback);
-        this.actor.add_actor(this.button);
+
+        this.parent({style_class: 'notification-icon-button',
+                     child: this.icon});
+
+        this.connect('clicked', callback);
+
+        // override base style
+        this.icon.set_style('padding: 0px');
+        this.set_style('padding: 8px');
     },
+
     setIcon: function(icon) {
         this.icon.icon_name = icon;
-    },
-    hide: function() {
-        this.actor.hide();
-    },
-    show: function() {
-        this.actor.show();
-    },
-}
+    }
+});
 
 function SliderItem() {
     this._init.apply(this, arguments);
