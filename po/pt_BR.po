@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-03 10:26+0200\n"
-"PO-Revision-Date: 2012-05-21 23:10-0300\n"
+"PO-Revision-Date: 2012-07-28 12:51-0300\n"
 "Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -29,7 +29,7 @@ msgstr "Tocando"
 
 #: ../src/extension.js:52
 msgid "Paused"
-msgstr "Em pausa"
+msgstr "Pausado"
 
 #: ../src/extension.js:152
 msgid "by"
