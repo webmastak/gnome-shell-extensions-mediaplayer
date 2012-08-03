@@ -25,7 +25,7 @@ msgstr "Parado"
 
 #: ../src/extension.js:51
 msgid "Playing"
-msgstr "Tocando"
+msgstr "Reproduzindo"
 
 #: ../src/extension.js:52
 msgid "Paused"
