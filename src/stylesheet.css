@@ -1,12 +1,5 @@
-.button-container {
-    padding-left: 3px;
-    padding-right: 3px;
-}
-
-.button-icon {
-   color: #fff;
-   icon-size: 20px;
-   padding: 2px;
+.controls {
+    spacing: 5px;
 }
 
 .status-icon {
@@ -53,11 +46,13 @@
 }
 
 .button-quit {
-    border: 1px solid rgba(150, 150, 150, 0.5);
-    border-radius: 3px;
+    padding: 0.1em;
+    background: rgba(150, 150, 150, 0.2);
+    border: 0.15em solid rgba(150, 150, 150, 0.5);
+    border-radius: 1em;
 }
 
 .button-quit:hover {
-    border: 1px solid white;
-    background: 1px solid rgba(150, 150, 150, 0.5);
+    border-color: white;
+    background: #c03;
 }

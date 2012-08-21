@@ -159,12 +159,12 @@ const Player = new Lang.Class({
         this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
 
         this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
-        this.trackBox.addInfo(this.trackTitle.box, 0);
-        this.trackBox.addInfo(this.trackArtist.box, 1);
-        this.trackBox.addInfo(this.trackAlbum.box, 2);
+        this.trackBox.addInfo(this.trackTitle, 0);
+        this.trackBox.addInfo(this.trackArtist, 1);
+        this.trackBox.addInfo(this.trackAlbum, 2);
         if (this.showRating) {
             this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
-            this.trackBox.addInfo(this.trackRating.box, 3);
+            this.trackBox.addInfo(this.trackRating, 3);
         }
 
         this.addMenuItem(this.trackBox);
@@ -173,21 +173,21 @@ const Player = new Lang.Class({
         this.trackBox.box.opacity = 0;
         this.trackBox.box.set_height(0);
 
-        this._prevButton = new Widget.ControlButton('media-skip-backward',
+        this._prevButton = new Widget.PlayerButton('media-skip-backward',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
-        this._playButton = new Widget.ControlButton('media-playback-start',
+        this._playButton = new Widget.PlayerButton('media-playback-start',
             Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
-        this._stopButton = new Widget.ControlButton('media-playback-stop',
+        this._stopButton = new Widget.PlayerButton('media-playback-stop',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._stopButton.hide();
-        this._nextButton = new Widget.ControlButton('media-skip-forward',
+        this._nextButton = new Widget.PlayerButton('media-skip-forward',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
 
-        this.trackControls = new Widget.ControlButtons();
-        this.trackControls.addButton(this._prevButton.actor);
-        this.trackControls.addButton(this._playButton.actor);
-        this.trackControls.addButton(this._stopButton.actor);
-        this.trackControls.addButton(this._nextButton.actor);
+        this.trackControls = new Widget.PlayerButtons();
+        this.trackControls.addButton(this._prevButton);
+        this.trackControls.addButton(this._playButton);
+        this.trackControls.addButton(this._stopButton);
+        this.trackControls.addButton(this._nextButton);
 
         this.addMenuItem(this.trackControls);
 
