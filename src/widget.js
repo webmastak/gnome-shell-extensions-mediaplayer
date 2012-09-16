@@ -63,8 +63,7 @@ const PlayerButton = new Lang.Class({
 
     _init: function(icon, callback) {
         this.icon = new St.Icon({
-            icon_type: St.IconType.SYMBOLIC,
-            icon_name: icon,
+            icon_name: icon + '-symbolic',
             icon_size: 20
         });
 
@@ -79,7 +78,7 @@ const PlayerButton = new Lang.Class({
     },
 
     setIcon: function(icon) {
-        this.icon.icon_name = icon;
+        this.icon.icon_name = icon + '-symbolic';
     }
 });
 
@@ -92,7 +91,7 @@ const SliderItem = new Lang.Class({
 
         this.removeActor(this._slider);
         this._box = new St.Table({style_class: 'slider-item'});
-        this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon});
+        this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon + '-symbolic'});
         this._label = new St.Label({text: text});
         this._box.add(this._icon, {row: 0, col: 0, x_expand: false})
         this._box.add(this._label, {row: 0, col: 1, x_expand: false})
@@ -102,7 +101,7 @@ const SliderItem = new Lang.Class({
     },
 
     setIcon: function(icon) {
-        this._icon.icon_name = icon;
+        this._icon.icon_name = icon + '-symbolic';
     },
 
     setLabel: function(text) {
@@ -155,8 +154,7 @@ const TitleItem = new Lang.Class({
         this.button = new St.Button({style_class: "button-quit"});
         this.button.connect('clicked', callback);
         this.button_icon = new St.Icon({
-            icon_type: St.IconType.SYMBOLIC,
-            icon_name: 'window-close',
+            icon_name: 'window-close-symbolic',
             icon_size: 16
         });
         this.button.set_child(this.button_icon);
@@ -212,14 +210,12 @@ const TrackRating = new Lang.Class({
             // Create starred icons
             this._starredIcon[i] = new St.Icon({style_class: 'star-icon',
                                                 icon_size: 16,
-                                                icon_type: St.IconType.SYMBOLIC,
-                                                icon_name: 'starred'
+                                                icon_name: 'starred-symbolic'
                                                });
             // Create non-starred icons
             this._nonStarredIcon[i] = new St.Icon({style_class: 'star-icon',
                                                    icon_size: 16,
-                                                   icon_type: St.IconType.SYMBOLIC,
-                                                   icon_name: 'non-starred'
+                                                   icon_name: 'non-starred-symbolic'
                                                   });
             // Create the button with starred icon
             this._starButton[i] = new St.Button({style_class: 'button-star',
@@ -310,7 +306,7 @@ const PlaylistItem = new Lang.Class({
         this.obj = obj;
         this.box = new St.BoxLayout();
         this.label = new St.Label({text: text});
-        this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list'});
+        this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list-symbolic'});
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
 

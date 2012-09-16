@@ -102,17 +102,6 @@ const Player = new Lang.Class({
         }));
         this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
         this.supportPosition = true;
-        this._settings.connect("changed::" + MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
-            if (this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY)) {
-                this.showPosition = true;
-                if (this._status != Status.STOP && this.supportPosition)
-                    this._position.actor.show();
-            }
-            else {
-                this.showPosition = false;
-                this._position.actor.hide();
-            }
-        }));
         this.showPlaylists = this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY);
         this._settings.connect("changed::" + MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY)) {
@@ -142,7 +131,7 @@ const Player = new Lang.Class({
                 this.trackRating.destroy();
             }
         }));
-        let genericIcon = new St.Icon({icon_name: "audio-x-generic", icon_size: 16, icon_type: St.IconType.SYMBOLIC});
+        let genericIcon = new St.Icon({icon_name: "audio-x-generic-symbolic", icon_size: 16});
         this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
 
         this.addMenuItem(this.playerTitle);
@@ -151,7 +140,7 @@ const Player = new Lang.Class({
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
         this.trackCoverFile = false;
         this.trackCoverFileTmp = false;
-        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
+        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize});
         this.trackCoverContainer.set_child(this.trackCover);
 
         this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
@@ -173,14 +162,14 @@ const Player = new Lang.Class({
         this.trackBox.box.opacity = 0;
         this.trackBox.box.set_height(0);
 
-        this._prevButton = new Widget.PlayerButton('media-skip-backward',
+        this._prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
-        this._playButton = new Widget.PlayerButton('media-playback-start',
+        this._playButton = new Widget.PlayerButton('media-playback-start-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
-        this._stopButton = new Widget.PlayerButton('media-playback-stop',
+        this._stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._stopButton.hide();
-        this._nextButton = new Widget.PlayerButton('media-skip-forward',
+        this._nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
 
         this.trackControls = new Widget.PlayerButtons();
@@ -198,10 +187,21 @@ const Player = new Lang.Class({
             this._wantedSeekValue = Math.round(time * 1000000);
             this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
         }));
+        this._settings.connect("changed::" + MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
+            if (this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY)) {
+                this.showPosition = true;
+                if (this._status != Status.STOP && this.supportPosition)
+                    this._position.actor.show();
+            }
+            else {
+                this.showPosition = false;
+                this._position.actor.hide();
+            }
+        }));
         this.addMenuItem(this._position);
         this._position.actor.hide();
 
-        this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high", 0);
+        this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.Volume = item._value;
         }));
@@ -477,7 +477,7 @@ const Player = new Lang.Class({
             onComplete: Lang.bind(this, function() {
                 // Change cover
                 if (! cover_path || ! GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
-                    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize, icon_type: St.IconType.FULLCOLOR});
+                    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize});
                 }
                 else {
                     this.trackCover = new St.Bin({style_class: 'track-cover'});
@@ -521,13 +521,13 @@ const Player = new Lang.Class({
 
         if (this.showVolume) {
             if (value == 0)
-                this._volume.setIcon("audio-volume-muted");
+                this._volume.setIcon("audio-volume-muted-symbolic");
             if (value > 0)
-                this._volume.setIcon("audio-volume-low");
+                this._volume.setIcon("audio-volume-low-symbolic");
             if (value > 0.30)
-                this._volume.setIcon("audio-volume-medium");
+                this._volume.setIcon("audio-volume-medium-symbolic");
             if (value > 0.80)
-                this._volume.setIcon("audio-volume-high");
+                this._volume.setIcon("audio-volume-high-symbolic");
             this._volume.setValue(value);
         }
     },
@@ -853,9 +853,9 @@ const MediaplayerStatusButton = new Lang.Class({
         }));
 
         this._iconBox = new St.BoxLayout();
-        this._iconIndicator = new St.Icon({icon_name: 'audio-x-generic',
+        this._iconIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
                                            style_class: 'system-status-icon'});
-        this._iconState = new St.Icon({icon_name: 'system-run',
+        this._iconState = new St.Icon({icon_name: 'system-run-symbolic',
                                        style_class: 'status-icon'})
         this._iconStateBin = new St.Bin({child: this._iconState,
                                          y_align: St.Align.END});
@@ -898,13 +898,13 @@ const MediaplayerStatusButton = new Lang.Class({
 
     setState: function(state) {
         if (state == Status.PLAY)
-            this._iconState.icon_name = "media-playback-start";
+            this._iconState.icon_name = "media-playback-start-symbolic";
         else if (state == Status.PAUSE)
-            this._iconState.icon_name = "media-playback-pause";
+            this._iconState.icon_name = "media-playback-pause-symbolic";
         else if (state == Status.STOP)
-            this._iconState.icon_name = "media-playback-stop";
+            this._iconState.icon_name = "media-playback-stop-symbolic";
         else if (state == Status.RUN)
-            this._iconState.icon_name = "system-run";
+            this._iconState.icon_name = "system-run-symbolic";
     }
 });
 
@@ -916,8 +916,11 @@ function init() {
 function enable() {
     if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY)) {
         // wait for the volume menu
-        while(Main.panel._statusArea['volume']) {
-            mediaplayerMenu = Main.panel._statusArea['volume'];
+        let status = Main.panel._statusArea;
+        if (Main.panel.statusArea)
+            status = Main.panel.statusArea;
+        while(status['volume']) {
+            mediaplayerMenu = status['volume'];
             break;
         }
     }
