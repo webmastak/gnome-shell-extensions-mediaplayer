@@ -1,6 +1,6 @@
 # gnome-shell-extensions-mediaplayer
 
-gnome-shell-extensions-mediaplayer is a simple extension for controlling any 
+gnome-shell-extensions-mediaplayer is a simple extension for controlling any
 MPRIS v2.1 capable media player.
 
 This extension will monitor D-Bus for active players and automatically display them
@@ -10,7 +10,7 @@ in the GNOME Shell's volume menu by default.
 
 By default, media players shows up in the volume menu:
 
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png) 
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png)
 
 Notice the support of playlists in Banshee (MPRIS 2.1 playlist interface).
 
@@ -20,10 +20,10 @@ But you can have the media players in a separate menu (see settings):
 
 ![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
-You can go to the next or previous track by using the mouse wheel on the status icon. 
+You can go to the next or previous track by using the mouse wheel on the status icon.
 You can also play or pause the player by clicking with the middle button on the status icon.
 
-You may also use the status icon to run your favorite media player if no player is running 
+You may also use the status icon to run your favorite media player if no player is running
 (see the ```rundefault``` setting below).
 
 The current track rating can also be displayed and changed depending of the
@@ -31,7 +31,9 @@ player you are using (see the ```rating``` setting below).
 
 - - -
 
-gnome-shell-extensions-mediaplayer can be easily configured through http://extensions.gnome.org as well as command-line (all settings are listed below).
+gnome-shell-extensions-mediaplayer can be easily configured through
+http://extensions.gnome.org as well as command-line (all settings are
+listed below).
 
 ![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/prefs.png)
 
@@ -49,7 +51,9 @@ gnome-shell-extensions-mediaplayer can be easily configured through http://exten
 
 ### Manual installation
 
-Git branches `master` and `devel` work with the current stable release of GNOME Shell (currently 3.4). For older GNOME versions (3.0 and 3.2), separate branches `gnome-shell-3.0` and `gnome-shell-3.2` exist, but they won't have most of the new features.
+Git branches `master` and `devel` work with GNOME Shell 3.4 and 3.6.
+For older GNOME versions (3.0 and 3.2), separate branches `gnome-shell-3.0`
+and `gnome-shell-3.2` exist, but they won't have most of the new features.
 
 Prerequisites: automake, gnome-common, gettext, glib2 devel files
 
@@ -117,7 +121,7 @@ All settings can be changed from within the `gnome-shell-extension-prefs` tool, 
 
 ## Compatible players
 
-Any player that supports the [MPRIS v2](http://www.mpris.org/2.1/spec/) 
+Any player that supports the [MPRIS v2](http://www.mpris.org/2.1/spec/)
 spec can be supported.
 
 **Note:** Many players will require you to enable the MPRIS v2 support
@@ -155,9 +159,9 @@ This extension has been tested with:
 Some players do not send the MPRIS "Seeked" signal so the extension can't update
 the position slider when the song is seeked from the extension or the player.
 
-* Banshee: https://bugzilla.gnome.org/show_bug.cgi?id=654524
-* Exaile: https://bugs.launchpad.net/exaile/+bug/1021645
-* VLC: https://trac.videolan.org/vlc/ticket/6802
+  * Banshee: https://bugzilla.gnome.org/show_bug.cgi?id=654524
+  * Exaile: https://bugs.launchpad.net/exaile/+bug/1021645
+  * VLC: https://trac.videolan.org/vlc/ticket/6802
 
 ## *Not* supported players
 
