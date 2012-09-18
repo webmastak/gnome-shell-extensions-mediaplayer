@@ -1,9 +1,13 @@
 <schemalist gettext-domain="gnome-shell-extensions-mediaplayer">
+  <enum id='org.gnome.shell.extensions.mediaplayer.positions'>
+    <value nick='center' value='0'/>
+    <value nick='right' value='1'/>
+    <value nick='volume-menu' value='2'/>
+  </enum>
   <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
-    <key name="volumemenu" type="b">
-        <default>true</default>
-        <_summary>Show the media player in the volume menu</_summary>
-        <_description>Whether to show the mediaplayer controls in the volume menu.</_description>
+    <key name="indicator-position" enum="org.gnome.shell.extensions.mediaplayer.positions">
+        <default>'volume-menu'</default>
+        <_summary>Where to display the indicator (center, right, volume menu)</_summary>
     </key>
     <key name="volume" type="b">
         <default>false</default>
