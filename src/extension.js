@@ -929,11 +929,6 @@ function enable() {
         Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
     }
     playerManager = new PlayerManager(mediaplayerMenu);
-
-    settings.connect("changed::" + MEDIAPLAYER_VOLUME_MENU_KEY, function() {
-        disable();
-        enable();
-    });
 }
 
 function disable() {

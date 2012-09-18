@@ -30,7 +30,8 @@ function init() {
     Lib.initTranslations(Me);
     settings = Lib.getSettings(Me);
     settings_bool = {
-        volumemenu: {label: _("Show the media player in the volume menu")},
+        volumemenu: {label: _("Show the media player in the volume menu"),
+                     help: _("Restart the shell to apply this setting.")},
         rundefault: {label: _("Allow to start the default media player"),
                      help: _("Runs the default mediaplayer by clicking on the media player status icon.")},
         volume: {label: _("Show the media player volume slider")},
