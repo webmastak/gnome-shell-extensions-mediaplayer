@@ -31,7 +31,12 @@ const _ = Gettext.gettext;
 const N_ = function(t) { return t };
 
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
-const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
+const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
+const IndicatorPosition = {
+    CENTER: 0,
+    RIGHT: 1,
+    VOLUMEMENU: 2
+};
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
@@ -677,7 +682,7 @@ const PlayerManager = new Lang.Class({
         // the DBus interface
         this._dbus = new DBusIface.DBus();
         // hide the menu by default
-        if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) &&
+        if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
             !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT))
                 this.menu.actor.hide();
         // player DBus name pattern
@@ -736,7 +741,7 @@ const PlayerManager = new Lang.Class({
             this._players[owner] = {player: new Player(busName, owner)};
             this._players[owner].signal = this._players[owner].player.connect('status-changed',
                 Lang.bind(this, this._statusChanged));
-            if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY))
+            if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU)
                 position = this.menu.menu.numMenuItems - 2;
             else
                 position = 0;
@@ -752,7 +757,7 @@ const PlayerManager = new Lang.Class({
             this._players[owner].player.disconnect(this._players[owner].signal);
             this._players[owner].player.destroy();
             delete this._players[owner];
-            if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY) &&
+            if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
                 !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
                 this._nbPlayers() == 0)
                     this.menu.actor.hide();
@@ -914,7 +919,9 @@ function init() {
 }
 
 function enable() {
-    if (settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY)) {
+    let position = settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY);
+    log(position);
+    if (position == IndicatorPosition.VOLUMEMENU) {
         // wait for the volume menu
         let status = Main.panel._statusArea;
         if (Main.panel.statusArea)
@@ -926,7 +933,12 @@ function enable() {
     }
     else {
         mediaplayerMenu = new MediaplayerStatusButton();
-        Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
+        if (position == IndicatorPosition.RIGHT)
+            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
+        if (position == IndicatorPosition.CENTER) {
+            Main.panel._centerBox.add(mediaplayerMenu.actor);
+            Main.panel._menus.addMenu(mediaplayerMenu.menu);
+        }
     }
     playerManager = new PlayerManager(mediaplayerMenu);
 }
