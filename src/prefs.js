@@ -43,7 +43,28 @@ function init() {
         rundefault: {
             type: "b",
             label: _("Allow to start the default media player"),
-            help: _("Runs the default mediaplayer by clicking on the media player status icon.")
+            help: _("Runs the default mediaplayer by clicking on the indicator icon")
+        },
+        status_type: {
+            type: "e",
+            label: _("Indicator appearance"),
+            list: [
+                { nick: "icon", name: _('Symbolic icon'), id: 0 },
+                { nick: "cover", name: _('The current album cover'), id: 1 }
+            ]
+        },
+        status_state: {
+            type: "e",
+            label: _("Indicator status type"),
+            list: [
+                { nick: "icon", name: _('Symbolic icon'), id: 0 },
+                { nick: "text", name: _('A custom text'), id: 1 }
+            ]
+        },
+        status_text: {
+            type: "s",
+            label: _("Indicator status text"),
+            help: _("%a: Artist, %t: Title")
         },
         volume: {
             type: "b",

@@ -37,6 +37,12 @@ const IndicatorPosition = {
     RIGHT: 1,
     VOLUMEMENU: 2
 };
+const MEDIAPLAYER_STATUS_TYPE_KEY = 'status-type';
+const IndicatorStatusType = {
+    ICON: 0,
+    COVER: 1
+};
+const MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
@@ -234,7 +240,7 @@ const Player = new Lang.Class({
                     else
                         this._mediaServer.RaiseRemote();
                     // Close the indicator
-                    mediaplayerMenu.menu.close();
+                    this.emit("close-menu");
                 })
             );
         }
@@ -446,12 +452,13 @@ const Player = new Lang.Class({
                     }
                     // Local cover
                     else if (this.trackCoverFile.match(/^file/)) {
-                        cover_path = decodeURIComponent(this.trackCoverFile.substr(7));
-                        this._showCover(cover_path);
+                        this.trackCoverPath = decodeURIComponent(this.trackCoverFile.substr(7));
+                        this._showCover();
                     }
                 }
-                else
+                else {
                     this._showCover(false);
+                }
             }
         }
     },
@@ -464,8 +471,8 @@ const Player = new Lang.Class({
 
     _onSavedCover: function(outStream, result) {
         outStream.splice_finish(result, null);
-        let cover_path = this.trackCoverFileTmp.get_path();
-        this._showCover(cover_path);
+        this.trackCoverPath = this.trackCoverFileTmp.get_path();
+        this._showCover();
     },
 
     _hideCover: function() {
@@ -475,18 +482,19 @@ const Player = new Lang.Class({
         });
     },
 
-    _showCover: function(cover_path) {
+    _showCover: function() {
+        this.emit('player-cover-changed', this.trackCoverPath)
         Tweener.addTween(this.trackCoverContainer, { opacity: 0,
             time: 0.3,
             transition: 'easeOutCubic',
             onComplete: Lang.bind(this, function() {
                 // Change cover
-                if (! cover_path || ! GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
+                if (! this.trackCoverPath || ! GLib.file_test(this.trackCoverPath, GLib.FileTest.EXISTS)) {
                     this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize});
                 }
                 else {
                     this.trackCover = new St.Bin({style_class: 'track-cover'});
-                    let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
+                    let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this.trackCoverPath});
                     let [coverWidth, coverHeight] = coverTexture.get_base_size();
                     this.trackCover.width = this.coverSize;
                     this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
@@ -496,7 +504,8 @@ const Player = new Lang.Class({
                 // Show the new cover
                 Tweener.addTween(this.trackCoverContainer, { opacity: 255,
                     time: 0.3,
-                    transition: 'easeInCubic'
+                    transition: 'easeInCubic',
+                    onComplete: this.emit('player-cover-changed', this.trackCoverPath)
                 });
             })
         });
@@ -545,6 +554,7 @@ const Player = new Lang.Class({
         if (status != this._status) {
             this._status = status;
             if (this._status == Status.PLAY) {
+                this.emit('player-cover-changed', this.trackCoverPath);
                 this._playButton.setIcon("media-playback-pause");
                 this._startTimer();
             }
@@ -607,7 +617,7 @@ const Player = new Lang.Class({
             this._position.actor.hide();
         }
         this._setIdentity();
-        this.emit('status-changed');
+        this.emit('player-status-changed');
     },
 
     _getStatus: function() {
@@ -739,8 +749,15 @@ const PlayerManager = new Lang.Class({
                 return;
         } else if (owner) {
             this._players[owner] = {player: new Player(busName, owner)};
-            this._players[owner].signal = this._players[owner].player.connect('status-changed',
-                Lang.bind(this, this._statusChanged));
+            this._players[owner].statusEvent = this._players[owner].player.connect('player-status-changed', Lang.bind(this, this._statusChanged));
+            this._players[owner].coverEvent = this._players[owner].player.connect('player-cover-changed', Lang.bind(this, function(player, cover_path) {
+                if (this.menu instanceof MediaplayerStatusButton)
+                    this.menu._showCover(cover_path);
+            }));
+            this._players[owner].closeEvent = this._players[owner].player.connect('menu-close', Lang.bind(this, function() {
+                if (this.menu instanceof MediaplayerStatusButton)
+                    this.menu.close();
+            }));
             if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU)
                 position = this.menu.menu.numMenuItems - 2;
             else
@@ -754,7 +771,9 @@ const PlayerManager = new Lang.Class({
 
     _removePlayer: function(busName, owner) {
         if (this._players[owner]) {
-            this._players[owner].player.disconnect(this._players[owner].signal);
+            this._players[owner].player.disconnect(this._players[owner].statusEvent);
+            this._players[owner].player.disconnect(this._players[owner].coverEvent);
+            this._players[owner].player.disconnect(this._players[owner].closeEvent);
             this._players[owner].player.destroy();
             delete this._players[owner];
             if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
@@ -786,7 +805,7 @@ const PlayerManager = new Lang.Class({
 
     _refreshStatus: function() {
         // Display current status in the top panel
-        if (mediaplayerMenu instanceof MediaplayerStatusButton) {
+        if (this.menu instanceof MediaplayerStatusButton) {
             let globalStatus = false;
             if (this._nbPlayers() == 0) {
                 globalStatus = Status.RUN;
@@ -801,7 +820,7 @@ const PlayerManager = new Lang.Class({
                 if (!globalStatus)
                     globalStatus = Status.STOP;
             }
-            mediaplayerMenu.setState(globalStatus);
+            this.menu.setState(globalStatus);
         }
     },
 
@@ -857,19 +876,62 @@ const MediaplayerStatusButton = new Lang.Class({
             }
         }));
 
-        this._iconBox = new St.BoxLayout();
-        this._iconIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
-                                           style_class: 'system-status-icon'});
-        this._iconState = new St.Icon({icon_name: 'system-run-symbolic',
+        this._coverPath = "";
+        this._coverSize = 22;
+
+        this._box = new St.BoxLayout();
+
+        this._icon = new St.Icon({icon_name: 'audio-x-generic-symbolic',
+                                  style_class: 'system-status-icon'});
+        this._bin = new St.Bin({child: this._icon});
+
+        this._stateText = new St.Label();
+        this._stateIcon = new St.Icon({icon_name: 'system-run-symbolic',
                                        style_class: 'status-icon'})
-        this._iconStateBin = new St.Bin({child: this._iconState,
+        this._stateIconBin = new St.Bin({child: this._stateIcon,
                                          y_align: St.Align.END});
 
-        this._iconBox.add(this._iconIndicator);
-        this._iconBox.add(this._iconStateBin);
-        this.actor.add_actor(this._iconBox);
+        this._box.add(this._bin);
+        this._box.add(this._stateText);
+        this._box.add(this._stateIconBin);
+        this.actor.add_actor(this._box);
         this.actor.add_style_class_name('panel-status-button');
         this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
+    },
+
+    _showCover: function(cover_path) {
+        if (settings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY) == IndicatorStatusType.COVER &&
+           this._coverPath != cover_path) {
+            this._coverPath = cover_path;
+            Tweener.addTween(this._bin, {
+                opacity: 0,
+                time: 0.3,
+                transition: 'easeOutCubic',
+                onComplete: Lang.bind(this, function() {
+                    // Change cover
+                    let cover = this._icon;
+                    if (cover_path && GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
+                        cover = new St.Bin();
+                        let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
+                        let [coverWidth, coverHeight] = coverTexture.get_base_size();
+                        cover.height = this._coverSize;
+                        cover.width = this._coverSize;
+                        cover.set_child(coverTexture);
+                    }
+                    this._bin.set_child(cover);
+                    // Show the new cover
+                    Tweener.addTween(this._bin, { opacity: 255,
+                        time: 0.3,
+                        transition: 'easeInCubic'
+                    });
+                })
+            });
+        }
+    },
+
+    _updateStateText: function(metadata) {
+        let stateText = settings.get_string(MEDIAPLAYER_STATUS_TEXT_KEY);
+        this._stateText.text = "plop!";
     },
 
     _onScrollEvent: function(actor, event) {
@@ -903,13 +965,17 @@ const MediaplayerStatusButton = new Lang.Class({
 
     setState: function(state) {
         if (state == Status.PLAY)
-            this._iconState.icon_name = "media-playback-start-symbolic";
+            this._stateIcon.icon_name = "media-playback-start-symbolic";
         else if (state == Status.PAUSE)
-            this._iconState.icon_name = "media-playback-pause-symbolic";
-        else if (state == Status.STOP)
-            this._iconState.icon_name = "media-playback-stop-symbolic";
-        else if (state == Status.RUN)
-            this._iconState.icon_name = "system-run-symbolic";
+            this._stateIcon.icon_name = "media-playback-pause-symbolic";
+        else if (state == Status.STOP) {
+            this._stateIcon.icon_name = "media-playback-stop-symbolic";
+            this._showCover(false);
+        }
+        else if (state == Status.RUN) {
+            this._stateIcon.icon_name = "system-run-symbolic";
+            this._showCover(false);
+        }
     }
 });
 
@@ -920,7 +986,6 @@ function init() {
 
 function enable() {
     let position = settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY);
-    log(position);
     if (position == IndicatorPosition.VOLUMEMENU) {
         // wait for the volume menu
         let status = Main.panel._statusArea;
