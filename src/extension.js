@@ -460,6 +460,10 @@ const Player = new Lang.Class({
                     this._showCover(false);
                 }
             }
+
+            this.emit('player-metadata-changed', {artist: this.trackArtist.getText(),
+                                                  album: this.trackAlbum.getText(),
+                                                  title: this.trackTitle.getText()});
         }
     },
 
@@ -748,16 +752,36 @@ const PlayerManager = new Lang.Class({
             else
                 return;
         } else if (owner) {
-            this._players[owner] = {player: new Player(busName, owner)};
-            this._players[owner].statusEvent = this._players[owner].player.connect('player-status-changed', Lang.bind(this, this._statusChanged));
-            this._players[owner].coverEvent = this._players[owner].player.connect('player-cover-changed', Lang.bind(this, function(player, cover_path) {
-                if (this.menu instanceof MediaplayerStatusButton)
-                    this.menu._showCover(cover_path);
-            }));
-            this._players[owner].closeEvent = this._players[owner].player.connect('menu-close', Lang.bind(this, function() {
-                if (this.menu instanceof MediaplayerStatusButton)
-                    this.menu.close();
-            }));
+            this._players[owner] = {player: new Player(busName, owner), signals: []};
+            this._players[owner].signals.push(
+                this._players[owner].player.connect('player-metadata-changed',
+                    Lang.bind(this, function(player, metadata) {
+                        if (this.menu instanceof MediaplayerStatusButton)
+                            this.menu._updateStateText(metadata);
+                    })
+                )
+            );
+            this._players[owner].signals.push(
+                this._players[owner].player.connect('player-status-changed',
+                    Lang.bind(this, this._statusChanged)
+                )
+            );
+            this._players[owner].signals.push(
+                this._players[owner].player.connect('player-cover-changed',
+                    Lang.bind(this, function(player, cover_path) {
+                        if (this.menu instanceof MediaplayerStatusButton)
+                            this.menu._showCover(cover_path);
+                    })
+                )
+            );
+            this._players[owner].signals.push(
+                this._players[owner].player.connect('menu-close',
+                    Lang.bind(this, function() {
+                        if (this.menu instanceof MediaplayerStatusButton)
+                            this.menu.close();
+                    })
+                )
+            );
             if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU)
                 position = this.menu.menu.numMenuItems - 2;
             else
@@ -771,9 +795,8 @@ const PlayerManager = new Lang.Class({
 
     _removePlayer: function(busName, owner) {
         if (this._players[owner]) {
-            this._players[owner].player.disconnect(this._players[owner].statusEvent);
-            this._players[owner].player.disconnect(this._players[owner].coverEvent);
-            this._players[owner].player.disconnect(this._players[owner].closeEvent);
+            for (let i=0; i<this._players[owner].signals.length; i++)
+                this._players[owner].player.disconnect(this._players[owner].signals[i]);
             this._players[owner].player.destroy();
             delete this._players[owner];
             if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
@@ -878,6 +901,7 @@ const MediaplayerStatusButton = new Lang.Class({
 
         this._coverPath = "";
         this._coverSize = 22;
+        this._state = "";
 
         this._box = new St.BoxLayout();
 
@@ -886,13 +910,16 @@ const MediaplayerStatusButton = new Lang.Class({
         this._bin = new St.Bin({child: this._icon});
 
         this._stateText = new St.Label();
+        this._stateTextBin = new St.Bin({child: this._stateText,
+                                         y_align: St.Align.MIDDLE});
+
         this._stateIcon = new St.Icon({icon_name: 'system-run-symbolic',
                                        style_class: 'status-icon'})
         this._stateIconBin = new St.Bin({child: this._stateIcon,
                                          y_align: St.Align.END});
 
         this._box.add(this._bin);
-        this._box.add(this._stateText);
+        this._box.add(this._stateTextBin);
         this._box.add(this._stateIconBin);
         this.actor.add_actor(this._box);
         this.actor.add_style_class_name('panel-status-button');
@@ -901,7 +928,7 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _showCover: function(cover_path) {
         if (settings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY) == IndicatorStatusType.COVER &&
-           this._coverPath != cover_path) {
+           this._coverPath != cover_path && (this._state == State.PLAY || this._state == State.PAUSE)) {
             this._coverPath = cover_path;
             Tweener.addTween(this._bin, {
                 opacity: 0,
@@ -930,8 +957,16 @@ const MediaplayerStatusButton = new Lang.Class({
     },
 
     _updateStateText: function(metadata) {
-        let stateText = settings.get_string(MEDIAPLAYER_STATUS_TEXT_KEY);
-        this._stateText.text = "plop!";
+        if (metadata && (this._state == State.PLAY || this._state == State.PAUSE)) {
+            let stateText = settings.get_string(MEDIAPLAYER_STATUS_TEXT_KEY);
+            stateText = stateText.replace(/%a/, metadata.artist)
+                                 .replace(/%t/, metadata.title)
+                                 .replace(/%b/, metadata.album)
+                                 .replace(/&/, "&amp;");
+            this._stateText.clutter_text.set_markup(stateText);
+        }
+        else
+            this._stateText.text = "";
     },
 
     _onScrollEvent: function(actor, event) {
@@ -971,11 +1006,14 @@ const MediaplayerStatusButton = new Lang.Class({
         else if (state == Status.STOP) {
             this._stateIcon.icon_name = "media-playback-stop-symbolic";
             this._showCover(false);
+            this._updateStateText(false);
         }
         else if (state == Status.RUN) {
             this._stateIcon.icon_name = "system-run-symbolic";
             this._showCover(false);
+            this._updateStateText(false);
         }
+        this._state = state;
     }
 });
 

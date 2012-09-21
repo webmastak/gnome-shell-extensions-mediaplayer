@@ -53,18 +53,10 @@ function init() {
                 { nick: "cover", name: _('The current album cover'), id: 1 }
             ]
         },
-        status_state: {
-            type: "e",
-            label: _("Indicator status type"),
-            list: [
-                { nick: "icon", name: _('Symbolic icon'), id: 0 },
-                { nick: "text", name: _('A custom text'), id: 1 }
-            ]
-        },
         status_text: {
             type: "s",
             label: _("Indicator status text"),
-            help: _("%a: Artist, %t: Title")
+            help: _("%a: Artist, %b: Album, %t: Title. Pango markup supported.")
         },
         volume: {
             type: "b",

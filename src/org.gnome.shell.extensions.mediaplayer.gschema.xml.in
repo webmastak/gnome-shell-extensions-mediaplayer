@@ -9,10 +9,6 @@
     <value nick='cover' value='1'/>
     <value nick='icon-fullcolor' value='2'/>
   </enum>
-  <enum id='org.gnome.shell.extensions.mediaplayer.status-state'>
-    <value nick='icon' value='0'/>
-    <value nick='text' value='1'/>
-  </enum>
   <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
     <key name="indicator-position" enum="org.gnome.shell.extensions.mediaplayer.positions">
         <default>'volume-menu'</default>
@@ -52,12 +48,8 @@
     	<default>'icon'</default>
     	<_summary>Indicator appearance</_summary>
     </key>
-    <key name="status-state" enum="org.gnome.shell.extensions.mediaplayer.status-state">
-    	<default>'icon'</default>
-    	<_summary>Indicator status type</_summary>
-    </key>
     <key type="s" name="status-text">
-    	<default>'%t by %a'</default>
+    	<default>''</default>
     	<_summary>The indicator status text</_summary>
     </key>
   </schema>

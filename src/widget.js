@@ -137,6 +137,10 @@ const TrackTitle = new Lang.Class({
             this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
             this._label.clutter_text.set_text(text.toString());
         }
+    },
+
+    getText: function() {
+        return this._label.text;
     }
 });
 
