@@ -22,16 +22,17 @@
 }
 
 .track-artist {
-    padding-top: 2px;
+    padding-top: 0.2em;
     font-size: 0.9em;
 }
 
 .track-album {
-    padding-top: 2px;
+    padding-top: 0.2em;
     font-size: 0.9em;
 }
 
 .track-rating {
+    padding-top: 0.15em;
     font-size: 0.9em;
 }
 
