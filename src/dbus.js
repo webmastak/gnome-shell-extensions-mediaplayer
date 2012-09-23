@@ -63,6 +63,8 @@ const MediaServer2PlayerIface = <interface name="org.mpris.MediaPlayer2.Player">
     <arg type="o" direction="in" />
     <arg type="x" direction="in" />
 </method>
+<property name="CanPause" type="b" access="read" />
+<property name="CanSeek" type="b" access="read" />
 <property name="Metadata" type="a{sv}" access="read" />
 <property name="Volume" type="d" access="readwrite" />
 <property name="PlaybackStatus" type="s" access="read" />

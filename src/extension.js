@@ -176,7 +176,13 @@ const Player = new Lang.Class({
         this._prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
         this._playButton = new Widget.PlayerButton('media-playback-start-symbolic',
-            Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
+            Lang.bind(this, function () {
+                if (this._mediaServerPlayer.CanPause == false)
+                    this._mediaServerPlayer.PlayRemote()
+                else
+                    this._mediaServerPlayer.PlayPauseRemote()
+            })
+        );
         this._stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._stopButton.hide();
@@ -380,13 +386,13 @@ const Player = new Lang.Class({
             if (metadata["mpris:length"]) {
                 this._songLength = metadata["mpris:length"].unpack() / 1000000;
                 this.supportPosition = true;
-                if (this.showPosition && this._status != Status.STOP)
-                    this._position.actor.show();
+                if (this._mediaServerPlayer.CanSeek == false)
+                    this.supportPosition = false;
+
             }
             else {
                 this._songLength = 0;
                 this.supportPosition = false;
-                this._position.actor.hide();
             }
             if (metadata["xesam:artist"])
                 this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
@@ -556,18 +562,17 @@ const Player = new Lang.Class({
 
     _setStatus: function(status) {
         if (status != this._status) {
+            log("Change status " + status);
             this._status = status;
             if (this._status == Status.PLAY) {
-                this.emit('player-cover-changed', this.trackCoverPath);
-                this._playButton.setIcon("media-playback-pause");
                 this._startTimer();
             }
             else if (this._status == Status.PAUSE) {
+                this._stopButton.show();
                 this._playButton.setIcon("media-playback-start");
                 this._pauseTimer();
             }
             else if (this._status == Status.STOP) {
-                this._playButton.setIcon("media-playback-start");
                 this._stopTimer();
             }
 
@@ -579,6 +584,23 @@ const Player = new Lang.Class({
     },
 
     _refreshStatus: function() {
+        if (this._status == Status.PLAY) {
+            this._stopButton.show();
+            this.emit('player-cover-changed', this.trackCoverPath);
+            log(this._mediaServerPlayer.CanPause);
+            if (this._mediaServerPlayer.CanPause == false)
+                this._playButton.hide();
+            else
+                this._playButton.setIcon("media-playback-pause");
+        }
+        if (this._status == Status.STOP) {
+            this._stopButton.hide();
+            if (this._mediaServerPlayer.CanPause == false)
+                this._playButton.show();
+            else
+                this._playButton.setIcon("media-playback-start");
+
+        }
         if (this._status != Status.STOP) {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
                 this.trackBox.box.show();
@@ -597,11 +619,12 @@ const Player = new Lang.Class({
                       onCompleteScope: this
                     });
             }
-            this._stopButton.show();
             if (this.showVolume)
                 this._volume.actor.show();
             if (this.showPosition && this.supportPosition)
                 this._position.actor.show();
+            else
+                this._position.actor.hide()
         }
         else {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {
@@ -616,7 +639,6 @@ const Player = new Lang.Class({
                       onCompleteScope: this
                     });
             }
-            this._stopButton.hide();
             this._volume.actor.hide();
             this._position.actor.hide();
         }
@@ -928,7 +950,7 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _showCover: function(cover_path) {
         if (settings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY) == IndicatorStatusType.COVER &&
-           this._coverPath != cover_path && (this._state == State.PLAY || this._state == State.PAUSE)) {
+           this._coverPath != cover_path && (this._state == Status.PLAY || this._state == Status.PAUSE)) {
             this._coverPath = cover_path;
             Tweener.addTween(this._bin, {
                 opacity: 0,
@@ -957,7 +979,7 @@ const MediaplayerStatusButton = new Lang.Class({
     },
 
     _updateStateText: function(metadata) {
-        if (metadata && (this._state == State.PLAY || this._state == State.PAUSE)) {
+        if (metadata && (this._state == Status.PLAY || this._state == Status.PAUSE)) {
             let stateText = settings.get_string(MEDIAPLAYER_STATUS_TEXT_KEY);
             stateText = stateText.replace(/%a/, metadata.artist)
                                  .replace(/%t/, metadata.title)
