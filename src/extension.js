@@ -562,7 +562,6 @@ const Player = new Lang.Class({
 
     _setStatus: function(status) {
         if (status != this._status) {
-            log("Change status " + status);
             this._status = status;
             if (this._status == Status.PLAY) {
                 this._startTimer();
@@ -587,7 +586,6 @@ const Player = new Lang.Class({
         if (this._status == Status.PLAY) {
             this._stopButton.show();
             this.emit('player-cover-changed', this.trackCoverPath);
-            log(this._mediaServerPlayer.CanPause);
             if (this._mediaServerPlayer.CanPause == false)
                 this._playButton.hide();
             else
