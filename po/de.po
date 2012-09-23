@@ -2,14 +2,15 @@
 # Copyright (C) 2012 gnome-shell-extension-mediaplayer package.
 # This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
 # Frederik Hahne <frederik.hahne@googlemail.com>, 2012.
+# Agilo Kern <prdiewelt@googlemail.com>, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-03 10:26+0200\n"
-"PO-Revision-Date: 2012-04-04 09:00+0200\n"
-"Last-Translator: Frederik Hahne <frederik.hahne@googlemail.com>\n"
+"PO-Revision-Date: 2012-09-22 22:50+0100\n"
+"Last-Translator: Agilo Kern <prdiewelt@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +39,7 @@ msgstr "aus"
 
 #: ../src/extension.js:154
 msgid "rating"
-msgstr ""
+msgstr "bewertung"
 
 #: ../src/extension.js:196
 msgid "Volume"
@@ -62,7 +63,7 @@ msgstr "Unbekannter Titel"
 
 #: ../src/prefs.js:33
 msgid "Show the media player in the volume menu"
-msgstr "Mediaplayer im Lautstärkemenu anzeigen"
+msgstr "Mediaplayer im Lautstärkemenü anzeigen"
 
 #: ../src/prefs.js:34
 msgid "Allow to start the default media player"
@@ -70,7 +71,7 @@ msgstr "Erlauben den Standard-Mediaplayer zu starten"
 
 #: ../src/prefs.js:35
 msgid "Runs the default mediaplayer by clicking on the media player status icon."
-msgstr "Den Standard-Mediaplayer beim klick auf das Status Icon starten"
+msgstr "Den Standard-Mediaplayer beim Klick auf das Status-Icon starten."
 
 #: ../src/prefs.js:36
 msgid "Show the media player volume slider"
@@ -98,4 +99,5 @@ msgstr "Größe der Albumcover"
 
 #: ../src/prefs.js:44
 msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr "Größe der Albumcover im Menu. Standard ist eine Breite von 80px."
+msgstr "Größe der Albumcover im Menü. Standard ist eine Breite von 80px."
+
