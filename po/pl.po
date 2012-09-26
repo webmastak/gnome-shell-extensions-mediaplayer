@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-03 10:26+0200\n"
+"POT-Creation-Date: 2012-09-26 09:41+0200\n"
 "PO-Revision-Date: 2012-04-08 11:54+0200\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
@@ -18,91 +18,130 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : ((n%10>=2 && n%10<=4 && (n"
 "%100<10 || n%100>=20)) ? 1 : 2));\n"
 
-#: ../src/extension.js:50
+#: ../src/extension.js:61
 msgid "Stopped"
 msgstr "Zatrzymano"
 
-#: ../src/extension.js:51
+#: ../src/extension.js:62
 msgid "Playing"
 msgstr "Odtwarzanie"
 
-#: ../src/extension.js:52
+#: ../src/extension.js:63
 msgid "Paused"
 msgstr "Wstrzymano"
 
-#: ../src/extension.js:152
-msgid "by"
-msgstr "w wykonaniu"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "z albumu"
-
-#: ../src/extension.js:154
+#: ../src/extension.js:128 ../src/extension.js:157
 msgid "rating"
 msgstr ""
 
-#: ../src/extension.js:196
+#: ../src/extension.js:149
+msgid "by"
+msgstr "w wykonaniu"
+
+#: ../src/extension.js:150
+msgid "from"
+msgstr "z albumu"
+
+#: ../src/extension.js:206
 msgid "Volume"
 msgstr "Głośność"
 
-#: ../src/extension.js:290
+#: ../src/extension.js:314
 msgid "Playlists"
 msgstr "Listy odtwarzania"
 
-#: ../src/extension.js:361
+#: ../src/extension.js:384
 msgid "Unknown Artist"
 msgstr "Nieznany wykonawca"
 
-#: ../src/extension.js:365
+#: ../src/extension.js:388
 msgid "Unknown Album"
 msgstr "Nieznany album"
 
-#: ../src/extension.js:369
+#: ../src/extension.js:392
 msgid "Unknown Title"
 msgstr "Nieznany tytuł"
 
-#: ../src/prefs.js:33
-msgid "Show the media player in the volume menu"
-msgstr "Wyświetlanie rozszerzenia w menu głośności"
-
-#: ../src/prefs.js:34
-msgid "Allow to start the default media player"
-msgstr "Uruchamianie domyślnego odtwarzacza"
-
-#: ../src/prefs.js:35
-msgid ""
-"Runs the default mediaplayer by clicking on the media player status icon."
-msgstr ""
-"Uruchamia domyślny odtwarzacz multimediów po kliknięciu w ikonę stanu "
-"rozszerzenia"
-
-#: ../src/prefs.js:36
-msgid "Show the media player volume slider"
-msgstr "Wyświetlanie suwaka głośności odtwarzacza"
-
 #: ../src/prefs.js:37
-msgid "Show the media player position slider"
-msgstr "Wyświetlanie suwaka pozycji odtwarzania"
+msgid "Position in the top panel"
+msgstr ""
 
 #: ../src/prefs.js:38
-msgid "Show media player playlists"
-msgstr "Wyświetlanie list odtwarzania"
-
-#: ../src/prefs.js:39
-msgid "Display song rating"
+msgid "Restart the shell to apply this setting."
 msgstr ""
 
 #: ../src/prefs.js:40
+msgid "Center"
+msgstr ""
+
+#: ../src/prefs.js:41
+msgid "Right"
+msgstr ""
+
+#: ../src/prefs.js:42
+msgid "Volume menu integration"
+msgstr ""
+
+#: ../src/prefs.js:47
+msgid "Show the media player volume slider"
+msgstr "Wyświetlanie suwaka głośności odtwarzacza"
+
+#: ../src/prefs.js:51
+msgid "Show the media player position slider"
+msgstr "Wyświetlanie suwaka pozycji odtwarzania"
+
+#: ../src/prefs.js:55
+msgid "Show media player playlists"
+msgstr "Wyświetlanie list odtwarzania"
+
+#: ../src/prefs.js:59
+msgid "Display song rating"
+msgstr ""
+
+#: ../src/prefs.js:60
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr ""
 
-#: ../src/prefs.js:43
+#: ../src/prefs.js:64
 msgid "Album cover size"
 msgstr "Rozmiar okładki albumu"
 
-#: ../src/prefs.js:44
+#: ../src/prefs.js:65
 msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr ""
 "Określa rozmiar okładki wyświetlanej w menu. Domyślna szerokość obrazu "
 "wynosi 80 pikseli."
+
+#: ../src/prefs.js:75
+msgid "Allow to start the default media player"
+msgstr "Uruchamianie domyślnego odtwarzacza"
+
+#: ../src/prefs.js:76
+#, fuzzy
+msgid "Runs the default mediaplayer by clicking on the indicator"
+msgstr ""
+"Uruchamia domyślny odtwarzacz multimediów po kliknięciu w ikonę stanu "
+"rozszerzenia"
+
+#: ../src/prefs.js:80
+msgid "Appearance"
+msgstr ""
+
+#: ../src/prefs.js:82
+msgid "Symbolic icon"
+msgstr ""
+
+#: ../src/prefs.js:83
+msgid "Current album cover"
+msgstr ""
+
+#: ../src/prefs.js:88
+msgid "Status text"
+msgstr ""
+
+#: ../src/prefs.js:89
+msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+msgstr ""
+
+#~ msgid "Show the media player in the volume menu"
+#~ msgstr "Wyświetlanie rozszerzenia w menu głośności"

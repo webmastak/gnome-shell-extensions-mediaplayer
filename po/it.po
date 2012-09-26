@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-03 10:26+0200\n"
+"POT-Creation-Date: 2012-09-26 09:41+0200\n"
 "PO-Revision-Date: 2012-01-12 20:17+0100\n"
 "Last-Translator: Fabio <fbmail74-abc@yahoo.it>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,92 +16,127 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/extension.js:50
+#: ../src/extension.js:61
 msgid "Stopped"
 msgstr "Arrestato"
 
-#: ../src/extension.js:51
+#: ../src/extension.js:62
 msgid "Playing"
 msgstr "In Riproduzione"
 
-#: ../src/extension.js:52
+#: ../src/extension.js:63
 msgid "Paused"
 msgstr "In Pausa"
 
-#: ../src/extension.js:152
-msgid "by"
-msgstr "di"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "da"
-
-#: ../src/extension.js:154
+#: ../src/extension.js:128 ../src/extension.js:157
 msgid "rating"
 msgstr ""
 
-#: ../src/extension.js:196
+#: ../src/extension.js:149
+msgid "by"
+msgstr "di"
+
+#: ../src/extension.js:150
+msgid "from"
+msgstr "da"
+
+#: ../src/extension.js:206
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:290
+#: ../src/extension.js:314
 msgid "Playlists"
 msgstr "Playlists"
 
-#: ../src/extension.js:361
+#: ../src/extension.js:384
 msgid "Unknown Artist"
 msgstr "Artista Sconosciuto"
 
-#: ../src/extension.js:365
+#: ../src/extension.js:388
 msgid "Unknown Album"
 msgstr "Album Sconosciuto"
 
-#: ../src/extension.js:369
+#: ../src/extension.js:392
 msgid "Unknown Title"
 msgstr "Titolo Sconosciuto"
 
-#: ../src/prefs.js:33
-msgid "Show the media player in the volume menu"
+#: ../src/prefs.js:37
+msgid "Position in the top panel"
 msgstr ""
 
-#: ../src/prefs.js:34
-msgid "Allow to start the default media player"
+#: ../src/prefs.js:38
+msgid "Restart the shell to apply this setting."
 msgstr ""
 
-#: ../src/prefs.js:35
-msgid ""
-"Runs the default mediaplayer by clicking on the media player status icon."
+#: ../src/prefs.js:40
+msgid "Center"
 msgstr ""
 
-#: ../src/prefs.js:36
+#: ../src/prefs.js:41
+msgid "Right"
+msgstr ""
+
+#: ../src/prefs.js:42
+msgid "Volume menu integration"
+msgstr ""
+
+#: ../src/prefs.js:47
 #, fuzzy
 msgid "Show the media player volume slider"
 msgstr "Playlists"
 
-#: ../src/prefs.js:37
+#: ../src/prefs.js:51
 #, fuzzy
 msgid "Show the media player position slider"
 msgstr "Playlists"
 
-#: ../src/prefs.js:38
+#: ../src/prefs.js:55
 #, fuzzy
 msgid "Show media player playlists"
 msgstr "Playlists"
 
-#: ../src/prefs.js:39
+#: ../src/prefs.js:59
 msgid "Display song rating"
 msgstr ""
 
-#: ../src/prefs.js:40
+#: ../src/prefs.js:60
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr ""
 
-#: ../src/prefs.js:43
+#: ../src/prefs.js:64
 msgid "Album cover size"
 msgstr ""
 
-#: ../src/prefs.js:44
+#: ../src/prefs.js:65
 msgid "The size of the cover displayed in the menu. Default is 80px width."
+msgstr ""
+
+#: ../src/prefs.js:75
+msgid "Allow to start the default media player"
+msgstr ""
+
+#: ../src/prefs.js:76
+msgid "Runs the default mediaplayer by clicking on the indicator"
+msgstr ""
+
+#: ../src/prefs.js:80
+msgid "Appearance"
+msgstr ""
+
+#: ../src/prefs.js:82
+msgid "Symbolic icon"
+msgstr ""
+
+#: ../src/prefs.js:83
+msgid "Current album cover"
+msgstr ""
+
+#: ../src/prefs.js:88
+msgid "Status text"
+msgstr ""
+
+#: ../src/prefs.js:89
+msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
 msgstr ""
 
 #~ msgid "Schema \"%s\" not found."

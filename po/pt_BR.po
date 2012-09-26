@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-03 10:26+0200\n"
+"POT-Creation-Date: 2012-09-26 09:41+0200\n"
 "PO-Revision-Date: 2012-07-28 12:51-0300\n"
 "Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
 "Language-Team: \n"
@@ -19,91 +19,130 @@ msgstr ""
 "X-Poedit-Language: Portuguese\n"
 "X-Poedit-Country: BRAZIL\n"
 
-#: ../src/extension.js:50
+#: ../src/extension.js:61
 msgid "Stopped"
 msgstr "Parado"
 
-#: ../src/extension.js:51
+#: ../src/extension.js:62
 msgid "Playing"
 msgstr "Reproduzindo"
 
-#: ../src/extension.js:52
+#: ../src/extension.js:63
 msgid "Paused"
 msgstr "Pausado"
 
-#: ../src/extension.js:152
-msgid "by"
-msgstr "por"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "de"
-
-#: ../src/extension.js:154
+#: ../src/extension.js:128 ../src/extension.js:157
 msgid "rating"
 msgstr "avaliação"
 
-#: ../src/extension.js:196
+#: ../src/extension.js:149
+msgid "by"
+msgstr "por"
+
+#: ../src/extension.js:150
+msgid "from"
+msgstr "de"
+
+#: ../src/extension.js:206
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:290
+#: ../src/extension.js:314
 msgid "Playlists"
 msgstr "Playlists"
 
-#: ../src/extension.js:361
+#: ../src/extension.js:384
 msgid "Unknown Artist"
 msgstr "Artista Deconhecido"
 
-#: ../src/extension.js:365
+#: ../src/extension.js:388
 msgid "Unknown Album"
 msgstr "Álbum Desconhecido"
 
-#: ../src/extension.js:369
+#: ../src/extension.js:392
 msgid "Unknown Title"
 msgstr "Título Desconhecido"
 
-#: ../src/prefs.js:33
-msgid "Show the media player in the volume menu"
-msgstr "Exibir o media player no menu de volume"
-
-#: ../src/prefs.js:34
-msgid "Allow to start the default media player"
-msgstr "Permitir iniciar o media player padrão"
-
-#: ../src/prefs.js:35
-msgid ""
-"Runs the default mediaplayer by clicking on the media player status icon."
+#: ../src/prefs.js:37
+msgid "Position in the top panel"
 msgstr ""
-"Executa o media player padrão clicando no ícone de status do media player"
 
-#: ../src/prefs.js:36
+#: ../src/prefs.js:38
+msgid "Restart the shell to apply this setting."
+msgstr ""
+
+#: ../src/prefs.js:40
+msgid "Center"
+msgstr ""
+
+#: ../src/prefs.js:41
+msgid "Right"
+msgstr ""
+
+#: ../src/prefs.js:42
+msgid "Volume menu integration"
+msgstr ""
+
+#: ../src/prefs.js:47
 msgid "Show the media player volume slider"
 msgstr "Exibir o controle de volume do media player"
 
-#: ../src/prefs.js:37
+#: ../src/prefs.js:51
 msgid "Show the media player position slider"
 msgstr "Exibir o controle de posição do media player"
 
-#: ../src/prefs.js:38
+#: ../src/prefs.js:55
 msgid "Show media player playlists"
 msgstr "Exibir playlists do media player"
 
-#: ../src/prefs.js:39
+#: ../src/prefs.js:59
 msgid "Display song rating"
 msgstr "Mostrar a avaliação da música"
 
-#: ../src/prefs.js:40
+#: ../src/prefs.js:60
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr "Mostra a avaliação da música que está tocando em uma escala de 0 a 5"
 
-#: ../src/prefs.js:43
+#: ../src/prefs.js:64
 msgid "Album cover size"
 msgstr "Tamanho da capa do álbum"
 
-#: ../src/prefs.js:44
+#: ../src/prefs.js:65
 msgid "The size of the cover displayed in the menu. Default is 80px width."
 msgstr "O tamanho da capa exibida no menu. Por padrão, 80 pixels de largura."
+
+#: ../src/prefs.js:75
+msgid "Allow to start the default media player"
+msgstr "Permitir iniciar o media player padrão"
+
+#: ../src/prefs.js:76
+#, fuzzy
+msgid "Runs the default mediaplayer by clicking on the indicator"
+msgstr ""
+"Executa o media player padrão clicando no ícone de status do media player"
+
+#: ../src/prefs.js:80
+msgid "Appearance"
+msgstr ""
+
+#: ../src/prefs.js:82
+msgid "Symbolic icon"
+msgstr ""
+
+#: ../src/prefs.js:83
+msgid "Current album cover"
+msgstr ""
+
+#: ../src/prefs.js:88
+msgid "Status text"
+msgstr ""
+
+#: ../src/prefs.js:89
+msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+msgstr ""
+
+#~ msgid "Show the media player in the volume menu"
+#~ msgstr "Exibir o media player no menu de volume"
 
 #~ msgid "Schema \"%s\" not found."
 #~ msgstr "Esquema \"%s\" não encontrado."
