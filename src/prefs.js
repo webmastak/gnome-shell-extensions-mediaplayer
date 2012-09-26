@@ -25,6 +25,8 @@ const Lib = Me.imports.lib;
 
 let gsettings;
 let settings;
+let settings_indicator;
+let vbox_indicator;
 
 function init() {
     Lib.initTranslations(Me);
@@ -32,31 +34,13 @@ function init() {
     settings = {
         indicator_position: {
             type: "e",
-            label: _("The position of the indicator in the top panel"),
+            label: _("Position in the top panel"),
             help: _("Restart the shell to apply this setting."),
             list: [
-                { nick: "center", name: _('Center'), id: 0 },
-                { nick: "right", name: _('Right'), id: 1 },
-                { nick: "volume-menu", name: _('Volume menu'), id: 2 }
+                { nick: "center", name: _("Center"), id: 0 },
+                { nick: "right", name: _("Right"), id: 1 },
+                { nick: "volume-menu", name: _("Volume menu integration"), id: 2 }
             ]
-        },
-        rundefault: {
-            type: "b",
-            label: _("Allow to start the default media player"),
-            help: _("Runs the default mediaplayer by clicking on the indicator icon")
-        },
-        status_type: {
-            type: "e",
-            label: _("Indicator appearance"),
-            list: [
-                { nick: "icon", name: _('Symbolic icon'), id: 0 },
-                { nick: "cover", name: _('The current album cover'), id: 1 }
-            ]
-        },
-        status_text: {
-            type: "s",
-            label: _("Indicator status text"),
-            help: _("%a: Artist, %b: Album, %t: Title. Pango markup supported.")
         },
         volume: {
             type: "b",
@@ -85,35 +69,76 @@ function init() {
             default: 80
         }
     };
+    settings_indicator = {
+        rundefault: {
+            type: "b",
+            label: _("Allow to start the default media player"),
+            help: _("Runs the default mediaplayer by clicking on the indicator")
+        },
+        status_type: {
+            type: "e",
+            label: _("Appearance"),
+            list: [
+                { nick: "icon", name: _("Symbolic icon"), id: 0 },
+                { nick: "cover", name: _("Current album cover"), id: 1 }
+            ]
+        },
+        status_text: {
+            type: "s",
+            label: _("Status text"),
+            help: _("%a: Artist, %b: Album, %t: Title. Pango markup supported.")
+        }
+    };
 }
 
 function buildPrefsWidget() {
     let frame = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
-                             border_width: 10 });
+                             border_width: 10});
     let vbox = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
                             margin: 20, margin_top: 10 });
+    vbox_indicator = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
+                                      margin_left: 30, margin_bottom: 10});
     let hbox;
 
+    for (setting_indicator in settings_indicator) {
+        hbox = buildHbox(settings_indicator, setting_indicator);
+        vbox_indicator.add(hbox);
+    }
+
     for (setting in settings) {
-        if (settings[setting].type == 's')
-            hbox = createStringSetting(setting);
-        if (settings[setting].type == "i")
-            hbox = createIntSetting(setting);
-        if (settings[setting].type == "b")
-            hbox = createBoolSetting(setting);
-        if (settings[setting].type == "r")
-            hbox = createRangeSetting(setting);
-        if (settings[setting].type == "e")
-            hbox = createEnumSetting(setting);
+        hbox = buildHbox(settings, setting);
         vbox.add(hbox);
+        if (setting == "indicator_position")
+            vbox.add(vbox_indicator);
     }
 
     frame.add(vbox);
     frame.show_all();
+
+    if (gsettings.get_enum("indicator-position") == 2)
+        vbox_indicator.hide();
+
     return frame;
 }
 
-function createEnumSetting(setting) {
+function buildHbox(settings, setting) {
+    let hbox;
+
+    if (settings[setting].type == 's')
+        hbox = createStringSetting(settings, setting);
+    if (settings[setting].type == "i")
+        hbox = createIntSetting(settings, setting);
+    if (settings[setting].type == "b")
+        hbox = createBoolSetting(settings, setting);
+    if (settings[setting].type == "r")
+        hbox = createRangeSetting(settings, setting);
+    if (settings[setting].type == "e")
+        hbox = createEnumSetting(settings, setting);
+
+    return hbox;
+}
+
+function createEnumSetting(settings, setting) {
 
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,
                             margin_top: 5});
@@ -145,6 +170,13 @@ function createEnumSetting(setting) {
 
         let id = model.get_value(iter, 0)
         gsettings.set_enum(setting.replace('_', '-'), id);
+
+        if (setting == "indicator_position") {
+            if (gsettings.get_enum("indicator-position") == 2)
+                vbox_indicator.hide();
+            else
+                vbox_indicator.show();
+        }
     });
 
     if (settings[setting].help) {
@@ -159,7 +191,7 @@ function createEnumSetting(setting) {
 
 }
 
-function createStringSetting(setting) {
+function createStringSetting(settings, setting) {
 
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,
                             margin_top: 5});
@@ -168,6 +200,7 @@ function createStringSetting(setting) {
                                        xalign: 0 });
 
     let setting_string = new Gtk.Entry({text: gsettings.get_string(setting.replace('_', '-'))});
+    setting_string.set_width_chars(30);
     setting_string.connect('notify::text', function(entry) {
         gsettings.set_string(setting.replace('_', '-'), entry.text);
     });
@@ -187,7 +220,7 @@ function createStringSetting(setting) {
     return hbox;
 }
 
-function createIntSetting(setting) {
+function createIntSetting(settings, setting) {
 
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,
                             margin_top: 5});
@@ -214,7 +247,7 @@ function createIntSetting(setting) {
     return hbox;
 }
 
-function createBoolSetting(setting) {
+function createBoolSetting(settings, setting) {
 
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,
                             margin_top: 5});
@@ -238,7 +271,7 @@ function createBoolSetting(setting) {
     return hbox;
 }
 
-function createRangeSetting(setting) {
+function createRangeSetting(settings, setting) {
 
     let hbox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
 
