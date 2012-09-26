@@ -189,7 +189,6 @@ const Player = new Lang.Class({
         this.addMenuItem(this.trackControls);
 
         this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
-        this.supportPosition = true;
         this._position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
         this._position.connect('value-changed', Lang.bind(this, function(item) {
             let time = item._value * this._songLength;
@@ -350,8 +349,7 @@ const Player = new Lang.Class({
     _setPosition: function(value) {
         // Player does not have a position property
         if (value == null && this._status != Status.STOP) {
-            this.supportPosition = false;
-            this._updateSliders();
+            this._updateSliders(false);
         }
         else {
             this._currentTime = value / 1000000;
@@ -368,18 +366,15 @@ const Player = new Lang.Class({
         // value on stop
         if (metadata != null && Object.keys(metadata).length > 1) {
             this._currentTime = -1;
-            if (metadata["mpris:length"]) {
+            if (metadata["mpris:length"])
                 this._songLength = metadata["mpris:length"].unpack() / 1000000;
-                this.supportPosition = true;
-            }
-            else {
+            else
                 this._songLength = 0;
-                this.supportPosition = false;
-            }
             // Banshee workaround
             Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
             // Check if the current track can be paused
             this._updateControls();
+
             if (metadata["xesam:artist"])
                 this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
             else
@@ -567,6 +562,9 @@ const Player = new Lang.Class({
     },
 
     _refreshStatus: function() {
+        this._updateSliders();
+        this._updateControls();
+        this._setIdentity();
         if (this._status != Status.STOP) {
             this.emit('player-cover-changed', this.trackCoverPath);
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
@@ -601,22 +599,29 @@ const Player = new Lang.Class({
                     });
             }
         }
-        this._updateSliders();
-        this._updateControls();
-        this._setIdentity();
         this.emit('player-status-changed');
     },
 
-    _updateSliders: function() {
-        if (this.showPosition && this.supportPosition && this._status != Status.STOP)
-            this._position.actor.show();
-        else
-            this._position.actor.hide();
+    _updateSliders: function(position) {
+        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanSeek',
+            Lang.bind(this, function(value, err) {
+                this._canSeek = true;
+                if (!err)
+                    this._canSeek = value[0].unpack();
+                if (this._songLength == 0 || position == false)
+                    this._canSeek = false
 
-        if (this.showVolume && this._status != Status.STOP)
-            this._volume.actor.show();
-        else
-            this._volume.actor.hide();
+                if (this._status != Status.STOP && this._canSeek && this.showPosition)
+                    this._position.actor.show();
+                else
+                    this._position.actor.hide();
+
+                if (this._status != Status.STOP && this.showVolume)
+                    this._volume.actor.show();
+                else
+                    this._volume.actor.hide();
+            })
+        );
     },
 
     _updateControls: function() {
@@ -681,7 +686,7 @@ const Player = new Lang.Class({
     },
 
     _updateTimer: function() {
-        if (this.showPosition && this.supportPosition) {
+        if (this.showPosition && this._canSeek) {
             if (!isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0)
                 this._position.setValue(this._currentTime / this._songLength);
             else
