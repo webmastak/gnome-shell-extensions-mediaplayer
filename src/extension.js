@@ -378,6 +378,8 @@ const Player = new Lang.Class({
             }
             // Banshee workaround
             Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
+            // Check if the current track can be paused
+            this._updateControls();
             if (metadata["xesam:artist"])
                 this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
             else
@@ -551,8 +553,6 @@ const Player = new Lang.Class({
                 this._startTimer();
             }
             else if (this._status == Status.PAUSE) {
-                this._stopButton.show();
-                this._playButton.setIcon("media-playback-start");
                 this._pauseTimer();
             }
             else if (this._status == Status.STOP) {
@@ -567,24 +567,8 @@ const Player = new Lang.Class({
     },
 
     _refreshStatus: function() {
-        log(this._status);
-        if (this._status == Status.PLAY) {
-            this._stopButton.show();
-            this.emit('player-cover-changed', this.trackCoverPath);
-            if (this._mediaServerPlayer.CanPause == false)
-                this._playButton.hide();
-            else
-                this._playButton.setIcon("media-playback-pause");
-        }
-        if (this._status == Status.STOP) {
-            this._stopButton.hide();
-            if (this._mediaServerPlayer.CanPause == false)
-                this._playButton.show();
-            else
-                this._playButton.setIcon("media-playback-start");
-
-        }
         if (this._status != Status.STOP) {
+            this.emit('player-cover-changed', this.trackCoverPath);
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
                 this.trackBox.box.show();
                 this.trackBox.box.set_height(-1);
@@ -618,6 +602,7 @@ const Player = new Lang.Class({
             }
         }
         this._updateSliders();
+        this._updateControls();
         this._setIdentity();
         this.emit('player-status-changed');
     },
@@ -632,6 +617,34 @@ const Player = new Lang.Class({
             this._volume.actor.show();
         else
             this._volume.actor.hide();
+    },
+
+    _updateControls: function() {
+        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPause',
+            Lang.bind(this, function(value, err) {
+                // assume the player can pause by default
+                let canPause = true;
+                if (!err)
+                    canPause = value[0].unpack();
+
+                if (this._status == Status.PLAY) {
+                    this._stopButton.show();
+                    if (canPause)
+                        this._playButton.setIcon("media-playback-pause");
+                    else
+                        this._playButton.hide();
+                }
+
+                if (this._status == Status.PAUSE)
+                    this._playButton.setIcon("media-playback-start");
+
+                if (this._status == Status.STOP) {
+                    this._stopButton.hide();
+                    this._playButton.show();
+                    this._playButton.setIcon("media-playback-start");
+                }
+            })
+        );
     },
 
     _getStatus: function() {

@@ -34,6 +34,11 @@ const DBusIface = <interface name="org.freedesktop.DBus">
 const DBusProxy = Gio.DBusProxy.makeProxyWrapper(DBusIface);
 
 const PropertiesIface = <interface name="org.freedesktop.DBus.Properties">
+<method name="Get">
+    <arg type="s" direction="in" />
+    <arg type="s" direction="in" />
+    <arg type="v" direction="out" />
+</method>
 <signal name="PropertiesChanged">
     <arg type="s" direction="out" />
     <arg type="a{sv}" direction="out" />
