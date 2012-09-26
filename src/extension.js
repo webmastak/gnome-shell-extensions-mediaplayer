@@ -101,18 +101,9 @@ const Player = new Lang.Class({
 
         this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
         this._settings.connect("changed::" + MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
-            if (this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY)) {
-                this.showVolume = true;
-                if (this._status != Status.STOP)
-                    this._volume.actor.show();
-            }
-            else {
-                this.showVolume = false;
-                this._volume.actor.hide();
-            }
+            this.showVolume = this._settings.get_boolean(MEDIAPLAYER_VOLUME_KEY);
+            this._updateSliders();
         }));
-        this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
-        this.supportPosition = true;
         this.showPlaylists = this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY);
         this._settings.connect("changed::" + MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_PLAYLISTS_KEY)) {
@@ -135,7 +126,7 @@ const Player = new Lang.Class({
             if (this._settings.get_boolean(MEDIAPLAYER_RATING_KEY)) {
                 this.showRating = true;
                 this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
-                this.trackBox.addInfo(this.trackRating.box, 3);
+                this.trackBox.addInfo(this.trackRating, 3);
             }
             else {
                 this.showRating = false;
@@ -197,6 +188,8 @@ const Player = new Lang.Class({
 
         this.addMenuItem(this.trackControls);
 
+        this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
+        this.supportPosition = true;
         this._position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
         this._position.connect('value-changed', Lang.bind(this, function(item) {
             let time = item._value * this._songLength;
@@ -205,25 +198,16 @@ const Player = new Lang.Class({
             this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
         }));
         this._settings.connect("changed::" + MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
-            if (this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY)) {
-                this.showPosition = true;
-                if (this._status != Status.STOP && this.supportPosition)
-                    this._position.actor.show();
-            }
-            else {
-                this.showPosition = false;
-                this._position.actor.hide();
-            }
+            this.showPosition = this._settings.get_boolean(MEDIAPLAYER_POSITION_KEY);
+            this._updateSliders();
         }));
         this.addMenuItem(this._position);
-        this._position.actor.hide();
 
         this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
         this._volume.connect('value-changed', Lang.bind(this, function(item) {
             this._mediaServerPlayer.Volume = item._value;
         }));
         this.addMenuItem(this._volume);
-        this._volume.actor.hide();
 
         this._getVolume();
         this._getIdentity();
@@ -235,6 +219,7 @@ const Player = new Lang.Class({
             this._getPlaylists();
             this._getActivePlaylist();
         }
+        this._updateSliders();
 
         if (this._mediaServer.CanRaise) {
             this.playerTitle.connect('activate',
@@ -366,7 +351,7 @@ const Player = new Lang.Class({
         // Player does not have a position property
         if (value == null && this._status != Status.STOP) {
             this.supportPosition = false;
-            this._position.actor.hide();
+            this._updateSliders();
         }
         else {
             this._currentTime = value / 1000000;
@@ -386,14 +371,13 @@ const Player = new Lang.Class({
             if (metadata["mpris:length"]) {
                 this._songLength = metadata["mpris:length"].unpack() / 1000000;
                 this.supportPosition = true;
-                if (this._mediaServerPlayer.CanSeek == false)
-                    this.supportPosition = false;
-
             }
             else {
                 this._songLength = 0;
                 this.supportPosition = false;
             }
+            // Banshee workaround
+            Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
             if (metadata["xesam:artist"])
                 this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
             else
@@ -583,6 +567,7 @@ const Player = new Lang.Class({
     },
 
     _refreshStatus: function() {
+        log(this._status);
         if (this._status == Status.PLAY) {
             this._stopButton.show();
             this.emit('player-cover-changed', this.trackCoverPath);
@@ -617,12 +602,6 @@ const Player = new Lang.Class({
                       onCompleteScope: this
                     });
             }
-            if (this.showVolume)
-                this._volume.actor.show();
-            if (this.showPosition && this.supportPosition)
-                this._position.actor.show();
-            else
-                this._position.actor.hide()
         }
         else {
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {
@@ -637,11 +616,22 @@ const Player = new Lang.Class({
                       onCompleteScope: this
                     });
             }
-            this._volume.actor.hide();
-            this._position.actor.hide();
         }
+        this._updateSliders();
         this._setIdentity();
         this.emit('player-status-changed');
+    },
+
+    _updateSliders: function() {
+        if (this.showPosition && this.supportPosition && this._status != Status.STOP)
+            this._position.actor.show();
+        else
+            this._position.actor.hide();
+
+        if (this.showVolume && this._status != Status.STOP)
+            this._volume.actor.show();
+        else
+            this._volume.actor.hide();
     },
 
     _getStatus: function() {
