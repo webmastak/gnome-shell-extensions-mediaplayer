@@ -67,7 +67,7 @@ const PlayerButton = new Lang.Class({
             icon_size: 20
         });
 
-        this.parent({style_class: 'notification-icon-button',
+        this.parent({style_class: 'notification-icon-button control-button',
                      child: this.icon});
 
         this.connect('clicked', callback);
@@ -79,6 +79,18 @@ const PlayerButton = new Lang.Class({
 
     setIcon: function(icon) {
         this.icon.icon_name = icon + '-symbolic';
+    },
+
+    enable: function() {
+        this.remove_style_pseudo_class('disabled');
+        this.can_focus = true;
+        this.reactive = true;
+    },
+
+    disable: function() {
+        this.add_style_pseudo_class('disabled');
+        this.can_focus = false;
+        this.reactive = false;
     }
 });
 

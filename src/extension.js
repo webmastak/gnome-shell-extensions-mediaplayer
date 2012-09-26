@@ -620,6 +620,7 @@ const Player = new Lang.Class({
     },
 
     _updateControls: function() {
+        // called for each song change and status change
         this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPause',
             Lang.bind(this, function(value, err) {
                 // assume the player can pause by default
@@ -643,6 +644,34 @@ const Player = new Lang.Class({
                     this._playButton.show();
                     this._playButton.setIcon("media-playback-start");
                 }
+            })
+        );
+        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
+            Lang.bind(this, function(value, err) {
+                // assume the player can go next by default
+                let canGoNext = true;
+                if (!err)
+                    canGoNext = value[0].unpack();
+
+                log("disable next");
+
+                if (canGoNext)
+                    this._nextButton.enable();
+                else
+                    this._nextButton.disable();
+            })
+        );
+        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoPrevious',
+            Lang.bind(this, function(value, err) {
+                // assume the player can go previous by default
+                let canGoPrevious = true;
+                if (!err)
+                    canGoPrevious = value[0].unpack();
+
+                if (canGoPrevious)
+                    this._prevButton.enable();
+                else
+                    this._prevButton.disable();
             })
         );
     },

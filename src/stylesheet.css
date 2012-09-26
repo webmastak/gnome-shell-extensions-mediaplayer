@@ -57,3 +57,7 @@
     border-color: white;
     background: #c03;
 }
+
+.control-button:disabled {
+    color: #999;
+}
