@@ -658,8 +658,6 @@ const Player = new Lang.Class({
                 if (!err)
                     canGoNext = value[0].unpack();
 
-                log("disable next");
-
                 if (canGoNext)
                     this._nextButton.enable();
                 else
@@ -985,7 +983,7 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _showCover: function(cover_path) {
         if (settings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY) == IndicatorStatusType.COVER &&
-           this._coverPath != cover_path && (this._state == Status.PLAY || this._state == Status.PAUSE)) {
+           this._coverPath != cover_path) {
             this._coverPath = cover_path;
             Tweener.addTween(this._bin, {
                 opacity: 0,
@@ -1014,7 +1012,7 @@ const MediaplayerStatusButton = new Lang.Class({
     },
 
     _updateStateText: function(metadata) {
-        if (metadata && (this._state == Status.PLAY || this._state == Status.PAUSE)) {
+        if (metadata) {
             let stateText = settings.get_string(MEDIAPLAYER_STATUS_TEXT_KEY);
             stateText = stateText.replace(/%a/, metadata.artist)
                                  .replace(/%t/, metadata.title)
