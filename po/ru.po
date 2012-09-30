@@ -3,12 +3,12 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-05-03 10:26+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Aries-Soft Roman aries-soft@mail.ru\n"
+"PO-Revision-Date: 2012-09-30 09:57+0300\n"
+"Last-Translator: Pavel Vasin\n"
 "Language-Team: Aries-Soft Roman aries-soft@mail.ru\n"
 "Language: Russian\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../src/extension.js:50
@@ -25,28 +25,27 @@ msgstr "Пауза"
 
 #: ../src/extension.js:152
 msgid "by"
-msgstr ""
+msgstr "исполняет"
 
 #: ../src/extension.js:153
 msgid "from"
-msgstr ""
+msgstr "из альбома"
 
 #: ../src/extension.js:154
 msgid "rating"
-msgstr ""
+msgstr "оценка"
 
 #: ../src/extension.js:196
 msgid "Volume"
 msgstr "Громкость"
 
 #: ../src/extension.js:290
-#, fuzzy
 msgid "Playlists"
-msgstr "Проигрывается"
+msgstr "Плейлисты"
 
 #: ../src/extension.js:361
 msgid "Unknown Artist"
-msgstr "Неизвестный артист"
+msgstr "Неизвестный исполнитель"
 
 #: ../src/extension.js:365
 msgid "Unknown Album"
@@ -54,48 +53,45 @@ msgstr "Неизвестный альбом"
 
 #: ../src/extension.js:369
 msgid "Unknown Title"
-msgstr "Неизвестный заголовок"
+msgstr "Неизвестное название"
 
 #: ../src/prefs.js:33
 msgid "Show the media player in the volume menu"
-msgstr ""
+msgstr "Встроить в индикатор громкости"
 
 #: ../src/prefs.js:34
 msgid "Allow to start the default media player"
-msgstr ""
+msgstr "Разрешить запуск плеера по умолчанию"
 
 #: ../src/prefs.js:35
-msgid ""
-"Runs the default mediaplayer by clicking on the media player status icon."
-msgstr ""
+msgid "Runs the default mediaplayer by clicking on the media player status icon."
+msgstr "Запуск плеера кликом по иконке статуса"
 
 #: ../src/prefs.js:36
-#, fuzzy
 msgid "Show the media player volume slider"
-msgstr "Проигрывается"
+msgstr "Показывать регулятор громкости"
 
 #: ../src/prefs.js:37
-#, fuzzy
 msgid "Show the media player position slider"
-msgstr "Проигрывается"
+msgstr "Показывать регулятор позиции"
 
 #: ../src/prefs.js:38
-#, fuzzy
 msgid "Show media player playlists"
-msgstr "Проигрывается"
+msgstr "Показывать плейлисты"
 
 #: ../src/prefs.js:39
 msgid "Display song rating"
-msgstr ""
+msgstr "Показывать оценку песен"
 
 #: ../src/prefs.js:40
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr ""
+msgstr "Показывать оценку текущей песни по шкале от 0 до 5"
 
 #: ../src/prefs.js:43
 msgid "Album cover size"
-msgstr ""
+msgstr "Размер обложки альбома"
 
 #: ../src/prefs.js:44
 msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr ""
+msgstr "Размер обложки, отображаемой в меню. По умолчанию 80 пикселей."
+
