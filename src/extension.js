@@ -1082,6 +1082,7 @@ function enable() {
     if (position == IndicatorPosition.VOLUMEMENU) {
         // wait for the volume menu
         let status = Main.panel._statusArea;
+        // g-s 3.6
         if (Main.panel.statusArea)
             status = Main.panel.statusArea;
         while(status['volume']) {
@@ -1094,8 +1095,13 @@ function enable() {
         if (position == IndicatorPosition.RIGHT)
             Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
         if (position == IndicatorPosition.CENTER) {
-            Main.panel._centerBox.add(mediaplayerMenu.actor);
-            Main.panel._menus.addMenu(mediaplayerMenu.menu);
+            // g-s 3.6
+            if (Main.panel.statusArea)
+                Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 0, 'center');
+            else {
+                Main.panel._centerBox.add(mediaplayerMenu.actor);
+                Main.panel._menus.addMenu(mediaplayerMenu.menu);
+            }
         }
     }
     playerManager = new PlayerManager(mediaplayerMenu);
