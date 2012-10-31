@@ -52,5 +52,10 @@
     	<default>''</default>
     	<_summary>The indicator status text</_summary>
     </key>
+    <key name="volumemenu" type="b">
+        <default>true</default>
+        <_summary>Show the media player in the volume menu</_summary>
+        <_description>Whether to show the mediaplayer controls in the volume menu.</_description>
+    </key>
   </schema>
 </schemalist>

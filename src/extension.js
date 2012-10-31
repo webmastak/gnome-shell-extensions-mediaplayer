@@ -50,6 +50,9 @@ const MEDIAPLAYER_COVER_SIZE = 'coversize';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 const MEDIAPLAYER_RATING_KEY = 'rating';
 
+// OLD SETTING
+const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
+
 const FADE_ANIMATION_TIME = 0.16;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -1083,6 +1086,12 @@ function init() {
 }
 
 function enable() {
+    // MIGRATE TO NEW SETTINGS
+    if (!settings.get_boolean(MEDIAPLAYER_VOLUME_MENU_KEY)) {
+        settings.set_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY, 1);
+        settings.set_boolean(MEDIAPLAYER_VOLUME_MENU_KEY, true);
+    }
+
     let position = settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY);
     if (position == IndicatorPosition.VOLUMEMENU) {
         // wait for the volume menu
