@@ -167,13 +167,7 @@ const Player = new Lang.Class({
         this._prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
         this._playButton = new Widget.PlayerButton('media-playback-start-symbolic',
-            Lang.bind(this, function () {
-                if (this._mediaServerPlayer.CanPause == false)
-                    this._mediaServerPlayer.PlayRemote()
-                else
-                    this._mediaServerPlayer.PlayPauseRemote()
-            })
-        );
+            Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
         this._stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
         this._stopButton.hide();
@@ -632,6 +626,17 @@ const Player = new Lang.Class({
                 let canPause = true;
                 if (!err)
                     canPause = value[0].unpack();
+
+                if (canPause) {
+                    this._playButton.setCallback(Lang.bind(this, function() {
+                        this._mediaServerPlayer.PlayPauseRemote();
+                    }));
+                }
+                else {
+                    this._playButton.setCallback(Lang.bind(this, function() {
+                        this._mediaServerPlayer.PlayRemote();
+                    }));
+                }
 
                 if (this._status == Status.PLAY) {
                     this._stopButton.show();

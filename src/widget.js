@@ -70,11 +70,16 @@ const PlayerButton = new Lang.Class({
         this.parent({style_class: 'notification-icon-button control-button',
                      child: this.icon});
 
-        this.connect('clicked', callback);
+        this._callback_id = this.connect('clicked', callback);
 
         // override base style
         this.icon.set_style('padding: 0px');
         this.set_style('padding: 8px');
+    },
+
+    setCallback: function(callback) {
+        this.disconnect(this._callback_id);
+        this._callback_id = this.connect('clicked', callback);
     },
 
     setIcon: function(icon) {
