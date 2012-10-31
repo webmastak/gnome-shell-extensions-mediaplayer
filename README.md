@@ -8,15 +8,14 @@ in the GNOME Shell's volume menu by default.
 
 ## Screenshots
 
-By default, media players shows up in the volume menu:
+Volume menu integration, rating support for Banshee, Rhythmbox. Support of
+playlists in Banshee (MPRIS 2.1 playlist interface)
 
 ![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png)
 
-Notice the support of playlists in Banshee (MPRIS 2.1 playlist interface).
-
 - - -
 
-But you can have the media players in a separate menu (see settings):
+Indicator menu on the right with custom status text and current album cover
 
 ![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
 
@@ -28,6 +27,12 @@ You may also use the status icon to run your favorite media player if no player 
 
 The current track rating can also be displayed and changed depending of the
 player you are using (see the ```rating``` setting below).
+
+- - -
+
+Centered indicator with custom status text
+
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer3.png)
 
 - - -
 
@@ -74,9 +79,9 @@ Restart the shell and then enable the extension.
 
 All settings can be changed from within the `gnome-shell-extension-prefs` tool, or from the command line.
 
-  * **Show the extension in its own menu instead of the volume menu:** (default: true)
+  * **Position of the indicator:** (default: 'volume-menu')
 
-        gsettings set org.gnome.shell.extensions.mediaplayer volumemenu false
+        gsettings set org.gnome.shell.extensions.mediaplayer indicator-position 'center'|'right'|'volume-menu'
 
   * **Start the default media player by clicking on the status icon if no player is running:** (default: false)
 
@@ -85,7 +90,23 @@ All settings can be changed from within the `gnome-shell-extension-prefs` tool, 
     You can configure the default media player in GNOME System Settings, under *Details
     → Default Applications*.
 
-    Note: This setting has no effect if the extension is shown in the volume menu.
+    Note: This setting has only effect if indicator-position is 'center' or 'right'.
+
+  * **Indicator appearance:** (default: 'icon')
+
+        gsettings set org.gnome.shell.extensions.mediaplayer status-type 'icon'|'cover'
+
+    Note: This setting has only effect if indicator-position is 'center' or 'right'.
+
+  * **Indicator status text:** (default: empty)
+
+        gsettings set org.gnome.shell.extensions.mediaplayer status-text ' <span color="#76B0EC" font="9">%t</span>'
+
+    The status text can be formatted with the Pango syntax. %t, %a, %b are
+    replaced respectively by the current title, current artist and current
+    album playing.
+
+    Note: This setting has only effect if indicator-position is 'center' or 'right'.
 
   * **Show the volume control slider of the media player:** (default: false)
 
