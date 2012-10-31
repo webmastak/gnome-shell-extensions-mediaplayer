@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-26 09:41+0200\n"
+"POT-Creation-Date: 2012-10-31 14:54+0100\n"
 "PO-Revision-Date: 2012-04-08 11:54+0200\n"
 "Last-Translator: Piotr Sokół <psokol@jabster.pl>\n"
 "Language-Team: polski <>\n"
@@ -18,47 +18,47 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : ((n%10>=2 && n%10<=4 && (n"
 "%100<10 || n%100>=20)) ? 1 : 2));\n"
 
-#: ../src/extension.js:61
+#: ../src/extension.js:64
 msgid "Stopped"
 msgstr "Zatrzymano"
 
-#: ../src/extension.js:62
+#: ../src/extension.js:65
 msgid "Playing"
 msgstr "Odtwarzanie"
 
-#: ../src/extension.js:63
+#: ../src/extension.js:66
 msgid "Paused"
 msgstr "Wstrzymano"
 
-#: ../src/extension.js:128 ../src/extension.js:157
+#: ../src/extension.js:131 ../src/extension.js:160
 msgid "rating"
 msgstr ""
 
-#: ../src/extension.js:149
+#: ../src/extension.js:152
 msgid "by"
 msgstr "w wykonaniu"
 
-#: ../src/extension.js:150
+#: ../src/extension.js:153
 msgid "from"
 msgstr "z albumu"
 
-#: ../src/extension.js:206
+#: ../src/extension.js:202
 msgid "Volume"
 msgstr "Głośność"
 
-#: ../src/extension.js:314
+#: ../src/extension.js:310
 msgid "Playlists"
 msgstr "Listy odtwarzania"
 
-#: ../src/extension.js:384
+#: ../src/extension.js:378
 msgid "Unknown Artist"
 msgstr "Nieznany wykonawca"
 
-#: ../src/extension.js:388
+#: ../src/extension.js:382
 msgid "Unknown Album"
 msgstr "Nieznany album"
 
-#: ../src/extension.js:392
+#: ../src/extension.js:386
 msgid "Unknown Title"
 msgstr "Nieznany tytuł"
 
