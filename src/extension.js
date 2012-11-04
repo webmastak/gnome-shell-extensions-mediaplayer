@@ -205,18 +205,6 @@ const Player = new Lang.Class({
         }));
         this.addMenuItem(this._volume);
 
-        this._getVolume();
-        this._getIdentity();
-        this._getDesktopEntry();
-        this._getMetadata();
-        this._getStatus();
-        this._getPosition();
-        if (this.showPlaylists) {
-            this._getPlaylists();
-            this._getActivePlaylist();
-        }
-        this._updateSliders();
-
         if (this._mediaServer.CanRaise) {
             this.playerTitle.connect('activate',
                 Lang.bind(this, function () {
@@ -269,6 +257,20 @@ const Player = new Lang.Class({
 
             this._wantedSeekValue = 0;
         }));
+    },
+
+    init: function() {
+        this._getVolume();
+        this._getIdentity();
+        this._getDesktopEntry();
+        this._getMetadata();
+        this._getStatus();
+        this._getPosition();
+        if (this.showPlaylists) {
+            this._getPlaylists();
+            this._getActivePlaylist();
+        }
+        this._updateSliders();
     },
 
     _getIdentity: function() {
@@ -849,6 +851,7 @@ const PlayerManager = new Lang.Class({
                     })
                 )
             );
+            this._players[owner].player.init();
             if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU)
                 position = this.menu.menu.numMenuItems - 2;
             else
@@ -1116,7 +1119,7 @@ function enable() {
         if (position == IndicatorPosition.CENTER) {
             // g-s 3.6
             if (Main.panel.statusArea)
-                Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 0, 'center');
+                Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
             else {
                 Main.panel._centerBox.add(mediaplayerMenu.actor);
                 Main.panel._menus.addMenu(mediaplayerMenu.menu);
@@ -1131,4 +1134,3 @@ function disable() {
     if (mediaplayerMenu instanceof MediaplayerStatusButton)
         mediaplayerMenu.destroy();
 }
-
