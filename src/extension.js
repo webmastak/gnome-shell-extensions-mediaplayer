@@ -752,6 +752,7 @@ const PlayerManager = new Lang.Class({
     Name: 'PlayerManager',
 
     _init: function(menu) {
+        this._disabling = false;
         // the menu
         this.menu = menu;
         // players list
@@ -772,7 +773,8 @@ const PlayerManager = new Lang.Class({
                     if (name_regex.test(name)) {
                         this._dbus.GetNameOwnerRemote(name, Lang.bind(this,
                             function(owner) {
-                                this._addPlayer(name, owner);
+                                if (!this._disabling)
+                                    this._addPlayer(name, owner);
                             }
                         ));
                     }
@@ -783,12 +785,14 @@ const PlayerManager = new Lang.Class({
         this._dbus.connectSignal('NameOwnerChanged', Lang.bind(this,
             function(proxy, sender, [name, old_owner, new_owner]) {
                 if (name_regex.test(name)) {
-                    if (new_owner && !old_owner)
-                        this._addPlayer(name, new_owner);
-                    else if (old_owner && !new_owner)
-                        this._removePlayer(name, old_owner);
-                    else
-                        this._changePlayerOwner(name, old_owner, new_owner);
+                    if (!this._disabling) {
+                        if (new_owner && !old_owner)
+                            this._addPlayer(name, new_owner);
+                        else if (old_owner && !new_owner)
+                            this._removePlayer(name, old_owner);
+                        else
+                            this._changePlayerOwner(name, old_owner, new_owner);
+                    }
                 }
             }
         ));
@@ -937,6 +941,7 @@ const PlayerManager = new Lang.Class({
     },
 
     destroy: function() {
+        this._disabling = true;
         for (let owner in this._players)
             this._removePlayer(null, owner);
     }
