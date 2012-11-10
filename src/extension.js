@@ -364,15 +364,23 @@ const Player = new Lang.Class({
         // Pragha sends a metadata dict with one
         // value on stop
         if (metadata != null && Object.keys(metadata).length > 1) {
-            this._currentTime = -1;
-            if (metadata["mpris:length"])
-                this._songLength = metadata["mpris:length"].unpack() / 1000000;
-            else
-                this._songLength = 0;
-            // Banshee workaround
-            Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
-            // Check if the current track can be paused
-            this._updateControls();
+            // Check if the track has changed
+            let trackChanged = true;
+            if (metadata["mpris:trackid"] && metadata["mpris:trackid"].unpack() == this.trackObj)
+                trackChanged = false;
+
+            // Reset the timer only when the track has changed
+            if (trackChanged) {
+                this._currentTime = -1;
+                if (metadata["mpris:length"])
+                    this._songLength = metadata["mpris:length"].unpack() / 1000000;
+                else
+                    this._songLength = 0;
+                // Banshee workaround
+                Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
+                // Check if the current track can be paused
+                this._updateControls();
+            }
 
             if (metadata["xesam:artist"])
                 this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
@@ -392,9 +400,8 @@ const Player = new Lang.Class({
             else
                 this.trackUrl = false;
 
-            if (metadata["mpris:trackid"]) {
+            if (metadata["mpris:trackid"])
                 this.trackObj = metadata["mpris:trackid"].unpack();
-            }
 
             if (this.showRating) {
                 let rating = 0;
