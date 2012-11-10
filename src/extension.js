@@ -443,7 +443,8 @@ const Player = new Lang.Class({
                     }
                 }
                 else {
-                    this._showCover(false);
+                    this.trackCoverPath = false;
+                    this._showCover();
                 }
             }
 
