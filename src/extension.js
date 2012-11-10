@@ -410,8 +410,8 @@ const Player = new Lang.Class({
                 // Clementine
                 if (metadata["rating"])
                     rating = metadata["rating"].deep_unpack();
-                this.trackRating.setRating(rating);
-                this.trackRating.showRating(rating);
+                this.trackRating.setRating(parseInt(rating));
+                this.trackRating.showRating(parseInt(rating));
             }
 
             let change = false;
