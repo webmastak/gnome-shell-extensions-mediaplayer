@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-31 14:54+0100\n"
-"PO-Revision-Date: 2012-09-22 22:50+0100\n"
+"PO-Revision-Date: 2012-11-11 15:26+0100\n"
 "Last-Translator: Agilo Kern <prdiewelt@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
@@ -29,9 +29,10 @@ msgstr "Spielt gerade"
 msgid "Paused"
 msgstr "Pausiert"
 
-#: ../src/extension.js:131 ../src/extension.js:160
+#: ../src/extension.js:131
+#: ../src/extension.js:160
 msgid "rating"
-msgstr "bewertung"
+msgstr "Bewertung"
 
 #: ../src/extension.js:152
 msgid "by"
@@ -47,7 +48,7 @@ msgstr "Lautstärke"
 
 #: ../src/extension.js:310
 msgid "Playlists"
-msgstr "Playlists"
+msgstr "Wiedergabelisten"
 
 #: ../src/extension.js:378
 msgid "Unknown Artist"
@@ -63,23 +64,23 @@ msgstr "Unbekannter Titel"
 
 #: ../src/prefs.js:37
 msgid "Position in the top panel"
-msgstr ""
+msgstr "Position in oberer Leiste"
 
 #: ../src/prefs.js:38
 msgid "Restart the shell to apply this setting."
-msgstr ""
+msgstr "Diese Einstellung wird nach Neustart der Shell angewendet."
 
 #: ../src/prefs.js:40
 msgid "Center"
-msgstr ""
+msgstr "Mittig"
 
 #: ../src/prefs.js:41
 msgid "Right"
-msgstr ""
+msgstr "Rechts"
 
 #: ../src/prefs.js:42
 msgid "Volume menu integration"
-msgstr ""
+msgstr "Integration im Lautstärkemenü"
 
 #: ../src/prefs.js:47
 msgid "Show the media player volume slider"
@@ -87,11 +88,11 @@ msgstr "Lautstärkeregler anzeigen"
 
 #: ../src/prefs.js:51
 msgid "Show the media player position slider"
-msgstr "Slider anzeigen"
+msgstr "Suchleiste anzeigen"
 
 #: ../src/prefs.js:55
 msgid "Show media player playlists"
-msgstr "Playlists anzeigen"
+msgstr "Wiedergabelisten anzeigen"
 
 #: ../src/prefs.js:59
 msgid "Display song rating"
@@ -111,32 +112,31 @@ msgstr "Größe der Albumcover im Menü. Standard ist eine Breite von 80px."
 
 #: ../src/prefs.js:75
 msgid "Allow to start the default media player"
-msgstr "Erlauben den Standard-Mediaplayer zu starten"
+msgstr "Es zulassen, den Standard-Mediaplayer aufzurufen"
 
 #: ../src/prefs.js:76
-#, fuzzy
 msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr "Den Standard-Mediaplayer beim Klick auf das Status-Icon starten."
+msgstr "Beim Klick auf die Statuszeile den Standard-Mediaplayer aufrufen."
 
 #: ../src/prefs.js:80
 msgid "Appearance"
-msgstr ""
+msgstr "Aussehen"
 
 #: ../src/prefs.js:82
 msgid "Symbolic icon"
-msgstr ""
+msgstr "Symbolisches Zeichen"
 
 #: ../src/prefs.js:83
 msgid "Current album cover"
-msgstr ""
+msgstr "Aktuelles Album-Cover"
 
 #: ../src/prefs.js:88
 msgid "Status text"
-msgstr ""
+msgstr "Statusanzeige"
 
 #: ../src/prefs.js:89
 msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
-msgstr ""
+msgstr "%a: Künstler, %b: Album, %t: Titel. Pango-Auszeichnung wird unterstützt."
 
 #~ msgid "Show the media player in the volume menu"
 #~ msgstr "Mediaplayer im Lautstärkemenü anzeigen"
