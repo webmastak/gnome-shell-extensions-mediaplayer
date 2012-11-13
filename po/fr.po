@@ -13,11 +13,11 @@ msgstr ""
 
 #: ../src/extension.js:64
 msgid "Stopped"
-msgstr "Stoppé"
+msgstr "Arrêté"
 
 #: ../src/extension.js:65
 msgid "Playing"
-msgstr "En cours"
+msgstr "Lecture en cours"
 
 #: ../src/extension.js:66
 msgid "Paused"
@@ -33,7 +33,7 @@ msgstr "par"
 
 #: ../src/extension.js:153
 msgid "from"
-msgstr "sur"
+msgstr "dans"
 
 #: ../src/extension.js:202
 msgid "Volume"
@@ -57,11 +57,11 @@ msgstr "Titre inconnu"
 
 #: ../src/prefs.js:37
 msgid "Position in the top panel"
-msgstr "Position sur le panel"
+msgstr "Position dans le panneau"
 
 #: ../src/prefs.js:38
 msgid "Restart the shell to apply this setting."
-msgstr "Redémarrez le shell pour appliquer le changement."
+msgstr "Redémarrez le shell pour appliquer ce changement."
 
 #: ../src/prefs.js:40
 msgid "Center"
@@ -73,7 +73,7 @@ msgstr "À droite"
 
 #: ../src/prefs.js:42
 msgid "Volume menu integration"
-msgstr ""
+msgstr "Intégration au menu de volume"
 
 #: ../src/prefs.js:47
 msgid "Show the media player volume slider"
@@ -107,7 +107,7 @@ msgstr ""
 
 #: ../src/prefs.js:75
 msgid "Allow to start the default media player"
-msgstr "Permettre de lancer le lecteur multimédia par défaut"
+msgstr "Permettre le lancement du lecteur multimédia par défaut"
 
 #: ../src/prefs.js:76
 msgid "Runs the default mediaplayer by clicking on the indicator"
@@ -115,11 +115,11 @@ msgstr "Lance le lecteur multimédia par défaut en cliquant sur l'indicateur"
 
 #: ../src/prefs.js:80
 msgid "Appearance"
-msgstr "Apparance"
+msgstr "Apparence"
 
 #: ../src/prefs.js:82
 msgid "Symbolic icon"
-msgstr ""
+msgstr "Icône symbolique"
 
 #: ../src/prefs.js:83
 msgid "Current album cover"
