@@ -481,7 +481,7 @@ const Player = new Lang.Class({
     },
 
     _showCover: function() {
-        this.emit('player-cover-changed', this.trackCoverPath)
+        this.emit('player-cover-changed', this.trackCoverPath);
         Tweener.addTween(this.trackCoverContainer, { opacity: 0,
             time: 0.3,
             transition: 'easeOutCubic',
@@ -1009,29 +1009,18 @@ const MediaplayerStatusButton = new Lang.Class({
         if (settings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY) == IndicatorStatusType.COVER &&
            this._coverPath != cover_path) {
             this._coverPath = cover_path;
-            Tweener.addTween(this._bin, {
-                opacity: 0,
-                time: 0.3,
-                transition: 'easeOutCubic',
-                onComplete: Lang.bind(this, function() {
-                    // Change cover
-                    let cover = this._icon;
-                    if (cover_path && GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
-                        cover = new St.Bin();
-                        let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
-                        let [coverWidth, coverHeight] = coverTexture.get_base_size();
-                        cover.height = this._coverSize;
-                        cover.width = this._coverSize;
-                        cover.set_child(coverTexture);
-                    }
-                    this._bin.set_child(cover);
-                    // Show the new cover
-                    Tweener.addTween(this._bin, { opacity: 255,
-                        time: 0.3,
-                        transition: 'easeInCubic'
-                    });
-                })
-            });
+            // Change cover
+            if (cover_path && GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
+                cover = new St.Bin();
+                let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
+                let [coverWidth, coverHeight] = coverTexture.get_base_size();
+                cover.height = this._coverSize;
+                cover.width = this._coverSize;
+                cover.set_child(coverTexture);
+                this._bin.set_child(cover);
+            }
+            else
+                this._bin.set_child(this._icon);
         }
     },
 
