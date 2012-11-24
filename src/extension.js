@@ -1014,7 +1014,7 @@ const MediaplayerStatusButton = new Lang.Class({
             this._coverPath = cover_path;
             // Change cover
             if (cover_path && GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
-                cover = new St.Bin();
+                let cover = new St.Bin();
                 let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
                 let [coverWidth, coverHeight] = coverTexture.get_base_size();
                 cover.height = this._coverSize;
