@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-31 14:54+0100\n"
-"PO-Revision-Date: 2012-07-28 12:51-0300\n"
+"PO-Revision-Date: 2012-11-25 14:47-0300\n"
 "Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -65,35 +65,35 @@ msgstr "Título Desconhecido"
 
 #: ../src/prefs.js:37
 msgid "Position in the top panel"
-msgstr ""
+msgstr "Posição no painel superior"
 
 #: ../src/prefs.js:38
 msgid "Restart the shell to apply this setting."
-msgstr ""
+msgstr "É necessário reiniciar o GNOME Shell"
 
 #: ../src/prefs.js:40
 msgid "Center"
-msgstr ""
+msgstr "Centro"
 
 #: ../src/prefs.js:41
 msgid "Right"
-msgstr ""
+msgstr "Direita"
 
 #: ../src/prefs.js:42
 msgid "Volume menu integration"
-msgstr ""
+msgstr "Integração com o menu de volume"
 
 #: ../src/prefs.js:47
 msgid "Show the media player volume slider"
-msgstr "Exibir o controle de volume do media player"
+msgstr "Exibir o controle de volume do reprodutor"
 
 #: ../src/prefs.js:51
 msgid "Show the media player position slider"
-msgstr "Exibir o controle de posição do media player"
+msgstr "Exibir o controle de posição do reprodutor"
 
 #: ../src/prefs.js:55
 msgid "Show media player playlists"
-msgstr "Exibir playlists do media player"
+msgstr "Exibir playlists do reprodutor"
 
 #: ../src/prefs.js:59
 msgid "Display song rating"
@@ -116,30 +116,28 @@ msgid "Allow to start the default media player"
 msgstr "Permitir iniciar o media player padrão"
 
 #: ../src/prefs.js:76
-#, fuzzy
 msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr ""
-"Executa o media player padrão clicando no ícone de status do media player"
+msgstr "Executa o reprodutor padrão através de um clique no indicador"
 
 #: ../src/prefs.js:80
 msgid "Appearance"
-msgstr ""
+msgstr "Aparência"
 
 #: ../src/prefs.js:82
 msgid "Symbolic icon"
-msgstr ""
+msgstr "Ícone simbólico"
 
 #: ../src/prefs.js:83
 msgid "Current album cover"
-msgstr ""
+msgstr "Capa atual"
 
 #: ../src/prefs.js:88
 msgid "Status text"
-msgstr ""
+msgstr "Texto de status"
 
 #: ../src/prefs.js:89
 msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
-msgstr ""
+msgstr "%a: Artista, %b: Álbum, %t: Título. Marcação Pango suportada."
 
 #~ msgid "Show the media player in the volume menu"
 #~ msgstr "Exibir o media player no menu de volume"
