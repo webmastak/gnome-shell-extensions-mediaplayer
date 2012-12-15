@@ -22,27 +22,6 @@ const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 
-const TrackBox = new Lang.Class({
-    Name: "TrackBox",
-    Extends: PopupMenu.PopupBaseMenuItem,
-
-    _init: function(cover) {
-        this.parent({reactive: false});
-
-        this.box = new St.Table();
-        this._cover = cover;
-        this._infos = new St.Table({style_class: "track-infos"});
-        this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
-        this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
-
-        this.addActor(this.box, {span: -1, expand: true});
-    },
-
-    addInfo: function(item, row) {
-        this._infos.add(item, {row: row, col: 1, y_expand: false});
-    }
-});
-
 const PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
     Extends: PopupMenu.PopupBaseMenuItem,
@@ -53,13 +32,12 @@ const PlayerButtons = new Lang.Class({
         this.addActor(this.box, {span: -1, align: St.Align.MIDDLE});
     },
     addButton: function(button) {
-        this.box.add_actor(button);
+        this.box.add_actor(button.actor);
     }
 });
 
 const PlayerButton = new Lang.Class({
     Name: "PlayerButton",
-    Extends: St.Button,
 
     _init: function(icon, callback) {
         this.icon = new St.Icon({
@@ -67,19 +45,20 @@ const PlayerButton = new Lang.Class({
             icon_size: 20
         });
 
-        this.parent({style_class: 'notification-icon-button control-button',
-                     child: this.icon});
+        this.actor = new St.Button({style_class: 'notification-icon-button control-button',
+                                    child: this.icon});
+        this.actor._delegate = this
 
-        this._callback_id = this.connect('clicked', callback);
+        this._callback_id = this.actor.connect('clicked', callback);
 
         // override base style
         this.icon.set_style('padding: 0px');
-        this.set_style('padding: 8px');
+        this.actor.set_style('padding: 8px');
     },
 
     setCallback: function(callback) {
-        this.disconnect(this._callback_id);
-        this._callback_id = this.connect('clicked', callback);
+        this.actor.disconnect(this._callback_id);
+        this._callback_id = this.actor.connect('clicked', callback);
     },
 
     setIcon: function(icon) {
@@ -87,15 +66,23 @@ const PlayerButton = new Lang.Class({
     },
 
     enable: function() {
-        this.remove_style_pseudo_class('disabled');
-        this.can_focus = true;
-        this.reactive = true;
+        this.actor.remove_style_pseudo_class('disabled');
+        this.actor.can_focus = true;
+        this.actor.reactive = true;
     },
 
     disable: function() {
-        this.add_style_pseudo_class('disabled');
-        this.can_focus = false;
-        this.reactive = false;
+        this.actor.add_style_pseudo_class('disabled');
+        this.actor.can_focus = false;
+        this.actor.reactive = false;
+    },
+
+    show: function() {
+        this.actor.show();
+    },
+
+    hide: function() {
+        this.actor.hide();
     }
 });
 
@@ -127,22 +114,43 @@ const SliderItem = new Lang.Class({
     }
 });
 
+const TrackBox = new Lang.Class({
+    Name: "TrackBox",
+    Extends: PopupMenu.PopupBaseMenuItem,
+
+    _init: function(cover) {
+        this.parent({reactive: false});
+
+        this.box = new St.Table();
+        this._cover = cover;
+        this._infos = new St.Table({style_class: "track-infos"});
+        this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
+        this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
+
+        this.addActor(this.box, {span: -1, expand: true});
+    },
+
+    addInfo: function(item, row) {
+        this._infos.add(item.actor, {row: row, col: 1, y_expand: false});
+    }
+});
+
 const TrackTitle = new Lang.Class({
     Name: "TrackTitle",
-    Extends: St.Table,
 
     _init: function(prepend, text, style) {
-        this.parent({style_class: style});
+        this.actor = new St.Table({style_class: style});
+        this.actor._delegate = this;
 
         this._label = new St.Label();
         if (prepend) {
             this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + " "});
             this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.add(this._prepend, {row: 0, col: 0, x_fill: true, x_expand: false});
-            this.add(this._label, {row: 0, col: 1});
+            this.actor.add(this._prepend, {row: 0, col: 0, x_fill: true, x_expand: false});
+            this.actor.add(this._label, {row: 0, col: 1});
         }
         else
-            this.add(this._label, {row: 0, col: 0});
+            this.actor.add(this._label, {row: 0, col: 0});
 
         this.setText(text);
     },
@@ -204,15 +212,15 @@ const TitleItem = new Lang.Class({
 
 const TrackRating = new Lang.Class({
     Name: "TrackRating",
-    Extends: St.BoxLayout,
 
     _init: function(prepend, value, style, player) {
-        this.parent({style_class: style});
+        this.actor = new St.BoxLayout({style_class: style});
+        this.actor._delegate = this;
 
         if (prepend) {
             this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + ": "});
             this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.add(this._prepend);
+            this.actor.add(this._prepend);
         }
         // Reference to our player
         this._player = player;
@@ -250,7 +258,7 @@ const TrackRating = new Lang.Class({
             this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
 
             // Put the button in the box
-            this.add(this._starButton[i]);
+            this.actor.add(this._starButton[i]);
         }
         this.showRating(this._value);
     },
@@ -313,7 +321,7 @@ const TrackRating = new Lang.Class({
     },
 
     destroy: function() {
-        this.destroy();
+        this.actor.destroy();
     },
 });
 
