@@ -808,11 +808,13 @@ const PlayerManager = new Lang.Class({
         ));
     },
 
-    // TODO: move to proper place
     _isInstance: function(busName) {
         // MPRIS instances are in the form
-        // org.mpris.MediaPlayer2.name.instanceXXXX
-        return busName.split('.').length > 4;
+        //   org.mpris.MediaPlayer2.name.instanceXXXX
+        // ...except for VLC, which to this day uses
+        //   org.mpris.MediaPlayer2.name-XXXX
+        return busName.split('.').length > 4 ||
+                /^org\.mpris\.MediaPlayer2\.vlc-\d+$/.test(busName);
     },
 
     _addPlayer: function(busName, owner) {
