@@ -83,8 +83,8 @@ const Player = new Lang.Class({
 
         let baseName = busName.split('.')[3];
 
-        this._owner = owner;
-        this._busName = busName;
+        this.owner = owner;
+        this.busName = busName;
         this._app = "";
         this._status = "";
         // Guess the name based on the dbus path
@@ -808,24 +808,26 @@ const PlayerManager = new Lang.Class({
         ));
     },
 
-    // TODO: move to proper place
     _isInstance: function(busName) {
         // MPRIS instances are in the form
-        // org.mpris.MediaPlayer2.name.instanceXXXX
-        return busName.split('.').length > 4;
+        //   org.mpris.MediaPlayer2.name.instanceXXXX
+        // ...except for VLC, which to this day uses
+        //   org.mpris.MediaPlayer2.name-XXXX
+        return busName.split('.').length > 4 ||
+                /^org\.mpris\.MediaPlayer2\.vlc-\d+$/.test(busName);
     },
 
     _addPlayer: function(busName, owner) {
         let position;
         if (this._players[owner]) {
-            let prevName = this._players[owner]._busName;
+            let prevName = this._players[owner].player.busName;
             // HAVE:       ADDING:     ACTION:
             // master      master      reject, cannot happen
             // master      instance    upgrade to instance
             // instance    master      reject, duplicate
             // instance    instance    reject, cannot happen
             if (this._isInstance(busName) && !this._isInstance(prevName))
-                this._players[owner]._busName = busName;
+                this._players[owner].player.busName = busName;
             else
                 return;
         } else if (owner) {
@@ -886,8 +888,9 @@ const PlayerManager = new Lang.Class({
     },
 
     _changePlayerOwner: function(busName, oldOwner, newOwner) {
-        if (this._players[oldOwner]) {
+        if (this._players[oldOwner] && busName == this._players[oldOwner].player.busName) {
             this._players[newOwner] = this._players[oldOwner];
+            this._players[newOwner].player.owner = newOwner;
             delete this._players[oldOwner];
         }
         this._refreshStatus();
@@ -898,7 +901,7 @@ const PlayerManager = new Lang.Class({
     },
 
     _statusChanged: function(player) {
-        let owner = player._owner;
+        let owner = player.owner;
         let status = player._status;
         this._players[owner].status = status;
         this._refreshStatus();
