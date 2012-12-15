@@ -264,7 +264,7 @@ const TrackRating = new Lang.Class({
     },
 
     newRating: function(button) {
-        if (this._supported[this._player._busName]) {
+        if (this._supported[this._player.busName]) {
             if (button.hover)
                 this.showRating(button._rateValue);
             else
@@ -286,8 +286,8 @@ const TrackRating = new Lang.Class({
     applyRating: function(button) {
         // Apply the rating in the player
         let applied = false;
-        if (this._supported[this._player._busName]) {
-            let applyFunc = Lang.bind(this, this._supported[this._player._busName]);
+        if (this._supported[this._player.busName]) {
+            let applyFunc = Lang.bind(this, this._supported[this._player.busName]);
             applied = applyFunc(button._rateValue);
         }
         if (applied) {
