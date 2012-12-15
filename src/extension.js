@@ -83,8 +83,8 @@ const Player = new Lang.Class({
 
         let baseName = busName.split('.')[3];
 
-        this._owner = owner;
-        this._busName = busName;
+        this.owner = owner;
+        this.busName = busName;
         this._app = "";
         this._status = "";
         // Guess the name based on the dbus path
@@ -818,14 +818,14 @@ const PlayerManager = new Lang.Class({
     _addPlayer: function(busName, owner) {
         let position;
         if (this._players[owner]) {
-            let prevName = this._players[owner]._busName;
+            let prevName = this._players[owner].busName;
             // HAVE:       ADDING:     ACTION:
             // master      master      reject, cannot happen
             // master      instance    upgrade to instance
             // instance    master      reject, duplicate
             // instance    instance    reject, cannot happen
             if (this._isInstance(busName) && !this._isInstance(prevName))
-                this._players[owner]._busName = busName;
+                this._players[owner].busName = busName;
             else
                 return;
         } else if (owner) {
@@ -898,7 +898,7 @@ const PlayerManager = new Lang.Class({
     },
 
     _statusChanged: function(player) {
-        let owner = player._owner;
+        let owner = player.owner;
         let status = player._status;
         this._players[owner].status = status;
         this._refreshStatus();
