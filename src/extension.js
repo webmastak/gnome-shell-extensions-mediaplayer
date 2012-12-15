@@ -818,14 +818,14 @@ const PlayerManager = new Lang.Class({
     _addPlayer: function(busName, owner) {
         let position;
         if (this._players[owner]) {
-            let prevName = this._players[owner].busName;
+            let prevName = this._players[owner].player.busName;
             // HAVE:       ADDING:     ACTION:
             // master      master      reject, cannot happen
             // master      instance    upgrade to instance
             // instance    master      reject, duplicate
             // instance    instance    reject, cannot happen
             if (this._isInstance(busName) && !this._isInstance(prevName))
-                this._players[owner].busName = busName;
+                this._players[owner].player.busName = busName;
             else
                 return;
         } else if (owner) {
