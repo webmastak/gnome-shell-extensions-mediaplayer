@@ -890,6 +890,7 @@ const PlayerManager = new Lang.Class({
     _changePlayerOwner: function(busName, oldOwner, newOwner) {
         if (this._players[oldOwner]) {
             this._players[newOwner] = this._players[oldOwner];
+            this._players[newOwner].player.owner = newOwner;
             delete this._players[oldOwner];
         }
         this._refreshStatus();
