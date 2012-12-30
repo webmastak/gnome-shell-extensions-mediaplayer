@@ -561,10 +561,13 @@ const Player = new Lang.Class({
                 this._stopTimer();
             }
 
-            // Wait a little before changing the state
-            // Some players are sending the stopped signal
-            // when changing tracks
-            Mainloop.timeout_add(1000, Lang.bind(this, this._refreshStatus));
+            if (this.busName == "org.mpris.MediaPlayer2.banshee") {
+                // Banshee sends a "PlaybackStatus: Stopped" signal when changing
+                // tracks, so wait a little before refreshing.
+                Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
+            } else {
+                this._refreshStatus();
+            }
         }
     },
 
