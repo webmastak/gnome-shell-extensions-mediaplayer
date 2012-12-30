@@ -551,6 +551,7 @@ const Player = new Lang.Class({
     _setStatus: function(status) {
         if (status != this._status) {
             this._status = status;
+
             if (this._status == Status.PLAY) {
                 this._startTimer();
             }
@@ -561,11 +562,16 @@ const Player = new Lang.Class({
                 this._stopTimer();
             }
 
-            if (this.busName == "org.mpris.MediaPlayer2.banshee") {
+            if (this.trackBox.box.get_stage() == null) {
+                // Hack to avoid trackBox remaining invisible
+                Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
+            }
+            else if (this.busName == "org.mpris.MediaPlayer2.banshee") {
                 // Banshee sends a "PlaybackStatus: Stopped" signal when changing
                 // tracks, so wait a little before refreshing.
                 Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
-            } else {
+            }
+            else {
                 this._refreshStatus();
             }
         }
