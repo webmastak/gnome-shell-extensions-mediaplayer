@@ -264,7 +264,9 @@ const Player = new Lang.Class({
         this._getIdentity();
         this._getDesktopEntry();
         this._getMetadata();
-        this._getStatus();
+        // FIXME
+        // Hack to avoid the trackBox.box.get_stage() == null
+        Mainloop.timeout_add(300, Lang.bind(this, this._getStatus));
         this._getPosition();
         if (this.showPlaylists) {
             this._getPlaylists();
