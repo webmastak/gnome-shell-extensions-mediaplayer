@@ -378,8 +378,13 @@ const Player = new Lang.Class({
                     this._songLength = metadata["mpris:length"].unpack() / 1000000;
                 else
                     this._songLength = 0;
-                // Banshee workaround
-                Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
+                if (this.busName == "org.mpris.MediaPlayer2.banshee") {
+                    // Banshee sends a "PlaybackStatus: Stopped" signal when changing
+                    // tracks, so wait a little before refreshing sliders.
+                    Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateSliders));
+                } else {
+                    this._updateSliders();
+                }
                 // Check if the current track can be paused
                 this._updateControls();
             }
