@@ -1034,10 +1034,13 @@ const MediaplayerStatusButton = new Lang.Class({
                                  .replace(/%t/, metadata.title)
                                  .replace(/%b/, metadata.album)
                                  .replace(/&/, "&amp;");
-            this._stateText.clutter_text.set_markup(stateText);
+            this._stateTextCache = stateText;
         }
-        else
-            this._stateText.text = "";
+        this._stateText.clutter_text.set_markup(this._stateTextCache);
+    },
+
+    _clearStateText: function() {
+        this._stateText.text = "";
     },
 
     _onScrollEvent: function(actor, event) {
@@ -1070,19 +1073,21 @@ const MediaplayerStatusButton = new Lang.Class({
     },
 
     setState: function(state) {
-        if (state == Status.PLAY)
+        if (state == Status.PLAY) {
             this._stateIcon.icon_name = "media-playback-start-symbolic";
+            this._updateStateText();
+        }
         else if (state == Status.PAUSE)
             this._stateIcon.icon_name = "media-playback-pause-symbolic";
         else if (state == Status.STOP) {
             this._stateIcon.icon_name = "media-playback-stop-symbolic";
             this._showCover(false);
-            this._updateStateText(false);
+            this._clearStateText();
         }
         else if (state == Status.RUN) {
             this._stateIcon.icon_name = "system-run-symbolic";
             this._showCover(false);
-            this._updateStateText(false);
+            this._clearStateText();
         }
         this._state = state;
     }
