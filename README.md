@@ -157,9 +157,12 @@ This extension has been tested with:
   * BeatBox
   * Clementine
   * DeaDBeeF (with third-party DeaDBeeF-MPRIS plugin)
+  * Dragon Player
   * Exaile (with third-party [Sound Menu](https://github.com/grawity/Exaile-Soundmenu-Indicator) plugin)
   * GMusicBrowser
+  * GNOME-Mplayer (1.0.7)
   * Guayadeque (0.3.2)
+  * JuK
   * mpd (with [mpDris2](https://github.com/eonpatapon/mpDris2) daemon)
   * Nuvola *aka* Google Music Frame
   * Pithos
@@ -180,9 +183,9 @@ This extension has been tested with:
 Some players do not send the MPRIS "Seeked" signal so the extension can't update
 the position slider when the song is seeked from the extension or the player.
 
-  * Banshee: https://bugzilla.gnome.org/show_bug.cgi?id=654524
-  * Exaile: https://bugs.launchpad.net/exaile/+bug/1021645
-  * VLC: https://trac.videolan.org/vlc/ticket/6802
+  * Banshee ([bug report](https://bugzilla.gnome.org/show_bug.cgi?id=654524))
+  * Exaile – fixed in 3.3.0 ([bug report](https://bugs.launchpad.net/exaile/+bug/1021645))
+  * VLC – fixed in 2.x? ([bug report](https://trac.videolan.org/vlc/ticket/6802))
 
 ## *Not* supported players
 
