@@ -99,8 +99,6 @@ const DefaultPlayer = new Lang.Class({
         this._runButton = new Widget.PlayerButton('system-run-symbolic',
                                                   Lang.bind(this, function () {
                                                       this._app.activate_full(-1, 0);
-                                                      this._delegate._removePlayer(null,
-                                                                           DEFAULT_PLAYER_OWNER);
                                                   }));
 
         this.trackControls = new Widget.PlayerButtons();
@@ -119,7 +117,6 @@ const Player = new Lang.Class({
         this.parent();
 
         let baseName = busName.split('.')[3];
-
         this.owner = owner;
         this.busName = busName;
         this._app = "";
@@ -921,6 +918,11 @@ const PlayerManager = new Lang.Class({
                 )
             );
             this._players[owner].player.init();
+
+            // remove the default player
+            if (this._players[DEFAULT_PLAYER_OWNER])
+                this._removePlayer(null, DEFAULT_PLAYER_OWNER);
+
             this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
                                        this._getPlayerPosition())
             this.menu.menu.addMenuItem(this._players[owner].player, this._getPlayerPosition());
@@ -937,9 +939,7 @@ const PlayerManager = new Lang.Class({
     _hideOrDefaultPlayer: function() {
         if (this._nbPlayers() == 0 && settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT)) {
             if (!this._players[DEFAULT_PLAYER_OWNER]) {
-                let player = new DefaultPlayer()
-                player._delegate = this;
-                this._players[DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
+                this._players[DEFAULT_PLAYER_OWNER] = {player: new DefaultPlayer(), signals: []};
                 this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
                                            this._getPlayerPosition())
                 this.menu.menu.addMenuItem(this._players[DEFAULT_PLAYER_OWNER].player,
