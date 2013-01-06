@@ -923,12 +923,7 @@ const PlayerManager = new Lang.Class({
             if (this._players[DEFAULT_PLAYER_OWNER])
                 this._removePlayer(null, DEFAULT_PLAYER_OWNER);
 
-            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
-                                       this._getPlayerPosition())
-            this.menu.menu.addMenuItem(this._players[owner].player, this._getPlayerPosition());
-            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
-                                       this._getPlayerPosition())
-            this.menu.actor.show();
+            this._addPlayerMenu(this._players[owner].player);
         }
 
         Mainloop.timeout_add(500, Lang.bind(this, function() {
@@ -939,19 +934,58 @@ const PlayerManager = new Lang.Class({
     _hideOrDefaultPlayer: function() {
         if (this._nbPlayers() == 0 && settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT)) {
             if (!this._players[DEFAULT_PLAYER_OWNER]) {
-                this._players[DEFAULT_PLAYER_OWNER] = {player: new DefaultPlayer(), signals: []};
-                this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
-                                           this._getPlayerPosition())
-                this.menu.menu.addMenuItem(this._players[DEFAULT_PLAYER_OWNER].player,
-                                           this._getPlayerPosition());
-                this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
-                                           this._getPlayerPosition())
+                let player = new DefaultPlayer();
+                this._players[DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
+                this._addPlayerMenu(player);
             }
         }
         else if (this._nbPlayers() > 1 && this._players[DEFAULT_PLAYER_OWNER]) {
             this._removePlayer(null, DEFAULT_PLAYER_OWNER);
         }
         this._hideOrShowMenu();
+    },
+
+    _addPlayerMenu: function(player) {
+        let position = this._getPlayerPosition();
+        if (! (this._getMenuItem(position) instanceof PopupMenu.PopupSeparatorMenuItem)) {
+            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
+                                       position);
+        }
+
+        this.menu.menu.addMenuItem(player, position);
+
+        if (! (this._getMenuItem(position - 1) instanceof PopupMenu.PopupSeparatorMenuItem)) {
+            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
+                                       position);
+        }
+        this.menu.actor.show();
+    },
+
+    _getMenuItem: function(position) {
+        let items = this.menu.menu.box.get_children().map(function(actor) {
+            return actor._delegate;
+        });
+        if (items[position])
+            return items[position];
+        else
+            return null;
+    },
+
+    _removeMenuItem: function(position) {
+        let item = this._getMenuItem(position);
+        if (item)
+            item.destroy();
+    },
+
+    _getPlayerMenuPosition: function(player) {
+        let items = this.menu.menu.box.get_children().map(function(actor) {
+            return actor._delegate;
+        });
+        for (let i in items) {
+            if (items[i] == player)
+                return i;
+        }
+        return null;
     },
 
     _hideOrShowMenu: function() {
@@ -970,8 +1004,11 @@ const PlayerManager = new Lang.Class({
         if (this._players[owner]) {
             for (let i=0; i<this._players[owner].signals.length; i++)
                 this._players[owner].player.disconnect(this._players[owner].signals[i]);
-            if (this._players[owner].player)
-                this._players[owner].player.destroy();
+            let position = this._getPlayerMenuPosition(this._players[owner].player);
+            this._players[owner].player.destroy();
+            // Remove the bottom separator
+            if (position)
+                this._removeMenuItem(position);
             delete this._players[owner];
             // wait for all players to be loaded
             Mainloop.timeout_add(500, Lang.bind(this, function() {
