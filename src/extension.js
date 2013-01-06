@@ -851,6 +851,9 @@ const PlayerManager = new Lang.Class({
                 }
             }
         ));
+        settings.connect("changed::" + MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
+            this._hideOrDefaultPlayer();
+        }));
         // wait for all players to be loaded
         Mainloop.timeout_add(500, Lang.bind(this, function() {
             this._hideOrDefaultPlayer();
@@ -945,14 +948,22 @@ const PlayerManager = new Lang.Class({
                                            this._getPlayerPosition())
             }
         }
-        else if (!settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
-                 settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
-                 this._nbPlayers() == 0) {
-            this.menu.actor.hide();
-        }
         else if (this._nbPlayers() > 1 && this._players[DEFAULT_PLAYER_OWNER]) {
             this._removePlayer(null, DEFAULT_PLAYER_OWNER);
         }
+        this._hideOrShowMenu();
+    },
+
+    _hideOrShowMenu: function() {
+        // Never hide the menu in this case
+        if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) ||
+            settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU) {
+            this.menu.actor.show();
+            return;
+        }
+        // No player or just the default player
+        if (this._nbPlayers() == 0 || (this._nbPlayers() == 1 && this._players[DEFAULT_PLAYER_OWNER]))
+                this.menu.actor.hide();
     },
 
     _removePlayer: function(busName, owner) {
@@ -1050,15 +1061,6 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _init: function() {
         this.parent(0.0, "mediaplayer");
-
-        settings.connect("changed::" + MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
-            if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT)) {
-                this.actor.show();
-            }
-            else if (playerManager._nbPlayers() == 0) {
-                this.actor.hide();
-            }
-        }));
 
         this._coverPath = "";
         this._coverSize = 22;
