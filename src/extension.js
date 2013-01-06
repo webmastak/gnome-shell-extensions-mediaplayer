@@ -946,7 +946,8 @@ const PlayerManager = new Lang.Class({
             }
         }
         else if (!settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
-                 settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU) {
+                 settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
+                 this._nbPlayers() == 0) {
             this.menu.actor.hide();
         }
         else if (this._nbPlayers() > 1 && this._players[DEFAULT_PLAYER_OWNER]) {
