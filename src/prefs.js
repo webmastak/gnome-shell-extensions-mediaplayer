@@ -42,6 +42,11 @@ function init() {
                 { nick: "volume-menu", name: _("Volume menu integration"), id: 2 }
             ]
         },
+        rundefault: {
+            type: "b",
+            label: _("Allow to start the default media player"),
+            help: _("Runs the default mediaplayer by clicking on the indicator or from the menu")
+        },
         volume: {
             type: "b",
             label: _("Show the media player volume slider")
@@ -70,11 +75,6 @@ function init() {
         }
     };
     settings_indicator = {
-        rundefault: {
-            type: "b",
-            label: _("Allow to start the default media player"),
-            help: _("Runs the default mediaplayer by clicking on the indicator")
-        },
         status_type: {
             type: "e",
             label: _("Appearance"),
@@ -97,7 +97,7 @@ function buildPrefsWidget() {
     let vbox = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
                             margin: 20, margin_top: 10 });
     vbox_indicator = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
-                                      margin_left: 30, margin_bottom: 10});
+                                  margin_left: 30, margin_bottom: 10});
     let hbox;
 
     for (setting_indicator in settings_indicator) {
