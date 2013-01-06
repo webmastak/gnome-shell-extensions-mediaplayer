@@ -238,6 +238,8 @@ const Player = new Lang.Class({
                 this._setMetadata(props.Metadata.deep_unpack());
             if (props.ActivePlaylist)
                 this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
+            if (props.CanGoNext || props.CanGoPrevious)
+                this._updateControls();
         }));
 
         this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
