@@ -69,6 +69,11 @@ const Status = {
     RUN: "Run"
 };
 
+const send_stop_on_change = [
+    "org.mpris.MediaPlayer2.banshee",
+    "org.mpris.MediaPlayer2.pragha"
+];
+
 /* global values */
 let settings;
 let playerManager;
@@ -414,8 +419,8 @@ const Player = new Lang.Class({
                     this._songLength = metadata["mpris:length"].unpack() / 1000000;
                 else
                     this._songLength = 0;
-                if (this.busName == "org.mpris.MediaPlayer2.banshee") {
-                    // Banshee sends a "PlaybackStatus: Stopped" signal when changing
+                if (send_stop_on_change.indexOf(this.busName) != -1) {
+                    // Some players send a "PlaybackStatus: Stopped" signal when changing
                     // tracks, so wait a little before refreshing sliders.
                     Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateSliders));
                 } else {
@@ -604,8 +609,8 @@ const Player = new Lang.Class({
                 this._stopTimer();
             }
 
-            if (this.busName == "org.mpris.MediaPlayer2.banshee") {
-                // Banshee sends a "PlaybackStatus: Stopped" signal when changing
+            if (send_stop_on_change.indexOf(this.busName) != -1) {
+                // Some players send a "PlaybackStatus: Stopped" signal when changing
                 // tracks, so wait a little before refreshing.
                 Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
             } else {
