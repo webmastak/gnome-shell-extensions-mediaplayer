@@ -947,14 +947,17 @@ const PlayerManager = new Lang.Class({
 
     _addPlayerMenu: function(player) {
         let position = this._getPlayerPosition();
-        if (! (this._getMenuItem(position) instanceof PopupMenu.PopupSeparatorMenuItem)) {
+
+        let item = this._getMenuItem(position);
+        if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
             this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
                                        position);
         }
 
         this.menu.menu.addMenuItem(player, position);
 
-        if (! (this._getMenuItem(position - 1) instanceof PopupMenu.PopupSeparatorMenuItem)) {
+        let item = this._getMenuItem(position - 1);
+        if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
             this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
                                        position);
         }
@@ -1005,8 +1008,8 @@ const PlayerManager = new Lang.Class({
             for (let i=0; i<this._players[owner].signals.length; i++)
                 this._players[owner].player.disconnect(this._players[owner].signals[i]);
             let position = this._getPlayerMenuPosition(this._players[owner].player);
-            this._players[owner].player.destroy();
             // Remove the bottom separator
+            this._players[owner].player.destroy();
             if (position)
                 this._removeMenuItem(position);
             delete this._players[owner];
