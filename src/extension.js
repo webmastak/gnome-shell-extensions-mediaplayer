@@ -1159,9 +1159,9 @@ const MediaplayerStatusButton = new Lang.Class({
         let direction = event.get_scroll_direction();
 
         if (direction == Clutter.ScrollDirection.DOWN)
-            playerManager.previous();
-        else if (direction == Clutter.ScrollDirection.UP)
             playerManager.next();
+        else if (direction == Clutter.ScrollDirection.UP)
+            playerManager.previous();
     },
 
     // Override PanelMenu.Button._onButtonPress
