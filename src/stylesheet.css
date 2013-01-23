@@ -61,3 +61,10 @@
 .control-button:disabled {
     color: #999;
 }
+
+.program-label {
+    font-weight: bold;
+
+    min-width: 230px;
+}
+

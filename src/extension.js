@@ -73,12 +73,72 @@ const SEND_STOP_ON_CHANGE = [
     "org.mpris.MediaPlayer2.banshee",
     "org.mpris.MediaPlayer2.pragha"
 ];
+const ICON_SIZE = 22;
 
 /* global values */
 let settings;
 let playerManager;
 let mediaplayerMenu;
 let tmpCover;
+let compatible_mediaplayers = ["banshee", "spotify", "amarok", "rhythmbox"];
+
+const LauncherMenuItem = new Lang.Class({
+    Name: 'LauncherMenu.LauncherMenuItem',
+    Extends: PopupMenu.PopupBaseMenuItem,
+
+    _init: function(app) {
+		this.parent();
+		this._app = app;
+	
+		this.label = new St.Label({ text:app.get_name(), style_class: 'program-label' });
+		this.addActor(this.label);
+	
+		this._icon = app.create_icon_texture(ICON_SIZE);
+		this.addActor(this._icon, { align: St.Align.END, span: -1 });
+    },
+
+    activate: function(event) {
+	
+		this._app.activate_full(-1, event.get_time());
+		this.parent(event);
+    }
+});
+
+const LauncherMenu = new Lang.Class({
+	Name: 'LauncherMenu',
+	
+	_init: function(menu) {	
+		this.menu = menu;
+        this.available_mediaplayers = new Array();	
+        this._getApps();
+        this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        for (var k=0; k<this.available_mediaplayers.length; k++) {
+			let m_app=this.available_mediaplayers[k];
+			d = new LauncherMenuItem(m_app);
+			this.menu.menu.addMenuItem(d);
+		}
+        
+	},
+	
+	_getApps: function() {
+		let appsys = Shell.AppSystem.get_default();
+		//get available Apps
+		for (var p=0; p<compatible_mediaplayers.length; p++) {
+			let app_name = compatible_mediaplayers[p];
+			let app = appsys.lookup_app(app_name+'.desktop');
+		
+			if (app != null) {
+				this.available_mediaplayers.push(app);				
+			}
+		}
+
+	},
+	
+	destroy: function() {
+
+        this.parent();
+    },
+});
 
 const DefaultPlayer = new Lang.Class({
     Name: 'DefaultPlayer',
@@ -1249,6 +1309,7 @@ function enable() {
             }
         }
     }
+    launcherMenu = new LauncherMenu(mediaplayerMenu);
     playerManager = new PlayerManager(mediaplayerMenu);
 }
 
@@ -1256,4 +1317,6 @@ function disable() {
     playerManager.destroy();
     if (mediaplayerMenu instanceof MediaplayerStatusButton)
         mediaplayerMenu.destroy();
+  	if (LauncherMenu instanceof LauncherMenu)
+  		LauncherMenu.destroy();
 }
