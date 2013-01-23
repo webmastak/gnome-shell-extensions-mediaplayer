@@ -60,12 +60,19 @@ const Widget = Me.imports.widget;
 const DBusIface = Me.imports.dbus;
 const Lib = Me.imports.lib;
 
+const DEFAULT_PLAYER_OWNER = "org.gnome.shell.extensions.mediaplayer";
+
 const Status = {
     STOP: N_("Stopped"),
     PLAY: N_("Playing"),
     PAUSE: N_("Paused"),
     RUN: "Run"
 };
+
+const SEND_STOP_ON_CHANGE = [
+    "org.mpris.MediaPlayer2.banshee",
+    "org.mpris.MediaPlayer2.pragha"
+];
 const ICON_SIZE = 22;
 
 /* global values */
@@ -74,7 +81,6 @@ let playerManager;
 let mediaplayerMenu;
 let tmpCover;
 let compatible_mediaplayers = ["banshee", "spotify", "amarok", "rhythmbox"];
-
 
 const LauncherMenuItem = new Lang.Class({
     Name: 'LauncherMenu.LauncherMenuItem',
@@ -134,6 +140,39 @@ const LauncherMenu = new Lang.Class({
     },
 });
 
+const DefaultPlayer = new Lang.Class({
+    Name: 'DefaultPlayer',
+    Extends: PopupMenu.PopupMenuSection,
+
+    _init: function() {
+        this.parent();
+
+        this._app = Shell.AppSystem.get_default().lookup_app(
+            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
+        );
+
+        let icon = this._app.create_icon_texture(16);
+        this.playerTitle = new Widget.TitleItem(this._app.get_name(),
+                                                icon,
+                                                function() {});
+        this.playerTitle.setSensitive(false);
+        this.playerTitle.actor.remove_style_pseudo_class('insensitive');
+        this.playerTitle.hideButton();
+
+        this.addMenuItem(this.playerTitle);
+
+        this._runButton = new Widget.PlayerButton('system-run-symbolic',
+                                                  Lang.bind(this, function () {
+                                                      this._app.activate_full(-1, 0);
+                                                  }));
+
+        this.trackControls = new Widget.PlayerButtons();
+        this.trackControls.addButton(this._runButton);
+
+        this.addMenuItem(this.trackControls);
+    }
+});
+
 
 const Player = new Lang.Class({
     Name: 'Player',
@@ -143,9 +182,8 @@ const Player = new Lang.Class({
         this.parent();
 
         let baseName = busName.split('.')[3];
-
-        this._owner = owner;
-        this._busName = busName;
+        this.owner = owner;
+        this.busName = busName;
         this._app = "";
         this._status = "";
         // Guess the name based on the dbus path
@@ -188,7 +226,7 @@ const Player = new Lang.Class({
         this.showRating = this._settings.get_boolean(MEDIAPLAYER_RATING_KEY);
         this._settings.connect("changed::" + MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
             if (this._settings.get_boolean(MEDIAPLAYER_RATING_KEY)) {
-                this.showRating = true;f
+                this.showRating = true;
                 this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
                 this.trackBox.addInfo(this.trackRating, 3);
             }
@@ -299,6 +337,8 @@ const Player = new Lang.Class({
                 this._setMetadata(props.Metadata.deep_unpack());
             if (props.ActivePlaylist)
                 this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
+            if (props.CanGoNext || props.CanGoPrevious)
+                this._updateControls();
         }));
 
         this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
@@ -325,13 +365,19 @@ const Player = new Lang.Class({
         this._getIdentity();
         this._getDesktopEntry();
         this._getMetadata();
-        this._getStatus();
+        // FIXME
+        // Hack to avoid the trackBox.box.get_stage() == null
+        Mainloop.timeout_add(300, Lang.bind(this, this._getStatus));
         this._getPosition();
         if (this.showPlaylists) {
             this._getPlaylists();
             this._getActivePlaylist();
         }
         this._updateSliders();
+    },
+
+    toString: function() {
+        return "[object Player(%s,%s)]".format(this._identity, this._status);
     },
 
     _getIdentity: function() {
@@ -347,7 +393,7 @@ const Player = new Lang.Class({
         this._app = appSys.lookup_app(entry+".desktop");
         if (this._app) {
             let icon = this._app.create_icon_texture(16);
-            this.playerTitle.setIcon(icon); 
+            this.playerTitle.setIcon(icon);
         }
     },
 
@@ -437,8 +483,13 @@ const Player = new Lang.Class({
                     this._songLength = metadata["mpris:length"].unpack() / 1000000;
                 else
                     this._songLength = 0;
-                // Banshee workaround
-                Mainloop.timeout_add(1000, Lang.bind(this, this._updateSliders));
+                if (SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
+                    // Some players send a "PlaybackStatus: Stopped" signal when changing
+                    // tracks, so wait a little before refreshing sliders.
+                    Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateSliders));
+                } else {
+                    this._updateSliders();
+                }
                 // Check if the current track can be paused
                 this._updateControls();
             }
@@ -516,9 +567,7 @@ const Player = new Lang.Class({
                 }
             }
 
-            this.emit('player-metadata-changed', {artist: this.trackArtist.getText(),
-                                                  album: this.trackAlbum.getText(),
-                                                  title: this.trackTitle.getText()});
+            this.emit('player-metadata-changed');
         }
     },
 
@@ -542,7 +591,7 @@ const Player = new Lang.Class({
     },
 
     _showCover: function() {
-        this.emit('player-cover-changed', this.trackCoverPath)
+        this.emit('player-cover-changed');
         Tweener.addTween(this.trackCoverContainer, { opacity: 0,
             time: 0.3,
             transition: 'easeOutCubic',
@@ -564,7 +613,7 @@ const Player = new Lang.Class({
                 Tweener.addTween(this.trackCoverContainer, { opacity: 255,
                     time: 0.3,
                     transition: 'easeInCubic',
-                    onComplete: this.emit('player-cover-changed', this.trackCoverPath)
+                    onComplete: this.emit('player-cover-changed')
                 });
             })
         });
@@ -622,10 +671,13 @@ const Player = new Lang.Class({
                 this._stopTimer();
             }
 
-            // Wait a little before changing the state
-            // Some players are sending the stopped signal
-            // when changing tracks
-            Mainloop.timeout_add(1000, Lang.bind(this, this._refreshStatus));
+            if (SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
+                // Some players send a "PlaybackStatus: Stopped" signal when changing
+                // tracks, so wait a little before refreshing.
+                Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
+            } else {
+                this._refreshStatus();
+            }
         }
     },
 
@@ -634,7 +686,7 @@ const Player = new Lang.Class({
         this._updateControls();
         this._setIdentity();
         if (this._status != Status.STOP) {
-            this.emit('player-cover-changed', this.trackCoverPath);
+            this.emit('player-cover-changed');
             if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
                 this.trackBox.box.show();
                 this.trackBox.box.set_height(-1);
@@ -821,7 +873,6 @@ const Player = new Lang.Class({
 
 const PlayerManager = new Lang.Class({
     Name: 'PlayerManager',
-	    
 
     _init: function(menu) {
         this._disabling = false;
@@ -829,12 +880,10 @@ const PlayerManager = new Lang.Class({
         this.menu = menu;
         // players list
         this._players = {};
+        // player shown in the panel
+        this._status_player = false;
         // the DBus interface
         this._dbus = new DBusIface.DBus();
-        // hide the menu by default
-        /*if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
-            !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT))
-                this.menu.actor.hide();*/
         // player DBus name pattern
         let name_regex = /^org\.mpris\.MediaPlayer2\./;
         // load players
@@ -868,49 +917,59 @@ const PlayerManager = new Lang.Class({
                 }
             }
         ));
-	},
+        settings.connect("changed::" + MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
+            this._hideOrDefaultPlayer();
+        }));
+        // wait for all players to be loaded
+        Mainloop.timeout_add(500, Lang.bind(this, function() {
+            this._hideOrDefaultPlayer();
+        }));
+    },
 
-    // TODO: move to proper place
     _isInstance: function(busName) {
         // MPRIS instances are in the form
-        // org.mpris.MediaPlayer2.name.instanceXXXX
-        return busName.split('.').length > 4;
+        //   org.mpris.MediaPlayer2.name.instanceXXXX
+        // ...except for VLC, which to this day uses
+        //   org.mpris.MediaPlayer2.name-XXXX
+        return busName.split('.').length > 4 ||
+                /^org\.mpris\.MediaPlayer2\.vlc-\d+$/.test(busName);
+    },
+
+    _getPlayerPosition: function() {
+        let position = 0;
+        if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU)
+                position = this.menu.menu.numMenuItems - 2;
+        return position;
     },
 
     _addPlayer: function(busName, owner) {
         let position;
         if (this._players[owner]) {
-            let prevName = this._players[owner]._busName;
+            let prevName = this._players[owner].player.busName;
             // HAVE:       ADDING:     ACTION:
             // master      master      reject, cannot happen
             // master      instance    upgrade to instance
             // instance    master      reject, duplicate
             // instance    instance    reject, cannot happen
             if (this._isInstance(busName) && !this._isInstance(prevName))
-                this._players[owner]._busName = busName;
+                this._players[owner].player.busName = busName;
             else
                 return;
         } else if (owner) {
             this._players[owner] = {player: new Player(busName, owner), signals: []};
             this._players[owner].signals.push(
                 this._players[owner].player.connect('player-metadata-changed',
-                    Lang.bind(this, function(player, metadata) {
-                        if (this.menu instanceof MediaplayerStatusButton)
-                            this.menu._updateStateText(metadata);
-                    })
+                    Lang.bind(this, this._refreshStatus)
                 )
             );
             this._players[owner].signals.push(
                 this._players[owner].player.connect('player-status-changed',
-                    Lang.bind(this, this._statusChanged)
+                    Lang.bind(this, this._refreshStatus)
                 )
             );
             this._players[owner].signals.push(
                 this._players[owner].player.connect('player-cover-changed',
-                    Lang.bind(this, function(player, cover_path) {
-                        if (this.menu instanceof MediaplayerStatusButton)
-                            this.menu._showCover(cover_path);
-                    })
+                    Lang.bind(this, this._refreshStatus)
                 )
             );
             this._players[owner].signals.push(
@@ -922,34 +981,115 @@ const PlayerManager = new Lang.Class({
                 )
             );
             this._players[owner].player.init();
-            if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU)
-                position = this.menu.menu.numMenuItems - 2;
-            else
-                position = 0;
-            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
-            this.menu.menu.addMenuItem(this._players[owner].player, position);
-            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(), position)
-            this.menu.actor.show();
+
+            // remove the default player
+            if (this._players[DEFAULT_PLAYER_OWNER])
+                this._removePlayer(null, DEFAULT_PLAYER_OWNER);
+
+            this._addPlayerMenu(this._players[owner].player);
         }
+
+        Mainloop.timeout_add(500, Lang.bind(this, function() {
+            this._hideOrDefaultPlayer();
+        }));
+
+        this._refreshStatus();
+    },
+
+    _hideOrDefaultPlayer: function() {
+        if (this._nbPlayers() == 0 && settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT)) {
+            if (!this._players[DEFAULT_PLAYER_OWNER]) {
+                let player = new DefaultPlayer();
+                this._players[DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
+                this._addPlayerMenu(player);
+            }
+        }
+        else if (this._nbPlayers() > 1 && this._players[DEFAULT_PLAYER_OWNER]) {
+            this._removePlayer(null, DEFAULT_PLAYER_OWNER);
+        }
+        this._hideOrShowMenu();
+    },
+
+    _addPlayerMenu: function(player) {
+        let position = this._getPlayerPosition();
+
+        let item = this._getMenuItem(position);
+        if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
+            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
+                                       position);
+        }
+
+        this.menu.menu.addMenuItem(player, position);
+
+        let item = this._getMenuItem(position - 1);
+        if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
+            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
+                                       position);
+        }
+        this.menu.actor.show();
+    },
+
+    _getMenuItem: function(position) {
+        let items = this.menu.menu.box.get_children().map(function(actor) {
+            return actor._delegate;
+        });
+        if (items[position])
+            return items[position];
+        else
+            return null;
+    },
+
+    _removeMenuItem: function(position) {
+        let item = this._getMenuItem(position);
+        if (item)
+            item.destroy();
+    },
+
+    _getPlayerMenuPosition: function(player) {
+        let items = this.menu.menu.box.get_children().map(function(actor) {
+            return actor._delegate;
+        });
+        for (let i in items) {
+            if (items[i] == player)
+                return i;
+        }
+        return null;
+    },
+
+    _hideOrShowMenu: function() {
+        // Never hide the menu in this case
+        if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) ||
+            settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) == IndicatorPosition.VOLUMEMENU) {
+            this.menu.actor.show();
+            return;
+        }
+        // No player or just the default player
+        if (this._nbPlayers() == 0 || (this._nbPlayers() == 1 && this._players[DEFAULT_PLAYER_OWNER]))
+                this.menu.actor.hide();
     },
 
     _removePlayer: function(busName, owner) {
         if (this._players[owner]) {
             for (let i=0; i<this._players[owner].signals.length; i++)
                 this._players[owner].player.disconnect(this._players[owner].signals[i]);
+            let position = this._getPlayerMenuPosition(this._players[owner].player);
+            // Remove the bottom separator
             this._players[owner].player.destroy();
+            if (position)
+                this._removeMenuItem(position);
             delete this._players[owner];
-            if (settings.get_enum(MEDIAPLAYER_INDICATOR_POSITION_KEY) != IndicatorPosition.VOLUMEMENU &&
-                !settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
-                this._nbPlayers() == 0)
-                    this.menu.actor.hide();
+            // wait for all players to be loaded
+            Mainloop.timeout_add(500, Lang.bind(this, function() {
+                this._hideOrDefaultPlayer();
+            }));
         }
         this._refreshStatus();
     },
 
     _changePlayerOwner: function(busName, oldOwner, newOwner) {
-        if (this._players[oldOwner]) {
+        if (this._players[oldOwner] && busName == this._players[oldOwner].player.busName) {
             this._players[newOwner] = this._players[oldOwner];
+            this._players[newOwner].player.owner = newOwner;
             delete this._players[oldOwner];
         }
         this._refreshStatus();
@@ -959,58 +1099,44 @@ const PlayerManager = new Lang.Class({
         return Object.keys(this._players).length;
     },
 
-    _statusChanged: function(player) {
-        let owner = player._owner;
-        let status = player._status;
-        this._players[owner].status = status;
-        this._refreshStatus();
-    },
-
     _refreshStatus: function() {
         // Display current status in the top panel
         if (this.menu instanceof MediaplayerStatusButton) {
-            let globalStatus = false;
-            if (this._nbPlayers() == 0) {
-                globalStatus = Status.RUN;
-            }
-            else {
+            this._status_player = false;
+            if (this._nbPlayers() > 0) {
+                // Get the first player
+                // with status PLAY or PAUSE
+                // else all players are stopped
                 for (let owner in this._players) {
-                    if (this._players[owner].status == Status.PLAY)
-                        globalStatus = this._players[owner].status;
-                    if (this._players[owner].status == Status.PAUSE && !globalStatus)
-                        globalStatus = this._players[owner].status;
+                    let player = this._players[owner].player;
+                    if (player._status == Status.PLAY) {
+                        this._status_player = player;
+                        break
+                    }
+                    if (player._status == Status.PAUSE && !this._status_player)
+                        this._status_player = player;
+                    if (player._status == Status.STOP && !this._status_player)
+                        this._status_player = player;
                 }
-                if (!globalStatus)
-                    globalStatus = Status.STOP;
             }
-            this.menu.setState(globalStatus);
+            this.menu.setState(this._status_player);
         }
     },
 
     next: function() {
-        // Ignore stopped or paused players
-        for (let owner in this._players) {
-            if (this._players[owner].status == Status.PLAY)
-                this._players[owner].player._mediaServerPlayer.NextRemote();
-        }
+        if (this._status_player && this._status_player._status == Status.PLAY)
+            this._status_player._mediaServerPlayer.NextRemote();
     },
 
     previous: function() {
-        // Ignore stopped or paused players
-        for (let owner in this._players) {
-            if (this._players[owner].status == Status.PLAY)
-                this._players[owner].player._mediaServerPlayer.PreviousRemote();
-        }
+        if (this._status_player && this._status_player._status == Status.PLAY)
+            this._status_player._mediaServerPlayer.PreviousRemote();
     },
 
     playPause: function() {
-        // Ignore stopped players
-        for (let owner in this._players) {
-            if (this._players[owner].status == Status.PLAY ||
-                this._players[owner].status == Status.PAUSE)
-                this._players[owner].player._mediaServerPlayer.PlayPauseRemote();
-        }
-
+        if (this._status_player &&
+                (this._status_player._status == Status.PLAY || this._status_player._status == Status.PAUSE))
+            this._status_player._mediaServerPlayer.PlayPauseRemote();
     },
 
     destroy: function() {
@@ -1026,19 +1152,6 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _init: function() {
         this.parent(0.0, "mediaplayer");
-
-        // get the default player
-        this._default = Shell.AppSystem.get_default().lookup_app(
-            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
-        );
-        settings.connect("changed::" + MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
-            if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT)) {
-                this.actor.show();
-            }
-            else if (playerManager._nbPlayers() == 0) {
-                this.actor.hide();
-            }
-        }));
 
         this._coverPath = "";
         this._coverSize = 22;
@@ -1067,56 +1180,48 @@ const MediaplayerStatusButton = new Lang.Class({
         this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     },
 
-    _showCover: function(cover_path) {
+    _showCover: function(player) {
         if (settings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY) == IndicatorStatusType.COVER &&
-           this._coverPath != cover_path) {
-            this._coverPath = cover_path;
-            Tweener.addTween(this._bin, {
-                opacity: 0,
-                time: 0.3,
-                transition: 'easeOutCubic',
-                onComplete: Lang.bind(this, function() {
-                    // Change cover
-                    let cover = this._icon;
-                    if (cover_path && GLib.file_test(cover_path, GLib.FileTest.EXISTS)) {
-                        cover = new St.Bin();
-                        let coverTexture = new Clutter.Texture({filter_quality: 2, filename: cover_path});
-                        let [coverWidth, coverHeight] = coverTexture.get_base_size();
-                        cover.height = this._coverSize;
-                        cover.width = this._coverSize;
-                        cover.set_child(coverTexture);
-                    }
-                    this._bin.set_child(cover);
-                    // Show the new cover
-                    Tweener.addTween(this._bin, { opacity: 255,
-                        time: 0.3,
-                        transition: 'easeInCubic'
-                    });
-                })
-            });
+           this._coverPath != player.trackCoverPath) {
+            this._coverPath = player.trackCoverPath;
+            // Change cover
+            if (this._coverPath && GLib.file_test(this._coverPath, GLib.FileTest.EXISTS)) {
+                let cover = new St.Bin();
+                let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this._coverPath});
+                let [coverWidth, coverHeight] = coverTexture.get_base_size();
+                cover.height = this._coverSize;
+                cover.width = this._coverSize;
+                cover.set_child(coverTexture);
+                this._bin.set_child(cover);
+            }
+            else
+                this._bin.set_child(this._icon);
         }
     },
 
-    _updateStateText: function(metadata) {
-        if (metadata) {
+    _updateStateText: function(player) {
+        if (player && player.trackArtist) {
             let stateText = settings.get_string(MEDIAPLAYER_STATUS_TEXT_KEY);
-            stateText = stateText.replace(/%a/, metadata.artist)
-                                 .replace(/%t/, metadata.title)
-                                 .replace(/%b/, metadata.album)
+            stateText = stateText.replace(/%a/, player.trackArtist.getText())
+                                 .replace(/%t/, player.trackTitle.getText())
+                                 .replace(/%b/, player.trackAlbum.getText())
                                  .replace(/&/, "&amp;");
-            this._stateText.clutter_text.set_markup(stateText);
+            this._stateTextCache = stateText;
         }
-        else
-            this._stateText.text = "";
+        this._stateText.clutter_text.set_markup(this._stateTextCache);
+    },
+
+    _clearStateText: function() {
+        this._stateText.text = "";
     },
 
     _onScrollEvent: function(actor, event) {
         let direction = event.get_scroll_direction();
 
         if (direction == Clutter.ScrollDirection.DOWN)
-            playerManager.previous();
-        else if (direction == Clutter.ScrollDirection.UP)
             playerManager.next();
+        else if (direction == Clutter.ScrollDirection.UP)
+            playerManager.previous();
     },
 
     // Override PanelMenu.Button._onButtonPress
@@ -1126,10 +1231,10 @@ const MediaplayerStatusButton = new Lang.Class({
         if (button == 2)
             playerManager.playPause();
         else {
-            if (settings.get_boolean(MEDIAPLAYER_RUN_DEFAULT) &&
-                this._default && playerManager._nbPlayers() == 0) {
-                    this._default.activate_full(-1, 0);
-                    return;
+            if(playerManager._players[DEFAULT_PLAYER_OWNER]) {
+                let player = playerManager._players[DEFAULT_PLAYER_OWNER].player;
+                player._app.activate_full(-1, 0);
+                return;
             }
 
             if (!this.menu)
@@ -1139,22 +1244,30 @@ const MediaplayerStatusButton = new Lang.Class({
         }
     },
 
-    setState: function(state) {
-        if (state == Status.PLAY)
-            this._stateIcon.icon_name = "media-playback-start-symbolic";
-        else if (state == Status.PAUSE)
-            this._stateIcon.icon_name = "media-playback-pause-symbolic";
-        else if (state == Status.STOP) {
-            this._stateIcon.icon_name = "media-playback-stop-symbolic";
-            this._showCover(false);
-            this._updateStateText(false);
+    setState: function(player) {
+        if (player) {
+            this._state = player._status;
+            if (this._state == Status.PLAY) {
+                this._stateIcon.icon_name = "media-playback-start-symbolic";
+                this._updateStateText(player);
+                this._showCover(player);
+            }
+            else if (this._state == Status.PAUSE) {
+                this._stateIcon.icon_name = "media-playback-pause-symbolic";
+                this._updateStateText(player);
+                this._showCover(player);
+            }
+            else if (!this.state || this._state == Status.STOP) {
+                this._stateIcon.icon_name = "media-playback-stop-symbolic";
+                this._clearStateText();
+                this._showCover(false);
+            }
         }
-        else if (state == Status.RUN) {
+        else {
             this._stateIcon.icon_name = "system-run-symbolic";
+            this._clearStateText();
             this._showCover(false);
-            this._updateStateText(false);
         }
-        this._state = state;
     }
 });
 
