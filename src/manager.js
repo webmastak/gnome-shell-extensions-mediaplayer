@@ -57,7 +57,7 @@ const PlayerManager = new Lang.Class({
             }
         ));
         // watch players
-        this._dbus.connectSignal('NameOwnerChanged', Lang.bind(this,
+        this._ownerChangedId = this._dbus.connectSignal('NameOwnerChanged', Lang.bind(this,
             function(proxy, sender, [name, old_owner, new_owner]) {
                 if (name_regex.test(name)) {
                     if (!this._disabling) {
@@ -71,9 +71,12 @@ const PlayerManager = new Lang.Class({
                 }
             }
         ));
-        Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
-            this._hideOrDefaultPlayer();
-        }));
+        this._signalsId = [];
+        this._signalsId.push(
+            Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
+                this._hideOrDefaultPlayer();
+            }))
+        );
         // wait for all players to be loaded
         Mainloop.timeout_add(500, Lang.bind(this, function() {
             this._hideOrDefaultPlayer();
@@ -224,8 +227,8 @@ const PlayerManager = new Lang.Class({
 
     _removePlayer: function(busName, owner) {
         if (this._players[owner]) {
-            for (let i=0; i<this._players[owner].signals.length; i++)
-                this._players[owner].player.disconnect(this._players[owner].signals[i]);
+            for (let id in this._players[owner].signals)
+                this._players[owner].player.disconnect(this._players[owner].signals[id]);
             let position = this._getPlayerMenuPosition(this._players[owner].player);
             // Remove the bottom separator
             this._players[owner].player.destroy();
@@ -233,9 +236,11 @@ const PlayerManager = new Lang.Class({
                 this._removeMenuItem(position);
             delete this._players[owner];
             // wait for all players to be loaded
-            Mainloop.timeout_add(500, Lang.bind(this, function() {
-                this._hideOrDefaultPlayer();
-            }));
+            if (!this._disabling) {
+                Mainloop.timeout_add(500, Lang.bind(this, function() {
+                    this._hideOrDefaultPlayer();
+                }));
+            }
         }
         this._refreshStatus();
     },
@@ -295,6 +300,10 @@ const PlayerManager = new Lang.Class({
 
     destroy: function() {
         this._disabling = true;
+        if (this._ownerChangedId)
+            this._dbus.disconnectSignal(this._ownerChangedId);
+        for (let id in this._signalsId)
+            Settings.gsettings.disconnect(this._signalsId[id]);
         for (let owner in this._players)
             this._removePlayer(null, owner);
     }

@@ -30,6 +30,10 @@ let mediaplayerMenu;
 function init() {
     Lib.initTranslations(Me);
     Settings.init();
+    Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {
+        disable();
+        enable();
+    });
 }
 
 function enable() {
@@ -71,6 +75,9 @@ function enable() {
 
 function disable() {
     playerManager.destroy();
-    if (mediaplayerMenu instanceof Panel.MediaplayerStatusButton)
+    playerManager = null;
+    if (mediaplayerMenu instanceof Panel.MediaplayerStatusButton) {
         mediaplayerMenu.destroy();
+        mediaplayerMenu = null;
+    }
 }

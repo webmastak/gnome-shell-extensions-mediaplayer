@@ -94,41 +94,50 @@ const MPRISPlayer = new Lang.Class({
         this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(busName);
         this._prop = new DBusIface.Properties(busName);
         this._settings = Settings.gsettings;
+        this._signalsId = [];
 
         this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
-        this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
-            this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
-            this._updateSliders();
-        }));
+        this._signalsId.push(
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
+                this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
+                this._updateSliders();
+            }))
+        );
         this.showPlaylists = this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY);
-        this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
-            if (this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)) {
-                this.showPlaylists = true;
-                this._getPlaylists();
-                this._getActivePlaylist();
-            }
-            else {
-                this.showPlaylists = false;
-                if (this._playlistsMenu)
-                    this._playlistsMenu.destroy();
-            }
-        }));
+        this._signalsId.push(
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
+                if (this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)) {
+                    this.showPlaylists = true;
+                    this._getPlaylists();
+                    this._getActivePlaylist();
+                }
+                else {
+                    this.showPlaylists = false;
+                    if (this._playlistsMenu)
+                        this._playlistsMenu.destroy();
+                }
+            }))
+        );
         this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
-        this._settings.connect("changed::" + Settings.MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
-            this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
-        }));
+        this._signalsId.push(
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
+                this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
+            }))
+        );
         this.showRating = this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY);
-        this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
-            if (this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)) {
-                this.showRating = true;
-                this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
-                this.trackBox.addInfo(this.trackRating, 3);
-            }
-            else {
-                this.showRating = false;
-                this.trackRating.destroy();
-            }
-        }));
+        this._signalsId.push(
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
+                if (this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)) {
+                    this.showRating = true;
+                    this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
+                    this.trackBox.addInfo(this.trackRating, 3);
+                }
+                else {
+                    this.showRating = false;
+                    this.trackRating.destroy();
+                }
+            }))
+        );
         let genericIcon = new St.Icon({icon_name: "audio-x-generic-symbolic", icon_size: 16});
         this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
 
@@ -186,10 +195,12 @@ const MPRISPlayer = new Lang.Class({
             this._wantedSeekValue = Math.round(time * 1000000);
             this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
         }));
-        this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
-            this.showPosition = this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY);
-            this._updateSliders();
-        }));
+        this._signalsId.push(
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
+                this.showPosition = this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY);
+                this._updateSliders();
+            }))
+        );
         this.addMenuItem(this._position);
 
         this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
@@ -222,7 +233,7 @@ const MPRISPlayer = new Lang.Class({
             this.playerTitle.showButton();
         }
 
-        this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
+        this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
             if (props.Volume)
                 this._setVolume(props.Volume.unpack());
             if (props.PlaybackStatus)
@@ -235,7 +246,7 @@ const MPRISPlayer = new Lang.Class({
                 this._updateControls();
         }));
 
-        this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
+        this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
             if (value > 0) {
                 this._setPosition(value);
             }
@@ -761,6 +772,12 @@ const MPRISPlayer = new Lang.Class({
 
     destroy: function() {
         this._stopTimer();
-        PopupMenu.PopupMenuSection.prototype.destroy.call(this);
+        if (this._propChangedId)
+            this._prop.disconnectSignal(this._propChangedId);
+        if (this._seekedId)
+            this._mediaServerPlayer.disconnectSignal(this._seekedId);
+        for (let id in this._signalsId)
+            this._settings.disconnect(this._signalsId[id]);
+        this.parent();
     }
 });
