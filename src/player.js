@@ -89,12 +89,34 @@ const MPRISPlayer = new Lang.Class({
         this._currentTime = -1;
         this._wantedSeekValue = 0;
         this._timeoutId = 0;
-        this._mediaServer = new DBusIface.MediaServer2(busName);
-        this._mediaServerPlayer = new DBusIface.MediaServer2Player(busName);
-        this._mediaServerPlaylists = new DBusIface.MediaServer2Playlists(busName);
-        this._prop = new DBusIface.Properties(busName);
         this._settings = Settings.gsettings;
         this._signalsId = [];
+        new DBusIface.MediaServer2(busName,
+                                   Lang.bind(this, function(proxy) {
+                                        this._mediaServer = proxy;
+                                        this._init2();
+                                   }));
+        new DBusIface.MediaServer2Player(busName,
+                                         Lang.bind(this, function(proxy) {
+                                             this._mediaServerPlayer = proxy;
+                                             this._init2();
+                                         }));
+        new DBusIface.MediaServer2Playlists(busName,
+                                            Lang.bind(this, function(proxy) {
+                                               this._mediaServerPlaylists = proxy;
+                                               this._init2();
+                                            }));
+        new DBusIface.Properties(busName,
+                                 Lang.bind(this, function(proxy) {
+                                    this._prop = proxy;
+                                    this._init2();
+                                 }));
+    },
+
+    _init2: function() {
+        // Wait all DBus callbacks to continue
+        if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._prop)
+            return;
 
         this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
         this._signalsId.push(
@@ -263,9 +285,11 @@ const MPRISPlayer = new Lang.Class({
 
             this._wantedSeekValue = 0;
         }));
+
+        this.emit('init-done');
     },
 
-    init: function() {
+    populate: function() {
         this._getVolume();
         this._getIdentity();
         this._getDesktopEntry();

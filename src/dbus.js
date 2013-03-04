@@ -102,22 +102,26 @@ function DBus() {
                          '/org/freedesktop/DBus');
 }
 
-function Properties(owner) {
-    return new PropertiesProxy(Gio.DBus.session, owner,
-                               '/org/mpris/MediaPlayer2');
+function Properties(owner, callback) {
+    new PropertiesProxy(Gio.DBus.session, owner,
+                        '/org/mpris/MediaPlayer2',
+                        callback);
 }
 
-function MediaServer2(owner) {
-    return new MediaServer2Proxy(Gio.DBus.session, owner,
-                                 '/org/mpris/MediaPlayer2');
+function MediaServer2(owner, callback) {
+    new MediaServer2Proxy(Gio.DBus.session, owner,
+                          '/org/mpris/MediaPlayer2',
+                          callback);
 }
 
-function MediaServer2Player(owner) {
-    return new MediaServer2PlayerProxy(Gio.DBus.session, owner,
-                                       '/org/mpris/MediaPlayer2');
+function MediaServer2Player(owner, callback) {
+    new MediaServer2PlayerProxy(Gio.DBus.session, owner,
+                                '/org/mpris/MediaPlayer2',
+                                callback);
 }
 
-function MediaServer2Playlists(owner) {
-    return new MediaServer2PlaylistsProxy(Gio.DBus.session, owner,
-                                          '/org/mpris/MediaPlayer2');
+function MediaServer2Playlists(owner, callback) {
+    new MediaServer2PlaylistsProxy(Gio.DBus.session, owner,
+                                   '/org/mpris/MediaPlayer2',
+                                   callback);
 }

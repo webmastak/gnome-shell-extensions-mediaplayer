@@ -137,7 +137,13 @@ const PlayerManager = new Lang.Class({
                     })
                 )
             );
-            this._players[owner].player.init();
+            this._players[owner].signals.push(
+                this._players[owner].player.connect('init-done',
+                    Lang.bind(this, function(player) {
+                        player.populate();
+                    })
+                )
+            );
 
             // remove the default player
             if (this._players[Settings.DEFAULT_PLAYER_OWNER])
