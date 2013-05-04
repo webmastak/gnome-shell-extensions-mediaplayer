@@ -3,7 +3,7 @@
 "name": "Media player indicator",
 "description": "Control MPRIS2 capable media players",
 "original-author": "eon@patapon.info",
-"shell-version": [ "3.4", "3.6", "3.8" ],
+"shell-version": [ "3.4", "3.6", "3.8", "3.8.1" ],
 "url": "@URL@",
 "locale": "@LOCALEDIR@"
 }
