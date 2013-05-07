@@ -264,6 +264,8 @@ const MPRISPlayer = new Lang.Class({
                 this._setMetadata(props.Metadata.deep_unpack());
             if (props.ActivePlaylist)
                 this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
+            if (props.PlaylistCount)
+                this._getPlaylists();
             if (props.CanGoNext || props.CanGoPrevious)
                 this._updateControls();
         }));
