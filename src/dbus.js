@@ -54,6 +54,7 @@ const MediaServer2Iface = <interface name="org.mpris.MediaPlayer2">
 <property name="CanQuit" type="b" access="read" />
 <property name="Identity" type="s" access="read" />
 <property name="DesktopEntry" type="s" access="read" />
+<property name="HasTrackList" type="b" access="read" />
 </interface>;
 const MediaServer2Proxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2Iface);
 
