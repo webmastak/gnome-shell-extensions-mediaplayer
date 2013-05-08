@@ -97,6 +97,42 @@ const MediaServer2PlaylistsIface = <interface name="org.mpris.MediaPlayer2.Playl
 </interface>
 const MediaServer2PlaylistsProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlaylistsIface);
 
+const MediaServer2TrackListIface = <interface name="org.mpris.MediaPlayer2.TrackList">
+<method name="GetTracksMetadata">
+    <arg type="ao" direction="in" />
+    <arg type="aa{sv}" direction="out" />
+</method>
+<method name="AddTrack">
+    <arg type="s" direction="in" />
+    <arg type="o" direction="in" />
+    <arg type="b" direction="in" />
+</method>
+<method name="RemoveTrack">
+    <arg type="o" direction="in" />
+</method>
+<method name="GoTo">
+    <arg type="o" direction="in" />
+</method>
+<signal name="TrackListReplaced">
+    <arg type="ao" direction="out" />
+    <arg type="o" direction="out" />
+</signal>
+<signal name="TrackAdded">
+    <arg type="a{sv}" direction="out" />
+    <arg type="o" direction="out" />
+</signal>
+<signal name="TrackRemoved">
+    <arg type="o" direction="out" />
+</signal>
+<signal name="TrackMetadataChanged">
+    <arg type="o" direction="out" />
+    <arg type="a{sv}" direction="out" />
+</signal>
+<property name="Tracks" type="ao" access="read" />
+<property name="CanEditTracks" type="b" access="read" />
+</interface>
+const MediaServer2TrackListProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2TrackListIface);
+
 function DBus() {
     return new DBusProxy(Gio.DBus.session, 'org.freedesktop.DBus',
                          '/org/freedesktop/DBus');
@@ -122,6 +158,12 @@ function MediaServer2Player(owner, callback) {
 
 function MediaServer2Playlists(owner, callback) {
     new MediaServer2PlaylistsProxy(Gio.DBus.session, owner,
+                                   '/org/mpris/MediaPlayer2',
+                                   callback);
+}
+
+function MediaServer2TrackList(owner, callback) {
+    new MediaServer2TrackListProxy(Gio.DBus.session, owner,
                                    '/org/mpris/MediaPlayer2',
                                    callback);
 }
