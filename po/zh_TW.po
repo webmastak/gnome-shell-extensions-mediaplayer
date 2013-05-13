@@ -1,0 +1,142 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-13 15:50+0800\n"
+"PO-Revision-Date: 2013-05-13 15:52+0800\n"
+"Last-Translator: 盧瑞元 (Ruei-Yuan Lu) <RueiYuan.Lu@gmail.com>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n>1);\n"
+"X-Poedit-Language: Traditional Chinese\n"
+"X-Poedit-Country: TAIWAN\n"
+
+#: ../src/prefs.js:37
+msgid "Position in the top panel"
+msgstr "頂端面板中的位置"
+
+#: ../src/prefs.js:38
+msgid "Restart the shell to apply this setting."
+msgstr "請重新啟動 Gnome Shell 以套用設定值。"
+
+#: ../src/prefs.js:40
+msgid "Center"
+msgstr "中央"
+
+#: ../src/prefs.js:41
+msgid "Right"
+msgstr "右邊"
+
+#: ../src/prefs.js:42
+msgid "Volume menu integration"
+msgstr "整合至音量選單"
+
+#: ../src/prefs.js:47
+msgid "Allow to start the default media player"
+msgstr "允許啟動預設的媒體播放器"
+
+#: ../src/prefs.js:48
+msgid "Runs the default mediaplayer by clicking on the indicator or from the menu"
+msgstr "點選選單或狀態圖示時，啟動預設的媒體播放器。"
+
+#: ../src/prefs.js:52
+msgid "Show the media player volume slider"
+msgstr "顯示媒體播放器的音量控制"
+
+#: ../src/prefs.js:56
+msgid "Show the media player position slider"
+msgstr "顯示媒體播放器的進度控制"
+
+#: ../src/prefs.js:60
+msgid "Show media player playlists"
+msgstr "顯示媒體播放器的播放清單"
+
+#: ../src/prefs.js:64
+msgid "Display song rating"
+msgstr "顯示歌曲評價"
+
+#: ../src/prefs.js:65
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "以零到五星表示目前正在播放的歌曲的評價。"
+
+#: ../src/prefs.js:69
+msgid "Album cover size"
+msgstr "專輯封面大小"
+
+#: ../src/prefs.js:70
+msgid "The size of the cover displayed in the menu. Default is 80px width."
+msgstr "在選單中顯示的封面大小。預設值為 80 個像素寬。"
+
+#: ../src/prefs.js:80
+msgid "Appearance"
+msgstr "外觀"
+
+#: ../src/prefs.js:82
+msgid "Symbolic icon"
+msgstr "符號圖示"
+
+#: ../src/prefs.js:83
+msgid "Current album cover"
+msgstr "目前的專輯封面"
+
+#: ../src/prefs.js:88
+msgid "Status text"
+msgstr "狀態文字訊息"
+
+#: ../src/prefs.js:89
+msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+msgstr "%a：藝人，%b：專輯，%t：標題。支援 Pango markup 標籤語法。"
+
+#: ../src/player.js:154
+#: ../src/player.js:184
+msgid "rating"
+msgstr "評價"
+
+#: ../src/player.js:176
+msgid "by"
+msgstr "藝人:"
+
+#: ../src/player.js:177
+msgid "from"
+msgstr "專輯:"
+
+#: ../src/player.js:228
+msgid "Volume"
+msgstr "音量"
+
+#: ../src/player.js:348
+msgid "Playlists"
+msgstr "播放清單"
+
+#: ../src/player.js:429
+msgid "Unknown Artist"
+msgstr "未知的藝人"
+
+#: ../src/player.js:433
+msgid "Unknown Album"
+msgstr "未知的專輯"
+
+#: ../src/player.js:437
+msgid "Unknown Title"
+msgstr "未知的標題"
+
+#: ../src/settings.js:45
+msgid "Stopped"
+msgstr "已停止"
+
+#: ../src/settings.js:46
+msgid "Playing"
+msgstr "播放中"
+
+#: ../src/settings.js:47
+msgid "Paused"
+msgstr "已暫停"
+
