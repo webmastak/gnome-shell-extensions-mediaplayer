@@ -85,6 +85,7 @@ const MPRISPlayer = new Lang.Class({
         this._identity = baseName.charAt(0).toUpperCase() + baseName.slice(1);
         this._playlists = "";
         this._playlistsMenu = "";
+        this._tracksMenu = "";
         this._currentPlaylist = "";
         this._currentTime = -1;
         this._wantedSeekValue = 0;
@@ -106,6 +107,11 @@ const MPRISPlayer = new Lang.Class({
                                                this._mediaServerPlaylists = proxy;
                                                this._init2();
                                             }));
+        new DBusIface.MediaServer2TrackList(busName,
+                                            Lang.bind(this, function(proxy) {
+                                               this._mediaServerTrackList = proxy;
+                                               this._init2();
+                                            }));
         new DBusIface.Properties(busName,
                                  Lang.bind(this, function(proxy) {
                                     this._prop = proxy;
@@ -115,7 +121,7 @@ const MPRISPlayer = new Lang.Class({
 
     _init2: function() {
         // Wait all DBus callbacks to continue
-        if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._prop)
+        if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._mediaServerTrackList || !this._prop)
             return;
 
         this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
@@ -266,6 +272,8 @@ const MPRISPlayer = new Lang.Class({
                 this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
             if (props.PlaylistCount)
                 this._getPlaylists();
+            if (props.Tracks)
+                this._getTracksMetadata();
             if (props.CanGoNext || props.CanGoPrevious)
                 this._updateControls();
         }));
@@ -287,6 +295,10 @@ const MPRISPlayer = new Lang.Class({
 
             this._wantedSeekValue = 0;
         }));
+
+        if (this._mediaServer.HasTrackList) {
+                this._getTracksMetadata();
+        }
 
         this.emit('init-done');
     },
@@ -376,6 +388,35 @@ const MPRISPlayer = new Lang.Class({
         this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, this._setPlaylists));
     },
 
+    _setTracks: function(tracks) {
+        if (!tracks && this._tracks)
+            tracks = this._tracks;
+
+        if (tracks && tracks[0].length > 0) {
+            this._tracks = tracks;
+            if (!this._tracksMenu) {
+                this._tracksMenu = new PopupMenu.PopupSubMenuMenuItem(_("Tracks"));
+                this.addMenuItem(this._tracksMenu);
+            }
+            this._tracksMenu.menu.removeAll();
+            for (let p in this._tracks[0]) {
+                let obj = this._tracks[0][p]["mpris:trackid"].unpack();
+                let name = this._tracks[0][p]["xesam:title"].unpack();
+                let track = new Widget.TrackItem(name, obj);
+                track.connect('activate', Lang.bind(this, function(track) {
+                    this._mediaServerTrackList.GoToRemote(track.obj);
+                }));
+                if (obj == this.trackObj)
+                    track.setShowDot(true);
+                this._tracksMenu.menu.addMenuItem(track);
+            }
+        }
+    },
+
+    _getTracksMetadata: function() {
+        this._mediaServerTrackList.GetTracksMetadataRemote(this._mediaServerTrackList.Tracks, Lang.bind(this, this._setTracks));
+    },
+
     _setIdentity: function() {
         if (this._status)
             this.playerTitle.setLabel(this._identity + " - " + _(this._status));
@@ -443,8 +484,12 @@ const MPRISPlayer = new Lang.Class({
             else
                 this.trackUrl = false;
 
-            if (metadata["mpris:trackid"])
+            if (metadata["mpris:trackid"]) {
                 this.trackObj = metadata["mpris:trackid"].unpack();
+                if (this._tracksMenu) {
+                    this._getTracksMetadata();
+                }
+            }
 
             if (this.showRating) {
                 let rating = 0;
