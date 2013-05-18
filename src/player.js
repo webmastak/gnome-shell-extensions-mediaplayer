@@ -402,9 +402,9 @@ const MPRISPlayer = new Lang.Class({
         if (metadata != null && Object.keys(metadata).length > 1) {
             // Check if the track has changed
             let trackChanged = true;
-            if (metadata["mpris:trackid"] && metadata["mpris:trackid"].unpack() == this.trackObj)
+            // Check if the URL has changed
+            if (metadata["xesam:url"] && metadata["xesam:url"].unpack() == this.trackUrl)
                 trackChanged = false;
-
             // Reset the timer only when the track has changed
             if (trackChanged) {
                 this._currentTime = -1;
