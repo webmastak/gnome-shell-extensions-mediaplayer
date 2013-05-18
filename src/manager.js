@@ -43,7 +43,7 @@ const PlayerManager = new Lang.Class({
         // load players
         this._dbus.ListNamesRemote(Lang.bind(this,
             function(names) {
-                for (n in names[0]) {
+                for (let n in names[0]) {
                     let name = names[0][n];
                     if (name_regex.test(name)) {
                         this._dbus.GetNameOwnerRemote(name, Lang.bind(this,
