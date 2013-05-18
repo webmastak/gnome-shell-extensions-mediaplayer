@@ -102,11 +102,11 @@ msgstr "評價"
 
 #: ../src/player.js:176
 msgid "by"
-msgstr "藝人:"
+msgstr "藝人："
 
 #: ../src/player.js:177
 msgid "from"
-msgstr "專輯:"
+msgstr "專輯："
 
 #: ../src/player.js:228
 msgid "Volume"
