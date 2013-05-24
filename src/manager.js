@@ -77,10 +77,7 @@ const PlayerManager = new Lang.Class({
                 this._hideOrDefaultPlayer();
             }))
         );
-        // wait for all players to be loaded
-        Mainloop.timeout_add(500, Lang.bind(this, function() {
-            this._hideOrDefaultPlayer();
-        }));
+        this._hideOrDefaultPlayer();
     },
 
     _isInstance: function(busName) {
@@ -152,14 +149,15 @@ const PlayerManager = new Lang.Class({
             this._addPlayerMenu(this._players[owner].player);
         }
 
-        Mainloop.timeout_add(500, Lang.bind(this, function() {
-            this._hideOrDefaultPlayer();
-        }));
+        this._hideOrDefaultPlayer();
 
         this._refreshStatus();
     },
 
     _hideOrDefaultPlayer: function() {
+        if (this._disabling)
+            return;
+            
         if (this._nbPlayers() == 0 && Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
             if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
                 let player = new Player.DefaultPlayer();
@@ -241,12 +239,7 @@ const PlayerManager = new Lang.Class({
             if (position)
                 this._removeMenuItem(position);
             delete this._players[owner];
-            // wait for all players to be loaded
-            if (!this._disabling) {
-                Mainloop.timeout_add(500, Lang.bind(this, function() {
-                    this._hideOrDefaultPlayer();
-                }));
-            }
+            this._hideOrDefaultPlayer();
         }
         this._refreshStatus();
     },
