@@ -17,6 +17,7 @@
 const Mainloop = imports.mainloop;
 const St = imports.gi.St;
 const PopupMenu = imports.ui.popupMenu;
+const Slider = imports.ui.slider;
 const Pango = imports.gi.Pango;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
@@ -29,7 +30,7 @@ const PlayerButtons = new Lang.Class({
     _init: function() {
         this.parent({reactive: false});
         this.box = new St.BoxLayout({style_class: 'controls'});
-        this.addActor(this.box, {span: -1, align: St.Align.MIDDLE});
+        this.actor.add(this.box, {span: -1, align: St.Align.MIDDLE});
     },
     addButton: function(button) {
         this.box.add_actor(button.actor);
@@ -88,20 +89,24 @@ const PlayerButton = new Lang.Class({
 
 const SliderItem = new Lang.Class({
     Name: "SliderItem",
-    Extends: PopupMenu.PopupSliderMenuItem,
+    Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function(text, icon, value) {
-        this.parent(value);
+        this.parent();
 
-        this.removeActor(this._slider);
+        this._slider = new Slider.Slider(value);
         this._box = new St.Table({style_class: 'slider-item'});
         this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon + '-symbolic'});
         this._label = new St.Label({text: text});
         this._box.add(this._icon, {row: 0, col: 0, x_expand: false})
         this._box.add(this._label, {row: 0, col: 1, x_expand: false})
-        this._box.add(this._slider, {row: 0, col: 2, x_expand: true})
+        this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true})
 
-        this.addActor(this._box, {span: -1, expand: true});
+        this.actor.add(this._box, {span: -1, expand: true});
+    },
+
+    setValue: function(value) {
+        this._slider.setValue(value);
     },
 
     setIcon: function(icon) {
@@ -127,7 +132,7 @@ const TrackBox = new Lang.Class({
         this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
         this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
 
-        this.addActor(this.box, {span: -1, expand: true});
+        this.actor.add(this.box, {span: -1, expand: true});
     },
 
     addInfo: function(item, row) {
@@ -177,7 +182,7 @@ const TitleItem = new Lang.Class({
         this.parent();
 
         this.box = new St.BoxLayout();
-        this.addActor(this.box);
+        this.actor.add(this.box);
         this.label = new St.Label({text: text});
         this.icon = new St.Bin({style_class: "menu-icon", child: icon});
         this.button = new St.Button({style_class: "button-quit"});
@@ -189,7 +194,7 @@ const TitleItem = new Lang.Class({
         this.button.set_child(this.button_icon);
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
-        this.addActor(this.button, {span: -1, expand: true, align: St.Align.END});
+        this.actor.add(this.button, {span: -1, expand: true, align: St.Align.END});
         this.hideButton();
     },
 
@@ -339,6 +344,6 @@ const PlaylistItem = new Lang.Class({
         this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
 
-        this.addActor(this.box);
+        this.actor.add(this.box);
     }
 });
