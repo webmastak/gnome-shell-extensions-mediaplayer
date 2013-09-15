@@ -91,13 +91,15 @@ const SliderItem = new Lang.Class({
     Name: "SliderItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(text, icon, value) {
+    _init: function(label, icon, value) {
         this.parent();
 
-        this._slider = new Slider.Slider(value);
         this._box = new St.Table({style_class: 'slider-item'});
+
         this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon + '-symbolic'});
-        this._label = new St.Label({text: text});
+        this._slider = new Slider.Slider(value);
+        this._label = new St.Label({text: label});
+
         this._box.add(this._icon, {row: 0, col: 0, x_expand: false})
         this._box.add(this._label, {row: 0, col: 1, x_expand: false})
         this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true})
@@ -116,6 +118,10 @@ const SliderItem = new Lang.Class({
     setLabel: function(text) {
         if (this._label.clutter_text)
             this._label.text = text;
+    },
+
+    connect: function(signal, callback) {
+	this._slider.connect(signal, callback);
     }
 });
 
