@@ -50,9 +50,14 @@ function enable() {
         // g-s 3.6
         if (Main.panel.statusArea)
             status = Main.panel.statusArea;
-        while(status['volume']) {
-            mediaplayerMenu = status['volume'];
-            break;
+        // g-s 3.10
+        if (status.aggregateMenu)
+            mediaplayerMenu = Main.panel.statusArea.aggregateMenu;
+        else {
+            while(status['volume']) {
+                mediaplayerMenu = status['volume'];
+                break;
+            }
         }
     }
     else {
