@@ -37,42 +37,16 @@ function init() {
 }
 
 function enable() {
-    // MIGRATE TO NEW SETTINGS
-    if (!Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_VOLUME_MENU_KEY)) {
-        Settings.gsettings.set_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, 1);
-        Settings.gsettings.set_boolean(Settings.MEDIAPLAYER_VOLUME_MENU_KEY, true);
-    }
-
     let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY);
     if (position == Settings.IndicatorPosition.VOLUMEMENU) {
-        // wait for the volume menu
-        let status = Main.panel._statusArea;
-        // g-s 3.6
-        if (Main.panel.statusArea)
-            status = Main.panel.statusArea;
-        // g-s 3.10
-        if (status.aggregateMenu)
-            mediaplayerMenu = Main.panel.statusArea.aggregateMenu;
-        else {
-            while(status['volume']) {
-                mediaplayerMenu = status['volume'];
-                break;
-            }
-        }
+        mediaplayerMenu = Main.panel.statusArea.aggregateMenu;
     }
     else {
         mediaplayerMenu = new Panel.MediaplayerStatusButton();
         if (position == Settings.IndicatorPosition.RIGHT)
             Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
-        if (position == Settings.IndicatorPosition.CENTER) {
-            // g-s 3.6
-            if (Main.panel.statusArea)
-                Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
-            else {
-                Main.panel._centerBox.add(mediaplayerMenu.actor);
-                Main.panel._menus.addMenu(mediaplayerMenu.menu);
-            }
-        }
+        else if (position == Settings.IndicatorPosition.CENTER)
+            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
     }
     playerManager = new Manager.PlayerManager(mediaplayerMenu);
     mediaplayerMenu._delegate = playerManager;

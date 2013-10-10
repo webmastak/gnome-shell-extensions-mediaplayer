@@ -30,7 +30,7 @@ const PlayerButtons = new Lang.Class({
     _init: function() {
         this.parent({reactive: false});
         this.box = new St.BoxLayout({style_class: 'controls'});
-        this.actor.add(this.box, {span: -1, align: St.Align.MIDDLE});
+        this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
     addButton: function(button) {
         this.box.add_actor(button.actor);
@@ -100,9 +100,9 @@ const SliderItem = new Lang.Class({
         this._slider = new Slider.Slider(value);
         this._label = new St.Label({text: label});
 
-        this._box.add(this._icon, {row: 0, col: 0, x_expand: false})
-        this._box.add(this._label, {row: 0, col: 1, x_expand: false})
-        this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true})
+        this._box.add(this._icon, {row: 0, col: 0, x_expand: false});
+        this._box.add(this._label, {row: 0, col: 1, x_expand: false});
+        this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true});
 
         this.actor.add(this._box, {span: -1, expand: true});
     },
@@ -121,7 +121,7 @@ const SliderItem = new Lang.Class({
     },
 
     connect: function(signal, callback) {
-	this._slider.connect(signal, callback);
+        this._slider.connect(signal, callback);
     }
 });
 
@@ -186,21 +186,18 @@ const TitleItem = new Lang.Class({
 
     _init: function(text, icon, callback) {
         this.parent();
-
-        this.box = new St.BoxLayout();
-        this.actor.add(this.box);
         this.label = new St.Label({text: text});
-        this.icon = new St.Bin({style_class: "menu-icon", child: icon});
-        this.button = new St.Button({style_class: "button-quit"});
+        this.icon = new St.Bin({child: icon});
+        this.button = new St.Button({style_class: "system-menu-action button-quit"});
         this.button.connect('clicked', callback);
         this.button_icon = new St.Icon({
             icon_name: 'window-close-symbolic',
-            icon_size: 16
+            icon_size: 14
         });
         this.button.set_child(this.button_icon);
-        this.box.add_actor(this.icon);
-        this.box.add_actor(this.label);
-        this.actor.add(this.button, {span: -1, expand: true, align: St.Align.END});
+        this.actor.add(this.icon);
+        this.actor.add(this.label);
+        this.actor.add(this.button, {expand: true, x_fill: false, x_align: St.Align.END});
         this.hideButton();
     },
 

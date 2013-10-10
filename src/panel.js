@@ -46,7 +46,7 @@ const MediaplayerStatusButton = new Lang.Class({
                                          y_align: St.Align.MIDDLE});
 
         this._stateIcon = new St.Icon({icon_name: 'system-run-symbolic',
-                                       style_class: 'status-icon'})
+                                       style_class: 'status-icon'});
         this._stateIconBin = new St.Bin({child: this._stateIcon,
                                          y_align: St.Align.END});
 

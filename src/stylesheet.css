@@ -4,6 +4,7 @@
 
 .status-icon {
     icon-size: 10px;
+    padding-bottom: 0.3em;
 }
 
 .track-cover {
@@ -47,15 +48,13 @@
 }
 
 .button-quit {
-    padding: 0.1em;
-    background: rgba(150, 150, 150, 0.2);
-    border: 0.15em solid rgba(150, 150, 150, 0.5);
-    border-radius: 1em;
+    padding: 3px;
+    border-radius: 12px;
 }
 
 .button-quit:hover {
-    border-color: white;
     background: #c03;
+    padding: 4px;
 }
 
 .control-button:disabled {
