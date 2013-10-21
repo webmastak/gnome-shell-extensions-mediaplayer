@@ -188,7 +188,7 @@ const TitleItem = new Lang.Class({
         this.parent();
 
         this.box = new St.BoxLayout();
-        this.actor.add(this.box);
+        this.actor.add(this.box, {expand: true});
         this.label = new St.Label({text: text});
         this.icon = new St.Bin({style_class: "menu-icon", child: icon});
         this.button = new St.Button({style_class: "button-quit"});
@@ -199,8 +199,8 @@ const TitleItem = new Lang.Class({
         });
         this.button.set_child(this.button_icon);
         this.box.add_actor(this.icon);
-        this.box.add_actor(this.label);
-        this.actor.add(this.button, {span: -1, expand: true, align: St.Align.END});
+        this.box.add_actor(this.label, {expand: true});
+        this.actor.add(this.button, {span: -1, expand: false, align: St.Align.END});
         this.hideButton();
     },
 
