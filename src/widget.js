@@ -48,7 +48,7 @@ const PlayerButton = new Lang.Class({
 
         this.actor = new St.Button({style_class: 'notification-icon-button control-button',
                                     child: this.icon});
-        this.actor._delegate = this
+        this.actor._delegate = this;
 
         this._callback_id = this.actor.connect('clicked', callback);
 
@@ -100,9 +100,9 @@ const SliderItem = new Lang.Class({
         this._slider = new Slider.Slider(value);
         this._label = new St.Label({text: label});
 
-        this._box.add(this._icon, {row: 0, col: 0, x_expand: false})
-        this._box.add(this._label, {row: 0, col: 1, x_expand: false})
-        this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true})
+        this._box.add(this._icon, {row: 0, col: 0, x_expand: false});
+        this._box.add(this._label, {row: 0, col: 1, x_expand: false});
+        this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true});
 
         this.actor.add(this._box, {span: -1, expand: true});
     },
@@ -240,7 +240,7 @@ const TrackRating = new Lang.Class({
         // Supported players
         this._supported = {
             "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
-            "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
+            "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating
         };
         // Icons
         this._starredIcon = [];
