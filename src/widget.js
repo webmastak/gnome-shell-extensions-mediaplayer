@@ -132,11 +132,11 @@ const TrackBox = new Lang.Class({
     _init: function(cover) {
         this.parent({reactive: false});
 
-        this.box = new St.Table();
+        this.box = new St.BoxLayout({vertical: false});
         this._cover = cover;
         this._infos = new St.Table({style_class: "track-infos"});
-        this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
-        this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
+        this.box.add(this._cover, {x_expand: false});
+        this.box.add(this._infos, {x_expand: true});
 
         this.actor.add(this.box, {span: -1, expand: true});
     },
