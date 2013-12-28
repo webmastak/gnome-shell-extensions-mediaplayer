@@ -16,7 +16,12 @@
     border-radius: 2px;
 }
 
-.track-infos {
+.track-infos:ltr {
+    padding-left: 1em;
+    width: 15em;
+}
+
+.track-infos:rtl {
     padding-left: 1em;
     width: 15em;
 }
