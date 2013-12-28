@@ -47,13 +47,14 @@
     width: 9em;
 }
 
-.button-quit {
+.title-button {
     padding: 3px;
     border-radius: 12px;
 }
 
-.button-quit:hover {
+.title-button:hover {
     background: #c03;
+    background: #999;
     padding: 4px;
 }
 

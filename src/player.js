@@ -45,25 +45,17 @@ const DefaultPlayer = new Lang.Class({
             Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
         );
 
-        let icon = this._app.create_icon_texture(16);
+        let appIcon = this._app.create_icon_texture(16);
         this.playerTitle = new Widget.TitleItem(this._app.get_name(),
-                                                icon,
-                                                function() {});
+                                                appIcon,
+                                                "system-run-symbolic",
+                                                Lang.bind(this, function () {
+                                                    this._app.activate_full(-1, 0);
+                                                }));
         this.playerTitle.setSensitive(false);
         this.playerTitle.actor.remove_style_pseudo_class('insensitive');
-        this.playerTitle.hideButton();
 
         this.addMenuItem(this.playerTitle);
-
-        this._runButton = new Widget.PlayerButton('system-run-symbolic',
-                                                  Lang.bind(this, function () {
-                                                      this._app.activate_full(-1, 0);
-                                                  }));
-
-        this.trackControls = new Widget.PlayerButtons();
-        this.trackControls.addButton(this._runButton);
-
-        this.addMenuItem(this.trackControls);
     }
 });
 
@@ -161,7 +153,10 @@ const MPRISPlayer = new Lang.Class({
             }))
         );
         let genericIcon = new St.Icon({icon_name: "audio-x-generic-symbolic", icon_size: 16});
-        this.playerTitle = new Widget.TitleItem(this._identity, genericIcon, Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
+        this.playerTitle = new Widget.TitleItem(this._identity,
+                                                genericIcon,
+                                                "window-close-symbolic",
+                                                Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
 
         this.addMenuItem(this.playerTitle);
 

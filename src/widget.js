@@ -184,21 +184,23 @@ const TitleItem = new Lang.Class({
     Name: "TitleItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(text, icon, callback) {
+    _init: function(text, icon, button_icon, button_callback) {
         this.parent();
         this.label = new St.Label({text: text});
         this.icon = new St.Bin({child: icon});
-        this.button = new St.Button({style_class: "system-menu-action button-quit"});
-        this.button.connect('clicked', callback);
-        this.button_icon = new St.Icon({
-            icon_name: 'window-close-symbolic',
-            icon_size: 14
-        });
-        this.button.set_child(this.button_icon);
         this.actor.add(this.icon);
         this.actor.add(this.label);
-        this.actor.add(this.button, {expand: true, x_fill: false, x_align: St.Align.END});
-        this.hideButton();
+
+        if (button_icon) {
+            this.button = new St.Button({style_class: "system-menu-action title-button"});
+            this.button.connect('clicked', button_callback);
+            this.button_icon = new St.Icon({
+                icon_name: button_icon,
+                icon_size: 14
+            });
+            this.button.set_child(this.button_icon);
+            this.actor.add(this.button, {expand: true, x_fill: false, x_align: St.Align.END});
+        }
     },
 
     setLabel: function(text) {
