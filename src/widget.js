@@ -364,3 +364,21 @@ const PlaylistItem = new Lang.Class({
         this.actor.add(this.box);
     }
 });
+
+const TrackItem = new Lang.Class({
+    Name: "TrackItem",
+    Extends: PopupMenu.PopupBaseMenuItem,
+
+    _init: function (text, obj, icon) {
+        this.parent();
+
+        this.obj = obj;
+        this.box = new St.BoxLayout();
+        this.label = new St.Label({text: text});
+        this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list-symbolic'});
+        this.box.add_actor(this.icon);
+        this.box.add_actor(this.label);
+
+        this.addActor(this.box);
+    }
+});
