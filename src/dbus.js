@@ -17,84 +17,94 @@
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 
-const DBusIface = <interface name="org.freedesktop.DBus">
-<method name="GetNameOwner">
-    <arg type="s" direction="in" />
-    <arg type="s" direction="out" />
-</method>
-<method name="ListNames">
-    <arg type="as" direction="out" />
-</method>
-<signal name="NameOwnerChanged">
-    <arg type="s" direction="out" />
-    <arg type="s" direction="out" />
-    <arg type="s" direction="out" />
-</signal>
-</interface>;
+const DBusIface = '<node>\
+    <interface name="org.freedesktop.DBus">\
+        <method name="GetNameOwner">\
+            <arg type="s" direction="in" />\
+            <arg type="s" direction="out" />\
+        </method>\
+        <method name="ListNames">\
+            <arg type="as" direction="out" />\
+        </method>\
+        <signal name="NameOwnerChanged">\
+            <arg type="s" direction="out" />\
+            <arg type="s" direction="out" />\
+            <arg type="s" direction="out" />\
+        </signal>\
+    </interface>\
+</node>';
 const DBusProxy = Gio.DBusProxy.makeProxyWrapper(DBusIface);
 
-const PropertiesIface = <interface name="org.freedesktop.DBus.Properties">
-<method name="Get">
-    <arg type="s" direction="in" />
-    <arg type="s" direction="in" />
-    <arg type="v" direction="out" />
-</method>
-<signal name="PropertiesChanged">
-    <arg type="s" direction="out" />
-    <arg type="a{sv}" direction="out" />
-    <arg type="as" direction="out" />
-</signal>
-</interface>;
+const PropertiesIface = '<node>\
+    <interface name="org.freedesktop.DBus.Properties">\
+        <method name="Get">\
+            <arg type="s" direction="in" />\
+            <arg type="s" direction="in" />\
+            <arg type="v" direction="out" />\
+        </method>\
+        <signal name="PropertiesChanged">\
+            <arg type="s" direction="out" />\
+            <arg type="a{sv}" direction="out" />\
+            <arg type="as" direction="out" />\
+        </signal>\
+    </interface>\
+</node>';
 const PropertiesProxy = Gio.DBusProxy.makeProxyWrapper(PropertiesIface);
 
-const MediaServer2Iface = <interface name="org.mpris.MediaPlayer2">
-<method name="Raise" />
-<method name="Quit" />
-<property name="CanRaise" type="b" access="read" />
-<property name="CanQuit" type="b" access="read" />
-<property name="Identity" type="s" access="read" />
-<property name="DesktopEntry" type="s" access="read" />
-</interface>;
+const MediaServer2Iface = '<node>\
+    <interface name="org.mpris.MediaPlayer2">\
+        <method name="Raise" />\
+        <method name="Quit" />\
+        <property name="CanRaise" type="b" access="read" />\
+        <property name="CanQuit" type="b" access="read" />\
+        <property name="Identity" type="s" access="read" />\
+        <property name="DesktopEntry" type="s" access="read" />\
+    </interface>\
+</node>';
 const MediaServer2Proxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2Iface);
 
-const MediaServer2PlayerIface = <interface name="org.mpris.MediaPlayer2.Player">
-<method name="PlayPause" />
-<method name="Pause" />
-<method name="Play" />
-<method name="Stop" />
-<method name="Next" />
-<method name="Previous" />
-<method name="SetPosition">
-    <arg type="o" direction="in" />
-    <arg type="x" direction="in" />
-</method>
-<property name="CanPause" type="b" access="read" />
-<property name="CanSeek" type="b" access="read" />
-<property name="Metadata" type="a{sv}" access="read" />
-<property name="Volume" type="d" access="readwrite" />
-<property name="PlaybackStatus" type="s" access="read" />
-<property name="Position" type="x" access="read" />
-<signal name="Seeked">
-    <arg type="x" direction="out" />
-</signal>
-</interface>
+const MediaServer2PlayerIface = '<node>\
+    <interface name="org.mpris.MediaPlayer2.Player">\
+        <method name="PlayPause" />\
+        <method name="Pause" />\
+        <method name="Play" />\
+        <method name="Stop" />\
+        <method name="Next" />\
+        <method name="Previous" />\
+        <method name="SetPosition">\
+            <arg type="o" direction="in" />\
+            <arg type="x" direction="in" />\
+        </method>\
+        <property name="CanPause" type="b" access="read" />\
+        <property name="CanSeek" type="b" access="read" />\
+        <property name="Metadata" type="a{sv}" access="read" />\
+        <property name="Volume" type="d" access="readwrite" />\
+        <property name="PlaybackStatus" type="s" access="read" />\
+        <property name="Position" type="x" access="read" />\
+        <signal name="Seeked">\
+            <arg type="x" direction="out" />\
+        </signal>\
+    </interface>\
+</node>';
 const MediaServer2PlayerProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlayerIface);
 
-const MediaServer2PlaylistsIface = <interface name="org.mpris.MediaPlayer2.Playlists">
-<method name="ActivatePlaylist">
-    <arg type="o" direction="in" />
-</method>
-<method name="GetPlaylists">
-    <arg type="u" direction="in" />
-    <arg type="u" direction="in" />
-    <arg type="s" direction="in" />
-    <arg type="b" direction="in" />
-    <arg type="a{oss}" direction="out" />
-</method>
-<property name="PlaylistCount" type="u" access="read" />
-<property name="Orderings" type="as" access="read" />
-<property name="ActivePlaylist" type="(b(oss))" access="read" />
-</interface>
+const MediaServer2PlaylistsIface = '<node>\
+    <interface name="org.mpris.MediaPlayer2.Playlists">\
+        <method name="ActivatePlaylist">\
+            <arg type="o" direction="in" />\
+        </method>\
+        <method name="GetPlaylists">\
+            <arg type="u" direction="in" />\
+            <arg type="u" direction="in" />\
+            <arg type="s" direction="in" />\
+            <arg type="b" direction="in" />\
+            <arg type="a{oss}" direction="out" />\
+        </method>\
+        <property name="PlaylistCount" type="u" access="read" />\
+        <property name="Orderings" type="as" access="read" />\
+        <property name="ActivePlaylist" type="(b(oss))" access="read" />\
+    </interface>\
+</node>';
 const MediaServer2PlaylistsProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlaylistsIface);
 
 function DBus() {
