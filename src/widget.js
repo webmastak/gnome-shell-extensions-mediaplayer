@@ -330,12 +330,14 @@ const TrackRating = new Lang.Class({
     },
 
     applyRhythmbox3Rating: function(value) {
-        const Rhythmbox3Iface = <interface name="org.gnome.Rhythmbox3.RhythmDB">
-        <method name="SetEntryProperties">
-            <arg type="s" direction="in" />
-            <arg type="a{sv}" direction="in" />
-        </method>
-        </interface>;
+        const Rhythmbox3Iface = '<node>\
+            <interface name="org.gnome.Rhythmbox3.RhythmDB">\
+                <method name="SetEntryProperties">\
+                    <arg type="s" direction="in" />\
+                    <arg type="a{sv}" direction="in" />\
+                </method>\
+            </interface>\
+        </node>';
         const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
 
         if (this._player.trackUrl) {
