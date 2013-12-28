@@ -240,67 +240,77 @@ const TrackRating = new Lang.Class({
             "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
         };
         // Icons
-        this._starredIcon = [];
-        this._nonStarredIcon = [];
+        this._starIcon = [];
         this._starButton = [];
         for(let i=0; i < 5; i++) {
-            // Create starred icons
-            this._starredIcon[i] = new St.Icon({style_class: 'star-icon',
-                                                icon_size: 16,
-                                                icon_name: 'starred-symbolic'
-                                               });
-            // Create non-starred icons
-            this._nonStarredIcon[i] = new St.Icon({style_class: 'star-icon',
-                                                   icon_size: 16,
-                                                   icon_name: 'non-starred-symbolic'
-                                                  });
+            // Create star icons
+            this._starIcon[i] = new St.Icon({style_class: 'star-icon',
+                                             icon_size: 16,
+                                             icon_name: 'non-starred-symbolic'
+                                             });
             // Create the button with starred icon
             this._starButton[i] = new St.Button({style_class: 'button-star',
                                                  x_align: St.Align.START,
                                                  y_align: St.Align.MIDDLE,
                                                  track_hover: true,
-                                                 child: this._starredIcon[i]
+                                                 child: this._starIcon[i]
                                                 });
             this._starButton[i]._rateValue = i + 1;
+            this._starButton[i]._starred = false;
             this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
             this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
 
             // Put the button in the box
             this.actor.add(this._starButton[i]);
         }
-        this.showRating(this._value);
+        this.setRating(this._value);
     },
 
     newRating: function(button) {
         if (this._supported[this._player.busName]) {
             if (button.hover)
-                this.showRating(button._rateValue);
+                this.hoverRating(button._rateValue);
             else
-                this.showRating(this._value);
+                this.setRating(this._value);
         }
     },
 
-    showRating: function(value) {
-        for (let i = 0; i < 5; i++)
-            this._starButton[i].set_child(this._nonStarredIcon[i]);
-        for (let i = 0; i < value; i++)
-            this._starButton[i].set_child(this._starredIcon[i]);
+    hoverRating: function(value) {
+        for (let i = 0; i < 5; i++) {
+            this._starButton[i].child.icon_name = "non-starred-symbolic";
+        }
+        for (let i = 0; i < value; i++) {
+            this._starButton[i].child.icon_name = "starred-symbolic";
+        }
     },
 
     setRating: function(value) {
+        for (let i = 0; i < 5; i++) {
+            this._starButton[i].child.icon_name = "non-starred-symbolic";
+            this._starButton[i]._starred = false;
+        }
+        for (let i = 0; i < value; i++) {
+            this._starButton[i].child.icon_name = "starred-symbolic";
+            this._starButton[i]._starred = true;
+        }
         this._value = value;
     },
 
     applyRating: function(button) {
+        let rateValue;
+        // Click on a already starred icon, unrates
+        if (button._starred && button._rateValue == this._value)
+            rateValue = 0
+        else
+            rateValue = button._rateValue
         // Apply the rating in the player
         let applied = false;
         if (this._supported[this._player.busName]) {
             let applyFunc = Lang.bind(this, this._supported[this._player.busName]);
-            applied = applyFunc(button._rateValue);
+            applied = applyFunc(rateValue);
         }
         if (applied) {
-            this.setRating(button._rateValue);
-            this.showRating(button._rateValue);
+            this.setRating(rateValue);
         }
     },
 

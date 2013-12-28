@@ -452,7 +452,6 @@ const MPRISPlayer = new Lang.Class({
                 if (metadata["rating"])
                     rating = metadata["rating"].deep_unpack();
                 this.trackRating.setRating(parseInt(rating));
-                this.trackRating.showRating(parseInt(rating));
             }
 
             let change = false;
