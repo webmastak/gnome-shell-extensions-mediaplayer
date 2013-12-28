@@ -7,6 +7,10 @@
     padding-bottom: 0.3em;
 }
 
+.track-box {
+    padding-left: 2em;
+}
+
 .track-cover {
     border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 2px;
@@ -53,7 +57,6 @@
 }
 
 .title-button:hover {
-    background: #c03;
     background: #999;
     padding: 4px;
 }

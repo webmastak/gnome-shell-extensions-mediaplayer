@@ -130,7 +130,9 @@ const TrackBox = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function(cover) {
-        this.parent({reactive: false});
+        this.parent({reactive: false, style_class: "track-box"});
+        // This adds an unwanted height if the PopupBaseMenuItem is empty
+        this.actor.remove_actor(this._ornamentLabel)
 
         this.box = new St.BoxLayout({vertical: false});
         this._cover = cover;
@@ -138,7 +140,7 @@ const TrackBox = new Lang.Class({
         this.box.add(this._cover, {x_expand: false});
         this.box.add(this._infos, {x_expand: true});
 
-        this.actor.add(this.box, {span: -1, expand: true});
+        this.actor.add(this.box, {expand: true});
     },
 
     addInfo: function(item, row) {
