@@ -242,6 +242,7 @@ const TrackRating = new Lang.Class({
         this._supported = {
             "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
             "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
+            "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating
         };
         // Icons
         this._starIcon = [];
@@ -320,6 +321,11 @@ const TrackRating = new Lang.Class({
 
     applyBansheeRating: function(value) {
         GLib.spawn_command_line_async("banshee --set-rating=%s".format(value));
+        return true;
+    },
+
+    applyGuayadequeRating: function(value) {
+        GLib.spawn_command_line_async("guayadeque --set-rating=%s".format(value));
         return true;
     },
 
