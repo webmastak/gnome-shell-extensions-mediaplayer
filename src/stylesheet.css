@@ -2,9 +2,13 @@
     spacing: 5px;
 }
 
+.indicator-icon {
+    padding-right: 0px;
+}
+
 .status-icon {
     icon-size: 10px;
-    padding-bottom: 0.3em;
+    padding-bottom: 0.4em;
 }
 
 .track-box {

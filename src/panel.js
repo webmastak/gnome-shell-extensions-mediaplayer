@@ -38,7 +38,7 @@ const MediaplayerStatusButton = new Lang.Class({
         this._box = new St.BoxLayout();
 
         this._icon = new St.Icon({icon_name: 'audio-x-generic-symbolic',
-                                  style_class: 'system-status-icon'});
+                                  style_class: 'system-status-icon indicator-icon'});
         this._bin = new St.Bin({child: this._icon});
 
         this._stateText = new St.Label();
@@ -60,7 +60,7 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _showCover: function(player) {
         if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER &&
-           this._coverPath != player.trackCoverPath) {
+                this._coverPath != player.trackCoverPath) {
             this._coverPath = player.trackCoverPath;
             // Change cover
             if (this._coverPath && GLib.file_test(this._coverPath, GLib.FileTest.EXISTS)) {
