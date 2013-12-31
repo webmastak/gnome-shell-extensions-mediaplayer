@@ -246,9 +246,8 @@ const MPRISPlayer = new Lang.Class({
             this.playerTitle.actor.remove_style_pseudo_class('insensitive');
         }
 
-        if (this._mediaServer.CanQuit) {
-            this.playerTitle.showButton();
-        }
+        if (!this._mediaServer.CanQuit)
+            this.playerTitle.hideButton();
 
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
             if (props.Volume)
