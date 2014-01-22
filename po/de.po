@@ -104,19 +104,19 @@ msgstr "Zeigt eine Bewertungsskala von 0 bis 5 für das aktuelle Lied an"
 
 #: ../src/prefs.js:64
 msgid "Album cover size"
-msgstr "Größe der Albumcover"
+msgstr "Größe der Albumbilder"
 
 #: ../src/prefs.js:65
 msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr "Größe der Albumcover im Menü. Standard ist eine Breite von 80px."
+msgstr "Größe der Albumbilder im Menü. Standard ist eine Breite von 80px."
 
 #: ../src/prefs.js:75
 msgid "Allow to start the default media player"
-msgstr "Es zulassen, den Standard-Mediaplayer aufzurufen"
+msgstr "Es zulassen, die vorgegebene Medienwiedergabe aufzurufen"
 
 #: ../src/prefs.js:76
 msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr "Beim Klick auf die Statuszeile den Standard-Mediaplayer aufrufen."
+msgstr "Beim Klick auf die Anzeige die vorgegebene Medienwiedergabe aufrufen."
 
 #: ../src/prefs.js:80
 msgid "Appearance"
@@ -128,7 +128,7 @@ msgstr "Symbolisches Zeichen"
 
 #: ../src/prefs.js:83
 msgid "Current album cover"
-msgstr "Aktuelles Album-Cover"
+msgstr "Aktuelles Albumbild"
 
 #: ../src/prefs.js:88
 msgid "Status text"
@@ -139,4 +139,4 @@ msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
 msgstr "%a: Künstler, %b: Album, %t: Titel. Pango-Auszeichnung wird unterstützt."
 
 #~ msgid "Show the media player in the volume menu"
-#~ msgstr "Mediaplayer im Lautstärkemenü anzeigen"
+#~ msgstr "Medienwiedergabe im Lautstärkemenü anzeigen"
