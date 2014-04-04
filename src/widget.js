@@ -63,7 +63,7 @@ const PlayerButton = new Lang.Class({
     },
 
     setIcon: function(icon) {
-        this.icon.icon_name = icon + '-symbolic';
+        this.icon.icon_name = icon;
     },
 
     enable: function() {

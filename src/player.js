@@ -689,18 +689,18 @@ const MPRISPlayer = new Lang.Class({
                 if (this._status == Settings.Status.PLAY) {
                     this._stopButton.show();
                     if (canPause)
-                        this._playButton.setIcon("media-playback-pause");
+                        this._playButton.setIcon("media-playback-pause-symbolic");
                     else
                         this._playButton.hide();
                 }
 
                 if (this._status == Settings.Status.PAUSE)
-                    this._playButton.setIcon("media-playback-start");
+                    this._playButton.setIcon("media-playback-start-symbolic");
 
                 if (this._status == Settings.Status.STOP) {
                     this._stopButton.hide();
                     this._playButton.show();
-                    this._playButton.setIcon("media-playback-start");
+                    this._playButton.setIcon("media-playback-start-symbolic");
                 }
             })
         );
