@@ -2,19 +2,22 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Matanya Moses <matanya@foss.co.il>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-31 14:54+0100\n"
-"PO-Revision-Date: 2012-01-16 09:24+0200\n"
-"Last-Translator: Yakir Sitbon <kingyes1@gmail.com>\n"
-"Language-Team: Yakir Sitbon <kingyes1@gmail.com>\n"
+"PO-Revision-Date: 2014-04-24 00:42+0300\n"
+"Last-Translator: Matanya Moses <matanya@foss.co.il>\n"
+"Language-Team: עברית <>\n"
 "Language: Hebrew\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 2.91.6\n"
 
 #: ../src/extension.js:64
 msgid "Stopped"
@@ -30,7 +33,7 @@ msgstr "הושהה"
 
 #: ../src/extension.js:131 ../src/extension.js:160
 msgid "rating"
-msgstr ""
+msgstr "דירוג"
 
 #: ../src/extension.js:152
 msgid "by"
@@ -45,9 +48,8 @@ msgid "Volume"
 msgstr "עוצמת קול"
 
 #: ../src/extension.js:310
-#, fuzzy
 msgid "Playlists"
-msgstr "מתנגן"
+msgstr "רשימות השמעה"
 
 #: ../src/extension.js:378
 msgid "Unknown Artist"
@@ -63,79 +65,76 @@ msgstr "שיר לא ידוע"
 
 #: ../src/prefs.js:37
 msgid "Position in the top panel"
-msgstr ""
+msgstr "מיקום בסרגל העליון"
 
 #: ../src/prefs.js:38
 msgid "Restart the shell to apply this setting."
-msgstr ""
+msgstr "יש לאתחל את המעטפת על מנת להחיל את השינויים"
 
 #: ../src/prefs.js:40
 msgid "Center"
-msgstr ""
+msgstr "מרכז"
 
 #: ../src/prefs.js:41
 msgid "Right"
-msgstr ""
+msgstr "ימין"
 
 #: ../src/prefs.js:42
 msgid "Volume menu integration"
-msgstr ""
+msgstr "שילוב בתפריט השמע"
 
 #: ../src/prefs.js:47
-#, fuzzy
 msgid "Show the media player volume slider"
-msgstr "מתנגן"
+msgstr "הצגת בורר השמע של נגן המדיה"
 
 #: ../src/prefs.js:51
-#, fuzzy
 msgid "Show the media player position slider"
-msgstr "מתנגן"
+msgstr "הצגת בורר מיקום השיר של נגן המדיה"
 
 #: ../src/prefs.js:55
-#, fuzzy
 msgid "Show media player playlists"
-msgstr "מתנגן"
+msgstr "הצגת רשימות ההשמעה של נגן המדיה"
 
 #: ../src/prefs.js:59
 msgid "Display song rating"
-msgstr ""
+msgstr "הצגת דירוג השיר"
 
 #: ../src/prefs.js:60
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr ""
+msgstr "הצגת דירוג השיר המתנגן בסקלה של 0 עד 5"
 
 #: ../src/prefs.js:64
 msgid "Album cover size"
-msgstr ""
+msgstr "גודל עטיפת האלבום"
 
 #: ../src/prefs.js:65
 msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr ""
+msgstr "גודל האלבום המוצג בתפריט. ברירת המחדל היא רוחב 80px"
 
 #: ../src/prefs.js:75
 msgid "Allow to start the default media player"
-msgstr ""
+msgstr "אפשרות להפעיל את נגן ברירת המחדל של המערכת"
 
 #: ../src/prefs.js:76
 msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr ""
+msgstr "מפעיל את נגן ברירת המחדל בלחיצה על הסמן"
 
 #: ../src/prefs.js:80
 msgid "Appearance"
-msgstr ""
+msgstr "מראה"
 
 #: ../src/prefs.js:82
 msgid "Symbolic icon"
-msgstr ""
+msgstr "סמליל מייצג"
 
 #: ../src/prefs.js:83
 msgid "Current album cover"
-msgstr ""
+msgstr "עטיפת אלבום נוכחי"
 
 #: ../src/prefs.js:88
 msgid "Status text"
-msgstr ""
+msgstr "טקסט המצב"
 
 #: ../src/prefs.js:89
 msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
-msgstr ""
+msgstr "%a: אמן, %b: אלבום, %t: כותר. תחביר Pango נתמך."
