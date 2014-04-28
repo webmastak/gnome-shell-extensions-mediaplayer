@@ -34,6 +34,11 @@
         <_summary>Album cover size</_summary>
         <_description>The size of the cover displayed in the menu. Default is 80px width.</_description>
     </key>
+    <key name="ellipsize" type="i">
+        <default>300</default>
+        <_summary>Title width</_summary>
+        <_description>The the maximum width before the title gets an ellipsis. Default is 300px.</_description>
+    </key>
     <key name="rundefault" type="b">
         <default>false</default>
         <_summary>Allow to start the default media player</_summary>
