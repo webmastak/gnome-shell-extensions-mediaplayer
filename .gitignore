@@ -16,3 +16,5 @@ metadata.json
 *.gschema.valid
 _build
 zip-files
+
+*.swp
