@@ -39,6 +39,11 @@
         <_summary>Allow to start the default media player</_summary>
         <_description>Starts the default mediaplayer by clicking on the media player status icon.</_description>
     </key>
+    <key name="mpname" type="s">
+        <default>''</default>
+        <_summary>Summary</_summary>
+        <_description>Description.</_description>
+    </key>
     <key type="b" name="rating">
     	<default>false</default>
     	<_summary>Display song rating</_summary>

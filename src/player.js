@@ -38,12 +38,20 @@ const DefaultPlayer = new Lang.Class({
     Name: 'DefaultPlayer',
     Extends: PopupMenu.PopupMenuSection,
 
-    _init: function() {
+    _init: function(mpname) {
         this.parent();
 
-        this._app = Shell.AppSystem.get_default().lookup_app(
-            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
-        );
+        this._app = null;
+        mpname = mpname.trim();
+        if (mpname.length > 0)
+            this._app = Shell.AppSystem.get_default().lookup_app(
+                mpname + ".desktop"
+            );
+        
+        if (!this._app)
+            this._app = Shell.AppSystem.get_default().lookup_app(
+                Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
+            );
 
         let appIcon = this._app.create_icon_texture(16);
         this.playerTitle = new Widget.TitleItem(this._app.get_name(),

@@ -44,8 +44,13 @@ function init() {
         },
         rundefault: {
             type: "b",
-            label: _("Allow to start the default media player"),
-            help: _("Runs the default mediaplayer by clicking on the indicator or from the menu")
+            label: _("Allow to start the media player"),
+            help: _("Runs the mediaplayer by clicking on the indicator or from the menu")
+        },
+        mpname: {
+            type: "s",
+            label: _("Media player name"),
+            help: _("Name of the media player to start. Leave empty for default.")
         },
         volume: {
             type: "b",

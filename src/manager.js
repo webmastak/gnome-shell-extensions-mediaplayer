@@ -160,7 +160,7 @@ const PlayerManager = new Lang.Class({
             
         if (this._nbPlayers() == 0 && Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
             if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-                let player = new Player.DefaultPlayer();
+                let player = new Player.DefaultPlayer(Settings.gsettings.get_string(Settings.MEDIAPLAYER_NAME));
                 this._players[Settings.DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
                 this._addPlayerMenu(player);
             }
