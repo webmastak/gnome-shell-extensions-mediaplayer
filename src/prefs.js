@@ -72,6 +72,15 @@ function init() {
             max: 110,
             step: 5,
             default: 80
+        },
+        ellipsize: {
+            type: "r",
+            label: _("Title width"),
+            help: _("The the maximum width before the title gets an ellipsis. Default is 300px."),
+            min: 100,
+            max: 900,
+            step: 5,
+            default: 300
         }
     };
     settings_indicator = {
