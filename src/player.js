@@ -41,15 +41,13 @@ const DefaultPlayer = new Lang.Class({
     _init: function(mpname) {
         this.parent();
 
-        this._app = null;
-        mpname = mpname.trim();
+        let appSys = Shell.AppSystem.get_default();
+
         if (mpname.length > 0)
-            this._app = Shell.AppSystem.get_default().lookup_app(
-                mpname + ".desktop"
-            );
+            this._app = appSys.lookup_app(mpname + ".desktop")
         
         if (!this._app)
-            this._app = Shell.AppSystem.get_default().lookup_app(
+            this._app = appSys.lookup_app(
                 Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
             );
 
