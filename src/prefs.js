@@ -1,4 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* jshint esnext: true */
+/* global imports: false */
 /**
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
+
+'use strict';
 
 const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
@@ -109,7 +113,7 @@ function buildPrefsWidget() {
                                   margin_left: 30, margin_bottom: 10});
     let hbox;
 
-    for (setting_indicator in settings_indicator) {
+    for (let setting_indicator in settings_indicator) {
         hbox = buildHbox(settings_indicator, setting_indicator);
         vbox_indicator.add(hbox);
     }
@@ -177,7 +181,7 @@ function createEnumSetting(settings, setting) {
         if (!success)
             return;
 
-        let id = model.get_value(iter, 0)
+        let id = model.get_value(iter, 0);
         gsettings.set_enum(setting.replace('_', '-'), id);
 
         if (setting == "indicator_position") {
@@ -189,8 +193,8 @@ function createEnumSetting(settings, setting) {
     });
 
     if (settings[setting].help) {
-        setting_label.set_tooltip_text(settings[setting].help)
-        setting_enum.set_tooltip_text(settings[setting].help)
+        setting_label.set_tooltip_text(settings[setting].help);
+        setting_enum.set_tooltip_text(settings[setting].help);
     }
 
     hbox.pack_start(setting_label, true, true, 0);
@@ -219,8 +223,8 @@ function createStringSetting(settings, setting) {
     }
 
     if (settings[setting].help) {
-        setting_label.set_tooltip_text(settings[setting].help)
-        setting_string.set_tooltip_text(settings[setting].help)
+        setting_label.set_tooltip_text(settings[setting].help);
+        setting_string.set_tooltip_text(settings[setting].help);
     }
 
     hbox.pack_start(setting_label, true, true, 0);
@@ -246,8 +250,8 @@ function createIntSetting(settings, setting) {
     });
 
     if (settings[setting].help) {
-        setting_label.set_tooltip_text(settings[setting].help)
-        setting_int.set_tooltip_text(settings[setting].help)
+        setting_label.set_tooltip_text(settings[setting].help);
+        setting_int.set_tooltip_text(settings[setting].help);
     }
 
     hbox.pack_start(setting_label, true, true, 0);
@@ -270,8 +274,8 @@ function createBoolSetting(settings, setting) {
     });
 
     if (settings[setting].help) {
-        setting_label.set_tooltip_text(settings[setting].help)
-        setting_switch.set_tooltip_text(settings[setting].help)
+        setting_label.set_tooltip_text(settings[setting].help);
+        setting_switch.set_tooltip_text(settings[setting].help);
     }
 
     hbox.pack_start(setting_label, true, true, 0);
@@ -300,8 +304,8 @@ function createRangeSetting(settings, setting) {
     });
 
     if (settings[setting].help) {
-        setting_label.set_tooltip_text(settings[setting].help)
-        setting_range.set_tooltip_text(settings[setting].help)
+        setting_label.set_tooltip_text(settings[setting].help);
+        setting_range.set_tooltip_text(settings[setting].help);
     }
 
     hbox.pack_start(setting_label, true, true, 0);

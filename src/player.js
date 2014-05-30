@@ -1,4 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* jshint esnext: true */
+/* global imports: false */
 /**
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
+
+'use strict';
 
 const Mainloop = imports.mainloop;
 const Gio = imports.gi.Gio;
@@ -377,7 +381,7 @@ const MPRISPlayer = new Lang.Class({
 
     _setPosition: function(value) {
         // Player does not have a position property
-        if (value == null && this._status != Settings.Status.STOP) {
+        if (value === null && this._status != Settings.Status.STOP) {
             this._updateSliders(false);
         }
         else {
@@ -393,7 +397,7 @@ const MPRISPlayer = new Lang.Class({
     _setMetadata: function(metadata) {
         // Pragha sends a metadata dict with one
         // value on stop
-        if (metadata != null && Object.keys(metadata).length > 1) {
+        if (metadata !== null && Object.keys(metadata).length > 1) {
             // Check if the track has changed
             let trackChanged = true;
             // Check if the URL has changed
@@ -456,7 +460,7 @@ const MPRISPlayer = new Lang.Class({
                 }
             }
             else {
-                if (this.trackCoverFile != false) {
+                if (this.trackCoverFile !== false) {
                     this.trackCoverFile = false;
                     change = true;
                 }
@@ -560,11 +564,11 @@ const MPRISPlayer = new Lang.Class({
 
     _setVolume: function(value) {
         // Player does not have a volume property
-        if (value == null)
+        if (value === null)
             this.showVolume = false;
 
         if (this.showVolume) {
-            if (value == 0)
+            if (value === 0)
                 this._volume.setIcon("audio-volume-muted-symbolic");
             if (value > 0)
                 this._volume.setIcon("audio-volume-low-symbolic");
@@ -609,7 +613,7 @@ const MPRISPlayer = new Lang.Class({
         this._setIdentity();
         if (this._status != Settings.Status.STOP) {
             this.emit('player-cover-changed');
-            if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 0) {
+            if (this.trackBox.box.get_stage() && this.trackBox.box.opacity === 0) {
                 this.trackBox.box.show();
                 this.trackBox.box.set_height(-1);
                 let [minHeight, naturalHeight] = this.trackBox.box.get_preferred_height(-1);
@@ -650,8 +654,8 @@ const MPRISPlayer = new Lang.Class({
                 this._canSeek = true;
                 if (!err)
                     this._canSeek = value[0].unpack();
-                if (this._songLength == 0 || position == false)
-                    this._canSeek = false
+                if (this._songLength === 0 || position === false)
+                    this._canSeek = false;
 
                 if (this._status != Settings.Status.STOP && this._canSeek && this.showPosition)
                     this._position.actor.show();
@@ -755,7 +759,7 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _pauseTimer: function() {
-        if (this._timeoutId != 0) {
+        if (this._timeoutId !== 0) {
             Mainloop.source_remove(this._timeoutId);
             this._timeoutId = 0;
         }
