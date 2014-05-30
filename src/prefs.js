@@ -72,15 +72,6 @@ function init() {
             max: 110,
             step: 5,
             default: 80
-        },
-        ellipsize: {
-            type: "r",
-            label: _("Title width"),
-            help: _("The the maximum width before the title gets an ellipsis. Default is 300px."),
-            min: 100,
-            max: 900,
-            step: 5,
-            default: 300
         }
     };
     settings_indicator = {
@@ -96,6 +87,15 @@ function init() {
             type: "s",
             label: _("Status text"),
             help: _("%a: Artist, %b: Album, %t: Title. Pango markup supported.")
+        },
+        status_size: {
+            type: "r",
+            label: _("Status text width"),
+            help: _("The the maximum width before the status text gets an ellipsis. Default is 300px."),
+            min: 100,
+            max: 900,
+            step: 5,
+            default: 300
         }
     };
 }
@@ -290,13 +290,13 @@ function createRangeSetting(settings, setting) {
     let setting_range = Gtk.HScale.new_with_range(settings[setting].min,
                                                   settings[setting].max,
                                                   settings[setting].step);
-    setting_range.set_value(gsettings.get_int(setting));
+    setting_range.set_value(gsettings.get_int(setting.replace('_', '-')));
     setting_range.set_draw_value(false);
     setting_range.add_mark(settings[setting].default,
                            Gtk.PositionType.BOTTOM, null);
     setting_range.set_size_request(200, -1);
     setting_range.connect('value-changed', function(slider) {
-        gsettings.set_int(setting, slider.get_value());
+        gsettings.set_int(setting.replace('_', '-'), slider.get_value());
     });
 
     if (settings[setting].help) {

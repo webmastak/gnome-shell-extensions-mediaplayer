@@ -24,13 +24,13 @@ const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
 const MEDIAPLAYER_STATUS_TYPE_KEY = 'status-type';
 const MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
+const MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 const MEDIAPLAYER_RATING_KEY = 'rating';
-const MEDIAPLAYER_ELLIPSIS_SIZE = 'ellipsize';
 // OLD SETTING
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
 

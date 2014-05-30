@@ -43,7 +43,7 @@ const MediaplayerStatusButton = new Lang.Class({
         this._bin = new St.Bin({child: this._icon});
 
         this._stateText = new St.Label();
-        this._stateText.clutter_text.set_ellipsize(Pango.EllipsizeMode.END)
+        this._stateText.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._stateTextBin = new St.Bin({child: this._stateText,
                                          y_align: St.Align.MIDDLE});
 
@@ -87,18 +87,21 @@ const MediaplayerStatusButton = new Lang.Class({
                                  .replace(/%b/, player.trackAlbum.getText())
                                  .replace(/&/, "&amp;");
             this._stateTextCache = stateText;
-        }
-        this._stateText.clutter_text.set_markup(this._stateTextCache);
-        // If You just set width it will add blank space. This makes sure the
-        // panel uses the minimum amount of space.
-        let ellipsize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_ELLIPSIS_SIZE);
-        this._stateText.clutter_text.set_width(-1);
-        let prefWidth = this._stateText.clutter_text.get_width();
-        if (prefWidth > ellipsize) {
-            this._stateText.clutter_text.set_width(ellipsize);
-        } else {
+
+            // If You just set width it will add blank space. This makes sure the
+            // panel uses the minimum amount of space.
+            let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
             this._stateText.clutter_text.set_width(-1);
+            let statusTextWidth = this._stateText.clutter_text.get_width();
+            if (statusTextWidth > prefWidth) {
+                this._stateText.clutter_text.set_width(prefWidth);
+            }
+            else {
+                this._stateText.clutter_text.set_width(-1);
+            }
         }
+
+        this._stateText.clutter_text.set_markup(this._stateTextCache);
     },
 
     _clearStateText: function() {
