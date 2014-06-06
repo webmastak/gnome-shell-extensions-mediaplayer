@@ -63,7 +63,7 @@ const PlayerButton = new Lang.Class({
     },
 
     setIcon: function(icon) {
-        this.icon.icon_name = icon + '-symbolic';
+        this.icon.icon_name = icon;
     },
 
     enable: function() {
@@ -130,15 +130,17 @@ const TrackBox = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function(cover) {
-        this.parent({reactive: false});
+        this.parent({reactive: false, style_class: "track-box"});
+        // This adds an unwanted height if the PopupBaseMenuItem is empty
+        this.actor.remove_actor(this._ornamentLabel)
 
-        this.box = new St.Table();
+        this.box = new St.BoxLayout({vertical: false});
         this._cover = cover;
         this._infos = new St.Table({style_class: "track-infos"});
-        this.box.add(this._cover, {row: 0, col: 1, x_expand: false});
-        this.box.add(this._infos, {row: 0, col: 2, x_expand: true});
+        this.box.add(this._cover, {x_expand: false});
+        this.box.add(this._infos, {x_expand: true});
 
-        this.actor.add(this.box, {span: -1, expand: true});
+        this.actor.add(this.box, {expand: true});
     },
 
     addInfo: function(item, row) {
@@ -184,21 +186,23 @@ const TitleItem = new Lang.Class({
     Name: "TitleItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(text, icon, callback) {
+    _init: function(text, icon, button_icon, button_callback) {
         this.parent();
         this.label = new St.Label({text: text});
         this.icon = new St.Bin({child: icon});
-        this.button = new St.Button({style_class: "system-menu-action button-quit"});
-        this.button.connect('clicked', callback);
-        this.button_icon = new St.Icon({
-            icon_name: 'window-close-symbolic',
-            icon_size: 14
-        });
-        this.button.set_child(this.button_icon);
         this.actor.add(this.icon);
         this.actor.add(this.label);
-        this.actor.add(this.button, {expand: true, x_fill: false, x_align: St.Align.END});
-        this.hideButton();
+
+        if (button_icon) {
+            this.button = new St.Button({style_class: "system-menu-action title-button"});
+            this.button.connect('clicked', button_callback);
+            this.button_icon = new St.Icon({
+                icon_name: button_icon,
+                icon_size: 14
+            });
+            this.button.set_child(this.button_icon);
+            this.actor.add(this.button, {expand: true, x_fill: false, x_align: St.Align.END});
+        }
     },
 
     setLabel: function(text) {
@@ -238,69 +242,80 @@ const TrackRating = new Lang.Class({
         this._supported = {
             "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
             "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
+            "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating
         };
         // Icons
-        this._starredIcon = [];
-        this._nonStarredIcon = [];
+        this._starIcon = [];
         this._starButton = [];
         for(let i=0; i < 5; i++) {
-            // Create starred icons
-            this._starredIcon[i] = new St.Icon({style_class: 'star-icon',
-                                                icon_size: 16,
-                                                icon_name: 'starred-symbolic'
-                                               });
-            // Create non-starred icons
-            this._nonStarredIcon[i] = new St.Icon({style_class: 'star-icon',
-                                                   icon_size: 16,
-                                                   icon_name: 'non-starred-symbolic'
-                                                  });
+            // Create star icons
+            this._starIcon[i] = new St.Icon({style_class: 'star-icon',
+                                             icon_size: 16,
+                                             icon_name: 'non-starred-symbolic'
+                                             });
             // Create the button with starred icon
             this._starButton[i] = new St.Button({style_class: 'button-star',
                                                  x_align: St.Align.START,
                                                  y_align: St.Align.MIDDLE,
                                                  track_hover: true,
-                                                 child: this._starredIcon[i]
+                                                 child: this._starIcon[i]
                                                 });
             this._starButton[i]._rateValue = i + 1;
+            this._starButton[i]._starred = false;
             this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
             this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
 
             // Put the button in the box
             this.actor.add(this._starButton[i]);
         }
-        this.showRating(this._value);
+        this.setRating(this._value);
     },
 
     newRating: function(button) {
         if (this._supported[this._player.busName]) {
             if (button.hover)
-                this.showRating(button._rateValue);
+                this.hoverRating(button._rateValue);
             else
-                this.showRating(this._value);
+                this.setRating(this._value);
         }
     },
 
-    showRating: function(value) {
-        for (let i = 0; i < 5; i++)
-            this._starButton[i].set_child(this._nonStarredIcon[i]);
-        for (let i = 0; i < value; i++)
-            this._starButton[i].set_child(this._starredIcon[i]);
+    hoverRating: function(value) {
+        for (let i = 0; i < 5; i++) {
+            this._starButton[i].child.icon_name = "non-starred-symbolic";
+        }
+        for (let i = 0; i < value; i++) {
+            this._starButton[i].child.icon_name = "starred-symbolic";
+        }
     },
 
     setRating: function(value) {
+        for (let i = 0; i < 5; i++) {
+            this._starButton[i].child.icon_name = "non-starred-symbolic";
+            this._starButton[i]._starred = false;
+        }
+        for (let i = 0; i < value; i++) {
+            this._starButton[i].child.icon_name = "starred-symbolic";
+            this._starButton[i]._starred = true;
+        }
         this._value = value;
     },
 
     applyRating: function(button) {
+        let rateValue;
+        // Click on a already starred icon, unrates
+        if (button._starred && button._rateValue == this._value)
+            rateValue = 0
+        else
+            rateValue = button._rateValue
         // Apply the rating in the player
         let applied = false;
         if (this._supported[this._player.busName]) {
             let applyFunc = Lang.bind(this, this._supported[this._player.busName]);
-            applied = applyFunc(button._rateValue);
+            applied = applyFunc(rateValue);
         }
         if (applied) {
-            this.setRating(button._rateValue);
-            this.showRating(button._rateValue);
+            this.setRating(rateValue);
         }
     },
 
@@ -309,13 +324,20 @@ const TrackRating = new Lang.Class({
         return true;
     },
 
+    applyGuayadequeRating: function(value) {
+        GLib.spawn_command_line_async("guayadeque --set-rating=%s".format(value));
+        return true;
+    },
+
     applyRhythmbox3Rating: function(value) {
-        const Rhythmbox3Iface = <interface name="org.gnome.Rhythmbox3.RhythmDB">
-        <method name="SetEntryProperties">
-            <arg type="s" direction="in" />
-            <arg type="a{sv}" direction="in" />
-        </method>
-        </interface>;
+        const Rhythmbox3Iface = '<node>\
+            <interface name="org.gnome.Rhythmbox3.RhythmDB">\
+                <method name="SetEntryProperties">\
+                    <arg type="s" direction="in" />\
+                    <arg type="a{sv}" direction="in" />\
+                </method>\
+            </interface>\
+        </node>';
         const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
 
         if (this._player.trackUrl) {

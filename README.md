@@ -56,7 +56,7 @@ listed below).
 
 ### Manual installation
 
-Git branches `master` and `devel` work with GNOME Shell 3.10.
+Git branches `master` and `devel` work with GNOME Shell 3.10 and 3.12.
 
 Other branches: gnome-shell-3.0, gnome-shell-3.2, gnome-shell-3.8 (for g-s 3.4, 3.6 and 3.8)
 
@@ -152,16 +152,17 @@ manually. If your player is listed but still doesn't work, look for words
 This extension has been tested with:
 
   * Amarok
-  * Audacious (3.2 with "MPRIS 2 Server" plugin)
+  * Audacious (≥ 3.2, with "MPRIS 2 Server" plugin)
   * Banshee (with "MPRIS D-Bus interface" extension)
   * BeatBox
   * Clementine
-  * DeaDBeeF (with third-party DeaDBeeF-MPRIS plugin)
+  * DeaDBeeF (with third-party "DeaDBeeF-MPRIS" plugin)
   * Dragon Player
   * Exaile (with third-party [Sound Menu](https://github.com/grawity/Exaile-Soundmenu-Indicator) plugin)
   * GMusicBrowser
-  * GNOME-Mplayer (1.0.7)
-  * Guayadeque (0.3.2)
+  * GNOME MPlayer (≥ 1.0.7)
+  * GNOME Music
+  * Guayadeque (≥ 0.3.2)
   * JuK
   * mpd (with [mpDris2](https://github.com/eonpatapon/mpDris2) daemon)
   * Nuvola *aka* Google Music Frame
@@ -171,8 +172,8 @@ This extension has been tested with:
   * Rhythmbox (with "MPRIS D-Bus interface" plugin)
   * Spotify
   * Tomahawk
-  * Totem (with "D-Bus Service" plugin)
-  * VLC (2.x with "dbus" control interface)
+  * Totem (≥ 3.1.91, with "D-Bus Service" plugin)
+  * VLC (≥ 2.0, with "dbus" control interface)
   * XBMC (with "MPRIS D-Bus interface" add-on)
   * *and more...*
 

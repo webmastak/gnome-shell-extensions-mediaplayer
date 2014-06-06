@@ -105,7 +105,7 @@ function buildPrefsWidget() {
         vbox_indicator.add(hbox);
     }
 
-    for (setting in settings) {
+    for (let setting in settings) {
         hbox = buildHbox(settings, setting);
         vbox.add(hbox);
         if (setting == "indicator_position")

@@ -2,9 +2,17 @@
     spacing: 5px;
 }
 
+.indicator-icon {
+    padding-right: 0px;
+}
+
 .status-icon {
     icon-size: 10px;
-    padding-bottom: 0.3em;
+    padding-bottom: 0.4em;
+}
+
+.track-box {
+    padding-left: 2em;
 }
 
 .track-cover {
@@ -12,7 +20,12 @@
     border-radius: 2px;
 }
 
-.track-infos {
+.track-infos:ltr {
+    padding-left: 1em;
+    width: 15em;
+}
+
+.track-infos:rtl {
     padding-left: 1em;
     width: 15em;
 }
@@ -47,13 +60,13 @@
     width: 9em;
 }
 
-.button-quit {
+.title-button {
     padding: 3px;
     border-radius: 12px;
 }
 
-.button-quit:hover {
-    background: #c03;
+.title-button:hover {
+    background: #999;
     padding: 4px;
 }
 
