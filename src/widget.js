@@ -188,10 +188,11 @@ const TitleItem = new Lang.Class({
 
     _init: function(text, icon, button_icon, button_callback) {
         this.parent();
-        this.label = new St.Label({text: text});
         this.icon = new St.Bin({child: icon});
+        this.label = new St.Label({text: text});
+        this.labelBin = new St.Bin({child: this.label});
         this.actor.add(this.icon);
-        this.actor.add(this.label);
+        this.actor.add(this.labelBin);
 
         if (button_icon) {
             this.button = new St.Button({style_class: "system-menu-action title-button"});

@@ -61,13 +61,19 @@
 }
 
 .title-button {
-    padding: 3px;
     border-radius: 12px;
+    border-width: 1px;
+    padding: 4px;
 }
 
-.title-button:hover {
-    background: #999;
-    padding: 4px;
+.title-button:hover,
+.popup-menu-item:active .title-button {
+    padding: 5px;
+    border: none;
+}
+
+.popup-menu-item:active .title-button {
+    color: white;
 }
 
 .control-button:disabled {
