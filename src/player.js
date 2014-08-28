@@ -708,6 +708,19 @@ const MPRISPlayer = new Lang.Class({
                 }
             })
         );
+        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPlay',
+            Lang.bind(this, function(value, err) {
+                // assume the player can play by default
+                let canPlay = true;
+                if (!err)
+                    canPlay = value[0].unpack();
+
+                if (canPlay)
+                    this._playButton.enable();
+                else
+                    this._playButton.disable();
+            })
+        );
         this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
             Lang.bind(this, function(value, err) {
                 // assume the player can go next by default
