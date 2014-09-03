@@ -65,8 +65,7 @@ const MediaplayerStatusButton = new Lang.Class({
     },
 
     _showCover: function(player) {
-        if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER &&
-                this._coverPath != player.trackCoverPath) {
+        if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
             this._coverPath = player.trackCoverPath;
             // Change cover
             if (this._coverPath && GLib.file_test(this._coverPath, GLib.FileTest.EXISTS)) {
