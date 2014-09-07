@@ -715,7 +715,7 @@ const MPRISPlayer = new Lang.Class({
                 if (!err)
                     canPlay = value[0].unpack();
 
-                if (canPlay)
+                if (canPlay || this._status != Settings.Status.STOP)
                     this._playButton.enable();
                 else
                     this._playButton.disable();
