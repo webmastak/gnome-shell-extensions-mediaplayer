@@ -597,13 +597,9 @@ const MPRISPlayer = new Lang.Class({
                 this._stopTimer();
             }
 
-            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
-                // Some players send a "PlaybackStatus: Stopped" signal when changing
-                // tracks, so wait a little before refreshing.
-                Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
-            } else {
-                this._refreshStatus();
-            }
+            // Some players send a "PlaybackStatus: Stopped" signal when changing
+            // tracks, so wait a little before refreshing.
+            Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
         }
     },
 
