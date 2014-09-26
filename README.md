@@ -56,9 +56,9 @@ listed below).
 
 ### Manual installation
 
-Git branches `master` and `devel` work with GNOME Shell 3.10 and 3.12.
+Git branches `master` and `devel` work with GNOME Shell 3.10 up to 3.14.
 
-Other branches: gnome-shell-3.0, gnome-shell-3.2, gnome-shell-3.8 (for g-s 3.4, 3.6 and 3.8)
+Other branches: gnome-shell-3.0, gnome-shell-3.2, gnome-shell-3.8 (for g-s 3.4 up to 3.8)
 
 Prerequisites: automake, gnome-common, gettext, glib2 devel files
 
