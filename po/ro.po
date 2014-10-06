@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-31 14:54+0100\n"
+"PO-Revision-Date: 2012-11-13 11:05+0100\n"
+"Last-Translator: Darius Berghe <darius.berghe@gmx.com>\n"
+"Language: Romanian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/extension.js:64
+msgid "Stopped"
+msgstr "Oprit"
+
+#: ../src/extension.js:65
+msgid "Playing"
+msgstr "În redare"
+
+#: ../src/extension.js:66
+msgid "Paused"
+msgstr "Suspendat"
+
+#: ../src/extension.js:131 ../src/extension.js:160
+msgid "rating"
+msgstr "notă"
+
+#: ../src/extension.js:152
+msgid "by"
+msgstr "de"
+
+#: ../src/extension.js:153
+msgid "from"
+msgstr "de la"
+
+#: ../src/extension.js:202
+msgid "Volume"
+msgstr "Volum"
+
+#: ../src/extension.js:310
+msgid "Playlists"
+msgstr "Listă de redare"
+
+#: ../src/extension.js:378
+msgid "Unknown Artist"
+msgstr "Artist necunoscut"
+
+#: ../src/extension.js:382
+msgid "Unknown Album"
+msgstr "Album necunoscut"
+
+#: ../src/extension.js:386
+msgid "Unknown Title"
+msgstr "Titlu necunoscut"
+
+#: ../src/prefs.js:37
+msgid "Position in the top panel"
+msgstr "Poziția în panou"
+
+#: ../src/prefs.js:38
+msgid "Restart the shell to apply this setting."
+msgstr "Reporniți interfața Gnome pentru a aplica setările."
+
+#: ../src/prefs.js:40
+msgid "Center"
+msgstr "Centru"
+
+#: ../src/prefs.js:41
+msgid "Right"
+msgstr "Dreapta"
+
+#: ../src/prefs.js:42
+msgid "Volume menu integration"
+msgstr "Integrarea în meniul volumului"
+
+#: ../src/prefs.js:47
+msgid "Show the media player volume slider"
+msgstr "Arată bara de control a volumului"
+
+#: ../src/prefs.js:51
+msgid "Show the media player position slider"
+msgstr "Arată bara de redare a poziției"
+
+#: ../src/prefs.js:55
+msgid "Show media player playlists"
+msgstr "Arată listele de redare"
+
+#: ../src/prefs.js:59
+msgid "Display song rating"
+msgstr "Arată nota melodiei"
+
+#: ../src/prefs.js:60
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Arată nota pentru melodia în curs de rulare pe o scară de la 0 la 5"
+
+#: ../src/prefs.js:64
+msgid "Album cover size"
+msgstr "Mărimea imaginii de album"
+
+#: ../src/prefs.js:65
+msgid "The size of the cover displayed in the menu. Default is 80px width."
+msgstr "Mărimea imaginii de album afișată în meniu. (Implicit: 80px lățime)"
+
+#: ../src/prefs.js:75
+msgid "Allow to start the default media player"
+msgstr "Permite pornirea programului media implicit"
+
+#: ../src/prefs.js:52
+msgid "Runs the default mediaplayer by clicking on the indicator"
+msgstr "Pornește programul media implicit la apăsarea indicatorului"
+
+#: ../src/prefs.js:80
+msgid "Appearance"
+msgstr "Iconița extensiei în panou"
+
+#: ../src/prefs.js:82
+msgid "Symbolic icon"
+msgstr "Iconiță simbolică"
+
+#: ../src/prefs.js:83
+msgid "Current album cover"
+msgstr "Imaginea de album"
+
+#: ../src/prefs.js:88
+msgid "Status text"
+msgstr "Text de stare"
+
+#: ../src/prefs.js:97
+msgid "Status text width"
+msgstr "Lățimea textului de stare"
+
+#: ../src/prefs.js:89
+msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+msgstr "%a: Artist, %b: Album, %t: Titlu. Formatarea Pango e suportată."
