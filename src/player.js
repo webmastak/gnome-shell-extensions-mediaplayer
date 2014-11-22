@@ -28,6 +28,8 @@ const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
+const GdkPixbuf = imports.gi.GdkPixbuf;
+const Cogl = imports.gi.Cogl;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
@@ -36,6 +38,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Widget = Me.imports.widget;
 const DBusIface = Me.imports.dbus;
 const Settings = Me.imports.settings;
+
 
 
 const DefaultPlayer = new Lang.Class({
@@ -524,15 +527,33 @@ const MPRISPlayer = new Lang.Class({
             onComplete: Lang.bind(this, function() {
                 // Change cover
                 if (! this.trackCoverPath || ! GLib.file_test(this.trackCoverPath, GLib.FileTest.EXISTS)) {
+		    // If no valid cover path is found
                     this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize});
                 }
                 else {
                     this.trackCover = new St.Bin({style_class: 'track-cover'});
-                    let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this.trackCoverPath});
-                    let [coverWidth, coverHeight] = coverTexture.get_base_size();
-                    this.trackCover.width = this.coverSize;
-                    this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
-                    this.trackCover.set_child(coverTexture);
+		    let pixbuf = GdkPixbuf.Pixbuf.new_from_file(this.trackCoverPath);
+		    let coverImage = new Clutter.Image();
+		    coverImage.set_data(
+			pixbuf.get_pixels(),
+			pixbuf.hasAlpha
+			    ? Cogl.PixelFormat.RGBA_8888
+			    : Cogl.PixelFormat.RGB_888,
+			pixbuf.get_width(),
+			pixbuf.get_height(),
+			pixbuf.get_rowstride());
+		    
+		    let imageActor = new Clutter.Actor();
+
+		    imageActor.set_content_scaling_filters(
+			Clutter.ScalingFilter.TRILINEAR,
+			Clutter.ScalingFilter.LINEAR);
+
+		    imageActor.set_content(coverImage);
+		    imageActor.set_size(this.coverSize,
+					pixbuf.get_height() / ( pixbuf.get_width() / this.coverSize));
+		    
+                    this.trackCover.set_child(imageActor);
                 }
                 this.trackCoverContainer.set_child(this.trackCover);
                 // Show the new cover

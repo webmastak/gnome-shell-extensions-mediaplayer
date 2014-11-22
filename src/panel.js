@@ -24,6 +24,8 @@ const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const PanelMenu = imports.ui.panelMenu;
 const GLib = imports.gi.GLib;
+const GdkPixbuf = imports.gi.GdkPixbuf;
+const Cogl = imports.gi.Cogl;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
@@ -71,11 +73,27 @@ const MediaplayerStatusButton = new Lang.Class({
             // Change cover
             if (this._coverPath && GLib.file_test(this._coverPath, GLib.FileTest.EXISTS)) {
                 let cover = new St.Bin();
-                let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this._coverPath});
-                let [coverWidth, coverHeight] = coverTexture.get_base_size();
-                cover.height = this._coverSize;
-                cover.width = this._coverSize;
-                cover.set_child(coverTexture);
+		let pixbuf = GdkPixbuf.Pixbuf.new_from_file(this._coverPath);
+		let coverImage = new Clutter.Image();
+		coverImage.set_data(
+		    pixbuf.get_pixels(),
+		    pixbuf.hasAlpha
+			? Cogl.PixelFormat.RGBA_8888
+			: Cogl.PixelFormat.RGB_888,
+		    pixbuf.get_width(),
+		    pixbuf.get_height(),
+		    pixbuf.get_rowstride());
+		
+		let imageActor = new Clutter.Actor();
+
+		imageActor.set_content_scaling_filters(
+		    Clutter.ScalingFilter.TRILINEAR,
+		    Clutter.ScalingFilter.LINEAR);
+
+		imageActor.set_content(coverImage);
+		imageActor.set_size(this._coverSize, this._coverSize);
+				
+		cover.set_child(imageActor);
                 this._bin.set_child(cover);
             }
             else
