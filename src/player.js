@@ -270,23 +270,25 @@ const MPRISPlayer = new Lang.Class({
             if (value > 0) {
                 this._setPosition(value);
             }
-            // Seek initiated by the position slider
-            else if (this._wantedSeekValue > 0) {
-                // Some broken gstreamer players (Banshee) reports always 0
-                // when the track is seeked so we set the position at the
-                // value we set on the slider
-                this._setPosition(this._wantedSeekValue);
-            }
-            // Seek value send by the player
+            // Banshee is buggy and always emits Seeked(0). See #34, #183,
+            // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
             else {
-                // The same problem as above with Banshee, but this time it
-                // breaks seeking from within the player itself! Argh.
-                this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
-                    if (err)
-                        this._setPosition(0);
-                    else
-                        this._setPosition(value[0].unpack());
-                }));
+                // If we caused the seek, just use the expected position.
+                // This is actually needed because even Get("Position")
+                // sometimes returns 0 immediately after seeking! *grumble*
+                if (this._wantedSeekValue > 0) {
+                    this._setPosition(this._wantedSeekValue);
+                }
+                // If the seek was initiated by the player itself, query it
+                // for the new position.
+                else {
+                    this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
+                        if (err)
+                            this._setPosition(0);
+                        else
+                            this._setPosition(value[0].unpack());
+                    }));
+                }
             }
 
             this._wantedSeekValue = 0;
