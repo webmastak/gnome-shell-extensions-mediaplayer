@@ -278,8 +278,16 @@ const MPRISPlayer = new Lang.Class({
                 this._setPosition(this._wantedSeekValue);
             }
             // Seek value send by the player
-            else
-                this._setPosition(value);
+            else {
+                // The same problem as above with Banshee, but this time it
+                // breaks seeking from within the player itself! Argh.
+                this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
+                    if (err)
+                        this._setPosition(0);
+                    else
+                        this._setPosition(value[0].unpack());
+                }));
+            }
 
             this._wantedSeekValue = 0;
         }));
