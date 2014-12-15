@@ -184,7 +184,7 @@ This extension has been tested with:
 Some players do not send the MPRIS "Seeked" signal so the extension can't update
 the position slider when the song is seeked from the extension or the player.
 
-  * Banshee ([bug report](https://bugzilla.gnome.org/show_bug.cgi?id=654524))
+  * Banshee ([bug report](https://bugzilla.gnome.org/show_bug.cgi?id=654524), issue #34, issue #183)
   * Exaile – fixed in 3.3.0 ([bug report](https://bugs.launchpad.net/exaile/+bug/1021645))
   * VLC – fixed in 2.x? ([bug report](https://trac.videolan.org/vlc/ticket/6802))
   * Spotify
