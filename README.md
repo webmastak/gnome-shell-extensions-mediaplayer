@@ -156,7 +156,7 @@ This extension has been tested with:
   * Banshee (with "MPRIS D-Bus interface" extension)
   * BeatBox
   * Clementine
-  * DeaDBeeF (with third-party "DeaDBeeF-MPRIS" plugin)
+  * DeaDBeeF (with third-party [deadbeef-mpris2](https://github.com/Serranya/deadbeef-mpris2-plugin) plugin)
   * Dragon Player
   * Exaile (with third-party [Sound Menu](https://github.com/grawity/Exaile-Soundmenu-Indicator) plugin)
   * GMusicBrowser
