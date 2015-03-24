@@ -89,7 +89,9 @@ const MediaplayerStatusButton = new Lang.Class({
             stateText = stateText.replace(/%a/, player.trackArtist.getText())
                                  .replace(/%t/, player.trackTitle.getText())
                                  .replace(/%b/, player.trackAlbum.getText())
-                                 .replace(/&/, "&amp;");
+                                 .replace(/&/, "&amp;")
+                                 .replace(/</, "&lt;")
+                                 .replace(/>/, "&gt;");
             this._stateTextCache = stateText;
 
             // If You just set width it will add blank space. This makes sure the
