@@ -1,4 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* jshint esnext: true */
+/* global imports: false */
 /**
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
+
+'use strict';
 
 const Mainloop = imports.mainloop;
 const St = imports.gi.St;
@@ -46,9 +50,9 @@ const PlayerButton = new Lang.Class({
             icon_size: 20
         });
 
-        this.actor = new St.Button({style_class: 'notification-icon-button control-button',
+        this.actor = new St.Button({style_class: 'modal-dialog-button button',
                                     child: this.icon});
-        this.actor._delegate = this
+        this.actor._delegate = this;
 
         this._callback_id = this.actor.connect('clicked', callback);
 
@@ -132,7 +136,7 @@ const TrackBox = new Lang.Class({
     _init: function(cover) {
         this.parent({reactive: false, style_class: "track-box"});
         // This adds an unwanted height if the PopupBaseMenuItem is empty
-        this.actor.remove_actor(this._ornamentLabel)
+        this.actor.remove_actor(this._ornamentLabel);
 
         this.box = new St.BoxLayout({vertical: false});
         this._cover = cover;
@@ -155,9 +159,9 @@ const TrackTitle = new Lang.Class({
         this.actor = new St.Table({style_class: style});
         this.actor._delegate = this;
 
-        this._label = new St.Label();
+        this._label = new St.Label({style_class: 'popup-inactive-menu-item'});
         if (prepend) {
-            this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + " "});
+            this._prepend = new St.Label({text: prepend + " "});
             this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
             this.actor.add(this._prepend, {row: 0, col: 0, x_fill: true, x_expand: false});
             this.actor.add(this._label, {row: 0, col: 1});
@@ -306,9 +310,9 @@ const TrackRating = new Lang.Class({
         let rateValue;
         // Click on a already starred icon, unrates
         if (button._starred && button._rateValue == this._value)
-            rateValue = 0
+            rateValue = 0;
         else
-            rateValue = button._rateValue
+            rateValue = button._rateValue;
         // Apply the rating in the player
         let applied = false;
         if (this._supported[this._player.busName]) {
