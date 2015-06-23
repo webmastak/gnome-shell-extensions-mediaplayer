@@ -26,6 +26,10 @@ const Pango = imports.gi.Pango;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
+const Tweener = imports.ui.tweener;
+
+const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Settings = Me.imports.settings;
 
 const PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
@@ -134,17 +138,70 @@ const TrackBox = new Lang.Class({
         // This adds an unwanted height if the PopupBaseMenuItem is empty
         this.actor.remove_actor(this._ornamentLabel);
 
-        this.box = new St.BoxLayout({vertical: false});
         this._cover = cover;
         this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
-        this.box.add(this._cover);
-        this.box.add(this._infos, {expand: true});
-
-        this.actor.add(this.box, {expand: true});
+        this.actor.add(this._cover);
+        this.actor.add(this._infos, {expand: true});
     },
 
     addInfo: function(item, row) {
         this._infos.add(item.actor);
+    },
+
+    get hidden() {
+      return this._hidden || false;
+    },
+
+    set hidden(value) {
+      this._hidden = value;
+    },
+
+    hide: function() {
+      this.actor.hide();
+      this.actor.opacity = 0;
+      this.actor.set_height(0);
+      this.hidden = true;
+    },
+
+    show: function() {
+      this.actor.show();
+      this.actor.opacity = 255;
+      this.actor.set_height(-1);
+      this.hidden = false;
+    },
+
+    showAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden === false)
+        return;
+
+      this.actor.set_height(-1);
+      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      Tweener.addTween(this.actor, {
+        opacity: 255,
+        height: naturalHeight,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.show();
+        },
+        onCompleteScope: this
+      });
+    },
+
+    hideAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden === true)
+        return;
+
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        height: 0,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.hide();
+        },
+        onCompleteScope: this
+      });
     }
 });
 
