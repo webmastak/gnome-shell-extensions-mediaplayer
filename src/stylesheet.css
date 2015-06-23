@@ -52,12 +52,11 @@
 
 .menu-icon {
     icon-size: 1.14em;
-    padding-right: .4em;
 }
 
-.slider-item StLabel {
+.slider-item .slider-text {
     font-size: 0.9em;
-    width: 9em;
+    width: 5em;
 }
 
 .title-button {

@@ -96,19 +96,15 @@ const SliderItem = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function(label, icon, value) {
-        this.parent();
-
-        this._box = new St.Table({style_class: 'slider-item'});
+        this.parent({style_class: 'slider-item'});
 
         this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon + '-symbolic'});
         this._slider = new Slider.Slider(value);
-        this._label = new St.Label({text: label});
+        this._label = new St.Label({style_class: 'slider-text', text: label});
 
-        this._box.add(this._icon, {row: 0, col: 0, x_expand: false});
-        this._box.add(this._label, {row: 0, col: 1, x_expand: false});
-        this._box.add(this._slider.actor, {row: 0, col: 2, x_expand: true});
-
-        this.actor.add(this._box, {span: -1, expand: true});
+        this.actor.add(this._icon);
+        this.actor.add(this._label);
+        this.actor.add(this._slider.actor, {expand: true});
     },
 
     setValue: function(value) {
@@ -140,15 +136,15 @@ const TrackBox = new Lang.Class({
 
         this.box = new St.BoxLayout({vertical: false});
         this._cover = cover;
-        this._infos = new St.Table({style_class: "track-infos"});
-        this.box.add(this._cover, {x_expand: false});
-        this.box.add(this._infos, {x_expand: true});
+        this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
+        this.box.add(this._cover);
+        this.box.add(this._infos, {expand: true});
 
         this.actor.add(this.box, {expand: true});
     },
 
     addInfo: function(item, row) {
-        this._infos.add(item.actor, {row: row, col: 1, y_expand: false});
+        this._infos.add(item.actor);
     }
 });
 
@@ -156,18 +152,18 @@ const TrackTitle = new Lang.Class({
     Name: "TrackTitle",
 
     _init: function(prepend, text, style) {
-        this.actor = new St.Table({style_class: style});
+        this.actor = new St.BoxLayout({style_class: style, vertical: false});
         this.actor._delegate = this;
 
         this._label = new St.Label({style_class: 'popup-inactive-menu-item'});
         if (prepend) {
             this._prepend = new St.Label({text: prepend + " "});
             this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.actor.add(this._prepend, {row: 0, col: 0, x_fill: true, x_expand: false});
-            this.actor.add(this._label, {row: 0, col: 1});
+            this.actor.add(this._prepend);
+            this.actor.add(this._label, {expand: true});
         }
         else
-            this.actor.add(this._label, {row: 0, col: 0});
+            this.actor.add(this._label, {expand: true});
 
         this.setText(text);
     },
