@@ -185,10 +185,7 @@ const MPRISPlayer = new Lang.Class({
         }
 
         this.addMenuItem(this.trackBox);
-
-        this.trackBox.box.hide();
-        this.trackBox.box.opacity = 0;
-        this.trackBox.box.set_height(0);
+        this.trackBox.hide();
 
         this._prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
@@ -611,7 +608,8 @@ const MPRISPlayer = new Lang.Class({
                 // Some players send a "PlaybackStatus: Stopped" signal when changing
                 // tracks, so wait a little before refreshing.
                 Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
-            } else {
+            }
+            else {
                 this._refreshStatus();
             }
         }
@@ -623,37 +621,10 @@ const MPRISPlayer = new Lang.Class({
         this._setIdentity();
         if (this._status != Settings.Status.STOP) {
             this.emit('player-cover-changed');
-            if (this.trackBox.box.get_stage() && this.trackBox.box.opacity === 0) {
-                this.trackBox.box.show();
-                this.trackBox.box.set_height(-1);
-                let [minHeight, naturalHeight] = this.trackBox.box.get_preferred_height(-1);
-                this.trackBox.box.opacity = 0;
-                this.trackBox.box.set_height(0);
-                Tweener.addTween(this.trackBox.box,
-                    { opacity: 255,
-                      height: naturalHeight,
-                      time: Settings.FADE_ANIMATION_TIME,
-                      transition: 'easeOutQuad',
-                      onComplete: function() {
-                           this.trackBox.box.set_height(-1);
-                      },
-                      onCompleteScope: this
-                    });
-            }
+            this.trackBox.showAnimate();
         }
         else {
-            if (this.trackBox.box.get_stage() && this.trackBox.box.opacity == 255) {
-                Tweener.addTween(this.trackBox.box,
-                    { opacity: 0,
-                      height: 0,
-                      time: Settings.FADE_ANIMATION_TIME,
-                      transition: 'easeOutQuad',
-                      onComplete: function() {
-                           this.trackBox.box.hide();
-                      },
-                      onCompleteScope: this
-                    });
-            }
+            this.trackBox.hideAnimate();
         }
         this.emit('player-status-changed');
     },
