@@ -1,0 +1,144 @@
+# Serbian Translation for gnome-shell-extension-mediaplayer package
+# Преводи на српски језик за пакет „gnome-shell-extension-mediaplayer“.
+# Copyright (C) 2012 gnome-shell-extension-mediaplayer package.
+# This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
+# Марко М. Костић <marko.m.kostic@gmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-31 14:54+0100\n"
+"PO-Revision-Date: 2015-06-11 13:33+0200\n"
+"Last-Translator: Марко М. Костић (Marko M. Kostić) <marko.m.kostic@gmail.com>\n"
+"Language-Team: Serbian\n"
+"Language: Serbian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: ../src/extension.js:64
+msgid "Stopped"
+msgstr "Заустављено"
+
+#: ../src/extension.js:65
+msgid "Playing"
+msgstr "Пуштено"
+
+#: ../src/extension.js:66
+msgid "Paused"
+msgstr "Паузирано"
+
+#: ../src/extension.js:131
+#: ../src/extension.js:160
+msgid "rating"
+msgstr "оцена"
+
+#: ../src/extension.js:152
+msgid "by"
+msgstr "изводи"
+
+#: ../src/extension.js:153
+msgid "from"
+msgstr "са албума"
+
+#: ../src/extension.js:202
+msgid "Volume"
+msgstr "Јачина звука"
+
+#: ../src/extension.js:310
+msgid "Playlists"
+msgstr "Списак песама"
+
+#: ../src/extension.js:378
+msgid "Unknown Artist"
+msgstr "Непознат извођач"
+
+#: ../src/extension.js:382
+msgid "Unknown Album"
+msgstr "Непознат албум"
+
+#: ../src/extension.js:386
+msgid "Unknown Title"
+msgstr "Непознат наслов"
+
+#: ../src/prefs.js:37
+msgid "Position in the top panel"
+msgstr "Положај у горњој траци"
+
+#: ../src/prefs.js:38
+msgid "Restart the shell to apply this setting."
+msgstr "Поново покрените Гномову шкољку да би се подешавање применило."
+
+#: ../src/prefs.js:40
+msgid "Center"
+msgstr "Центар"
+
+#: ../src/prefs.js:41
+msgid "Right"
+msgstr "Десно"
+
+#: ../src/prefs.js:42
+msgid "Volume menu integration"
+msgstr "Угради у показивач јачине звука"
+
+#: ../src/prefs.js:47
+msgid "Show the media player volume slider"
+msgstr "Покажи клизач за промену јачине звука"
+
+#: ../src/prefs.js:51
+msgid "Show the media player position slider"
+msgstr "Покажи клизач за премотавање песме"
+
+#: ../src/prefs.js:55
+msgid "Show media player playlists"
+msgstr "Прикажи списак са песмама"
+
+#: ../src/prefs.js:59
+msgid "Display song rating"
+msgstr "Прикажи оцену песме"
+
+#: ../src/prefs.js:60
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Прикажи оцену на скали од 0 до 5 за тренутно пуштену песму"
+
+#: ../src/prefs.js:64
+msgid "Album cover size"
+msgstr "Величина омота албума"
+
+#: ../src/prefs.js:65
+msgid "The size of the cover displayed in the menu. Default is 80px width."
+msgstr "Величина омота приказаног у менију. Подразумевано је 80 пиксела."
+
+#: ../src/prefs.js:75
+msgid "Allow to start the default media player"
+msgstr "Омогући покретање подразумеваног пуштача музике"
+
+#: ../src/prefs.js:76
+msgid "Runs the default mediaplayer by clicking on the indicator"
+msgstr "Покреће подразумевани пуштач музике приликом кликтања на показивач"
+
+#: ../src/prefs.js:80
+msgid "Appearance"
+msgstr "Изглед"
+
+#: ../src/prefs.js:82
+msgid "Symbolic icon"
+msgstr "Симболичка иконица"
+
+#: ../src/prefs.js:83
+msgid "Current album cover"
+msgstr "Тренутни омот албума"
+
+#: ../src/prefs.js:88
+msgid "Status text"
+msgstr "Статусни текст"
+
+#: ../src/prefs.js:89
+msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+msgstr "%a: Извођач, %b: Албум, %t: Наслов. Панго маркап је подржан."
+
+#~ msgid "Show the media player in the volume menu"
+#~ msgstr "Прикажи пуштач музике у показивачу јачине звука"
