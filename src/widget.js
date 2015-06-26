@@ -245,7 +245,7 @@ const TitleItem = new Lang.Class({
 
     _init: function(text, icon, button_icon, button_callback) {
         this.parent();
-        this.icon = new St.Bin({child: icon});
+        this.icon = new St.Icon(icon);
         this.label = new St.Label({text: text});
         this.labelBin = new St.Bin({child: this.label});
         this.actor.add(this.icon);
@@ -267,8 +267,14 @@ const TitleItem = new Lang.Class({
         this.label.text = text;
     },
 
-    setIcon: function(icon) {
-        this.icon.set_child(icon);
+    setIcon: function(icon_name) {
+        this.icon.gicon = null;
+        this.icon.icon_name = icon;
+    },
+
+    setGicon: function(gicon) {
+        this.icon.icon_name = null;
+        this.icon.gicon = gicon;
     },
 
     hideButton: function() {
