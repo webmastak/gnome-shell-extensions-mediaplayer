@@ -28,6 +28,7 @@ const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
+const BoxPointer = imports.ui.boxpointer;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
@@ -38,39 +39,77 @@ const DBusIface = Me.imports.dbus;
 const Settings = Me.imports.settings;
 
 
+const PlayerMenu = new Lang.Class({
+  Name: 'PlayerMenu',
+  Extends: PopupMenu.PopupSubMenuMenuItem,
+
+  _init: function(label, wantIcon) {
+    this.parent(label, wantIcon);
+    this.menu._close = this.menu.close;
+    this.menu._open = this.menu.open;
+    this.menu.close = Lang.bind(this, this.close);
+    this.menu.open = Lang.bind(this, this.open);
+  },
+
+  addMenuItem: function(item) {
+    this.menu.addMenuItem(item);
+  },
+
+  /* Submenu can be closed only manually by
+   * setSubmenuShown (clicking on the player name
+   *  or by the manager when another player menu
+   * is opened */
+  close: function(animate, force) {
+    global.log("close: " + force);
+    if (force !== true)
+      return;
+    this.menu._close(BoxPointer.PopupAnimation.FULL);
+    this.emit('player-menu-closed');
+  },
+
+  open: function(animate) {
+    if (!animate)
+      animate = BoxPointer.PopupAnimation.FULL
+    this.menu._open(animate);
+    this.emit('player-menu-opened');
+  },
+
+  setSubmenuShown: function(open) {
+    if (open)
+      this.menu.open(BoxPointer.PopupAnimation.FULL);
+    else
+      this.menu.close(BoxPointer.PopupAnimation.FULL, true);
+  }
+
+});
+
 const DefaultPlayer = new Lang.Class({
     Name: 'DefaultPlayer',
-    Extends: PopupMenu.PopupMenuSection,
+    Extends: PlayerMenu,
 
     _init: function() {
-        this.parent();
-
-        this._app = Shell.AppSystem.get_default().lookup_app(
+        let app = Shell.AppSystem.get_default().lookup_app(
             Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
         );
-
-        let appIcon = this._app.create_icon_texture(16);
-        this.playerTitle = new Widget.TitleItem(this._app.get_name(),
-                                                appIcon,
-                                                "system-run-symbolic",
-                                                Lang.bind(this, function () {
-                                                    this._app.activate_full(-1, 0);
-                                                }));
-        this.playerTitle.setSensitive(false);
-        this.playerTitle.actor.remove_style_pseudo_class('insensitive');
-
-        this.addMenuItem(this.playerTitle);
+        let appInfo = Gio.DesktopAppInfo.new(app.get_id());
+        this.parent(app.get_name(), true);
+        this.icon.gicon = appInfo.get_icon();
+        this._runButton = new Widget.PlayerButton('system-run-symbolic', function() {
+          app.activate_full(-1, 0);
+        });
+        this.buttons = new Widget.PlayerButtons();
+        this.buttons.addButton(this._runButton);
+        this.addMenuItem(this.buttons);
     }
 });
 
 
 const MPRISPlayer = new Lang.Class({
     Name: 'MPRISPlayer',
-    Extends: PopupMenu.PopupMenuSection,
+    //Extends: PopupMenu.PopupMenuSection,
+    Extends: PlayerMenu,
 
     _init: function(busName, owner) {
-        this.parent();
-
         let baseName = busName.split('.')[3];
         this.owner = owner;
         this.busName = busName;
@@ -87,6 +126,9 @@ const MPRISPlayer = new Lang.Class({
         this._timeoutId = 0;
         this._settings = Settings.gsettings;
         this._signalsId = [];
+
+        this.parent(this._identity, true);
+
         new DBusIface.MediaServer2(busName,
                                    Lang.bind(this, function(proxy) {
                                         this._mediaServer = proxy;
@@ -107,6 +149,7 @@ const MPRISPlayer = new Lang.Class({
                                     this._prop = proxy;
                                     this._init2();
                                  }));
+
     },
 
     _init2: function() {
@@ -156,13 +199,12 @@ const MPRISPlayer = new Lang.Class({
                 }
             }))
         );
-        let genericIcon = new St.Icon({icon_name: "audio-x-generic-symbolic", icon_size: 16});
-        this.playerTitle = new Widget.TitleItem(this._identity,
-                                                genericIcon,
-                                                "window-close-symbolic",
-                                                Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
+        //this.playerTitle = new Widget.TitleItem(this._identity,
+                                                //{icon_name: "audio-x-generic-symbolic", icon_size: 16},
+                                                //"window-close-symbolic",
+                                                //Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
 
-        this.addMenuItem(this.playerTitle);
+        //this.addMenuItem(this.playerTitle);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
@@ -227,28 +269,28 @@ const MPRISPlayer = new Lang.Class({
         }));
         this.addMenuItem(this._volume);
 
-        if (this._mediaServer.CanRaise) {
-            this.playerTitle.connect('activate',
-                Lang.bind(this, function () {
-                    // If we have an application in the appSystem
-                    // Bring it to the front else let the player decide
-                    if (this._app)
-                        this._app.activate_full(-1, 0);
-                    else
-                        this._mediaServer.RaiseRemote();
-                    // Close the indicator
-                    this.emit("close-menu");
-                })
-            );
-        }
-        else {
-            // Make the player title insensitive
-            this.playerTitle.setSensitive(false);
-            this.playerTitle.actor.remove_style_pseudo_class('insensitive');
-        }
+        //if (this._mediaServer.CanRaise) {
+            //this.playerTitle.connect('activate',
+                //Lang.bind(this, function () {
+                    //// If we have an application in the appSystem
+                    //// Bring it to the front else let the player decide
+                    //if (this._app)
+                        //this._app.activate_full(-1, 0);
+                    //else
+                        //this._mediaServer.RaiseRemote();
+                    //// Close the indicator
+                    //this.emit("close-menu");
+                //})
+            //);
+        //}
+        //else {
+            //// Make the player title insensitive
+            //this.playerTitle.setSensitive(false);
+            //this.playerTitle.actor.remove_style_pseudo_class('insensitive');
+        //}
 
-        if (!this._mediaServer.CanQuit)
-            this.playerTitle.hideButton();
+        //if (!this._mediaServer.CanQuit)
+            //this.playerTitle.hideButton();
 
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
             if (props.Volume)
@@ -323,11 +365,12 @@ const MPRISPlayer = new Lang.Class({
 
     _getDesktopEntry: function() {
         let entry = this._mediaServer.DesktopEntry;
-        let appSys = Shell.AppSystem.get_default();
-        this._app = appSys.lookup_app(entry+".desktop");
-        if (this._app) {
-            let icon = this._app.create_icon_texture(16);
-            this.playerTitle.setIcon(icon);
+        let appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
+        //let appSys = Shell.AppSystem.get_default();
+        //this._app = appSys.lookup_app(entry + ".desktop");
+        if (appInfo) {
+            //this.playerTitle.setGicon(appInfo.get_icon());
+            this.icon.gicon = appInfo.get_icon();
         }
     },
 
@@ -380,10 +423,13 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _setIdentity: function() {
-        if (this._status)
-            this.playerTitle.setLabel(this._identity + " - " + _(this._status));
-        else
-            this.playerTitle.setLabel(this._identity);
+        this.label.text = this._identity;
+        if (this._status) {
+          this.status.text = _(this._status);
+        }
+        else {
+          this.status.text = null;
+        }
     },
 
     _setPosition: function(value) {
@@ -774,10 +820,22 @@ const MPRISPlayer = new Lang.Class({
 
     destroy: function() {
         this._stopTimer();
-        if (this._propChangedId)
+        if (this._propChangedId) {
+          try {
             this._prop.disconnectSignal(this._propChangedId);
-        if (this._seekedId)
+          }
+          catch (err) {
+            global.log(err);
+          }
+        }
+        if (this._seekedId) {
+          try {
             this._mediaServerPlayer.disconnectSignal(this._seekedId);
+          }
+          catch (err) {
+            global.log(err);
+          }
+        }
         for (let id in this._signalsId)
             this._settings.disconnect(this._signalsId[id]);
         this.parent();

@@ -138,6 +138,15 @@ const PlayerManager = new Lang.Class({
                 this._players[owner].player.connect('init-done',
                     Lang.bind(this, function(player) {
                         player.populate();
+                        player.menu.open();
+                    })
+                )
+            );
+            this._players[owner].signals.push(
+                /* Close all other players menu when a player menu is opened */
+                this._players[owner].player.connect('player-menu-opened',
+                    Lang.bind(this, function(player) {
+                      this._hideOtherPlayers(player);
                     })
                 )
             );
@@ -146,7 +155,7 @@ const PlayerManager = new Lang.Class({
             if (this._players[Settings.DEFAULT_PLAYER_OWNER])
                 this._removePlayer(null, Settings.DEFAULT_PLAYER_OWNER);
 
-            this._addPlayerMenu(this._players[owner].player);
+            this._addPlayerToMenu(this._players[owner].player);
         }
 
         this._hideOrDefaultPlayer();
@@ -154,16 +163,24 @@ const PlayerManager = new Lang.Class({
         this._refreshStatus();
     },
 
+    _hideOtherPlayers: function(player) {
+      for (let owner in this._players) {
+        if (this._players[owner].player != player)
+          this._players[owner].player.menu.close(true, true);
+      }
+    },
+
     _hideOrDefaultPlayer: function() {
         if (this._disabling)
             return;
-            
+
         if (this._nbPlayers() == 0 && Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
-            if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-                let player = new Player.DefaultPlayer();
-                this._players[Settings.DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
-                this._addPlayerMenu(player);
-            }
+          if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
+            let player = new Player.DefaultPlayer();
+            this._players[Settings.DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
+            this._addPlayerToMenu(player);
+            player.menu.open();
+          }
         }
         else if (this._nbPlayers() > 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]) {
             this._removePlayer(null, Settings.DEFAULT_PLAYER_OWNER);
@@ -171,21 +188,27 @@ const PlayerManager = new Lang.Class({
         this._hideOrShowMenu();
     },
 
-    _addPlayerMenu: function(player) {
+    _addPlayerToMenu: function(player) {
         let position = this._getPlayerPosition();
 
         let item = this._getMenuItem(position);
-        if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
-            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
-                                       position);
+        if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) ==
+              Settings.IndicatorPosition.VOLUMEMENU) {
+          if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
+              this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
+                                         position);
+          }
         }
 
         this.menu.menu.addMenuItem(player, position);
 
-        let item = this._getMenuItem(position - 1);
-        if (item && ! (item instanceof PopupMenu.PopupSeparatorMenuItem)) {
-            this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
-                                       position);
+        if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) ==
+              Settings.IndicatorPosition.VOLUMEMENU) {
+          let item = this._getMenuItem(position - 1);
+          if (item && ! (item instanceof Player.MPRISPlayer)) {
+              this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
+                                         position);
+          }
         }
         this.menu.actor.show();
     },
