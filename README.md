@@ -1,5 +1,7 @@
 # gnome-shell-extensions-mediaplayer
 
+[![Join the chat at https://gitter.im/eonpatapon/gnome-shell-extensions-mediaplayer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eonpatapon/gnome-shell-extensions-mediaplayer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 gnome-shell-extensions-mediaplayer is a simple extension for controlling any
 MPRIS v2.1 capable media player.
 
