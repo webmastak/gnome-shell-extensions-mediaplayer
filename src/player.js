@@ -199,12 +199,6 @@ const MPRISPlayer = new Lang.Class({
                 }
             }))
         );
-        //this.playerTitle = new Widget.TitleItem(this._identity,
-                                                //{icon_name: "audio-x-generic-symbolic", icon_size: 16},
-                                                //"window-close-symbolic",
-                                                //Lang.bind(this, function() { this._mediaServer.QuitRemote(); }));
-
-        //this.addMenuItem(this.playerTitle);
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
@@ -245,6 +239,21 @@ const MPRISPlayer = new Lang.Class({
         this.trackControls.addButton(this._stopButton);
         this.trackControls.addButton(this._nextButton);
 
+        if (this._mediaServer.CanRaise) {
+          this._raiseButton = new Widget.PlayerButton('media-eject',
+                                                      Lang.bind(this, function() {
+                                                        // If we have an application in the appSystem
+                                                        // Bring it to the front else let the player decide
+                                                        if (this._app)
+                                                          this._app.activate_full(-1, 0);
+                                                        else
+                                                          this._mediaServer.RaiseRemote();
+                                                        // Close the indicator
+                                                        this.emit("menu-close");
+                                                      }));
+          this.trackControls.addButton(this._raiseButton);
+        }
+
         this.addMenuItem(this.trackControls);
 
         this.showPosition = this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY);
@@ -268,26 +277,6 @@ const MPRISPlayer = new Lang.Class({
             this._mediaServerPlayer.Volume = item._value;
         }));
         this.addMenuItem(this._volume);
-
-        //if (this._mediaServer.CanRaise) {
-            //this.playerTitle.connect('activate',
-                //Lang.bind(this, function () {
-                    //// If we have an application in the appSystem
-                    //// Bring it to the front else let the player decide
-                    //if (this._app)
-                        //this._app.activate_full(-1, 0);
-                    //else
-                        //this._mediaServer.RaiseRemote();
-                    //// Close the indicator
-                    //this.emit("close-menu");
-                //})
-            //);
-        //}
-        //else {
-            //// Make the player title insensitive
-            //this.playerTitle.setSensitive(false);
-            //this.playerTitle.actor.remove_style_pseudo_class('insensitive');
-        //}
 
         //if (!this._mediaServer.CanQuit)
             //this.playerTitle.hideButton();
@@ -365,11 +354,10 @@ const MPRISPlayer = new Lang.Class({
 
     _getDesktopEntry: function() {
         let entry = this._mediaServer.DesktopEntry;
+        let appSys = Shell.AppSystem.get_default();
+        this._app = appSys.lookup_app(entry + ".desktop");
         let appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
-        //let appSys = Shell.AppSystem.get_default();
-        //this._app = appSys.lookup_app(entry + ".desktop");
         if (appInfo) {
-            //this.playerTitle.setGicon(appInfo.get_icon());
             this.icon.gicon = appInfo.get_icon();
         }
     },

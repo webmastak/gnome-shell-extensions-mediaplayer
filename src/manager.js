@@ -64,7 +64,7 @@ const PlayerManager = new Lang.Class({
                         if (new_owner && !old_owner)
                             this._addPlayer(name, new_owner);
                         else if (old_owner && !new_owner)
-                            this._removePlayer(name, old_owner);
+                            this._removePlayerFromMenu(name, old_owner);
                         else
                             this._changePlayerOwner(name, old_owner, new_owner);
                     }
@@ -129,8 +129,7 @@ const PlayerManager = new Lang.Class({
             this._players[owner].signals.push(
                 this._players[owner].player.connect('menu-close',
                     Lang.bind(this, function() {
-                        if (this.menu instanceof Panel.MediaplayerStatusButton)
-                            this.menu.close();
+                        this.menu.menu.close();
                     })
                 )
             );
@@ -153,7 +152,7 @@ const PlayerManager = new Lang.Class({
 
             // remove the default player
             if (this._players[Settings.DEFAULT_PLAYER_OWNER])
-                this._removePlayer(null, Settings.DEFAULT_PLAYER_OWNER);
+                this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
 
             this._addPlayerToMenu(this._players[owner].player);
         }
@@ -183,7 +182,7 @@ const PlayerManager = new Lang.Class({
           }
         }
         else if (this._nbPlayers() > 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-            this._removePlayer(null, Settings.DEFAULT_PLAYER_OWNER);
+            this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
         }
         this._hideOrShowMenu();
     },
@@ -252,7 +251,7 @@ const PlayerManager = new Lang.Class({
                 this.menu.actor.hide();
     },
 
-    _removePlayer: function(busName, owner) {
+    _removePlayerFromMenu: function(busName, owner) {
         if (this._players[owner]) {
             for (let id in this._players[owner].signals)
                 this._players[owner].player.disconnect(this._players[owner].signals[id]);
@@ -327,6 +326,6 @@ const PlayerManager = new Lang.Class({
         for (let id in this._signalsId)
             Settings.gsettings.disconnect(this._signalsId[id]);
         for (let owner in this._players)
-            this._removePlayer(null, owner);
+            this._removePlayerFromMenu(null, owner);
     }
 });
