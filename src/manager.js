@@ -110,7 +110,14 @@ const PlayerManager = new Lang.Class({
             else
                 return;
         } else if (owner) {
-            this._players[owner] = {player: new Player.MPRISPlayer(busName, owner), signals: []};
+            let player = new Player.MPRISPlayer(busName, owner);
+            let ui = new Player.UI(player);
+            this._players[owner] = {
+              player: player,
+              ui: ui,
+              signals: []
+            };
+
             this._players[owner].signals.push(
                 this._players[owner].player.connect('player-metadata-changed',
                     Lang.bind(this, this._refreshStatus)
@@ -137,7 +144,7 @@ const PlayerManager = new Lang.Class({
                 this._players[owner].player.connect('init-done',
                     Lang.bind(this, function(player) {
                         player.populate();
-                        player.menu.open();
+                        //player.menu.open();
                     })
                 )
             );
@@ -154,7 +161,7 @@ const PlayerManager = new Lang.Class({
             if (this._players[Settings.DEFAULT_PLAYER_OWNER])
                 this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
 
-            this._addPlayerToMenu(this._players[owner].player);
+            this._addPlayerToMenu(this._players[owner].ui);
         }
 
         this._hideOrDefaultPlayer();
