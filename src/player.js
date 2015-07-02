@@ -607,13 +607,9 @@ const MPRISPlayer = new Lang.Class({
                 this._stopTimer();
             }
 
-            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
-                // Some players send a "PlaybackStatus: Stopped" signal when changing
-                // tracks, so wait a little before refreshing.
-                Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
-            } else {
-                this._refreshStatus();
-            }
+            // Some players send a "PlaybackStatus: Stopped" signal when changing
+            // tracks, so wait a little before refreshing.
+            Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
         }
     },
 
@@ -716,6 +712,19 @@ const MPRISPlayer = new Lang.Class({
                     this._playButton.show();
                     this._playButton.setIcon("media-playback-start-symbolic");
                 }
+            })
+        );
+        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPlay',
+            Lang.bind(this, function(value, err) {
+                // assume the player can play by default
+                let canPlay = true;
+                if (!err)
+                    canPlay = value[0].unpack();
+
+                if (canPlay || this._status != Settings.Status.STOP)
+                    this._playButton.enable();
+                else
+                    this._playButton.disable();
             })
         );
         this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
