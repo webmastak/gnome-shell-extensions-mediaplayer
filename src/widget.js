@@ -148,6 +148,10 @@ const TrackBox = new Lang.Class({
         this._infos.add(item.actor);
     },
 
+    empty: function() {
+        this._infos.destroy_all_children();
+    },
+
     get hidden() {
       return this._hidden || false;
     },
@@ -176,6 +180,8 @@ const TrackBox = new Lang.Class({
 
       this.actor.set_height(-1);
       let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      this.actor.set_height(0);
+      this.actor.show();
       Tweener.addTween(this.actor, {
         opacity: 255,
         height: naturalHeight,
