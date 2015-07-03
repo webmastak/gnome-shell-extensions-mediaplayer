@@ -39,6 +39,9 @@ const DBusIface = Me.imports.dbus;
 const Settings = Me.imports.settings;
 
 
+const COVER_SIZE = 64;
+
+
 const PlayerState = new Lang.Class({
   Name: 'PlayerState',
 
@@ -157,7 +160,7 @@ const UI = new Lang.Class({
     //this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
     this.trackCoverFile = false;
     this.trackCoverFileTmp = false;
-    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: 64});
+    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE});
     this.trackCoverContainer.set_child(this.trackCover);
 
     this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
@@ -184,9 +187,8 @@ const UI = new Lang.Class({
 
   update: function(player, newState) {
 
-    global.log("update");
+    global.log("#######################");
     global.log(JSON.stringify(newState));
-    global.log(player);
 
     if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
       this.trackBox.empty();
@@ -198,26 +200,54 @@ const UI = new Lang.Class({
         this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackAlbum, 'track-album'));
     }
 
-    //if ('canPause' in newState) {
-      //if (newState.canPause)
-        //this.playButton.setCallback(Lang.bind(this.player, this.player.playPause));
-      //else
-        //this.playButton.setCallback(Lang.bind(this.player, this.player.play));
-    //}
+    if ('trackCoverFile' in newState) {
+      if (newState.trackCoverFile) {
+        let cover_path = "";
+        // Distant cover
+        if (newState.trackCoverFile.match(/^http/)) {
+          // hide current cover
+          this._hideCover();
+          // Copy the cover to a tmp local file
+          let cover = Gio.file_new_for_uri(decodeURIComponent(newState.trackCoverFile));
+          // Don't create multiple tmp files
+          if (!this.trackCoverFileTmp)
+            this.trackCoverFileTmp = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
+          // asynchronous copy
+          cover.read_async(null, null, Lang.bind(this, this._onReadCover));
+        }
+        // Local cover
+        else if (newState.trackCoverFile.match(/^file/)) {
+          this.trackCoverPath = decodeURIComponent(newState.trackCoverFile.substr(7));
+          this._showCover();
+        }
 
-    //if ('canGoNext' in newState) {
-      //if (newState.canGoNext)
-        //this.nextButton.enable();
-      //else
-        //this.nextButton.disable();
-    //}
+      }
+      else {
+        this.trackCoverPath = false;
+        this._showCover();
+      }
+    }
 
-    //if ('canGoPrevious' in newState) {
-      //if (newState.canGoPrevious)
-        //this.prevButton.enable();
-      //else
-        //this.prevButton.disable();
-    //}
+    if (newState.canPause !== null) {
+      if (newState.canPause)
+        this.playButton.setCallback(Lang.bind(this.player, this.player.playPause));
+      else
+        this.playButton.setCallback(Lang.bind(this.player, this.player.play));
+    }
+
+    if (newState.canGoNext !== null) {
+      if (newState.canGoNext)
+        this.nextButton.enable();
+      else
+        this.nextButton.disable();
+    }
+
+    if (newState.canGoPrevious !== null) {
+      if (newState.canGoPrevious)
+        this.prevButton.enable();
+      else
+        this.prevButton.disable();
+    }
 
     if (newState.status) {
       let status = newState.status;
@@ -243,6 +273,60 @@ const UI = new Lang.Class({
         this.playButton.setIcon('media-playback-start-symbolic');
       }
     }
+
+    global.log("#######################");
+  },
+
+  _onReadCover: function(cover, result) {
+    let inStream = cover.read_finish(result);
+    let outStream = this.trackCoverFileTmp.replace(null, false,
+                                                   Gio.FileCreateFlags.REPLACE_DESTINATION,
+                                                   null, null);
+    outStream.splice_async(inStream, Gio.OutputStreamSpliceFlags.CLOSE_TARGET,
+                           0, null, Lang.bind(this, this._onSavedCover));
+  },
+
+  _onSavedCover: function(outStream, result) {
+    outStream.splice_finish(result, null);
+    this.trackCoverPath = this.trackCoverFileTmp.get_path();
+    this._showCover();
+  },
+
+  _hideCover: function() {
+    Tweener.addTween(this.trackCoverContainer, {
+      opacity: 0,
+      time: 0.3,
+      transition: 'easeOutCubic',
+    });
+  },
+
+  _showCover: function() {
+    Tweener.addTween(this.trackCoverContainer, {
+      opacity: 0,
+      time: 0.3,
+      transition: 'easeOutCubic',
+      onComplete: Lang.bind(this, function() {
+        // Change cover
+        if (! this.trackCoverPath || ! GLib.file_test(this.trackCoverPath, GLib.FileTest.EXISTS)) {
+          this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE});
+        }
+        else {
+          this.trackCover = new St.Bin({style_class: 'track-cover'});
+          let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this.trackCoverPath});
+          let [coverWidth, coverHeight] = coverTexture.get_base_size();
+          this.trackCover.width = COVER_SIZE;
+          this.trackCover.height = coverHeight / (coverWidth / COVER_SIZE);
+          this.trackCover.set_child(coverTexture);
+        }
+        this.trackCoverContainer.set_child(this.trackCover);
+        // Show the new cover
+        Tweener.addTween(this.trackCoverContainer, {
+          opacity: 255,
+          time: 0.3,
+          transition: 'easeInCubic',
+        });
+      })
+    });
   },
 
   updateInfo: function(player) {
@@ -342,9 +426,6 @@ const MPRISPlayer = new Lang.Class({
         this._signalsId.push(
           this.connect("player-update", Lang.bind(this, function(player, state) {
             this.state.update(state);
-            global.log("New state : " + JSON.stringify(state));
-            global.log("Merged state : " + JSON.stringify(this.state));
-            global.log("----------------------------------------------");
           }))
         );
 
@@ -504,6 +585,7 @@ const MPRISPlayer = new Lang.Class({
               newState.canGoPrevious = props.CanGoPrevious.unpack() || true;
             }
 
+            global.log("'PropertiesChanged'");
             this.emit('player-update', newState);
           }));
 
@@ -723,7 +805,9 @@ const MPRISPlayer = new Lang.Class({
                     this._updateSliders();
                 }
                 // Check if the current track can be paused
-                state = this._updateControls(state);
+                this._updateControls();
+                global.log("in metadata");
+                global.log(JSON.stringify(state));
             }
 
             if (metadata["xesam:artist"]) {
@@ -932,7 +1016,7 @@ const MPRISPlayer = new Lang.Class({
 
     _refreshStatus: function() {
         this._updateSliders();
-        this._updateControls({});
+        this._updateControls();
         this._setIdentity();
         if (this._status != Settings.Status.STOP) {
             this.emit('player-cover-changed');
@@ -966,81 +1050,51 @@ const MPRISPlayer = new Lang.Class({
         );
     },
 
-    _updateControls: function(state) {
+    _updateControls: function() {
         // called for each song change and status change
         this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPause',
-            Lang.bind(this, function(value, err) {
-                // assume the player can pause by default
-                let canPause = true;
-                if (!err)
-                    canPause = value[0].unpack();
+                             Lang.bind(this, function(value, err) {
+                               let state = new PlayerState();
+                               // assume the player can pause by default
+                               let canPause = true;
+                               if (!err)
+                                 canPause = value[0].unpack();
 
-                if (this.state.canPause != canPause)
-                  state.canPause = canPause;
-
-                if (canPause) {
-                    this._playButton.setCallback(Lang.bind(this, function() {
-                        this._mediaServerPlayer.PlayPauseRemote();
-                    }));
-                }
-                else {
-                    this._playButton.setCallback(Lang.bind(this, function() {
-                        this._mediaServerPlayer.PlayRemote();
-                    }));
-                }
-
-                if (this._status == Settings.Status.PLAY) {
-                    this._stopButton.show();
-                    if (canPause)
-                        this._playButton.setIcon("media-playback-pause-symbolic");
-                    else
-                        this._playButton.hide();
-                }
-
-                if (this._status == Settings.Status.PAUSE)
-                    this._playButton.setIcon("media-playback-start-symbolic");
-
-                if (this._status == Settings.Status.STOP) {
-                    this._stopButton.hide();
-                    this._playButton.show();
-                    this._playButton.setIcon("media-playback-start-symbolic");
-                }
-            })
+                               if (this.state.canPause != canPause) {
+                                 state.canPause = canPause;
+                                 this.emit('player-update', state);
+                               }
+                             })
         );
         this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
-            Lang.bind(this, function(value, err) {
-                // assume the player can go next by default
-                let canGoNext = true;
-                if (!err)
-                    canGoNext = value[0].unpack();
+                             Lang.bind(this, function(value, err) {
+                               let state = new PlayerState();
+                               // assume the player can go next by default
+                               let canGoNext = true;
+                               if (!err)
+                                 canGoNext = value[0].unpack();
 
-                if (this.state.canGoNext != canGoNext)
-                  state.canGoNext = canGoNext;
-
-                if (canGoNext)
-                    this._nextButton.enable();
-                else
-                    this._nextButton.disable();
-            })
+                               if (this.state.canGoNext != canGoNext) {
+                                 state.canGoNext = canGoNext;
+                                 this.emit('player-update', state);
+                               }
+                             })
         );
         this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoPrevious',
-            Lang.bind(this, function(value, err) {
-                // assume the player can go previous by default
-                let canGoPrevious = true;
-                if (!err)
-                    canGoPrevious = value[0].unpack();
+                             Lang.bind(this, function(value, err) {
+                               let state = new PlayerState();
+                               // assume the player can go previous by default
+                               let canGoPrevious = true;
+                               if (!err)
+                                 canGoPrevious = value[0].unpack();
 
-                if (this.state.canGoPrevious != canGoPrevious)
-                  state.CanGoPrevious = canGoPrevious;
-
-                if (canGoPrevious)
-                    this._prevButton.enable();
-                else
-                    this._prevButton.disable();
-            })
+                               if (this.state.canGoPrevious != canGoPrevious) {
+                                 state.canGoPrevious = canGoPrevious;
+                                 this.emit('player-update', state);
+                               }
+                             })
         );
 
-        return state;
     },
 
     _getStatus: function() {
