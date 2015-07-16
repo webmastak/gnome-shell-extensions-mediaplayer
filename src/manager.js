@@ -259,11 +259,14 @@ const PlayerManager = new Lang.Class({
     },
 
     _removePlayerFromMenu: function(busName, owner) {
+        global.log("Remove from menu : " + busName);
         if (this._players[owner]) {
             for (let id in this._players[owner].signals)
                 this._players[owner].player.disconnect(this._players[owner].signals[id]);
             let position = this._getPlayerMenuPosition(this._players[owner].player);
             // Remove the bottom separator
+            if (this._players[owner].ui)
+              this._players[owner].ui.destroy();
             this._players[owner].player.destroy();
             if (position)
                 this._removeMenuItem(position);
