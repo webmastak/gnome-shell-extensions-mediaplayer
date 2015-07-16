@@ -23,6 +23,7 @@ const Panel = Me.imports.panel;
 const Player = Me.imports.player;
 const Settings = Me.imports.settings;
 const DBusIface = Me.imports.dbus;
+const UI = Me.imports.ui;
 
 
 const PlayerManager = new Lang.Class({
@@ -111,7 +112,7 @@ const PlayerManager = new Lang.Class({
                 return;
         } else if (owner) {
             let player = new Player.MPRISPlayer(busName, owner);
-            let ui = new Player.UI(player);
+            let ui = new UI.PlayerUI(player);
             this._players[owner] = {
               player: player,
               ui: ui,
