@@ -263,20 +263,13 @@ const MPRISPlayer = new Lang.Class({
                 this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
             }))
         );
-        this.showRating = this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY);
+
         this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
-                if (this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)) {
-                    this.showRating = true;
-                    this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
-                    this.trackBox.addInfo(this.trackRating);
-                }
-                else {
-                    this.showRating = false;
-                    this.trackRating.destroy();
-                }
-            }))
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
+          }))
         );
+        this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
 
         this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
         this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
@@ -293,11 +286,6 @@ const MPRISPlayer = new Lang.Class({
         this.trackBox.addInfo(this.trackTitle);
         this.trackBox.addInfo(this.trackArtist);
         this.trackBox.addInfo(this.trackAlbum);
-
-        if (this.showRating) {
-            this.trackRating = new Widget.TrackRating(_("rating"), 0, 'track-rating', this);
-            this.trackBox.addInfo(this.trackRating);
-        }
 
         this.addMenuItem(this.trackBox);
         this.trackBox.hide();
@@ -645,16 +633,13 @@ const MPRISPlayer = new Lang.Class({
                 state.trackObj = metadata["mpris:trackid"].unpack();
             }
 
-            if (this.showRating) {
-                let rating = 0;
-                if (metadata["xesam:userRating"])
-                    rating = (metadata["xesam:userRating"].deep_unpack() * 5);
-                // Clementine
-                if (metadata["rating"])
-                    rating = metadata["rating"].deep_unpack();
-                this.trackRating.setRating(parseInt(rating));
-                state.trackRating = parseInt(rating);
-            }
+            let rating = 0;
+            if (metadata["xesam:userRating"])
+                rating = (metadata["xesam:userRating"].deep_unpack() * 5);
+            // Clementine
+            if (metadata["rating"])
+                rating = metadata["rating"].deep_unpack();
+            state.trackRating = parseInt(rating);
 
             let change = false;
             if (metadata["mpris:artUrl"]) {

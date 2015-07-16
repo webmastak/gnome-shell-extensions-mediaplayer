@@ -33,6 +33,8 @@ const PlayerUI = new Lang.Class({
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
     this._updateInfoId = player.connect("player-info-update", Lang.bind(this, this.updateInfo));
 
+    this.showRating = false;
+
     this.trackCoverContainer = new St.Button({style_class: 'track-cover-container',
                                               x_align: St.Align.START,
                                               y_align: St.Align.START});
@@ -69,6 +71,10 @@ const PlayerUI = new Lang.Class({
     global.log("#######################");
     global.log(JSON.stringify(newState));
 
+    if (newState.showRating) {
+      this.showRating = newState.showRating;
+    }
+
     if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
       this.trackBox.empty();
       if (player.state.trackTitle)
@@ -77,6 +83,8 @@ const PlayerUI = new Lang.Class({
         this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackArtist, 'track-artist'));
       if (player.state.trackAlbum)
         this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackAlbum, 'track-album'));
+      if (player.state.trackRating !== null && this.showRating)
+        this.trackBox.addInfo(new Widget.TrackRating(null, player.state.trackRating, 'track-rating', this.player));
     }
 
     if ('trackCoverFile' in newState) {
