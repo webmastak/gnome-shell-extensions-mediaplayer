@@ -34,6 +34,7 @@ const PlayerUI = new Lang.Class({
     this._updateInfoId = player.connect("player-info-update", Lang.bind(this, this.updateInfo));
 
     this.showRating = false;
+    this.showVolume = false;
 
     this.trackCoverContainer = new St.Button({style_class: 'track-cover-container',
                                               x_align: St.Align.START,
@@ -64,6 +65,13 @@ const PlayerUI = new Lang.Class({
     this.trackControls.addButton(this.nextButton);
 
     this.addMenuItem(this.trackControls);
+
+    this.volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
+    this.volume.connect('value-changed', Lang.bind(this, function(item) {
+      this.player._mediaServerPlayer.Volume = item._value;
+    }));
+    this.addMenuItem(this.volume);
+
   },
 
   update: function(player, newState) {
@@ -71,8 +79,13 @@ const PlayerUI = new Lang.Class({
     global.log("#######################");
     global.log(JSON.stringify(newState));
 
-    if (newState.showRating) {
+    if (newState.showRating !== null) {
       this.showRating = newState.showRating;
+    }
+
+    if (newState.showVolume !== null) {
+      this.showVolume = newState.showVolume;
+      global.log("showVolume : " + this.showVolume);
     }
 
     if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
@@ -85,6 +98,19 @@ const PlayerUI = new Lang.Class({
         this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackAlbum, 'track-album'));
       if (player.state.trackRating !== null && this.showRating)
         this.trackBox.addInfo(new Widget.TrackRating(null, player.state.trackRating, 'track-rating', this.player));
+    }
+
+    if (newState.volume !== null) {
+      let value = newState.volume;
+      if (value === 0)
+          this.volume.setIcon("audio-volume-muted-symbolic");
+      if (value > 0)
+          this.volume.setIcon("audio-volume-low-symbolic");
+      if (value > 0.30)
+          this.volume.setIcon("audio-volume-medium-symbolic");
+      if (value > 0.80)
+          this.volume.setIcon("audio-volume-high-symbolic");
+      this.volume.setValue(value);
     }
 
     if ('trackCoverFile' in newState) {
@@ -140,11 +166,15 @@ const PlayerUI = new Lang.Class({
       let status = newState.status;
       this.status.text = _(status);
 
-      if (status == Settings.Status.STOP)
+      if (status == Settings.Status.STOP) {
         this.trackBox.hideAnimate();
+        this.volume.actor.hide();
+      }
       else {
-        global.log("show Animate");
         this.trackBox.showAnimate();
+        global.log(this.showVolume);
+        if (this.showVolume)
+          this.volume.actor.show();
       }
 
       if (status === Settings.Status.PLAY) {

@@ -74,6 +74,7 @@ const PlayerState = new Lang.Class({
   canGoPrevious: null,
   canPause: null,
 
+  showVolume: null,
   hasVolume: null,
   volume: null,
 
@@ -235,13 +236,14 @@ const MPRISPlayer = new Lang.Class({
         if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._prop)
             return;
 
-        this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
         this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
-                this.showVolume = this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY);
-                this._updateSliders();
-            }))
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
+                                                        volume: this.state.volume}));
+          }))
         );
+        this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY)}));
+
         this.showPlaylists = this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY);
         this._signalsId.push(
             this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
@@ -341,13 +343,6 @@ const MPRISPlayer = new Lang.Class({
         );
         this.addMenuItem(this._position);
 
-        this._volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
-        this._volume.connect('value-changed', Lang.bind(this, function(item) {
-            this._mediaServerPlayer.Volume = item._value;
-            this.emit('player-update', new PlayerState({volume: item._value}));
-        }));
-        this.addMenuItem(this._volume);
-
         if (this._mediaServer.CanQuit)
             this.info.canQuit = true;
             //this.playerTitle.hideButton();
@@ -355,7 +350,6 @@ const MPRISPlayer = new Lang.Class({
           this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
             let newState = new PlayerState();
             if (props.Volume) {
-              this._setVolume(props.Volume.unpack());
               newState.volume = props.Volume.unpack();
             }
             if (props.PlaybackStatus) {
@@ -414,7 +408,6 @@ const MPRISPlayer = new Lang.Class({
     },
 
     populate: function() {
-
         let newState = new PlayerState({
           volume: this._mediaServerPlayer.Volume,
           position: this._mediaServerPlayer.Position,
@@ -422,7 +415,6 @@ const MPRISPlayer = new Lang.Class({
         });
         this._setMetadata(this._mediaServerPlayer.Metadata, newState);
 
-        this._getVolume();
         this._getIdentity();
         this._getDesktopEntry();
         this._getMetadata();
@@ -752,28 +744,6 @@ const MPRISPlayer = new Lang.Class({
         this._setMetadata(this._mediaServerPlayer.Metadata, {});
     },
 
-    _setVolume: function(value) {
-        // Player does not have a volume property
-        if (value === null)
-            this.showVolume = false;
-
-        if (this.showVolume) {
-            if (value === 0)
-                this._volume.setIcon("audio-volume-muted-symbolic");
-            if (value > 0)
-                this._volume.setIcon("audio-volume-low-symbolic");
-            if (value > 0.30)
-                this._volume.setIcon("audio-volume-medium-symbolic");
-            if (value > 0.80)
-                this._volume.setIcon("audio-volume-high-symbolic");
-            this._volume.setValue(value);
-        }
-    },
-
-    _getVolume: function() {
-        this._setVolume(this._mediaServerPlayer.Volume);
-    },
-
     _setStatus: function(status) {
         if (status != this._status) {
             this._status = status;
@@ -825,11 +795,6 @@ const MPRISPlayer = new Lang.Class({
                     this._position.actor.show();
                 else
                     this._position.actor.hide();
-
-                if (this._status != Settings.Status.STOP && this.showVolume)
-                    this._volume.actor.show();
-                else
-                    this._volume.actor.hide();
             })
         );
     },
