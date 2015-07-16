@@ -85,7 +85,10 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showVolume !== null) {
       this.showVolume = newState.showVolume;
-      global.log("showVolume : " + this.showVolume);
+      if (this.showVolume)
+        this.volume.actor.show();
+      else
+        this.volume.actor.hide();
     }
 
     if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
