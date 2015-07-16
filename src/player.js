@@ -339,6 +339,7 @@ const UI = new Lang.Class({
       this.player.disconnectSignal(this._updateId);
       this.player.disconnectSignal(this._updateInfoId);
     }
+    this.parent();
   }
 
 });
@@ -1155,20 +1156,10 @@ const MPRISPlayer = new Lang.Class({
     destroy: function() {
         this._stopTimer();
         if (this._propChangedId) {
-          try {
-            this._prop.disconnectSignal(this._propChangedId);
-          }
-          catch (err) {
-            global.log(err);
-          }
+          this._prop.disconnectSignal(this._propChangedId);
         }
         if (this._seekedId) {
-          try {
-            this._mediaServerPlayer.disconnectSignal(this._seekedId);
-          }
-          catch (err) {
-            global.log(err);
-          }
+          this._mediaServerPlayer.disconnectSignal(this._seekedId);
         }
         for (let id in this._signalsId)
             this._settings.disconnect(this._signalsId[id]);
