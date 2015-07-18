@@ -188,12 +188,11 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.positionText) {
-      this.position.setLabel(newState.positionText);
-    }
-
-    if (newState.position) {
-      this.position.setValue(newState.position);
+    if (newState.trackTime && newState.trackLength) {
+      this.position.setLabel(
+        this._formatTime(newState.trackTime) + " / " + this._formatTime(newState.trackLength)
+      );
+      this.position.setValue(newState.trackTime / newState.trackLength);
     }
 
     if (newState.status) {
@@ -299,6 +298,25 @@ const PlayerUI = new Lang.Class({
                        transition: 'easeInCubic'
       });
     }
+  },
+
+  _formatTime: function(s) {
+    let ms = s * 1000;
+    let msSecs = (1000);
+    let msMins = (msSecs * 60);
+    let msHours = (msMins * 60);
+    let numHours = Math.floor(ms/msHours);
+    let numMins = Math.floor((ms - (numHours * msHours)) / msMins);
+    let numSecs = Math.floor((ms - (numHours * msHours) - (numMins * msMins))/ msSecs);
+    if (numSecs < 10)
+      numSecs = "0" + numSecs.toString();
+    if (numMins < 10 && numHours > 0)
+      numMins = "0" + numMins.toString();
+    if (numHours > 0)
+      numHours = numHours.toString() + ":";
+    else
+      numHours = "";
+    return numHours + numMins.toString() + ":" + numSecs.toString();
   },
 
   updateInfo: function(player) {
