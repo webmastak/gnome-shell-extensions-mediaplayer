@@ -239,6 +239,7 @@ const MPRISPlayer = new Lang.Class({
         if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._prop)
             return;
 
+        // showVolume setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
             this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
@@ -247,6 +248,7 @@ const MPRISPlayer = new Lang.Class({
         );
         this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY)}));
 
+        // showPosition setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
             this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
@@ -254,6 +256,14 @@ const MPRISPlayer = new Lang.Class({
           }))
         );
         this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY)}));
+
+        // showRating setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
+          }))
+        );
+        this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
 
 
         this.showPlaylists = this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY);
@@ -271,38 +281,13 @@ const MPRISPlayer = new Lang.Class({
                 }
             }))
         );
+
         this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
         this._signalsId.push(
             this._settings.connect("changed::" + Settings.MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
                 this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
             }))
         );
-
-        this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
-          }))
-        );
-        this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
-
-        this.trackCoverContainer = new St.Button({style_class: 'track-cover-container', x_align: St.Align.START, y_align: St.Align.START});
-        this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
-        this.trackCoverFile = false;
-        this.trackCoverFileTmp = false;
-        this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize});
-        this.trackCoverContainer.set_child(this.trackCover);
-
-        this.trackTitle = new Widget.TrackTitle(null, _('Unknown Title'), 'track-title');
-        this.trackArtist = new Widget.TrackTitle(_("by"), _('Unknown Artist'), 'track-artist');
-        this.trackAlbum = new Widget.TrackTitle(_("from"), _('Unknown Album'), 'track-album');
-
-        this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
-        this.trackBox.addInfo(this.trackTitle);
-        this.trackBox.addInfo(this.trackArtist);
-        this.trackBox.addInfo(this.trackAlbum);
-
-        this.addMenuItem(this.trackBox);
-        this.trackBox.hide();
 
         this._prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
             Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
@@ -551,192 +536,64 @@ const MPRISPlayer = new Lang.Class({
         this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, this._setPlaylists));
     },
 
-
     _setMetadata: function(metadata, state) {
-        // Pragha sends a metadata dict with one
-        // value on stop
-        if (metadata !== null && Object.keys(metadata).length > 1) {
-            // Check if the track has changed
-            let trackChanged = true;
-            // Check if the URL has changed
-            if (metadata["xesam:url"] && metadata["xesam:url"].unpack() == this.trackUrl)
-                trackChanged = false;
-            // Reset the timer only when the track has changed
-            if (trackChanged) {
-                this._currentTime = -1;
-                if (metadata["mpris:length"]) {
-                    this._songLength = metadata["mpris:length"].unpack() / 1000000;
-                    state.trackLength = metadata["mpris:length"].unpack() / 1000000;
-                }
-                else {
-                    this._songLength = 0;
-                    state.trackLength = null;
-                }
-                if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
-                    // Some players send a "PlaybackStatus: Stopped" signal when changing
-                    // tracks, so wait a little before refreshing sliders
-                    Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateSliders));
-                } else {
-                    this._updateSliders();
-                }
-                // Check if the current track can be paused
-                this._updateControls();
-                global.log("in metadata");
-                global.log(JSON.stringify(state));
-            }
-
-            if (metadata["xesam:artist"]) {
-                this.trackArtist.setText(metadata["xesam:artist"].deep_unpack());
-                state.trackArtist = metadata["xesam:artist"].deep_unpack();
-            }
-            else {
-                this.trackArtist.setText(_("Unknown Artist"));
-                state.trackArtist = null;
-            }
-            if (metadata["xesam:album"]) {
-                this.trackAlbum.setText(metadata["xesam:album"].unpack());
-                state.trackAlbum = metadata["xesam:album"].unpack();
-            }
-            else {
-                this.trackAlbum.setText(_("Unknown Album"));
-                state.trackAlbum = null;
-            }
-            if (metadata["xesam:title"]) {
-                this.trackTitle.setText(metadata["xesam:title"].unpack());
-                state.trackTitle = metadata["xesam:title"].unpack();
-            }
-            else {
-                this.trackTitle.setText(_("Unknown Title"));
-            }
-
-            if (metadata["xesam:url"]) {
-                this.trackUrl = metadata["xesam:url"].unpack();
-                state.trackUrl = metadata["xesam:url"].unpack();
-            }
-            else
-                this.trackUrl = false;
-
-            if (metadata["mpris:trackid"]) {
-                state.trackObj = metadata["mpris:trackid"].unpack();
-            }
-
-            let rating = 0;
-            if (metadata["xesam:userRating"])
-                rating = (metadata["xesam:userRating"].deep_unpack() * 5);
-            // Clementine
-            if (metadata["rating"])
-                rating = metadata["rating"].deep_unpack();
-            state.trackRating = parseInt(rating);
-
-            let change = false;
-            if (metadata["mpris:artUrl"]) {
-                if (this.trackCoverFile != metadata["mpris:artUrl"].unpack()) {
-                    this.trackCoverFile = metadata["mpris:artUrl"].unpack();
-                    state.trackCoverFile = metadata["mpris:artUrl"].unpack();
-                    change = true;
-                }
-            }
-            else {
-                if (this.trackCoverFile !== false) {
-                    this.trackCoverFile = false;
-                    change = true;
-                }
-            }
-
-            if (change) {
-                if (this.trackCoverFile) {
-                    let cover_path = "";
-                    // Distant cover
-                    if (this.trackCoverFile.match(/^http/)) {
-                        // hide current cover
-                        this._hideCover();
-                        // Copy the cover to a tmp local file
-                        let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
-                        // Don't create multiple tmp files
-                        if (!this.trackCoverFileTmp)
-                            this.trackCoverFileTmp = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
-                        // asynchronous copy
-                        cover.read_async(null, null, Lang.bind(this, this._onReadCover));
-                    }
-                    // Local cover
-                    else if (this.trackCoverFile.match(/^file/)) {
-                        this.trackCoverPath = decodeURIComponent(this.trackCoverFile.substr(7));
-                        this._showCover();
-                    }
-                }
-                else {
-                    this.trackCoverPath = false;
-                    this._showCover();
-                }
-            }
-
-            this.emit('player-metadata-changed');
+      // Pragha sends a metadata dict with one
+      // value on stop
+      if (metadata !== null && Object.keys(metadata).length > 1) {
+        // Check if the track has changed
+        let trackChanged = true;
+        // Check if the URL has changed
+        if (metadata["xesam:url"] && metadata["xesam:url"].unpack() == this.state.trackUrl)
+          trackChanged = false;
+        // Reset the timer only when the track has changed
+        if (trackChanged) {
+          this._currentTime = -1;
+          if (metadata["mpris:length"]) {
+            state.trackLength = metadata["mpris:length"].unpack() / 1000000;
+          }
+          if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
+            // Some players send a "PlaybackStatus: Stopped" signal when changing
+            // tracks, so wait a little before refreshing sliders
+            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateSliders));
+          } else {
+            this._updateSliders();
+          }
+          // Check if the current track can be paused
+          this._updateControls();
         }
-    },
 
-    _onReadCover: function(cover, result) {
-        let inStream = cover.read_finish(result);
-        let outStream = this.trackCoverFileTmp.replace(null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null, null);
-        outStream.splice_async(inStream, Gio.OutputStreamSpliceFlags.CLOSE_TARGET, 0, null, Lang.bind(this, this._onSavedCover));
-    },
-
-    _onSavedCover: function(outStream, result) {
-        outStream.splice_finish(result, null);
-        this.trackCoverPath = this.trackCoverFileTmp.get_path();
-        this._showCover();
-    },
-
-    _hideCover: function() {
-        Tweener.addTween(this.trackCoverContainer, { opacity: 0,
-            time: 0.3,
-            transition: 'easeOutCubic',
-        });
-    },
-
-    _showCover: function() {
-        this.emit('player-cover-changed');
-        Tweener.addTween(this.trackCoverContainer, { opacity: 0,
-            time: 0.3,
-            transition: 'easeOutCubic',
-            onComplete: Lang.bind(this, function() {
-                // Change cover
-                if (! this.trackCoverPath || ! GLib.file_test(this.trackCoverPath, GLib.FileTest.EXISTS)) {
-                    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: this.coverSize});
-                }
-                else {
-                    this.trackCover = new St.Bin({style_class: 'track-cover'});
-                    let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this.trackCoverPath});
-                    let [coverWidth, coverHeight] = coverTexture.get_base_size();
-                    this.trackCover.width = this.coverSize;
-                    this.trackCover.height = coverHeight / (coverWidth / this.coverSize);
-                    this.trackCover.set_child(coverTexture);
-                }
-                this.trackCoverContainer.set_child(this.trackCover);
-                // Show the new cover
-                Tweener.addTween(this.trackCoverContainer, { opacity: 255,
-                    time: 0.3,
-                    transition: 'easeInCubic',
-                    onComplete: this.emit('player-cover-changed')
-                });
-            })
-        });
-    },
-
-    _toggleCover: function() {
-        if (this.trackCover.has_style_class_name('track-cover')) {
-            let factor = 2;
-            let [coverWidth, coverHeight] = this.trackCover.get_size();
-            if (coverWidth > this.coverSize)
-                factor = 0.5;
-            Tweener.addTween(this.trackCover, { height: coverHeight * factor, width: coverWidth * factor,
-                time: 0.3,
-                transition: 'easeInCubic'
-            });
+        if (metadata["xesam:artist"]) {
+          state.trackArtist = metadata["xesam:artist"].deep_unpack();
         }
-    },
 
-    _getMetadata: function() {
-        this._setMetadata(this._mediaServerPlayer.Metadata, {});
+        if (metadata["xesam:album"]) {
+          state.trackAlbum = metadata["xesam:album"].unpack();
+        }
+
+        if (metadata["xesam:title"]) {
+          state.trackTitle = metadata["xesam:title"].unpack();
+        }
+
+        if (metadata["xesam:url"]) {
+          state.trackUrl = metadata["xesam:url"].unpack();
+        }
+
+        if (metadata["mpris:trackid"]) {
+          state.trackObj = metadata["mpris:trackid"].unpack();
+        }
+
+        let rating = 0;
+        if (metadata["xesam:userRating"])
+          rating = (metadata["xesam:userRating"].deep_unpack() * 5);
+        // Clementine
+        if (metadata["rating"])
+          rating = metadata["rating"].deep_unpack();
+        state.trackRating = parseInt(rating);
+
+        if (metadata["mpris:artUrl"]) {
+          state.trackCoverFile = metadata["mpris:artUrl"].unpack();
+        }
+      }
     },
 
     _setStatus: function(status) {
@@ -767,14 +624,6 @@ const MPRISPlayer = new Lang.Class({
         this._updateSliders();
         this._updateControls();
         this._setIdentity();
-        if (this._status != Settings.Status.STOP) {
-            this.emit('player-cover-changed');
-            this.trackBox.showAnimate();
-        }
-        else {
-            this.trackBox.hideAnimate();
-        }
-        this.emit('player-status-changed');
     },
 
     _updateSliders: function(position) {
