@@ -448,6 +448,10 @@ const MPRISPlayer = new Lang.Class({
       }));
     },
 
+    setVolume: function(volume) {
+      this._mediaServerPlayer.Volume = volume;
+    },
+
     toString: function() {
         return "[object Player(%s,%s)]".format(this._identity, this._status);
     },
