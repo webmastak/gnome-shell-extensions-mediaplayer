@@ -39,7 +39,7 @@ const PlayerUI = new Lang.Class({
     this.trackCoverContainer = new St.Button({style_class: 'track-cover-container',
                                               x_align: St.Align.START,
                                               y_align: St.Align.START});
-    //this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
+    this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
     this.trackCoverFile = false;
     this.trackCoverFileTmp = false;
     this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE});
@@ -278,6 +278,27 @@ const PlayerUI = new Lang.Class({
         });
       })
     });
+  },
+
+  _toggleCover: function() {
+    if (this.trackCover.has_style_class_name('track-cover')) {
+      let [coverWidth, coverHeight] = this.trackCover.get_size(),
+          [boxWidth, boxHeight] = this.trackBox.actor.get_size(),
+          ratio = coverWidth / coverHeight,
+          targetHeight,
+          targetWidth;
+      if (coverWidth == COVER_SIZE) {
+        targetWidth = boxWidth - 100;
+      }
+      else {
+        targetWidth = COVER_SIZE;
+      }
+      targetHeight = targetWidth * ratio;
+      Tweener.addTween(this.trackCover, { height: targetHeight, width: targetWidth,
+                       time: 0.3,
+                       transition: 'easeInCubic'
+      });
+    }
   },
 
   updateInfo: function(player) {
