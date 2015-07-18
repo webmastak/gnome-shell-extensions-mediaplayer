@@ -145,15 +145,6 @@ const PlayerManager = new Lang.Class({
                 this._players[owner].player.connect('init-done',
                     Lang.bind(this, function(player) {
                         player.populate();
-                        //player.menu.open();
-                    })
-                )
-            );
-            this._players[owner].signals.push(
-                /* Close all other players menu when a player menu is opened */
-                this._players[owner].player.connect('player-menu-opened',
-                    Lang.bind(this, function(player) {
-                      this._hideOtherPlayers(player);
                     })
                 )
             );
@@ -163,6 +154,15 @@ const PlayerManager = new Lang.Class({
                 this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
 
             this._addPlayerToMenu(this._players[owner].ui);
+
+            this._players[owner].signals.push(
+                /* Close all other players menu when a player menu is opened */
+                this._players[owner].ui.connect('player-menu-opened',
+                    Lang.bind(this, function(ui) {
+                      this._hideOtherPlayers(ui);
+                    })
+                )
+            );
         }
 
         this._hideOrDefaultPlayer();
@@ -170,10 +170,10 @@ const PlayerManager = new Lang.Class({
         this._refreshStatus();
     },
 
-    _hideOtherPlayers: function(player) {
+    _hideOtherPlayers: function(ui) {
       for (let owner in this._players) {
-        if (this._players[owner].player != player)
-          this._players[owner].player.menu.close(true, true);
+        if (this._players[owner].ui != ui)
+          this._players[owner].ui.menu.close(true, true);
       }
     },
 
@@ -183,10 +183,10 @@ const PlayerManager = new Lang.Class({
 
         if (this._nbPlayers() == 0 && Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
           if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-            let player = new Player.DefaultPlayer();
-            this._players[Settings.DEFAULT_PLAYER_OWNER] = {player: player, signals: []};
-            this._addPlayerToMenu(player);
-            player.menu.open();
+            let ui = new UI.DefaultPlayerUI();
+            this._players[Settings.DEFAULT_PLAYER_OWNER] = {ui: ui, signals: []};
+            this._addPlayerToMenu(ui);
+            ui.menu.open();
           }
         }
         else if (this._nbPlayers() > 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]) {
@@ -195,7 +195,7 @@ const PlayerManager = new Lang.Class({
         this._hideOrShowMenu();
     },
 
-    _addPlayerToMenu: function(player) {
+    _addPlayerToMenu: function(ui) {
         let position = this._getPlayerPosition();
 
         let item = this._getMenuItem(position);
@@ -207,12 +207,12 @@ const PlayerManager = new Lang.Class({
           }
         }
 
-        this.menu.menu.addMenuItem(player, position);
+        this.menu.menu.addMenuItem(ui, position);
 
         if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) ==
               Settings.IndicatorPosition.VOLUMEMENU) {
           let item = this._getMenuItem(position - 1);
-          if (item && ! (item instanceof Player.MPRISPlayer)) {
+          if (item && ! (item instanceof UI.PlayerUI)) {
               this.menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(),
                                          position);
           }
@@ -236,12 +236,12 @@ const PlayerManager = new Lang.Class({
             item.destroy();
     },
 
-    _getPlayerMenuPosition: function(player) {
+    _getPlayerMenuPosition: function(ui) {
         let items = this.menu.menu.box.get_children().map(function(actor) {
             return actor._delegate;
         });
         for (let i in items) {
-            if (items[i] == player)
+            if (items[i] == ui)
                 return i;
         }
         return null;
@@ -264,11 +264,12 @@ const PlayerManager = new Lang.Class({
         if (this._players[owner]) {
             for (let id in this._players[owner].signals)
                 this._players[owner].player.disconnect(this._players[owner].signals[id]);
-            let position = this._getPlayerMenuPosition(this._players[owner].player);
+            let position = this._getPlayerMenuPosition(this._players[owner].ui);
             // Remove the bottom separator
             if (this._players[owner].ui)
               this._players[owner].ui.destroy();
-            this._players[owner].player.destroy();
+            if (this._players[owner].player)
+              this._players[owner].player.destroy();
             if (position)
                 this._removeMenuItem(position);
             delete this._players[owner];

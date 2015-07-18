@@ -29,6 +29,7 @@ const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Tweener = imports.ui.tweener;
 const BoxPointer = imports.ui.boxpointer;
+const Signals = imports.signals;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
@@ -83,74 +84,8 @@ const PlayerState = new Lang.Class({
 });
 
 
-const PlayerMenu = new Lang.Class({
-  Name: 'PlayerMenu',
-  Extends: PopupMenu.PopupSubMenuMenuItem,
-
-  _init: function(label, wantIcon) {
-    this.parent(label, wantIcon);
-    this.menu._close = this.menu.close;
-    this.menu._open = this.menu.open;
-    this.menu.close = Lang.bind(this, this.close);
-    this.menu.open = Lang.bind(this, this.open);
-  },
-
-  addMenuItem: function(item) {
-    this.menu.addMenuItem(item);
-  },
-
-  /* Submenu can be closed only manually by
-   * setSubmenuShown (clicking on the player name
-   *  or by the manager when another player menu
-   * is opened */
-  close: function(animate, force) {
-    global.log("close: " + force);
-    if (force !== true)
-      return;
-    this.menu._close(BoxPointer.PopupAnimation.FULL);
-    this.emit('player-menu-closed');
-  },
-
-  open: function(animate) {
-    if (!animate)
-      animate = BoxPointer.PopupAnimation.FULL
-    this.menu._open(animate);
-    this.emit('player-menu-opened');
-  },
-
-  setSubmenuShown: function(open) {
-    if (open)
-      this.menu.open(BoxPointer.PopupAnimation.FULL);
-    else
-      this.menu.close(BoxPointer.PopupAnimation.FULL, true);
-  }
-
-});
-
-const DefaultPlayer = new Lang.Class({
-    Name: 'DefaultPlayer',
-    Extends: PlayerMenu,
-
-    _init: function() {
-        let app = Shell.AppSystem.get_default().lookup_app(
-            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
-        );
-        let appInfo = Gio.DesktopAppInfo.new(app.get_id());
-        this.parent(app.get_name(), true);
-        this.icon.gicon = appInfo.get_icon();
-        this._runButton = new Widget.PlayerButton('system-run-symbolic', function() {
-          app.activate_full(-1, 0);
-        });
-        this.buttons = new Widget.PlayerButtons();
-        this.buttons.addButton(this._runButton);
-        this.addMenuItem(this.buttons);
-    }
-});
-
-
 const MPRISPlayer = new Lang.Class({
     Name: 'MPRISPlayer',
-    Extends: PlayerMenu,
 
     _init: function(busName, owner) {
         let baseName = busName.split('.')[3];
@@ -306,7 +241,7 @@ const MPRISPlayer = new Lang.Class({
           this.trackControls.addButton(this._raiseButton);
         }
 
-        this.addMenuItem(this.trackControls);
+        //this.addMenuItem(this.trackControls);
 
         if (this._mediaServer.CanQuit)
             this.info.canQuit = true;
@@ -413,8 +348,7 @@ const MPRISPlayer = new Lang.Class({
           this._trackTime = newState.trackTime;
         }
 
-        this._getIdentity();
-        this._getDesktopEntry();
+        this._getPlayerInfo();
 
         //if (this.showPlaylists) {
             //this._getPlaylists();
@@ -424,7 +358,6 @@ const MPRISPlayer = new Lang.Class({
         this._onTrackChange();
 
         this.emit('player-update', newState);
-
     },
 
     next: function() {
@@ -461,33 +394,15 @@ const MPRISPlayer = new Lang.Class({
         return "[object Player(%s,%s)]".format(this._identity, this._status);
     },
 
-    _getIdentity: function() {
+    _getPlayerInfo: function() {
         if (this._mediaServer.Identity) {
-            this.info.identity = this._mediaServer.Identity;
-
-            this._identity = this._mediaServer.Identity;
-            this._setIdentity();
+          this.info.identity = this._mediaServer.Identity;
         }
-    },
-
-    _setIdentity: function() {
-        this.label.text = this._identity;
-        if (this._status) {
-          this.status.text = _(this._status);
-        }
-        else {
-          this.status.text = null;
-        }
-    },
-
-    _getDesktopEntry: function() {
-        let entry = this._mediaServer.DesktopEntry;
-        let appSys = Shell.AppSystem.get_default();
-        this.info.app = appSys.lookup_app(entry + ".desktop");
-        let appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
-        this.info.appInfo = appInfo;
-        if (appInfo) {
-            this.icon.gicon = appInfo.get_icon();
+        if (this._mediaServer.DesktopEntry) {
+          let entry = this._mediaServer.DesktopEntry;
+          let appSys = Shell.AppSystem.get_default();
+          this.info.app = appSys.lookup_app(entry + ".desktop");
+          this.info.appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
         }
         this.emit('player-info-update');
     },
@@ -516,7 +431,7 @@ const MPRISPlayer = new Lang.Class({
             this._playlists = playlists;
             if (!this._playlistsMenu) {
                 this._playlistsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
-                this.addMenuItem(this._playlistsMenu);
+                //this.addMenuItem(this._playlistsMenu);
             }
             let show = false;
             this._playlistsMenu.menu.removeAll();
@@ -718,3 +633,4 @@ const MPRISPlayer = new Lang.Class({
         this.parent();
     }
 });
+Signals.addSignalMethods(MPRISPlayer.prototype);
