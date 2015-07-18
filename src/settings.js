@@ -35,6 +35,7 @@ const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
+const MEDIAPLAYER_NAME = 'mpname';
 const MEDIAPLAYER_RATING_KEY = 'rating';
 // OLD SETTING
 const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
