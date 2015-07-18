@@ -189,8 +189,6 @@ const MPRISPlayer = new Lang.Class({
 
         this.owner = owner;
         this.busName = busName;
-        this._app = "";
-        this._status = "";
         // Guess the name based on the dbus path
         // Should be overriden by the Identity property
         this._identity = baseName.charAt(0).toUpperCase() + baseName.slice(1);
@@ -199,7 +197,10 @@ const MPRISPlayer = new Lang.Class({
         this._currentPlaylist = "";
         this._currentTime = -1;
         this._wantedSeekValue = 0;
-        this._timeoutId = 0;
+
+        this._timerId = 0;
+        this._statusId = 0;
+
         this._settings = Settings.gsettings;
         this._signalsId = [];
 
@@ -229,6 +230,8 @@ const MPRISPlayer = new Lang.Class({
         this._signalsId.push(
           this.connect("player-update", Lang.bind(this, function(player, state) {
             this.state.update(state);
+            if (state.status)
+              this._onStatusChange();
           }))
         );
 
@@ -312,8 +315,8 @@ const MPRISPlayer = new Lang.Class({
                                                       Lang.bind(this, function() {
                                                         // If we have an application in the appSystem
                                                         // Bring it to the front else let the player decide
-                                                        if (this._app)
-                                                          this._app.activate_full(-1, 0);
+                                                        if (this.info.app)
+                                                          this.info.app.activate_full(-1, 0);
                                                         else
                                                           this._mediaServer.RaiseRemote();
                                                         // Close the indicator
@@ -330,24 +333,45 @@ const MPRISPlayer = new Lang.Class({
 
           this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
             let newState = new PlayerState();
+
             if (props.Volume) {
               newState.volume = props.Volume.unpack();
             }
+
             if (props.PlaybackStatus) {
-              this._setStatus(props.PlaybackStatus.unpack());
-              newState.status = props.PlaybackStatus.unpack();
-              global.log(newState.status);
-            }
-            if (props.Metadata)
-              this._setMetadata(props.Metadata.deep_unpack(), newState);
-            if (props.ActivePlaylist)
-              this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
-            if (props.CanGoNext || props.CanGoPrevious) {
-              newState.canGoNext = props.CanGoNext.unpack() || true;
-              newState.canGoPrevious = props.CanGoPrevious.unpack() || true;
+              let status = props.PlaybackStatus.unpack();
+              global.log("Received new status");
+              global.log(status);
+              if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
+                  // Some players send a "PlaybackStatus: Stopped" signal when changing
+                  // tracks, so wait a little before refreshing.
+                  if (this._statusId != 0) {
+                    global.log("removing old state update");
+                    Mainloop.source_remove(this._statusId);
+                    this._statusId = 0;
+                  }
+                  this._statusId = Mainloop.timeout_add(300, Lang.bind(this, function() {
+                    global.log("sending new state " + status);
+                    this.emit('player-update', new PlayerState({status: status}));
+                  }));
+              }
+              else {
+                newState.status = status;
+              }
             }
 
-            global.log("'PropertiesChanged'");
+            if (props.Metadata)
+              this._setMetadata(props.Metadata.deep_unpack(), newState);
+
+            if (props.ActivePlaylist)
+              this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
+
+            if (props.CanGoNext || props.CanGoPrevious || props.CanSeek) {
+              newState.canGoNext = props.CanGoNext.unpack() || true;
+              newState.canGoPrevious = props.CanGoPrevious.unpack() || true;
+              newState.canSeek = props.CanSeek.unpack() || true;
+            }
+
             this.emit('player-update', newState);
           }));
 
@@ -406,14 +430,12 @@ const MPRISPlayer = new Lang.Class({
         this._getIdentity();
         this._getDesktopEntry();
 
-        // FIXME
-        // Hack to avoid the trackBox.box.get_stage() == null
-        Mainloop.timeout_add(300, Lang.bind(this, this._getStatus));
         //if (this.showPlaylists) {
             //this._getPlaylists();
             //this._getActivePlaylist();
         //}
-        this._updateSliders();
+
+        this._onTrackChange();
 
         this.emit('player-update', newState);
 
@@ -478,8 +500,7 @@ const MPRISPlayer = new Lang.Class({
     _getDesktopEntry: function() {
         let entry = this._mediaServer.DesktopEntry;
         let appSys = Shell.AppSystem.get_default();
-        this._app = appSys.lookup_app(entry + ".desktop");
-        this.info.app = this._app;
+        this.info.app = appSys.lookup_app(entry + ".desktop");
         let appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
         this.info.appInfo = appInfo;
         if (appInfo) {
@@ -555,15 +576,8 @@ const MPRISPlayer = new Lang.Class({
           if (metadata["mpris:length"]) {
             state.trackLength = metadata["mpris:length"].unpack() / 1000000;
           }
-          if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
-            // Some players send a "PlaybackStatus: Stopped" signal when changing
-            // tracks, so wait a little before refreshing sliders
-            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateSliders));
-          } else {
-            this._updateSliders();
-          }
-          // Check if the current track can be paused
-          this._updateControls();
+          // refresh properties
+          this._onTrackChange();
         }
 
         if (metadata["xesam:artist"]) {
@@ -600,37 +614,27 @@ const MPRISPlayer = new Lang.Class({
       }
     },
 
-    _setStatus: function(status) {
-        if (status != this._status) {
-            this._status = status;
-            if (this._status == Settings.Status.PLAY) {
-                this._startTimer();
-            }
-            else if (this._status == Settings.Status.PAUSE) {
-                this._pauseTimer();
-            }
-            else if (this._status == Settings.Status.STOP) {
-                this._stopTimer();
-            }
-
-            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
-                // Some players send a "PlaybackStatus: Stopped" signal when changing
-                // tracks, so wait a little before refreshing.
-                Mainloop.timeout_add(300, Lang.bind(this, this._refreshStatus));
-            }
-            else {
-                this._refreshStatus();
-            }
-        }
+    _onStatusChange: function() {
+      let status = this.state.status;
+      global.log("on status change");
+      global.log(status);
+      if (status == Settings.Status.PLAY) {
+        this._startTimer();
+        global.log("start timer")
+      }
+      else if (status == Settings.Status.PAUSE) {
+        this._pauseTimer();
+        global.log("pause timer")
+      }
+      else if (status == Settings.Status.STOP) {
+        this._stopTimer();
+        global.log("stop timer")
+      }
     },
 
-    _refreshStatus: function() {
-        this._updateSliders();
-        this._updateControls();
-        this._setIdentity();
-    },
-
-    _updateSliders: function(position) {
+    _onTrackChange: function(position) {
+      global.log("on track change");
+      // check Can* properties
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanSeek',
                            Lang.bind(this, function(value, err) {
                              let state = new PlayerState();
@@ -647,10 +651,6 @@ const MPRISPlayer = new Lang.Class({
                              }
                            })
                           );
-    },
-
-    _updateControls: function() {
-      // called for each song change and status change
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPause',
                            Lang.bind(this, function(value, err) {
                              let state = new PlayerState();
@@ -664,7 +664,7 @@ const MPRISPlayer = new Lang.Class({
                                this.emit('player-update', state);
                              }
                            })
-      );
+                          );
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
                            Lang.bind(this, function(value, err) {
                              let state = new PlayerState();
@@ -678,7 +678,7 @@ const MPRISPlayer = new Lang.Class({
                                this.emit('player-update', state);
                              }
                            })
-      );
+                          );
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoPrevious',
                            Lang.bind(this, function(value, err) {
                              let state = new PlayerState();
@@ -692,11 +692,7 @@ const MPRISPlayer = new Lang.Class({
                                this.emit('player-update', state);
                              }
                            })
-      );
-    },
-
-    _getStatus: function() {
-        this._setStatus(this._mediaServerPlayer.PlaybackStatus);
+                          );
     },
 
     _updateTimer: function() {
@@ -707,25 +703,23 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _startTimer: function() {
-        if (this._status == Settings.Status.PLAY) {
-            this._timeoutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
-            this._currentTime += 1;
-            this._updateTimer();
-        }
+      this._pauseTimer();
+      this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
+      this._currentTime += 1;
+      this._updateTimer();
     },
 
     _pauseTimer: function() {
-        if (this._timeoutId !== 0) {
-            Mainloop.source_remove(this._timeoutId);
-            this._timeoutId = 0;
-        }
-        this._updateTimer();
+      if (this._timerId !== 0) {
+        Mainloop.source_remove(this._timerId);
+        this._timerId = 0;
+      }
+      this._updateTimer();
     },
 
     _stopTimer: function() {
-        this._currentTime = 0;
-        this._pauseTimer();
-        this._updateTimer();
+      this._currentTime = 0;
+      this._pauseTimer();
     },
 
     _formatTime: function(s) {
