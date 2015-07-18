@@ -70,6 +70,8 @@ const PlayerState = new Lang.Class({
   showRating: null,
   trackRating: null,
   rating: null,
+
+  canSeek: null,
   canGoNext: null,
   canGoPrevious: null,
   canPause: null,
@@ -78,6 +80,7 @@ const PlayerState = new Lang.Class({
   hasVolume: null,
   volume: null,
 
+  showPosition: null,
   hasPosition: null,
   _position: null,
 
@@ -88,7 +91,7 @@ const PlayerState = new Lang.Class({
     }
     else {
       this.hasPosition = true;
-      this._position = value / 1000000;
+      this._position = value;
     }
   },
 
@@ -244,6 +247,15 @@ const MPRISPlayer = new Lang.Class({
         );
         this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY)}));
 
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
+                                                        position: this.state.position}));
+          }))
+        );
+        this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY)}));
+
+
         this.showPlaylists = this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY);
         this._signalsId.push(
             this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
@@ -327,22 +339,6 @@ const MPRISPlayer = new Lang.Class({
 
         this.addMenuItem(this.trackControls);
 
-        this.showPosition = this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY);
-        this._position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
-        this._position.connect('value-changed', Lang.bind(this, function(item) {
-            let time = item._value * this._songLength;
-            this._position.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
-            this._wantedSeekValue = Math.round(time * 1000000);
-            this._mediaServerPlayer.SetPositionRemote(this.trackObj, time * 1000000);
-        }));
-        this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
-                this.showPosition = this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY);
-                this._updateSliders();
-            }))
-        );
-        this.addMenuItem(this._position);
-
         if (this._mediaServer.CanQuit)
             this.info.canQuit = true;
             //this.playerTitle.hideButton();
@@ -373,8 +369,9 @@ const MPRISPlayer = new Lang.Class({
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
             let newState = new PlayerState();
             if (value > 0) {
-                this._setPosition(value);
-                newState.position = value;
+                newState.position = value / 1000000 / this.state.trackLength;
+                this._currentTime = value / 1000000
+                this.emit('player-update', newState);
             }
             // Banshee is buggy and always emits Seeked(0). See #34, #183,
             // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
@@ -383,49 +380,54 @@ const MPRISPlayer = new Lang.Class({
                 // This is actually needed because even Get("Position")
                 // sometimes returns 0 immediately after seeking! *grumble*
                 if (this._wantedSeekValue > 0) {
-                    this._setPosition(this._wantedSeekValue);
-                    newState.position = this._wantedSeekValue;
+                    newState.position = this._wantedSeekValue / this.state.trackLength;
+                    this._currentTime = this._wantedSeekValue / 1000000
+                    this._wantedSeekValue = 0;
+                    this.emit('player-update', newState);
                 }
                 // If the seek was initiated by the player itself, query it
                 // for the new position.
                 else {
                     this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
                         if (err)
-                            this._setPosition(0);
+                            newState.position = null;
                         else {
-                            this._setPosition(value[0].unpack());
-                            newState.position = value[0].unpack();;
+                            newState.position = value[0].unpack() / 1000000 / this.state.trackLength;
+                            this._currentTime = value[0].unpack() / 1000000;
                         }
+                        this.emit('player-update', newState);
                     }));
                 }
             }
-
-            this._wantedSeekValue = 0;
-            this.emit('player-update', newState);
         }));
 
         this.emit('init-done');
     },
 
     populate: function() {
+      global.log("init populate");
         let newState = new PlayerState({
           volume: this._mediaServerPlayer.Volume,
-          position: this._mediaServerPlayer.Position,
           status: this._mediaServerPlayer.PlaybackStatus
         });
+
         this._setMetadata(this._mediaServerPlayer.Metadata, newState);
+
+        if (newState.status != Settings.Status.STOP) {
+          newState.position = this._mediaServerPlayer.Position / 1000000 / newState.trackLength;
+          this._currentTime = this._mediaServerPlayer.Position / 1000000;
+        }
 
         this._getIdentity();
         this._getDesktopEntry();
-        this._getMetadata();
+
         // FIXME
         // Hack to avoid the trackBox.box.get_stage() == null
         Mainloop.timeout_add(300, Lang.bind(this, this._getStatus));
-        this._getPosition();
-        if (this.showPlaylists) {
-            this._getPlaylists();
-            this._getActivePlaylist();
-        }
+        //if (this.showPlaylists) {
+            //this._getPlaylists();
+            //this._getActivePlaylist();
+        //}
         this._updateSliders();
 
         this.emit('player-update', newState);
@@ -450,6 +452,15 @@ const MPRISPlayer = new Lang.Class({
 
     stop: function() {
       this._mediaServerPlayer.StopRemote();
+    },
+
+    seek: function(value) {
+      let time = value * this.state.trackLength;
+      this._wantedSeekValue = Math.round(time * 1000000);
+      this._mediaServerPlayer.SetPositionRemote(this.state.trackObj, this._wantedSeekValue);
+      this.emit('player-update', new PlayerState({
+        positionText: this._formatTime(time) + " / " + this._formatTime(this.state.trackLength)
+      }));
     },
 
     toString: function() {
@@ -541,21 +552,6 @@ const MPRISPlayer = new Lang.Class({
     },
 
 
-    _setPosition: function(value) {
-        // Player does not have a position property
-        if (value === null && this._status != Settings.Status.STOP) {
-            this._updateSliders(false);
-        }
-        else {
-            this._currentTime = value / 1000000;
-            this._updateTimer();
-        }
-    },
-
-    _getPosition: function() {
-        this._setPosition(this._mediaServerPlayer.Position);
-    },
-
     _setMetadata: function(metadata, state) {
         // Pragha sends a metadata dict with one
         // value on stop
@@ -621,7 +617,6 @@ const MPRISPlayer = new Lang.Class({
                 this.trackUrl = false;
 
             if (metadata["mpris:trackid"]) {
-                this.trackObj = metadata["mpris:trackid"].unpack();
                 state.trackObj = metadata["mpris:trackid"].unpack();
             }
 
@@ -783,67 +778,68 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _updateSliders: function(position) {
-        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanSeek',
-            Lang.bind(this, function(value, err) {
-                this._canSeek = true;
-                if (!err)
-                    this._canSeek = value[0].unpack();
-                if (this._songLength === 0 || position === false)
-                    this._canSeek = false;
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanSeek',
+                           Lang.bind(this, function(value, err) {
+                             let state = new PlayerState();
+                             let canSeek = true;
+                             if (!err)
+                               canSeek = value[0].unpack();
 
-                if (this._status != Settings.Status.STOP && this._canSeek && this.showPosition)
-                    this._position.actor.show();
-                else
-                    this._position.actor.hide();
-            })
-        );
+                             if (this.state.trackLength === 0)
+                               canSeek = false
+
+                             if (this.state.canSeek != canSeek) {
+                               state.canSeek = canSeek;
+                               this.emit('player-update', state);
+                             }
+                           })
+                          );
     },
 
     _updateControls: function() {
-        // called for each song change and status change
-        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPause',
-                             Lang.bind(this, function(value, err) {
-                               let state = new PlayerState();
-                               // assume the player can pause by default
-                               let canPause = true;
-                               if (!err)
-                                 canPause = value[0].unpack();
+      // called for each song change and status change
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanPause',
+                           Lang.bind(this, function(value, err) {
+                             let state = new PlayerState();
+                             // assume the player can pause by default
+                             let canPause = true;
+                             if (!err)
+                               canPause = value[0].unpack();
 
-                               if (this.state.canPause != canPause) {
-                                 state.canPause = canPause;
-                                 this.emit('player-update', state);
-                               }
-                             })
-        );
-        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
-                             Lang.bind(this, function(value, err) {
-                               let state = new PlayerState();
-                               // assume the player can go next by default
-                               let canGoNext = true;
-                               if (!err)
-                                 canGoNext = value[0].unpack();
+                             if (this.state.canPause != canPause) {
+                               state.canPause = canPause;
+                               this.emit('player-update', state);
+                             }
+                           })
+      );
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoNext',
+                           Lang.bind(this, function(value, err) {
+                             let state = new PlayerState();
+                             // assume the player can go next by default
+                             let canGoNext = true;
+                             if (!err)
+                               canGoNext = value[0].unpack();
 
-                               if (this.state.canGoNext != canGoNext) {
-                                 state.canGoNext = canGoNext;
-                                 this.emit('player-update', state);
-                               }
-                             })
-        );
-        this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoPrevious',
-                             Lang.bind(this, function(value, err) {
-                               let state = new PlayerState();
-                               // assume the player can go previous by default
-                               let canGoPrevious = true;
-                               if (!err)
-                                 canGoPrevious = value[0].unpack();
+                             if (this.state.canGoNext != canGoNext) {
+                               state.canGoNext = canGoNext;
+                               this.emit('player-update', state);
+                             }
+                           })
+      );
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanGoPrevious',
+                           Lang.bind(this, function(value, err) {
+                             let state = new PlayerState();
+                             // assume the player can go previous by default
+                             let canGoPrevious = true;
+                             if (!err)
+                               canGoPrevious = value[0].unpack();
 
-                               if (this.state.canGoPrevious != canGoPrevious) {
-                                 state.canGoPrevious = canGoPrevious;
-                                 this.emit('player-update', state);
-                               }
-                             })
-        );
-
+                             if (this.state.canGoPrevious != canGoPrevious) {
+                               state.canGoPrevious = canGoPrevious;
+                               this.emit('player-update', state);
+                             }
+                           })
+      );
     },
 
     _getStatus: function() {
@@ -851,13 +847,10 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _updateTimer: function() {
-        if (this.showPosition && this._canSeek) {
-            if (!isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0)
-                this._position.setValue(this._currentTime / this._songLength);
-            else
-                this._position.setValue(0);
-            this._position.setLabel(this._formatTime(this._currentTime) + " / " + this._formatTime(this._songLength));
-        }
+      this.emit('player-update', new PlayerState({
+        position: this._currentTime / this.state.trackLength,
+        positionText: this._formatTime(this._currentTime) + " / " + this._formatTime(this.state.trackLength)
+      }));
     },
 
     _startTimer: function() {
