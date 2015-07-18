@@ -57,7 +57,8 @@ const PlayerState = new Lang.Class({
   playlists: null,
   playlistsMenu: null,
   currentPlaylist: null,
-  currentTime: null,
+
+  trackTime: null,
   trackTitle: null,
   trackAlbum: null,
   trackArtist: null,
@@ -67,38 +68,18 @@ const PlayerState = new Lang.Class({
   trackLength: null,
   trackCoverPath: null,
   trackObj: null,
-  showRating: null,
   trackRating: null,
-  rating: null,
+
+  showRating: null,
+  showVolume: null,
+  showPosition: null,
 
   canSeek: null,
   canGoNext: null,
   canGoPrevious: null,
   canPause: null,
 
-  showVolume: null,
-  hasVolume: null,
   volume: null,
-
-  showPosition: null,
-  hasPosition: null,
-  _position: null,
-
-  set position(value) {
-    if (value == null) {
-      this.hasPosition = false;
-      this._position = null;
-    }
-    else {
-      this.hasPosition = true;
-      this._position = value;
-    }
-  },
-
-  get position() {
-    return this._position;
-  }
-
 });
 
 
@@ -195,7 +176,7 @@ const MPRISPlayer = new Lang.Class({
         this._playlists = "";
         this._playlistsMenu = "";
         this._currentPlaylist = "";
-        this._currentTime = -1;
+        this._trackTime = -1;
         this._wantedSeekValue = 0;
 
         this._timerId = 0;
@@ -378,9 +359,10 @@ const MPRISPlayer = new Lang.Class({
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
             let newState = new PlayerState();
             if (value > 0) {
-                newState.position = value / 1000000 / this.state.trackLength;
-                this._currentTime = value / 1000000
-                this.emit('player-update', newState);
+              newState.trackLength = this.state.trackLength;
+              newState.trackTime = value / 1000000;
+              this._trackTime = newState.trackTime;
+              this.emit('player-update', newState);
             }
             // Banshee is buggy and always emits Seeked(0). See #34, #183,
             // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
@@ -389,8 +371,9 @@ const MPRISPlayer = new Lang.Class({
                 // This is actually needed because even Get("Position")
                 // sometimes returns 0 immediately after seeking! *grumble*
                 if (this._wantedSeekValue > 0) {
-                    newState.position = this._wantedSeekValue / this.state.trackLength;
-                    this._currentTime = this._wantedSeekValue / 1000000
+                    newState.trackLength = this.state.trackLength;
+                    newState.trackTime = this._wantedSeekValue / 1000000;
+                    this._trackTime = newState.trackTime;
                     this._wantedSeekValue = 0;
                     this.emit('player-update', newState);
                 }
@@ -398,11 +381,13 @@ const MPRISPlayer = new Lang.Class({
                 // for the new position.
                 else {
                     this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
-                        if (err)
-                            newState.position = null;
+                        if (err) {
+                          newState.showPosition = false;
+                        }
                         else {
-                            newState.position = value[0].unpack() / 1000000 / this.state.trackLength;
-                            this._currentTime = value[0].unpack() / 1000000;
+                          newState.trackLength = this.state.trackLength;
+                          newState.trackTime = value[0].unpack() / 1000000;
+                          this._trackTime = newState.trackTime;
                         }
                         this.emit('player-update', newState);
                     }));
@@ -423,8 +408,9 @@ const MPRISPlayer = new Lang.Class({
         this._setMetadata(this._mediaServerPlayer.Metadata, newState);
 
         if (newState.status != Settings.Status.STOP) {
-          newState.position = this._mediaServerPlayer.Position / 1000000 / newState.trackLength;
-          this._currentTime = this._mediaServerPlayer.Position / 1000000;
+          newState.trackLength = newState.trackLength;
+          newState.trackTime = this._mediaServerPlayer.Position / 1000000;
+          this._trackTime = newState.trackTime;
         }
 
         this._getIdentity();
@@ -465,9 +451,6 @@ const MPRISPlayer = new Lang.Class({
       let time = value * this.state.trackLength;
       this._wantedSeekValue = Math.round(time * 1000000);
       this._mediaServerPlayer.SetPositionRemote(this.state.trackObj, this._wantedSeekValue);
-      this.emit('player-update', new PlayerState({
-        positionText: this._formatTime(time) + " / " + this._formatTime(this.state.trackLength)
-      }));
     },
 
     setVolume: function(volume) {
@@ -572,7 +555,7 @@ const MPRISPlayer = new Lang.Class({
           trackChanged = false;
         // Reset the timer only when the track has changed
         if (trackChanged) {
-          this._currentTime = -1;
+          this._trackTime = -1;
           if (metadata["mpris:length"]) {
             state.trackLength = metadata["mpris:length"].unpack() / 1000000;
           }
@@ -697,15 +680,15 @@ const MPRISPlayer = new Lang.Class({
 
     _updateTimer: function() {
       this.emit('player-update', new PlayerState({
-        position: this._currentTime / this.state.trackLength,
-        positionText: this._formatTime(this._currentTime) + " / " + this._formatTime(this.state.trackLength)
+        trackLength: this.state.trackLength,
+        trackTime: this._trackTime,
       }));
     },
 
     _startTimer: function() {
       this._pauseTimer();
       this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
-      this._currentTime += 1;
+      this._trackTime += 1;
       this._updateTimer();
     },
 
@@ -718,27 +701,8 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _stopTimer: function() {
-      this._currentTime = 0;
+      this._trackTime = 0;
       this._pauseTimer();
-    },
-
-    _formatTime: function(s) {
-        let ms = s * 1000;
-        let msSecs = (1000);
-        let msMins = (msSecs * 60);
-        let msHours = (msMins * 60);
-        let numHours = Math.floor(ms/msHours);
-        let numMins = Math.floor((ms - (numHours * msHours)) / msMins);
-        let numSecs = Math.floor((ms - (numHours * msHours) - (numMins * msMins))/ msSecs);
-        if (numSecs < 10)
-            numSecs = "0" + numSecs.toString();
-        if (numMins < 10 && numHours > 0)
-            numMins = "0" + numMins.toString();
-        if (numHours > 0)
-            numHours = numHours.toString() + ":";
-        else
-            numHours = "";
-        return numHours + numMins.toString() + ":" + numSecs.toString();
     },
 
     destroy: function() {
