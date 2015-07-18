@@ -22,9 +22,75 @@ const Player = Me.imports.player;
 const COVER_SIZE = 128;
 
 
+const PlayerMenu = new Lang.Class({
+  Name: 'PlayerMenu',
+  Extends: PopupMenu.PopupSubMenuMenuItem,
+
+  _init: function(label, wantIcon) {
+    this.parent(label, wantIcon);
+    this.menu._close = this.menu.close;
+    this.menu._open = this.menu.open;
+    this.menu.close = Lang.bind(this, this.close);
+    this.menu.open = Lang.bind(this, this.open);
+  },
+
+  addMenuItem: function(item) {
+    this.menu.addMenuItem(item);
+  },
+
+  /* Submenu can be closed only manually by
+   * setSubmenuShown (clicking on the player name
+   *  or by the manager when another player menu
+   * is opened */
+  close: function(animate, force) {
+    global.log("close: " + force);
+    if (force !== true)
+      return;
+    this.menu._close(BoxPointer.PopupAnimation.FULL);
+    this.emit('player-menu-closed');
+  },
+
+  open: function(animate) {
+    if (!animate)
+      animate = BoxPointer.PopupAnimation.FULL
+    this.menu._open(animate);
+    this.emit('player-menu-opened');
+  },
+
+  setSubmenuShown: function(open) {
+    if (open)
+      this.menu.open(BoxPointer.PopupAnimation.FULL);
+    else
+      this.menu.close(BoxPointer.PopupAnimation.FULL, true);
+  }
+
+});
+
+
+const DefaultPlayerUI = new Lang.Class({
+    Name: 'DefaultPlayerUI',
+    Extends: PlayerMenu,
+
+    _init: function() {
+        let app = Shell.AppSystem.get_default().lookup_app(
+            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
+        );
+        let appInfo = Gio.DesktopAppInfo.new(app.get_id());
+        this.parent(app.get_name(), true);
+        this.icon.gicon = appInfo.get_icon();
+        this._runButton = new Widget.PlayerButton('system-run-symbolic', function() {
+          app.activate_full(-1, 0);
+        });
+        this.buttons = new Widget.PlayerButtons();
+        this.buttons.addButton(this._runButton);
+        this.addMenuItem(this.buttons);
+    }
+});
+
+
 const PlayerUI = new Lang.Class({
   Name: 'PlayerUI',
-  Extends: Player.PlayerMenu,
+  Extends: PlayerMenu,
 
   _init: function(player) {
     this.parent(player.info.identity, true);
