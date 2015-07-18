@@ -68,7 +68,7 @@ const PlayerUI = new Lang.Class({
 
     this.volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
     this.volume.connect('value-changed', Lang.bind(this, function(item) {
-      this.player._mediaServerPlayer.Volume = item._value;
+      this.player.setVolume(item._value);
     }));
     this.addMenuItem(this.volume);
 
