@@ -37,7 +37,6 @@ const _ = Gettext.gettext;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Widget = Me.imports.widget;
-const DBusIface = Me.imports.dbus;
 const Settings = Me.imports.settings;
 const Player = Me.imports.player;
 
