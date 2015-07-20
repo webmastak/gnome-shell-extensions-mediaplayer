@@ -204,13 +204,6 @@ const MPRISPlayer = new Lang.Class({
             }))
         );
 
-        this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
-        this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_COVER_SIZE, Lang.bind(this, function() {
-                this.coverSize = this._settings.get_int(Settings.MEDIAPLAYER_COVER_SIZE);
-            }))
-        );
-
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
           let newState = new PlayerState();
 
