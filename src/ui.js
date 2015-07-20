@@ -128,7 +128,7 @@ const PlayerUI = new Lang.Class({
                                               x_align: St.Align.START,
                                               y_align: St.Align.START});
     this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
-    this.trackCoverFile = false;
+    this.trackCoverUrl = false;
     this.trackCoverFileTmp = false;
     this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE});
     this.trackCoverContainer.set_child(this.trackCover);
@@ -220,15 +220,15 @@ const PlayerUI = new Lang.Class({
       this.volume.setValue(value);
     }
 
-    if ('trackCoverFile' in newState) {
-      if (newState.trackCoverFile) {
+    if (newState.trackCoverUrl !== null && newState.trackCoverUrl !== this.trackCoverUrl) {
+      if (newState.trackCoverUrl) {
         let cover_path = "";
         // Distant cover
-        if (newState.trackCoverFile.match(/^http/)) {
+        if (newState.trackCoverUrl.match(/^http/)) {
           // hide current cover
           this._hideCover();
           // Copy the cover to a tmp local file
-          let cover = Gio.file_new_for_uri(decodeURIComponent(newState.trackCoverFile));
+          let cover = Gio.file_new_for_uri(decodeURIComponent(newState.trackCoverUrl));
           // Don't create multiple tmp files
           if (!this.trackCoverFileTmp)
             this.trackCoverFileTmp = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
@@ -236,16 +236,16 @@ const PlayerUI = new Lang.Class({
           cover.read_async(null, null, Lang.bind(this, this._onReadCover));
         }
         // Local cover
-        else if (newState.trackCoverFile.match(/^file/)) {
-          this.trackCoverPath = decodeURIComponent(newState.trackCoverFile.substr(7));
+        else if (newState.trackCoverUrl.match(/^file/)) {
+          this.trackCoverPath = decodeURIComponent(newState.trackCoverUrl.substr(7));
           this._showCover();
         }
-
       }
       else {
         this.trackCoverPath = false;
         this._showCover();
       }
+      this.trackCoverUrl = newState.trackCoverUrl;
     }
 
     if (newState.canPause !== null) {
