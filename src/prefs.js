@@ -67,15 +67,6 @@ function init() {
             type: "b",
             label: _("Display song rating"),
             help: _("Display the currently playing song's rating on a 0 to 5 scale")
-        },
-        coversize: {
-            type: "r",
-            label: _("Album cover size"),
-            help: _("The size of the cover displayed in the menu. Default is 80px width."),
-            min: 50,
-            max: 110,
-            step: 5,
-            default: 80
         }
     };
     settings_indicator = {
