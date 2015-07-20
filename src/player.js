@@ -477,7 +477,10 @@ const MPRISPlayer = new Lang.Class({
         state.trackRating = parseInt(rating);
 
         if (metadata["mpris:artUrl"]) {
-          state.trackCoverFile = metadata["mpris:artUrl"].unpack();
+          state.trackCoverUrl = metadata["mpris:artUrl"].unpack();
+        }
+        else {
+          state.trackCoverUrl = '';
         }
       }
     },
