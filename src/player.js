@@ -23,14 +23,9 @@
 const Mainloop = imports.mainloop;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
-const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
-const St = imports.gi.St;
-const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
-const Tweener = imports.ui.tweener;
-const BoxPointer = imports.ui.boxpointer;
 const Signals = imports.signals;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
