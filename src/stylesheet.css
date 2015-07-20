@@ -13,6 +13,7 @@
 
 .track-box {
     padding-left: 1.7em;
+    padding-right: 1em;
 }
 
 .track-cover {
@@ -22,12 +23,10 @@
 
 .track-infos:ltr {
     padding-left: 0em;
-    width: 15em;
 }
 
 .track-infos:rtl {
     padding-left: 0em;
-    width: 15em;
 }
 
 .track-title {
@@ -46,7 +45,7 @@
 }
 
 .track-rating {
-    padding-top: 0.15em;
+    padding-top: 0.2em;
     font-size: 0.9em;
 }
 
@@ -59,19 +58,7 @@
     width: 7em;
 }
 
-.title-button {
-    border-radius: 12px;
-    border-width: 1px;
-    padding: 4px;
-}
-
-.title-button:hover,
-.popup-menu-item:active .title-button {
-    padding: 5px;
-    border: none;
-}
-
-.popup-menu-item:active .title-button {
+.popup-menu-item:active {
     color: white;
 }
 
