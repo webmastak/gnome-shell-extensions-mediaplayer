@@ -419,8 +419,8 @@ const PlayerUI = new Lang.Class({
 
   destroy: function() {
     if (this._updateId) {
-      this.player.disconnectSignal(this._updateId);
-      this.player.disconnectSignal(this._updateInfoId);
+      this.player.disconnect(this._updateId);
+      this.player.disconnect(this._updateInfoId);
     }
     this.parent();
   }
