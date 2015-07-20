@@ -27,6 +27,7 @@ const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
+const Params = imports.misc.params;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
@@ -133,15 +134,19 @@ const TrackBox = new Lang.Class({
     Name: "TrackBox",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(cover) {
-        this.parent({reactive: false, style_class: "track-box"});
-        // This adds an unwanted height if the PopupBaseMenuItem is empty
-        this.actor.remove_actor(this._ornamentLabel);
+    _init: function(cover, params) {
+      params = Params.parse(params, {
+        hover: false,
+        style_class: "track-box"
+      });
+      this.parent(params);
+      // This adds an unwanted height if the PopupBaseMenuItem is empty
+      this.actor.remove_actor(this._ornamentLabel);
 
-        this._cover = cover;
-        this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
-        this.actor.add(this._cover);
-        this.actor.add(this._infos, {expand: true});
+      this._cover = cover;
+      this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
+      this.actor.add(this._cover);
+      this.actor.add(this._infos, {expand: true});
     },
 
     addInfo: function(item, row) {

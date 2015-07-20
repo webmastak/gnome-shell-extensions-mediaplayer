@@ -134,6 +134,7 @@ const PlayerUI = new Lang.Class({
     this.trackCoverContainer.set_child(this.trackCover);
 
     this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
+    this.trackBox.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.trackBox);
 
     this.prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
