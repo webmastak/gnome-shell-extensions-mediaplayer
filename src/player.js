@@ -292,12 +292,8 @@ const MPRISPlayer = new Lang.Class({
           }));
 
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
-            let newState = new PlayerState();
             if (value > 0) {
-              newState.trackLength = this.state.trackLength;
-              newState.trackTime = value / 1000000;
-              this._trackTime = newState.trackTime;
-              this.emit('player-update', newState);
+              this.trackTime = value / 1000000;
             }
             // Banshee is buggy and always emits Seeked(0). See #34, #183,
             // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
@@ -306,31 +302,38 @@ const MPRISPlayer = new Lang.Class({
                 // This is actually needed because even Get("Position")
                 // sometimes returns 0 immediately after seeking! *grumble*
                 if (this._wantedSeekValue > 0) {
-                    newState.trackLength = this.state.trackLength;
-                    newState.trackTime = this._wantedSeekValue / 1000000;
-                    this._trackTime = newState.trackTime;
+                    this.trackTime = this._wantedSeekValue / 1000000;
                     this._wantedSeekValue = 0;
-                    this.emit('player-update', newState);
                 }
                 // If the seek was initiated by the player itself, query it
                 // for the new position.
                 else {
                     this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
                         if (err) {
-                          newState.showPosition = false;
+                          this.emit('player-update', new PlayerState({showPosition: false}));
                         }
                         else {
-                          newState.trackLength = this.state.trackLength;
-                          newState.trackTime = value[0].unpack() / 1000000;
-                          this._trackTime = newState.trackTime;
+                          this.trackTime = value[0].unpack() / 1000000;
                         }
-                        this.emit('player-update', newState);
                     }));
                 }
             }
         }));
 
         this.emit('init-done');
+    },
+
+    set trackTime(value) {
+      this._trackTime = value;
+      let newState = new PlayerState({
+        trackTime: this._trackTime,
+        trackLength: this.state.trackLength || 0
+      });
+      this.emit('player-update', newState);
+    },
+
+    get trackTime() {
+      return this._trackTime;
     },
 
     populate: function() {
@@ -343,9 +346,8 @@ const MPRISPlayer = new Lang.Class({
         this._setMetadata(this._mediaServerPlayer.Metadata, newState);
 
         if (newState.status != Settings.Status.STOP) {
-          newState.trackLength = newState.trackLength;
-          newState.trackTime = this._mediaServerPlayer.Position / 1000000;
-          this._trackTime = newState.trackTime;
+          this._trackTime = this._mediaServerPlayer.Position / 1000000;
+          newState.trackTime = this._trackTime;
         }
 
         this._getPlayerInfo();
@@ -518,15 +520,12 @@ const MPRISPlayer = new Lang.Class({
       global.log(status);
       if (status == Settings.Status.PLAY) {
         this._startTimer();
-        global.log("start timer")
       }
       else if (status == Settings.Status.PAUSE) {
         this._pauseTimer();
-        global.log("pause timer")
       }
       else if (status == Settings.Status.STOP) {
         this._stopTimer();
-        global.log("stop timer")
       }
     },
 
@@ -541,7 +540,7 @@ const MPRISPlayer = new Lang.Class({
                                canSeek = value[0].unpack();
 
                              if (this.state.trackLength === 0)
-                               canSeek = false
+                               canSeek = false;
 
                              if (this.state.canSeek != canSeek) {
                                state.canSeek = canSeek;
@@ -593,18 +592,10 @@ const MPRISPlayer = new Lang.Class({
                           );
     },
 
-    _updateTimer: function() {
-      this.emit('player-update', new PlayerState({
-        trackLength: this.state.trackLength,
-        trackTime: this._trackTime,
-      }));
-    },
-
     _startTimer: function() {
       this._pauseTimer();
       this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
-      this._trackTime += 1;
-      this._updateTimer();
+      this.trackTime += 1;
     },
 
     _pauseTimer: function() {
@@ -612,11 +603,10 @@ const MPRISPlayer = new Lang.Class({
         Mainloop.source_remove(this._timerId);
         this._timerId = 0;
       }
-      this._updateTimer();
     },
 
     _stopTimer: function() {
-      this._trackTime = 0;
+      this.trackTime = 0;
       this._pauseTimer();
     },
 
