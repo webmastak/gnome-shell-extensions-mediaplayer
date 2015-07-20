@@ -1,6 +1,8 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* jshint esnext: true */
+/* jshint -W097 */
 /* global imports: false */
+/* global global: false */
 /**
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -111,7 +113,7 @@ const MPRISPlayer = new Lang.Class({
         this._playlists = "";
         this._playlistsMenu = "";
         this._currentPlaylist = "";
-        this._trackTime = -1;
+        this._trackTime = 0;
         this._wantedSeekValue = 0;
 
         this._timerId = 0;
@@ -143,13 +145,11 @@ const MPRISPlayer = new Lang.Class({
                                     this._init2();
                                  }));
 
-        this._signalsId.push(
-          this.connect("player-update", Lang.bind(this, function(player, state) {
-            this.state.update(state);
-            if (state.status)
-              this._onStatusChange();
-          }))
-        );
+        this.connect("player-update", Lang.bind(this, function(player, state) {
+          this.state.update(state);
+          if (state.status)
+            this._onStatusChange();
+        }));
 
     },
 
@@ -391,7 +391,7 @@ const MPRISPlayer = new Lang.Class({
     },
 
     toString: function() {
-        return "[object Player(%s,%s)]".format(this._identity, this._status);
+        return "[object MPRISPlayer(%s)]".format(this.info.identity);
     },
 
     _getPlayerInfo: function() {
@@ -470,7 +470,7 @@ const MPRISPlayer = new Lang.Class({
           trackChanged = false;
         // Reset the timer only when the track has changed
         if (trackChanged) {
-          this._trackTime = -1;
+          this._trackTime = 0;
           if (metadata["mpris:length"]) {
             state.trackLength = metadata["mpris:length"].unpack() / 1000000;
           }
@@ -630,7 +630,6 @@ const MPRISPlayer = new Lang.Class({
         }
         for (let id in this._signalsId)
             this._settings.disconnect(this._signalsId[id]);
-        this.parent();
     }
 });
 Signals.addSignalMethods(MPRISPlayer.prototype);
