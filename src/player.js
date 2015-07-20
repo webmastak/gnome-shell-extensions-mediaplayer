@@ -158,6 +158,9 @@ const MPRISPlayer = new Lang.Class({
         if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._prop)
             return;
 
+        this.info.canRaise = this._mediaServer.CanRaise;
+        this.info.canQuit = this._mediaServer.CanQuit;
+
         // showVolume setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
@@ -208,95 +211,52 @@ const MPRISPlayer = new Lang.Class({
             }))
         );
 
-        this._prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
-            Lang.bind(this, function () { this._mediaServerPlayer.PreviousRemote(); }));
-        this._playButton = new Widget.PlayerButton('media-playback-start-symbolic',
-            Lang.bind(this, function () { this._mediaServerPlayer.PlayPauseRemote(); }));
-        this._stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
-            Lang.bind(this, function () { this._mediaServerPlayer.StopRemote(); }));
-        this._stopButton.hide();
-        this._nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
-            Lang.bind(this, function () { this._mediaServerPlayer.NextRemote(); }));
+        this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
+          let newState = new PlayerState();
 
-        this.trackControls = new Widget.PlayerButtons();
-        this.trackControls.addButton(this._prevButton);
-        this.trackControls.addButton(this._playButton);
-        this.trackControls.addButton(this._stopButton);
-        this.trackControls.addButton(this._nextButton);
+          if (props.Volume) {
+            newState.volume = props.Volume.unpack();
+          }
 
-        if (this._mediaServer.CanRaise) {
-            this.info.canRaise = true;
-
-          this._raiseButton = new Widget.PlayerButton('media-eject',
-                                                      Lang.bind(this, function() {
-                                                        // If we have an application in the appSystem
-                                                        // Bring it to the front else let the player decide
-                                                        if (this.info.app)
-                                                          this.info.app.activate_full(-1, 0);
-                                                        else
-                                                          this._mediaServer.RaiseRemote();
-                                                        // Close the indicator
-                                                        this.emit("menu-close");
-                                                      }));
-          this.trackControls.addButton(this._raiseButton);
-        }
-
-        //this.addMenuItem(this.trackControls);
-
-        if (this._mediaServer.CanQuit)
-            this.info.canQuit = true;
-            //this.playerTitle.hideButton();
-
-          this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
-            let newState = new PlayerState();
-
-            if (props.Volume) {
-              newState.volume = props.Volume.unpack();
-            }
-
-            if (props.PlaybackStatus) {
-              let status = props.PlaybackStatus.unpack();
-              global.log("Received new status");
-              global.log(status);
-              if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
-                  // Some players send a "PlaybackStatus: Stopped" signal when changing
-                  // tracks, so wait a little before refreshing.
-                  if (this._statusId != 0) {
-                    global.log("removing old state update");
-                    Mainloop.source_remove(this._statusId);
-                    this._statusId = 0;
-                  }
-                  this._statusId = Mainloop.timeout_add(300, Lang.bind(this, function() {
-                    global.log("sending new state " + status);
-                    this.emit('player-update', new PlayerState({status: status}));
-                  }));
+          if (props.PlaybackStatus) {
+            let status = props.PlaybackStatus.unpack();
+            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
+              // Some players send a "PlaybackStatus: Stopped" signal when changing
+              // tracks, so wait a little before refreshing.
+              if (this._statusId !== 0) {
+                Mainloop.source_remove(this._statusId);
+                this._statusId = 0;
               }
-              else {
-                newState.status = status;
-              }
+              this._statusId = Mainloop.timeout_add(300, Lang.bind(this, function() {
+                this.emit('player-update', new PlayerState({status: status}));
+              }));
             }
-
-            if (props.Metadata)
-              this._setMetadata(props.Metadata.deep_unpack(), newState);
-
-            if (props.ActivePlaylist)
-              this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
-
-            if (props.CanGoNext || props.CanGoPrevious || props.CanSeek) {
-              newState.canGoNext = props.CanGoNext.unpack() || true;
-              newState.canGoPrevious = props.CanGoPrevious.unpack() || true;
-              newState.canSeek = props.CanSeek.unpack() || true;
+            else {
+              newState.status = status;
             }
+          }
 
-            this.emit('player-update', newState);
-          }));
+          if (props.Metadata)
+            this._setMetadata(props.Metadata.deep_unpack(), newState);
+
+          if (props.ActivePlaylist)
+            this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
+
+          if (props.CanGoNext || props.CanGoPrevious || props.CanSeek) {
+            newState.canGoNext = props.CanGoNext.unpack() || true;
+            newState.canGoPrevious = props.CanGoPrevious.unpack() || true;
+            newState.canSeek = props.CanSeek.unpack() || true;
+          }
+
+          this.emit('player-update', newState);
+        }));
 
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
-            if (value > 0) {
-              this.trackTime = value / 1000000;
-            }
-            // Banshee is buggy and always emits Seeked(0). See #34, #183,
-            // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
+          if (value > 0) {
+            this.trackTime = value / 1000000;
+          }
+          // Banshee is buggy and always emits Seeked(0). See #34, #183,
+          // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
             else {
                 // If we caused the seek, just use the expected position.
                 // This is actually needed because even Get("Position")
@@ -360,6 +320,7 @@ const MPRISPlayer = new Lang.Class({
         this._onTrackChange();
 
         this.emit('player-update', newState);
+        this.emit('player-update-info', this.info);
     },
 
     next: function() {
@@ -390,6 +351,13 @@ const MPRISPlayer = new Lang.Class({
 
     setVolume: function(volume) {
       this._mediaServerPlayer.Volume = volume;
+    },
+
+    raise: function() {
+      if (this.info.app)
+        this.info.app.activate_full(-1, 0);
+      else if (this.info.canRaise)
+        this._mediaServer.RaiseRemote();
     },
 
     toString: function() {
