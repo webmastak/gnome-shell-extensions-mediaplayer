@@ -117,11 +117,12 @@ const PlayerUI = new Lang.Class({
     this.parent(player.info.identity, true);
     this.player = player;
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
-    this._updateInfoId = player.connect("player-info-update", Lang.bind(this, this.updateInfo));
+    this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
 
     this.showRating = false;
     this.showVolume = false;
     this.showPosition = false;
+    this.showPlaylists = false;
 
     this.trackCoverContainer = new St.Button({style_class: 'track-cover-container',
                                               x_align: St.Align.START,
@@ -166,6 +167,8 @@ const PlayerUI = new Lang.Class({
     }));
     this.addMenuItem(this.position);
 
+    this.playlists = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
+    this.addMenuItem(this.playlists);
   },
 
   update: function(player, newState) {
@@ -191,6 +194,15 @@ const PlayerUI = new Lang.Class({
         this.position.actor.show();
       else {
         this.position.actor.hide();
+      }
+    }
+
+    if (newState.showPlaylist !== null) {
+      this.showPlaylist = newState.showPlaylist;
+      if (this.showPlaylist)
+        this.playlists.actor.show();
+      else {
+        this.playlists.actor.hide();
       }
     }
 
@@ -269,7 +281,8 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.canSeek !== null) {
-      if (newState.canSeek && this.showPosition)
+      if (newState.canSeek && this.showPosition &&
+          this.player.state.status != Settings.Status.STOP)
         this.position.actor.show();
       else {
         this.position.actor.hide();
@@ -312,6 +325,35 @@ const PlayerUI = new Lang.Class({
         this.playButton.show();
         this.playButton.setIcon('media-playback-start-symbolic');
       }
+    }
+
+    if (newState.playlists) {
+      newState.playlists.forEach(Lang.bind(this, function(playlist) {
+        global.log(playlist);
+        let obj = playlist[0],
+            name = playlist[1];
+        if (obj.toString().search('Video') > 0)
+          return;
+        if (this.playlists.menu._getMenuItems().reduce(function(acc, menuItem) { if (menuItem.actor.obj == obj) return true; }, false)) {
+          global.log("return playlist");
+          return;
+        }
+        let playlistUI = new Widget.PlaylistItem(name, obj);
+        playlistUI.connect('activate', Lang.bind(this, function(playlist) {
+          this.player.playPlaylist(playlist.obj);
+        }));
+        global.log("add " + playlistUI);
+        this.playlists.menu.addMenuItem(playlistUI);
+      }));
+    }
+
+    if (newState.playlist) {
+      this.playlists.menu._getMenuItems().forEach(function(playlistItem) {
+        if (playlistItem.actor.obj == newState.playlist[0])
+          playlistItem.setShowDot(true);
+        else
+          playlistItem.setShowDot(false);
+      });
     }
   },
 
@@ -407,9 +449,9 @@ const PlayerUI = new Lang.Class({
     return numHours + numMins.toString() + ":" + numSecs.toString();
   },
 
-  updateInfo: function(player) {
-    this.icon.gicon = player.info.appInfo.get_icon();
-    this.label.text = player.info.identity;
+  updateInfo: function(player, playerInfo) {
+    this.icon.gicon = playerInfo.appInfo.get_icon();
+    this.label.text = playerInfo.identity;
   },
 
   toString: function() {

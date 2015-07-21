@@ -52,9 +52,9 @@ const PlayerState = new Lang.Class({
   },
 
   status: null,
+
+  playlist: null,
   playlists: null,
-  playlistsMenu: null,
-  currentPlaylist: null,
 
   trackTime: null,
   trackTitle: null,
@@ -68,6 +68,7 @@ const PlayerState = new Lang.Class({
   trackObj: null,
   trackRating: null,
 
+  showPlaylists: null,
   showRating: null,
   showVolume: null,
   showPosition: null,
@@ -159,44 +160,26 @@ const MPRISPlayer = new Lang.Class({
         // showVolume setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
-                                                        volume: this.state.volume}));
+            this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY)}));
           }))
         );
-        this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY)}));
-
         // showPosition setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
-                                                        position: this.state.position}));
+            this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY)}));
           }))
         );
-        this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY)}));
-
         // showRating setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
             this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
           }))
         );
-        this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
-
-
-        this.showPlaylists = this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY);
+        // showPlaylists setting
         this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
-                if (this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)) {
-                    this.showPlaylists = true;
-                    this._getPlaylists();
-                    this._getActivePlaylist();
-                }
-                else {
-                    this.showPlaylists = false;
-                    if (this._playlistsMenu)
-                        this._playlistsMenu.destroy();
-                }
-            }))
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({showPlaylists: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)}));
+          }))
         );
 
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
@@ -225,7 +208,7 @@ const MPRISPlayer = new Lang.Class({
           }
 
           if (props.Metadata)
-            this._setMetadata(props.Metadata.deep_unpack(), newState);
+            this._parseMetadata(props.Metadata.deep_unpack(), newState);
 
           if (props.ActivePlaylist)
             this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
@@ -268,7 +251,7 @@ const MPRISPlayer = new Lang.Class({
             }
         }));
 
-        this.emit('init-done');
+        this.populate();
     },
 
     set trackTime(value) {
@@ -285,30 +268,34 @@ const MPRISPlayer = new Lang.Class({
     },
 
     populate: function() {
-      global.log("init populate");
-        let newState = new PlayerState({
-          volume: this._mediaServerPlayer.Volume,
-          status: this._mediaServerPlayer.PlaybackStatus
-        });
+      this._refreshProperties();
 
-        this._setMetadata(this._mediaServerPlayer.Metadata, newState);
+      let newState = new PlayerState({
+        showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
+        showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
+        showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
+        showPlaylists: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
+        volume: this._mediaServerPlayer.Volume,
+        status: this._mediaServerPlayer.PlaybackStatus
+      });
 
-        if (newState.status != Settings.Status.STOP) {
-          this._trackTime = this._mediaServerPlayer.Position / 1000000;
-          newState.trackTime = this._trackTime;
-        }
+      if (this._mediaServerPlaylists.ActivePlaylist)
+        newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1];
 
-        this._getPlayerInfo();
+      this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, function(playlists) {
+        if (playlists && playlists[0])
+          this.emit('player-update', new PlayerState({playlists: playlists[0]}));
+        else
+          this.emit('player-update', new PlayerState({showPlaylists:false}));
+      }));
 
-        //if (this.showPlaylists) {
-            //this._getPlaylists();
-            //this._getActivePlaylist();
-        //}
+      this._parseMetadata(this._mediaServerPlayer.Metadata, newState);
 
-        this._onTrackChange();
+      this.emit('player-update', newState);
 
-        this.emit('player-update', newState);
-        this.emit('player-update-info', this.info);
+      this._getPlayerInfo();
+
+      this.emit('player-update-info', this.info);
     },
 
     next: function() {
@@ -341,15 +328,16 @@ const MPRISPlayer = new Lang.Class({
       this._mediaServerPlayer.Volume = volume;
     },
 
+    playPlaylist: function(playlist) {
+      this._mediaServerPlaylists.ActivatePlaylistRemote(playlist);
+      this.emit('player-update', new PlayerState({playlist: this._mediaServerPlaylists.ActivePlaylist[1]}));
+    },
+
     raise: function() {
       if (this.info.app)
         this.info.app.activate_full(-1, 0);
       else if (this.info.canRaise)
         this._mediaServer.RaiseRemote();
-    },
-
-    toString: function() {
-        return "[object MPRISPlayer(%s)]".format(this.info.identity);
     },
 
     _getPlayerInfo: function() {
@@ -362,62 +350,10 @@ const MPRISPlayer = new Lang.Class({
           this.info.app = appSys.lookup_app(entry + ".desktop");
           this.info.appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
         }
-        this.emit('player-info-update');
+        global.log(this.info);
     },
 
-    _setActivePlaylist: function(playlist) {
-        // Is there an active playlist ?
-        if (playlist && playlist[0]) {
-            this._currentPlaylist = playlist[1][0];
-            this.state.currentPlaylist = playlist[1][0];
-        }
-        else {
-            this.state.currentPlaylist = null;
-        }
-        this._setPlaylists(null);
-    },
-
-    _getActivePlaylist: function() {
-        this._setActivePlaylist(this._mediaServerPlaylists.ActivePlaylist);
-    },
-
-    _setPlaylists: function(playlists) {
-        if (!playlists && this._playlists)
-            playlists = this._playlists;
-
-        if (playlists && playlists[0].length > 0) {
-            this._playlists = playlists;
-            if (!this._playlistsMenu) {
-                this._playlistsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
-                //this.addMenuItem(this._playlistsMenu);
-            }
-            let show = false;
-            this._playlistsMenu.menu.removeAll();
-            for (let p in this._playlists[0]) {
-                let obj = this._playlists[0][p][0];
-                let name = this._playlists[0][p][1];
-                if (obj.toString().search('Video') == -1) {
-                    let playlist = new Widget.PlaylistItem(name, obj);
-                    playlist.connect('activate', Lang.bind(this, function(playlist) {
-                        this._mediaServerPlaylists.ActivatePlaylistRemote(playlist.obj);
-                    }));
-                    if (obj == this._currentPlaylist)
-                        playlist.setShowDot(true);
-                    this._playlistsMenu.menu.addMenuItem(playlist);
-                    show = true;
-                }
-            }
-            if (!show)
-                this._playlistsMenu.destroy();
-
-        }
-    },
-
-    _getPlaylists: function() {
-        this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, this._setPlaylists));
-    },
-
-    _setMetadata: function(metadata, state) {
+    _parseMetadata: function(metadata, state) {
       // Pragha sends a metadata dict with one
       // value on stop
       if (metadata !== null && Object.keys(metadata).length > 1) {
@@ -429,11 +365,10 @@ const MPRISPlayer = new Lang.Class({
         // Reset the timer only when the track has changed
         if (trackChanged) {
           this._trackTime = 0;
-          if (metadata["mpris:length"]) {
+          if (metadata["mpris:length"])
             state.trackLength = metadata["mpris:length"].unpack() / 1000000;
-          }
           // refresh properties
-          this._onTrackChange();
+          this._refreshProperties();
         }
 
         if (metadata["xesam:artist"]) {
@@ -473,23 +408,7 @@ const MPRISPlayer = new Lang.Class({
       }
     },
 
-    _onStatusChange: function() {
-      let status = this.state.status;
-      global.log("on status change");
-      global.log(status);
-      if (status == Settings.Status.PLAY) {
-        this._startTimer();
-      }
-      else if (status == Settings.Status.PAUSE) {
-        this._pauseTimer();
-      }
-      else if (status == Settings.Status.STOP) {
-        this._stopTimer();
-      }
-    },
-
-    _onTrackChange: function(position) {
-      global.log("on track change");
+    _refreshProperties: function() {
       // check Can* properties
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanSeek',
                            Lang.bind(this, function(value, err) {
@@ -551,6 +470,19 @@ const MPRISPlayer = new Lang.Class({
                           );
     },
 
+    _onStatusChange: function() {
+      let status = this.state.status;
+      if (status == Settings.Status.PLAY) {
+        this._startTimer();
+      }
+      else if (status == Settings.Status.PAUSE) {
+        this._pauseTimer();
+      }
+      else if (status == Settings.Status.STOP) {
+        this._stopTimer();
+      }
+    },
+
     _startTimer: function() {
       this._pauseTimer();
       this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
@@ -579,6 +511,10 @@ const MPRISPlayer = new Lang.Class({
         }
         for (let id in this._signalsId)
             this._settings.disconnect(this._signalsId[id]);
+    },
+
+    toString: function() {
+        return "[object MPRISPlayer(%s)]".format(this.info.identity);
     }
 });
 Signals.addSignalMethods(MPRISPlayer.prototype);

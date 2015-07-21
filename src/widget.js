@@ -440,8 +440,6 @@ const PlaylistItem = new Lang.Class({
         this.obj = obj;
         this.box = new St.BoxLayout();
         this.label = new St.Label({text: text});
-        this.icon = new St.Icon({style_class: 'menu-icon', icon_name: 'view-list-symbolic'});
-        this.box.add_actor(this.icon);
         this.box.add_actor(this.label);
 
         this.actor.add(this.box);
