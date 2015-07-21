@@ -174,3 +174,52 @@ const MediaplayerStatusButton = new Lang.Class({
         }
     }
 });
+
+const Indicator = new Lang.Class({
+  Name: 'MediaplayerIndicator',
+  Extends: PanelMenu.SystemIndicator,
+
+  _init: function(manager) {
+    this.parent();
+
+    this.manager = manager;
+    this.manager.connect('player-active', Lang.bind(this, this._onActivePlayer));
+
+    this._primaryIndicator = this._addIndicator();
+    this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
+    this.indicators.show();
+    this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
+    this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
+  },
+
+  _onScrollEvent: function(actor, event) {
+    switch (event.get_scroll_direction()) {
+      case Clutter.ScrollDirection.UP:
+        this.manager.activePlayer.previous();
+        break;
+      case Clutter.ScrollDirection.DOWN:
+        this.manager.activePlayer.next();
+        break;
+    }
+  },
+
+  _onButtonEvent: function(actor, event) {
+    if (event.type() == Clutter.EventType.BUTTON_PRESS) {
+      let button = event.get_button();
+      if (button == 2) {
+        this.manager.activePlayer.playPause();
+        return Clutter.EVENT_STOP;
+      }
+    }
+
+    return Clutter.EVENT_PROPAGATE;
+  },
+
+  _onActivePlayer: function(manager, player) {
+    if (player.info.appInfo)
+      this._primaryIndicator.gicon = player.info.appInfo.get_icon();
+  },
+
+});
+
+

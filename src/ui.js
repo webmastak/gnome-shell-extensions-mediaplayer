@@ -208,10 +208,10 @@ const PlayerUI = new Lang.Class({
 
     if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
       this.trackBox.empty();
-      if (player.state.trackTitle)
-        this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackTitle, 'track-title'));
       if (player.state.trackArtist)
         this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackArtist, 'track-artist'));
+      if (player.state.trackTitle)
+        this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackTitle, 'track-title'));
       if (player.state.trackAlbum)
         this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackAlbum, 'track-album'));
       if (player.state.trackRating !== null && this.showRating)
