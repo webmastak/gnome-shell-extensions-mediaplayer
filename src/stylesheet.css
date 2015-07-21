@@ -30,13 +30,13 @@
 }
 
 .track-title {
-    font-weight: bold;
-    font-size: 1.1em;
+    padding-top: 0.2em;
+    font-size: 0.9em;
 }
 
 .track-artist {
-    padding-top: 0.2em;
-    font-size: 0.9em;
+    font-weight: bold;
+    font-size: 1.1em;
 }
 
 .track-album {

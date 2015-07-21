@@ -1,4 +1,8 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* jshint esnext: true */
+/* jshint -W097 */
+/* global imports: false */
+/* global global: false */
 /**
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +30,7 @@ const Settings = Me.imports.settings;
 /* global values */
 let playerManager;
 let mediaplayerMenu;
+let indicator;
 
 function init() {
     Lib.initTranslations(Me);
@@ -38,25 +43,40 @@ function init() {
 
 function enable() {
     let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY);
+
     if (position == Settings.IndicatorPosition.VOLUMEMENU) {
         mediaplayerMenu = Main.panel.statusArea.aggregateMenu;
     }
     else {
         mediaplayerMenu = new Panel.MediaplayerStatusButton();
-        if (position == Settings.IndicatorPosition.RIGHT)
-            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
-        else if (position == Settings.IndicatorPosition.CENTER)
-            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
+        //if (position == Settings.IndicatorPosition.RIGHT)
+            //Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
+        //else if (position == Settings.IndicatorPosition.CENTER)
+            //Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
     }
+
     playerManager = new Manager.PlayerManager(mediaplayerMenu);
-    mediaplayerMenu._delegate = playerManager;
+    indicator = new Panel.Indicator(playerManager);
+
+    if (position == Settings.IndicatorPosition.VOLUMEMENU) {
+      let nbIndicators = mediaplayerMenu._indicators.get_children().length;
+      mediaplayerMenu._indicators.insert_child_at_index(indicator.indicators, nbIndicators - 1);
+    }
+    else {
+      Main.panel.addToStatusArea('mediaplayer', indicator, 999, 'center');
+    }
+
 }
 
 function disable() {
     playerManager.destroy();
     playerManager = null;
     if (mediaplayerMenu instanceof Panel.MediaplayerStatusButton) {
-        mediaplayerMenu.destroy();
-        mediaplayerMenu = null;
+      mediaplayerMenu.destroy();
+      mediaplayerMenu = null;
+    }
+    else {
+      indicator.destroy();
+      indicator = null;
     }
 }

@@ -20,7 +20,7 @@
 
 const Mainloop = imports.mainloop;
 const Lang = imports.lang;
-const PopupMenu = imports.ui.popupMenu;
+const Signals = imports.signals;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Panel = Me.imports.panel;
@@ -40,7 +40,7 @@ const PlayerManager = new Lang.Class({
         // players list
         this._players = {};
         // player shown in the panel
-        this._status_player = false;
+        this._activePlayer = null;
         // the DBus interface
         this._dbus = new DBusIface.DBus();
         // player DBus name pattern
@@ -85,6 +85,15 @@ const PlayerManager = new Lang.Class({
         this._hideOrDefaultPlayer();
     },
 
+    get activePlayer() {
+      return this._activePlayer;
+    },
+
+    set activePlayer(player) {
+      this._activePlayer = player;
+      this.emit('player-active', player);
+    },
+
     _isInstance: function(busName) {
         // MPRIS instances are in the form
         //   org.mpris.MediaPlayer2.name.instanceXXXX
@@ -119,7 +128,12 @@ const PlayerManager = new Lang.Class({
 
             this._players[owner].signals.push(
                 this._players[owner].player.connect('player-update',
-                    Lang.bind(this, this._refreshStatus)
+                    Lang.bind(this, this._onPlayerUpdate)
+                )
+            );
+            this._players[owner].signals.push(
+                this._players[owner].player.connect('player-update-info',
+                    Lang.bind(this, this._onPlayerInfoUpdate)
                 )
             );
             this._players[owner].signals.push(
@@ -147,8 +161,17 @@ const PlayerManager = new Lang.Class({
         }
 
         this._hideOrDefaultPlayer();
+    },
 
-        this._refreshStatus();
+    _onPlayerUpdate: function(player, newState) {
+      if (newState.status == Settings.Status.PLAY) {
+        this.activePlayer = player;
+      }
+    },
+
+    _onPlayerInfoUpdate: function(player, playerInfo) {
+      if (player == this.activePlayer)
+        this.activePlayer = player;
     },
 
     _hideOtherPlayers: function(ui) {
@@ -309,3 +332,4 @@ const PlayerManager = new Lang.Class({
             this._removePlayerFromMenu(null, owner);
     }
 });
+Signals.addSignalMethods(PlayerManager.prototype);
