@@ -129,13 +129,6 @@ const PlayerManager = new Lang.Class({
                     })
                 )
             );
-            this._players[owner].signals.push(
-                this._players[owner].player.connect('init-done',
-                    Lang.bind(this, function(player) {
-                        player.populate();
-                    })
-                )
-            );
             this._players[owner].signalsUI.push(
                 /* Close all other players menu when a player menu is opened */
                 this._players[owner].ui.connect('player-menu-opened',
