@@ -146,7 +146,7 @@ const TrackBox = new Lang.Class({
       this._cover = cover;
       this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
       this.actor.add(this._cover);
-      this.actor.add(this._infos, {expand: true});
+      this.actor.add(this._infos, {expand: true, y_expand: true});
     },
 
     addInfo: function(item, row) {

@@ -40,7 +40,7 @@ const Widget = Me.imports.widget;
 const Settings = Me.imports.settings;
 const Player = Me.imports.player;
 
-const COVER_SIZE = 128;
+const COVER_SIZE = 100;
 
 
 const PlayerMenu = new Lang.Class({
@@ -124,16 +124,16 @@ const PlayerUI = new Lang.Class({
     this.showPosition = false;
     this.showPlaylists = false;
 
-    this.trackCoverContainer = new St.Button({style_class: 'track-cover-container',
-                                              x_align: St.Align.START,
-                                              y_align: St.Align.START});
-    this.trackCoverContainer.connect('clicked', Lang.bind(this, this._toggleCover));
     this.trackCoverUrl = false;
     this.trackCoverFileTmp = false;
-    this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE});
-    this.trackCoverContainer.set_child(this.trackCover);
+    this.trackCover = new St.Button({style_class: 'track-cover-container',
+                                     x_align: St.Align.START,
+                                     y_align: St.Align.START,
+                                     child: new St.Icon({icon_name: "media-optical-cd-audio",
+                                                         icon_size: COVER_SIZE})});
+    this.trackCover.connect('clicked', Lang.bind(this, this._toggleCover));
 
-    this.trackBox = new Widget.TrackBox(this.trackCoverContainer);
+    this.trackBox = new Widget.TrackBox(this.trackCover);
     this.trackBox.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.trackBox);
 
@@ -373,7 +373,7 @@ const PlayerUI = new Lang.Class({
   },
 
   _hideCover: function() {
-    Tweener.addTween(this.trackCoverContainer, {
+    Tweener.addTween(this.trackCover, {
       opacity: 0,
       time: 0.3,
       transition: 'easeOutCubic',
@@ -381,26 +381,25 @@ const PlayerUI = new Lang.Class({
   },
 
   _showCover: function() {
-    Tweener.addTween(this.trackCoverContainer, {
+    Tweener.addTween(this.trackCover, {
       opacity: 0,
       time: 0.3,
       transition: 'easeOutCubic',
       onComplete: Lang.bind(this, function() {
         // Change cover
         if (! this.trackCoverPath || ! GLib.file_test(this.trackCoverPath, GLib.FileTest.EXISTS)) {
-          this.trackCover = new St.Icon({icon_name: "media-optical-cd-audio", icon_size: COVER_SIZE});
+          let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
+                                       icon_size: this.trackCover.child.icon_size});
+          this.trackCover.child = coverIcon;
         }
         else {
-          this.trackCover = new St.Bin({style_class: 'track-cover'});
-          let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this.trackCoverPath});
-          let [coverWidth, coverHeight] = coverTexture.get_base_size();
-          this.trackCover.width = COVER_SIZE;
-          this.trackCover.height = coverHeight / (coverWidth / COVER_SIZE);
-          this.trackCover.set_child(coverTexture);
+          let gicon = new Gio.FileIcon({file: Gio.File.new_for_path(this.trackCoverPath)});
+          let coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
+                                       icon_size: this.trackCover.child.icon_size});
+          this.trackCover.child = coverIcon;
         }
-        this.trackCoverContainer.set_child(this.trackCover);
         // Show the new cover
-        Tweener.addTween(this.trackCoverContainer, {
+        Tweener.addTween(this.trackCover, {
           opacity: 255,
           time: 0.3,
           transition: 'easeInCubic',
@@ -410,23 +409,16 @@ const PlayerUI = new Lang.Class({
   },
 
   _toggleCover: function() {
-    if (this.trackCover.has_style_class_name('track-cover')) {
-      let [coverWidth, coverHeight] = this.trackCover.get_size(),
-          [boxWidth, boxHeight] = this.trackBox.actor.get_size(),
-          ratio = coverWidth / coverHeight,
-          targetHeight,
-          targetWidth;
-      if (coverWidth == COVER_SIZE) {
-        targetWidth = boxWidth - 100;
-      }
-      else {
-        targetWidth = COVER_SIZE;
-      }
-      targetHeight = targetWidth * ratio;
-      Tweener.addTween(this.trackCover, { height: targetHeight, width: targetWidth,
-                       time: 0.3,
-                       transition: 'easeInCubic'
-      });
+    if (this.trackCover.child.has_style_class_name('track-cover')) {
+      let size = this.trackCover.child.icon_size,
+          targetSize;
+      if (size == COVER_SIZE)
+        targetSize = size * 2;
+      else
+        targetSize = COVER_SIZE;
+      Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
+                                               time: 0.3,
+                                               transition: 'easeInCubic'});
     }
   },
 
