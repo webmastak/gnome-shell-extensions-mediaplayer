@@ -185,6 +185,9 @@ const Indicator = new Lang.Class({
     this.manager = manager;
     this.manager.connect('player-active', Lang.bind(this, this._onActivePlayer));
 
+    this.activePlayer = null;
+    this.activePlayerId = null;
+
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
     this.indicators.show();
@@ -206,19 +209,28 @@ const Indicator = new Lang.Class({
   _onButtonEvent: function(actor, event) {
     if (event.type() == Clutter.EventType.BUTTON_PRESS) {
       let button = event.get_button();
-      if (button == 2) {
-        this.manager.activePlayer.playPause();
+      if (button == 2 && this.activePlayer) {
+        this.activePlayer.playPause();
         return Clutter.EVENT_STOP;
       }
     }
-
     return Clutter.EVENT_PROPAGATE;
   },
 
   _onActivePlayer: function(manager, player) {
-    if (player.info.appInfo)
-      this._primaryIndicator.gicon = player.info.appInfo.get_icon();
+    if (this.activePlayerId)
+      this.activePlayer.disconnect(this.activePlayerId);
+    this.activePlayer = player;
+    this.activePlayerId = this.activePlayer.connect('player-update', Lang.bind(this, this._onPlayerUpdate));
+
+    //if (player.info.appInfo)
+      //this._primaryIndicator.gicon = player.info.appInfo.get_icon();
   },
+
+  _onPlayerUpdate: function(player, state) {
+    if (state.trackCoverUrl) {
+    }
+  }
 
 });
 

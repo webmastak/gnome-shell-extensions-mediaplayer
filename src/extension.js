@@ -76,7 +76,7 @@ function disable() {
       mediaplayerMenu = null;
     }
     else {
-      indicator.destroy();
+      indicator.indicators.destroy();
       indicator = null;
     }
 }

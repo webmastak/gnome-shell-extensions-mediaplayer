@@ -91,7 +91,33 @@ const PlayerManager = new Lang.Class({
 
     set activePlayer(player) {
       this._activePlayer = player;
+      for (let owner in this._players) {
+        if (this._players[owner].player == player)
+          this._players[owner].ui.menu.open();
+      }
+      global.log("active player is now : " + player);
       this.emit('player-active', player);
+    },
+
+    nbPlayers: function() {
+      return Object.keys(this._players).length;
+    },
+
+    getPlayersByStatus: function(status) {
+      let players = [];
+      for (let owner in this._players) {
+        if (this._players[owner].player)
+          players.push(this._players[owner].player);
+      }
+      global.log("list of players : " + players);
+      return players.filter(function(player) {
+        global.log("filtering : " + player);
+        global.log("status : " + player.state.status);
+        if (player.state.status == status)
+          return true;
+        else
+          return false;
+      });
     },
 
     _isInstance: function(busName) {
@@ -116,7 +142,8 @@ const PlayerManager = new Lang.Class({
                 this._players[owner].player.busName = busName;
             else
                 return;
-        } else if (owner) {
+        }
+        else if (owner) {
             let player = new Player.MPRISPlayer(busName, owner);
             let ui = new UI.PlayerUI(player);
             this._players[owner] = {
@@ -134,13 +161,6 @@ const PlayerManager = new Lang.Class({
             this._players[owner].signals.push(
                 this._players[owner].player.connect('player-update-info',
                     Lang.bind(this, this._onPlayerInfoUpdate)
-                )
-            );
-            this._players[owner].signals.push(
-                this._players[owner].player.connect('menu-close',
-                    Lang.bind(this, function() {
-                        this.menu.menu.close();
-                    })
                 )
             );
             this._players[owner].signalsUI.push(
@@ -164,14 +184,11 @@ const PlayerManager = new Lang.Class({
     },
 
     _onPlayerUpdate: function(player, newState) {
-      if (newState.status == Settings.Status.PLAY) {
-        this.activePlayer = player;
-      }
+      if (newState.status)
+        this._refreshActivePlayer();
     },
 
     _onPlayerInfoUpdate: function(player, playerInfo) {
-      if (player == this.activePlayer)
-        this.activePlayer = player;
     },
 
     _hideOtherPlayers: function(ui) {
@@ -185,14 +202,14 @@ const PlayerManager = new Lang.Class({
         if (this._disabling)
             return;
 
-        if (this._nbPlayers() === 0 && Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
+        if (this.nbPlayers() === 0 && Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
           if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
             let ui = new UI.DefaultPlayerUI();
             this._players[Settings.DEFAULT_PLAYER_OWNER] = {ui: ui, signals: []};
             this._addPlayerToMenu(ui);
           }
         }
-        else if (this._nbPlayers() > 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]) {
+        else if (this.nbPlayers() > 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]) {
             this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
         }
         this._hideOrShowMenu();
@@ -208,7 +225,8 @@ const PlayerManager = new Lang.Class({
     _addPlayerToMenu: function(ui) {
       let position = this._getPlayerPosition();
       this.menu.menu.addMenuItem(ui, position);
-      ui.open();
+      global.log("refresh from _addPlayerToMenu:");
+      this._refreshActivePlayer();
     },
 
     _getMenuItem: function(position) {
@@ -235,7 +253,7 @@ const PlayerManager = new Lang.Class({
             return;
         }
         // No player or just the default player
-        if (this._nbPlayers() === 0 || (this._nbPlayers() == 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]))
+        if (this.nbPlayers() === 0 || (this.nbPlayers() == 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]))
           this.menu.actor.hide();
     },
 
@@ -251,7 +269,6 @@ const PlayerManager = new Lang.Class({
     },
 
     _removePlayerFromMenu: function(busName, owner) {
-        global.log("Remove from menu : " + owner);
         if (this._players[owner]) {
             for (let id in this._players[owner].signals)
                 this._players[owner].player.disconnect(this._players[owner].signals[id]);
@@ -265,7 +282,8 @@ const PlayerManager = new Lang.Class({
             delete this._players[owner];
             this._hideOrDefaultPlayer();
         }
-        this._refreshStatus();
+        global.log("refresh from _removePlayerFromMenu");
+        this._refreshActivePlayer();
     },
 
     _changePlayerOwner: function(busName, oldOwner, newOwner) {
@@ -274,52 +292,32 @@ const PlayerManager = new Lang.Class({
             this._players[newOwner].player.owner = newOwner;
             delete this._players[oldOwner];
         }
-        this._refreshStatus();
+        global.log("refresh from _changePlayerOwner");
+        this._refreshActivePlayer();
     },
 
-    _nbPlayers: function() {
-        return Object.keys(this._players).length;
-    },
+    _refreshActivePlayer: function() {
+      // Display current status in the top panel
+      if (this.nbPlayers() > 0) {
+        // Get the first player
+        // with status PLAY or PAUSE
+        // else all players are stopped
+        let playersSorted = [
+          this.getPlayersByStatus(Settings.Status.PLAY),
+          this.getPlayersByStatus(Settings.Status.PAUSE),
+          this.getPlayersByStatus(Settings.Status.STOP)
+        ];
 
-    _refreshStatus: function() {
-        // Display current status in the top panel
-        if (this.menu instanceof Panel.MediaplayerStatusButton) {
-            this._status_player = false;
-            if (this._nbPlayers() > 0) {
-                // Get the first player
-                // with status PLAY or PAUSE
-                // else all players are stopped
-                for (let owner in this._players) {
-                    let player = this._players[owner].player;
-                    if (player.state.status == Settings.Status.PLAY) {
-                        this._status_player = player;
-                        break;
-                    }
-                    if (player.state.status == Settings.Status.PAUSE && !this._status_player)
-                        this._status_player = player;
-                    if (player.state.status == Settings.Status.STOP && !this._status_player)
-                        this._status_player = player;
-                }
-            }
-            this.menu.setState(this._status_player);
+        global.log(playersSorted);
+
+        for (let players in playersSorted) {
+          if (playersSorted[players].length > 0) {
+            global.log("set active player to : " + playersSorted[players][0]);
+            this.activePlayer = playersSorted[players][0];
+            break;
+          }
         }
-    },
-
-    next: function() {
-        if (this._status_player && this._status_player.state.status == Settings.Status.PLAY)
-            this._status_player.next();
-    },
-
-    previous: function() {
-        if (this._status_player && this._status_player.state.status == Settings.Status.PLAY)
-            this._status_player.previous();
-    },
-
-    playPause: function() {
-        if (this._status_player &&
-                (this._status_player.state.status == Settings.Status.PLAY ||
-                 this._status_player.state.status == Settings.Status.PAUSE))
-            this._status_player.playPause();
+      }
     },
 
     destroy: function() {
