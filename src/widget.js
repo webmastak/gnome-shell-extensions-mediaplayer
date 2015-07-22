@@ -244,53 +244,6 @@ const TrackTitle = new Lang.Class({
     }
 });
 
-const TitleItem = new Lang.Class({
-    Name: "TitleItem",
-    Extends: PopupMenu.PopupBaseMenuItem,
-
-    _init: function(text, icon, button_icon, button_callback) {
-        this.parent();
-        this.icon = new St.Icon(icon);
-        this.label = new St.Label({text: text});
-        this.labelBin = new St.Bin({child: this.label});
-        this.actor.add(this.icon);
-        this.actor.add(this.labelBin);
-
-        if (button_icon) {
-            this.button = new St.Button({style_class: "system-menu-action title-button"});
-            this.button.connect('clicked', button_callback);
-            this.button_icon = new St.Icon({
-                icon_name: button_icon,
-                icon_size: 14
-            });
-            this.button.set_child(this.button_icon);
-            this.actor.add(this.button, {expand: true, x_fill: false, x_align: St.Align.END});
-        }
-    },
-
-    setLabel: function(text) {
-        this.label.text = text;
-    },
-
-    setIcon: function(icon_name) {
-        this.icon.gicon = null;
-        this.icon.icon_name = icon;
-    },
-
-    setGicon: function(gicon) {
-        this.icon.icon_name = null;
-        this.icon.gicon = gicon;
-    },
-
-    hideButton: function() {
-        this.button.hide();
-    },
-
-    showButton: function() {
-        this.button.show();
-    }
-});
-
 const TrackRating = new Lang.Class({
     Name: "TrackRating",
 
@@ -428,14 +381,10 @@ const PlaylistItem = new Lang.Class({
     Name: "PlaylistItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function (text, obj, icon) {
+    _init: function (text, obj) {
         this.parent();
-
         this.obj = obj;
-        this.box = new St.BoxLayout();
         this.label = new St.Label({text: text});
-        this.box.add_actor(this.label);
-
-        this.actor.add(this.box);
+        this.actor.add(this.label);
     }
 });
