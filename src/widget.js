@@ -52,18 +52,12 @@ const PlayerButton = new Lang.Class({
     _init: function(icon, callback) {
         this.icon = new St.Icon({
             icon_name: icon + '-symbolic',
-            icon_size: 20
         });
-
-        this.actor = new St.Button({style_class: 'modal-dialog-button button',
+        this.actor = new St.Button({style_class: 'system-menu-action',
                                     child: this.icon});
         this.actor._delegate = this;
 
         this._callback_id = this.actor.connect('clicked', callback);
-
-        // override base style
-        this.icon.set_style('padding: 0px');
-        this.actor.set_style('padding: 8px');
     },
 
     setCallback: function(callback) {

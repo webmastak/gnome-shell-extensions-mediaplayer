@@ -1,5 +1,7 @@
 .controls {
-    spacing: 5px;
+    padding-top: 0.4em;
+    spacing: 8px;
+    padding-bottom: 0.4em;
 }
 
 .indicator-icon {
@@ -62,6 +64,6 @@
     color: white;
 }
 
-.control-button:disabled {
+.system-menu-action:disabled {
     color: #999;
 }
