@@ -90,21 +90,24 @@ const PlayerMenu = new Lang.Class({
 
 const DefaultPlayerUI = new Lang.Class({
     Name: 'DefaultPlayerUI',
-    Extends: PlayerMenu,
+    Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function() {
+        this.parent();
         let app = Shell.AppSystem.get_default().lookup_app(
             Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
         );
         let appInfo = Gio.DesktopAppInfo.new(app.get_id());
-        this.parent(app.get_name(), true);
-        this.icon.gicon = appInfo.get_icon();
-        this._runButton = new Widget.PlayerButton('system-run-symbolic', function() {
+
+        this.label = new St.Label({text: app.get_name()});
+        this.icon = new St.Icon({gicon: appInfo.get_icon(), style_class: 'popup-menu-icon'});
+
+        this.actor.add_child(this.icon);
+        this.actor.add_child(this.label);
+
+        this.connect('activate', function() {
           app.activate_full(-1, 0);
         });
-        this.buttons = new Widget.PlayerButtons();
-        this.buttons.addButton(this._runButton);
-        this.addMenuItem(this.buttons);
     }
 });
 
