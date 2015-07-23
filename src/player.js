@@ -514,7 +514,7 @@ const MPRISPlayer = new Lang.Class({
     },
 
     toString: function() {
-        return "[object MPRISPlayer(%s)]".format(this.info.identity);
+        return "<object MPRISPlayer(%s)>".format(this.info.identity);
     }
 });
 Signals.addSignalMethods(MPRISPlayer.prototype);
