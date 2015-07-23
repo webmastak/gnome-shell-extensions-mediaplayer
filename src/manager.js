@@ -103,20 +103,25 @@ const PlayerManager = new Lang.Class({
       return Object.keys(this._players).length;
     },
 
-    getPlayersByStatus: function(status) {
-      let players = [];
-      for (let owner in this._players) {
-        if (this._players[owner].player)
-          players.push(this._players[owner].player);
-      }
-      global.log("list of players : " + players);
-      return players.filter(function(player) {
-        global.log("filtering : " + player);
-        global.log("status : " + player.state.status);
+    getPlayersByStatus: function(status, preference) {
+      // Return a list of running players by status and preference
+      // preference is a player instance, if found in the list
+      // it will be put in the first position
+      return Object.keys(this._players).map(Lang.bind(this, function(owner) {
+        return this._players[owner].player;
+      }))
+      .filter(function(player) {
         if (player.state.status == status)
           return true;
         else
           return false;
+      })
+      .sort(function(a, b) {
+        if (a == preference)
+          return -1;
+        else if (b == preference)
+          return 1;
+        return 0;
       });
     },
 
@@ -185,7 +190,7 @@ const PlayerManager = new Lang.Class({
 
     _onPlayerUpdate: function(player, newState) {
       if (newState.status)
-        this._refreshActivePlayer();
+        this._refreshActivePlayer(player);
     },
 
     _onPlayerInfoUpdate: function(player, playerInfo) {
@@ -296,23 +301,20 @@ const PlayerManager = new Lang.Class({
         this._refreshActivePlayer();
     },
 
-    _refreshActivePlayer: function() {
+    _refreshActivePlayer: function(player) {
       // Display current status in the top panel
       if (this.nbPlayers() > 0) {
         // Get the first player
         // with status PLAY or PAUSE
         // else all players are stopped
         let playersSorted = [
-          this.getPlayersByStatus(Settings.Status.PLAY),
-          this.getPlayersByStatus(Settings.Status.PAUSE),
-          this.getPlayersByStatus(Settings.Status.STOP)
+          this.getPlayersByStatus(Settings.Status.PLAY, player),
+          this.getPlayersByStatus(Settings.Status.PAUSE, player),
+          this.getPlayersByStatus(Settings.Status.STOP, player)
         ];
-
-        global.log(playersSorted);
 
         for (let players in playersSorted) {
           if (playersSorted[players].length > 0) {
-            global.log("set active player to : " + playersSorted[players][0]);
             this.activePlayer = playersSorted[players][0];
             break;
           }
