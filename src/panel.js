@@ -218,10 +218,13 @@ const Indicator = new Lang.Class({
   },
 
   _onActivePlayer: function(manager, player) {
-    if (this.activePlayerId)
+    if (this.activePlayerId) {
       this.activePlayer.disconnect(this.activePlayerId);
+      this.activePlayerId = null;
+    }
     this.activePlayer = player;
-    this.activePlayerId = this.activePlayer.connect('player-update', Lang.bind(this, this._onPlayerUpdate));
+    if (this.activePlayer)
+      this.activePlayerId = this.activePlayer.connect('player-update', Lang.bind(this, this._onPlayerUpdate));
 
     //if (player.info.appInfo)
       //this._primaryIndicator.gicon = player.info.appInfo.get_icon();
