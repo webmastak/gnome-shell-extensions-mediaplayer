@@ -124,7 +124,6 @@ const MediaplayerStatusButton = new Lang.Class({
         .replace(/&/, "&amp;")
         .replace(/</, "&lt;")
         .replace(/>/, "&gt;");
-        this._thirdIndicator.clutter_text.set_markup(stateText);
 
         // If You just set width it will add blank space. This makes sure the
         // panel uses the minimum amount of space.
@@ -136,6 +135,14 @@ const MediaplayerStatusButton = new Lang.Class({
         }
         else {
           this._thirdIndicator.clutter_text.set_width(-1);
+        }
+
+        if (stateText) {
+          this._thirdIndicator.clutter_text.set_markup(stateText);
+          this._thirdIndicator.show();
+        }
+        else {
+          this._thirdIndicator.hide();
         }
       }
     },
