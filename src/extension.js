@@ -44,26 +44,26 @@ function init() {
 function enable() {
     let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY);
 
-    if (position == Settings.IndicatorPosition.VOLUMEMENU) {
+    if (position == Settings.IndicatorPosition.VOLUMEMENU)
         mediaplayerMenu = Main.panel.statusArea.aggregateMenu;
-    }
     else {
         mediaplayerMenu = new Panel.MediaplayerStatusButton();
-        //if (position == Settings.IndicatorPosition.RIGHT)
-            //Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
-        //else if (position == Settings.IndicatorPosition.CENTER)
-            //Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
+        if (position == Settings.IndicatorPosition.RIGHT)
+            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
+        else if (position == Settings.IndicatorPosition.CENTER)
+            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
     }
 
     playerManager = new Manager.PlayerManager(mediaplayerMenu);
-    indicator = new Panel.Indicator(playerManager);
 
     if (position == Settings.IndicatorPosition.VOLUMEMENU) {
+      indicator = new Panel.Indicator(playerManager);
       let nbIndicators = mediaplayerMenu._indicators.get_children().length;
       mediaplayerMenu._indicators.insert_child_at_index(indicator.indicators, nbIndicators - 1);
+      indicator.manager = playerManager;
     }
     else {
-      Main.panel.addToStatusArea('mediaplayer', indicator, 999, 'center');
+      mediaplayerMenu.manager = playerManager;
     }
 
 }

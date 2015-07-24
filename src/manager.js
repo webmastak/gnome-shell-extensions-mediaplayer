@@ -41,6 +41,7 @@ const PlayerManager = new Lang.Class({
         this._players = {};
         // player shown in the panel
         this._activePlayer = null;
+        this._activePlayerId = null;
         // the DBus interface
         this._dbus = new DBusIface.DBus();
         // player DBus name pattern
@@ -90,14 +91,30 @@ const PlayerManager = new Lang.Class({
     },
 
     set activePlayer(player) {
+
+      if (player == this._activePlayer)
+        return;
+
+      if (player === null) {
+        this._activePlayerId = null;
+        this._activePlayer = null;
+        this.emit('player-active-remove');
+        return;
+      }
+
+      if (this._activePlayerId) {
+        this._activePlayer.disconnect(this._activePlayerId);
+        this._activePlayerId = null;
+      }
       this._activePlayer = player;
+      this._activePlayerId = this._activePlayer.connect('player-update',
+                                                        Lang.bind(this, this._onActivePlayerUpdate));
       for (let owner in this._players) {
         if (this._players[owner].player == player &&
             this._players[owner].ui.menu)
           this._players[owner].ui.menu.open();
       }
-      global.log("active player is now : " + player);
-      this.emit('player-active', player);
+      this.emit('player-active-update', player.state);
     },
 
     nbPlayers: function() {
@@ -191,6 +208,10 @@ const PlayerManager = new Lang.Class({
     _onPlayerUpdate: function(player, newState) {
       if (newState.status)
         this._refreshActivePlayer(player);
+    },
+
+    _onActivePlayerUpdate: function(player, newState) {
+      this.emit('player-active-update', newState);
     },
 
     _onPlayerInfoUpdate: function(player, playerInfo) {
@@ -312,6 +333,7 @@ const PlayerManager = new Lang.Class({
         )[0] || null;
       }
       else {
+        global.log("no more players!");
         this.activePlayer = null;
       }
     },

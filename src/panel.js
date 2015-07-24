@@ -1,5 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* jshint esnext: true */
+/* jshint -W097 */
 /* global imports: false */
 /**
     This program is free software: you can redistribute it and/or modify
@@ -29,6 +30,45 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 
 
+// method binded to classes below
+let _onScrollEvent = function(actor, event) {
+  switch (event.get_scroll_direction()) {
+    case Clutter.ScrollDirection.UP:
+      this.manager.activePlayer.previous();
+      break;
+    case Clutter.ScrollDirection.DOWN:
+      this.manager.activePlayer.next();
+      break;
+  }
+};
+
+// method binded to classes below
+let _onButtonEvent = function(actor, event) {
+  if (event.type() == Clutter.EventType.BUTTON_PRESS) {
+    let button = event.get_button();
+    if (button == 2 && this.manager.activePlayer) {
+      this.manager.activePlayer.playPause();
+      return Clutter.EVENT_STOP;
+    }
+  }
+  return Clutter.EVENT_PROPAGATE;
+};
+
+let _commonOnActivePlayerUpdate = function(manager, state) {
+  if (state.status) {
+    if (state.status == Settings.Status.PLAY) {
+      this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
+    }
+    else if (state.status == Settings.Status.PAUSE) {
+      this._secondaryIndicator.icon_name = "media-playback-pause-symbolic";
+    }
+    else if (state.status == Settings.Status.STOP) {
+      this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
+    }
+  }
+};
+
+
 const MediaplayerStatusButton = new Lang.Class({
     Name: 'MediaplayerStatusButton',
     Extends: PanelMenu.Button,
@@ -36,32 +76,78 @@ const MediaplayerStatusButton = new Lang.Class({
     _init: function() {
         this.parent(0.0, "mediaplayer");
 
+        this._manager = null;
+
         this._coverPath = "";
         this._coverSize = 22;
         this._state = "";
 
-        this._box = new St.BoxLayout();
+        this.indicators = new St.BoxLayout({vertical: false, style_class: 'indicators'});
 
-        this._icon = new St.Icon({icon_name: 'audio-x-generic-symbolic',
-                                  style_class: 'system-status-icon indicator-icon'});
-        this._bin = new St.Bin({child: this._icon});
+        this._primaryIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
+                                              style_class: 'system-status-icon indicator'});
+        this._secondaryIndicator = new St.Icon({icon_name: 'system-run-symbolic',
+                                                style_class: 'secondary-indicator'});
 
-        this._stateText = new St.Label();
-        this._stateText.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-        this._stateTextBin = new St.Bin({child: this._stateText,
+        this._thirdIndicator = new St.Label({style_class: 'third-indicator'});
+        this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
                                          y_align: St.Align.MIDDLE});
 
-        this._stateIcon = new St.Icon({icon_name: 'system-run-symbolic',
-                                       style_class: 'status-icon'});
-        this._stateIconBin = new St.Bin({child: this._stateIcon,
-                                         y_align: St.Align.END});
+        this.indicators.add(this._primaryIndicator);
+        this.indicators.add(this._secondaryIndicator);
+        this.indicators.add(this._thirdIndicatorBin);
 
-        this._box.add(this._bin);
-        this._box.add(this._stateTextBin);
-        this._box.add(this._stateIconBin);
-        this.actor.add_actor(this._box);
+        this.actor.add_actor(this.indicators);
         this.actor.add_style_class_name('panel-status-button');
-        this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
+        this.actor.connect('scroll-event', Lang.bind(this, _onScrollEvent));
+    },
+
+    set manager(manager) {
+      this._manager = manager;
+      this.manager.connect('player-active-update', Lang.bind(this, this._onActivePlayerUpdate));
+      this.manager.connect('player-active-remove', Lang.bind(this, this._onActivePlayerRemove));
+    },
+
+    get manager() {
+      return this._manager;
+    },
+
+    _onActivePlayerUpdate: function(manager, state) {
+      Lang.bind(this, _commonOnActivePlayerUpdate)(manager, state);
+
+      if (state.trackTitle || state.trackArtist || state.trackAlbum) {
+        let stateText = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY)
+        .replace(/%a/, state.trackArtist)
+        .replace(/%t/, state.trackTitle)
+        .replace(/%b/, state.trackAlbum)
+        .replace(/&/, "&amp;")
+        .replace(/</, "&lt;")
+        .replace(/>/, "&gt;");
+        this._thirdIndicator.clutter_text.set_markup(stateText);
+
+        // If You just set width it will add blank space. This makes sure the
+        // panel uses the minimum amount of space.
+        let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+        this._thirdIndicator.clutter_text.set_width(-1);
+        let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
+        if (statusTextWidth > prefWidth) {
+          this._thirdIndicator.clutter_text.set_width(prefWidth);
+        }
+        else {
+          this._thirdIndicator.clutter_text.set_width(-1);
+        }
+      }
+    },
+
+    _onActivePlayerRemove: function(manager) {
+      this._clearStateText();
+      this._secondaryIndicator.icon_name = "system-run-symbolic";
+    },
+
+    _clearStateText: function() {
+        this._thirdIndicator.text = "";
+        this._thirdIndicator.clutter_text.set_width(-1);
     },
 
     _showCover: function(player) {
@@ -83,95 +169,10 @@ const MediaplayerStatusButton = new Lang.Class({
         }
     },
 
-    _updateStateText: function(player) {
-        if (player && player.trackArtist) {
-            let stateText = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
-            stateText = stateText.replace(/%a/, player.trackArtist.getText())
-                                 .replace(/%t/, player.trackTitle.getText())
-                                 .replace(/%b/, player.trackAlbum.getText())
-                                 .replace(/&/, "&amp;")
-                                 .replace(/</, "&lt;")
-                                 .replace(/>/, "&gt;");
-            this._stateTextCache = stateText;
-
-            // If You just set width it will add blank space. This makes sure the
-            // panel uses the minimum amount of space.
-            let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
-            this._stateText.clutter_text.set_width(-1);
-            let statusTextWidth = this._stateText.clutter_text.get_width();
-            if (statusTextWidth > prefWidth) {
-                this._stateText.clutter_text.set_width(prefWidth);
-            }
-            else {
-                this._stateText.clutter_text.set_width(-1);
-            }
-        }
-
-        this._stateText.clutter_text.set_markup(this._stateTextCache);
-    },
-
-    _clearStateText: function() {
-        this._stateText.text = "";
-        this._stateText.clutter_text.set_width(-1);
-    },
-
-    _onScrollEvent: function(actor, event) {
-        let direction = event.get_scroll_direction();
-
-        if (direction == Clutter.ScrollDirection.DOWN)
-            this._delegate.next();
-        else if (direction == Clutter.ScrollDirection.UP)
-            this._delegate.previous();
-    },
-
     // Override PanelMenu.Button._onEvent
     _onEvent: function(actor, event) {
-
-      if (this.menu && event.type() == Clutter.EventType.TOUCH_BEGIN) {
-        this.menu.toggle();
-      }
-      else if (event.type() == Clutter.EventType.BUTTON_PRESS) {
-        let button = event.get_button();
-        if (button == 2)
-            this._delegate.playPause();
-        else {
-          if(this._delegate._players[Settings.DEFAULT_PLAYER_OWNER]) {
-            let player = this._delegate._players[Settings.DEFAULT_PLAYER_OWNER].player;
-            player._app.activate_full(-1, 0);
-          }
-          else if (this.menu) {
-            this.menu.toggle();
-          }
-        }
-      }
-
-      return Clutter.EVENT_PROPAGATE;
-    },
-
-    setState: function(player) {
-        if (player) {
-            this._state = player._status;
-            if (this._state == Settings.Status.PLAY) {
-                this._stateIcon.icon_name = "media-playback-start-symbolic";
-                this._updateStateText(player);
-                this._showCover(player);
-            }
-            else if (this._state == Settings.Status.PAUSE) {
-                this._stateIcon.icon_name = "media-playback-pause-symbolic";
-                this._updateStateText(player);
-                this._showCover(player);
-            }
-            else if (!this.state || this._state == Settings.Status.STOP) {
-                this._stateIcon.icon_name = "media-playback-stop-symbolic";
-                this._clearStateText();
-                this._showCover(false);
-            }
-        }
-        else {
-            this._stateIcon.icon_name = "system-run-symbolic";
-            this._clearStateText();
-            this._showCover(false);
-        }
+      if (Lang.bind(this, _onButtonEvent)(actor, event) == Clutter.EVENT_PROPAGATE)
+        this.parent(actor, event);
     }
 });
 
@@ -179,60 +180,42 @@ const Indicator = new Lang.Class({
   Name: 'MediaplayerIndicator',
   Extends: PanelMenu.SystemIndicator,
 
-  _init: function(manager) {
+  _init: function() {
     this.parent();
 
-    this.manager = manager;
-    this.manager.connect('player-active', Lang.bind(this, this._onActivePlayer));
-
-    this.activePlayer = null;
-    this.activePlayerId = null;
+    this._manager = null;
 
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-    this.indicators.show();
-    this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
-    this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
+    this._primaryIndicator.add_style_class_name('indicator');
+    this._secondaryIndicator = this._addIndicator();
+    this._secondaryIndicator.icon_name = 'media-playback-stop-symbolic';
+    this._secondaryIndicator.style_class = 'secondary-indicator';
+    this.indicators.connect('scroll-event', Lang.bind(this, _onScrollEvent));
+    this.indicators.connect('button-press-event', Lang.bind(this, _onButtonEvent));
+    this.indicators.style_class = 'indicators';
+    this.indicators.hide();
   },
 
-  _onScrollEvent: function(actor, event) {
-    switch (event.get_scroll_direction()) {
-      case Clutter.ScrollDirection.UP:
-        this.manager.activePlayer.previous();
-        break;
-      case Clutter.ScrollDirection.DOWN:
-        this.manager.activePlayer.next();
-        break;
-    }
+  set manager(manager) {
+    this._manager = manager;
+    this.manager.connect('player-active-update', Lang.bind(this, this._onActivePlayerUpdate));
+    this.manager.connect('player-active-remove', Lang.bind(this, this._onActivePlayerRemove));
   },
 
-  _onButtonEvent: function(actor, event) {
-    if (event.type() == Clutter.EventType.BUTTON_PRESS) {
-      let button = event.get_button();
-      if (button == 2 && this.activePlayer) {
-        this.activePlayer.playPause();
-        return Clutter.EVENT_STOP;
-      }
-    }
-    return Clutter.EVENT_PROPAGATE;
+  get manager() {
+    return this._manager;
   },
 
-  _onActivePlayer: function(manager, player) {
-    if (this.activePlayerId) {
-      this.activePlayer.disconnect(this.activePlayerId);
-      this.activePlayerId = null;
-    }
-    this.activePlayer = player;
-    if (this.activePlayer)
-      this.activePlayerId = this.activePlayer.connect('player-update', Lang.bind(this, this._onPlayerUpdate));
-
+  _onActivePlayerUpdate: function(manager, state) {
+    Lang.bind(this, _commonOnActivePlayerUpdate)(manager, state);
     //if (player.info.appInfo)
       //this._primaryIndicator.gicon = player.info.appInfo.get_icon();
+    this.indicators.show();
   },
 
-  _onPlayerUpdate: function(player, state) {
-    if (state.trackCoverUrl) {
-    }
+  _onActivePlayerRemove: function(manager) {
+    this.indicators.hide();
   }
 
 });
