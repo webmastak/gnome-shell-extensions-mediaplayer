@@ -81,7 +81,7 @@ function init() {
         status_text: {
             type: "s",
             label: _("Status text"),
-            help: _("%a: Artist, %b: Album, %t: Title. Pango markup supported.")
+            help: _("{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
         },
         status_size: {
             type: "r",

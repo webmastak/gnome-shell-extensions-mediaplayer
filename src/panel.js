@@ -113,18 +113,30 @@ const MediaplayerStatusButton = new Lang.Class({
       return this._manager;
     },
 
+    _formatStateText: function(stateText, playerState) {
+      return stateText.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
+        return playerState[fieldName]  + appendText || "";
+      })
+      .replace(/&/, "&amp;")
+      .replace(/</, "&lt;")
+      .replace(/>/, "&gt;");
+    },
+
     _onActivePlayerUpdate: function(manager, state) {
       Lang.bind(this, _commonOnActivePlayerUpdate)(manager, state);
 
-      if (state.trackTitle || state.trackArtist || state.trackAlbum) {
-        let stateText = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY)
-        .replace(/%a/, state.trackArtist)
-        .replace(/%t/, state.trackTitle)
-        .replace(/%b/, state.trackAlbum)
-        .replace(/&/, "&amp;")
-        .replace(/</, "&lt;")
-        .replace(/>/, "&gt;");
-
+      if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
+        let stateText = this._formatStateText(
+          Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
+          state
+        );
+        if (stateText) {
+          this._thirdIndicator.clutter_text.set_markup(stateText);
+          this._thirdIndicator.show();
+        }
+        else {
+          this._thirdIndicator.hide();
+        }
         // If You just set width it will add blank space. This makes sure the
         // panel uses the minimum amount of space.
         let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
@@ -137,13 +149,6 @@ const MediaplayerStatusButton = new Lang.Class({
           this._thirdIndicator.clutter_text.set_width(-1);
         }
 
-        if (stateText) {
-          this._thirdIndicator.clutter_text.set_markup(stateText);
-          this._thirdIndicator.show();
-        }
-        else {
-          this._thirdIndicator.hide();
-        }
       }
     },
 
