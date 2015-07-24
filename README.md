@@ -100,11 +100,11 @@ All settings can be changed from within the `gnome-shell-extension-prefs` tool, 
 
   * **Indicator status text:** (default: empty)
 
-        gsettings set org.gnome.shell.extensions.mediaplayer status-text ' <span color="#76B0EC" font="9">%t</span>'
+        gsettings set org.gnome.shell.extensions.mediaplayer status-text ' <span color="#76B0EC" font="9">{trackTitle}</span>'
 
-    The status text can be formatted with the Pango syntax. %t, %a, %b are
-    replaced respectively by the current title, current artist and current
-    album playing.
+    The status text can be formatted with the Pango syntax. Placeholders will
+    be replace with the actual value of the playing track. Common placeholders
+    to use: trackAlbum, trackArtist, trackNumber, trackTitle...
 
     Note: This setting has only effect if indicator-position is 'center' or 'right'.
 

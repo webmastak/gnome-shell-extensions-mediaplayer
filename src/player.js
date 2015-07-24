@@ -58,10 +58,10 @@ const PlayerState = new Lang.Class({
 
   trackTime: null,
   trackTitle: null,
+  trackNumber: null,
   trackAlbum: null,
   trackArtist: null,
   trackUrl: null,
-  trackNumber: null,
   trackCoverUrl: null,
   trackLength: null,
   trackCoverPath: null,
@@ -381,6 +381,10 @@ const MPRISPlayer = new Lang.Class({
 
         if (metadata["xesam:title"]) {
           state.trackTitle = metadata["xesam:title"].unpack();
+        }
+
+        if (metadata["xesam:trackNumber"]) {
+          state.trackNumber = metadata["xesam:trackNumber"].unpack();
         }
 
         if (metadata["xesam:url"]) {
