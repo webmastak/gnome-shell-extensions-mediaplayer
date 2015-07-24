@@ -8,9 +8,22 @@
     padding-right: 0px;
 }
 
-.status-icon {
-    icon-size: 10px;
-    padding-bottom: 0.4em;
+.indicators {
+    spacing: 0px;
+}
+
+.indicator {
+    padding-right: 1px;
+}
+
+.secondary-indicator {
+    icon-size: 8px;
+    padding-top: 0.5em;
+}
+
+.third-indicator {
+    icon-size: 8px;
+    padding-left: 0.5em;
 }
 
 .track-box {

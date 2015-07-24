@@ -93,21 +93,24 @@ const DefaultPlayerUI = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function() {
-        this.parent();
-        let app = Shell.AppSystem.get_default().lookup_app(
-            Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
-        );
-        let appInfo = Gio.DesktopAppInfo.new(app.get_id());
+      this.parent();
 
-        this.label = new St.Label({text: app.get_name()});
-        this.icon = new St.Icon({gicon: appInfo.get_icon(), style_class: 'popup-menu-icon'});
+      this.app = Shell.AppSystem.get_default().lookup_app(
+        Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
+      );
+      let appInfo = Gio.DesktopAppInfo.new(this.app.get_id());
 
-        this.actor.add_child(this.icon);
-        this.actor.add_child(this.label);
+      this.label = new St.Label({text: this.app.get_name()});
+      this.icon = new St.Icon({gicon: appInfo.get_icon(), style_class: 'popup-menu-icon'});
 
-        this.connect('activate', function() {
-          app.activate_full(-1, 0);
-        });
+      this.actor.add_child(this.icon);
+      this.actor.add_child(this.label);
+
+      this.connect('activate', Lang.bind(this, this.run));
+    },
+
+    run: function() {
+      this.app.activate_full(-1, 0);
     }
 });
 
