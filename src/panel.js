@@ -29,6 +29,18 @@ const GLib = imports.gi.GLib;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 
+let formatStateText = function(stateText, playerState) {
+  return stateText.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
+    let text = "";
+    if (playerState[fieldName] !== null) {
+      text = playerState[fieldName].toString()
+      .replace(/&/, "&amp;")
+      .replace(/</, "&lt;")
+      .replace(/>/, "&gt;") + appendText;
+    }
+    return text;
+  });
+};
 
 // method binded to classes below
 let _onScrollEvent = function(actor, event) {
@@ -54,6 +66,7 @@ let _onButtonEvent = function(actor, event) {
   return Clutter.EVENT_PROPAGATE;
 };
 
+// method binded to classes below
 let _commonOnActivePlayerUpdate = function(manager, state) {
   if (state.status) {
     if (state.status == Settings.Status.PLAY) {
@@ -64,6 +77,30 @@ let _commonOnActivePlayerUpdate = function(manager, state) {
     }
     else if (state.status == Settings.Status.STOP) {
       this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
+    }
+  }
+  if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
+    let stateText = formatStateText(
+      Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
+      state
+    );
+    if (stateText) {
+      this._thirdIndicator.clutter_text.set_markup(stateText);
+      this._thirdIndicator.show();
+    }
+    else {
+      this._thirdIndicator.hide();
+    }
+    // If You just set width it will add blank space. This makes sure the
+    // panel uses the minimum amount of space.
+    let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+    this._thirdIndicator.clutter_text.set_width(-1);
+    let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
+    if (statusTextWidth > prefWidth) {
+      this._thirdIndicator.clutter_text.set_width(prefWidth);
+    }
+    else {
+      this._thirdIndicator.clutter_text.set_width(-1);
     }
   }
 };
@@ -113,47 +150,8 @@ const MediaplayerStatusButton = new Lang.Class({
       return this._manager;
     },
 
-    _formatStateText: function(stateText, playerState) {
-      return stateText.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
-        let text = "";
-        if (playerState[fieldName] !== null) {
-          text = playerState[fieldName].toString()
-                 .replace(/&/, "&amp;")
-                 .replace(/</, "&lt;")
-                 .replace(/>/, "&gt;") + appendText;
-        }
-        return text;
-      });
-    },
-
     _onActivePlayerUpdate: function(manager, state) {
       Lang.bind(this, _commonOnActivePlayerUpdate)(manager, state);
-
-      if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
-        let stateText = this._formatStateText(
-          Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
-          state
-        );
-        if (stateText) {
-          this._thirdIndicator.clutter_text.set_markup(stateText);
-          this._thirdIndicator.show();
-        }
-        else {
-          this._thirdIndicator.hide();
-        }
-        // If You just set width it will add blank space. This makes sure the
-        // panel uses the minimum amount of space.
-        let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
-        this._thirdIndicator.clutter_text.set_width(-1);
-        let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
-        if (statusTextWidth > prefWidth) {
-          this._thirdIndicator.clutter_text.set_width(prefWidth);
-        }
-        else {
-          this._thirdIndicator.clutter_text.set_width(-1);
-        }
-
-      }
     },
 
     _onActivePlayerRemove: function(manager) {
@@ -207,10 +205,14 @@ const Indicator = new Lang.Class({
     this._secondaryIndicator = this._addIndicator();
     this._secondaryIndicator.icon_name = 'media-playback-stop-symbolic';
     this._secondaryIndicator.style_class = 'secondary-indicator';
+    this._thirdIndicator = new St.Label({style_class: 'third-indicator'});
+    this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+    this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
+                                     y_align: St.Align.MIDDLE});
+    this.indicators.add_actor(this._thirdIndicatorBin);
     this.indicators.connect('scroll-event', Lang.bind(this, _onScrollEvent));
     this.indicators.connect('button-press-event', Lang.bind(this, _onButtonEvent));
     this.indicators.style_class = 'indicators';
-    this.indicators.hide();
   },
 
   set manager(manager) {
