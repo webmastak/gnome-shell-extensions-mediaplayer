@@ -33,7 +33,7 @@ const Lib = Me.imports.lib;
 let formatStateText = function(stateText, playerState) {
   return stateText.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
     let text = "";
-    if (playerState[fieldName] !== null) {
+    if (playerState[fieldName]) {
       text = playerState[fieldName].toString()
       .replace(/&/, "&amp;")
       .replace(/</, "&lt;")
@@ -162,6 +162,8 @@ const PanelIndicator = new Lang.Class({
       this._coverPath = "";
       this._coverSize = 22;
       this._state = "";
+
+      this.menu.actor.add_style_class_name('mediaplayer-menu');
 
       this.indicators = new St.BoxLayout({vertical: false, style_class: 'indicators'});
 
