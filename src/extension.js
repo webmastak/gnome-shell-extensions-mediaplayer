@@ -28,55 +28,57 @@ const Panel = Me.imports.panel;
 const Settings = Me.imports.settings;
 
 /* global values */
-let playerManager;
-let mediaplayerMenu;
+let manager;
 let indicator;
 
 function init() {
-    Lib.initTranslations(Me);
-    Settings.init();
-    Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {
-        disable();
-        enable();
-    });
+  Lib.initTranslations(Me);
+  Settings.init();
+  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {
+    disable();
+    enable();
+  });
 }
 
 function enable() {
-    let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY);
+  let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY),
+      menu;
 
-    if (position == Settings.IndicatorPosition.VOLUMEMENU)
-        mediaplayerMenu = Main.panel.statusArea.aggregateMenu;
-    else {
-        mediaplayerMenu = new Panel.MediaplayerStatusButton();
-        if (position == Settings.IndicatorPosition.RIGHT)
-            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu);
-        else if (position == Settings.IndicatorPosition.CENTER)
-            Main.panel.addToStatusArea('mediaplayer', mediaplayerMenu, 999, 'center');
-    }
+  if (position == Settings.IndicatorPosition.VOLUMEMENU) {
+    indicator = new Panel.AggregateMenuIndicator();
+    menu = Main.panel.statusArea.aggregateMenu.menu;
+  }
+  else {
+    indicator = new Panel.PanelIndicator();
+    menu = indicator.menu;
+  }
 
-    playerManager = new Manager.PlayerManager(mediaplayerMenu);
+  manager = new Manager.PlayerManager(menu);
 
-    if (position == Settings.IndicatorPosition.VOLUMEMENU) {
-      indicator = new Panel.Indicator(playerManager);
-      let nbIndicators = mediaplayerMenu._indicators.get_children().length;
-      mediaplayerMenu._indicators.insert_child_at_index(indicator.indicators, nbIndicators - 1);
-      indicator.manager = playerManager;
-    }
-    else {
-      mediaplayerMenu.manager = playerManager;
-    }
+  if (position == Settings.IndicatorPosition.RIGHT) {
+    Main.panel.addToStatusArea('mediaplayer', indicator);
+  }
+  else if (position == Settings.IndicatorPosition.CENTER) {
+    Main.panel.addToStatusArea('mediaplayer', indicator, 999, 'center');
+  }
+  else {
+    let indicatorIndex = Main.panel.statusArea.aggregateMenu._indicators.get_children().length - 1;
+    Main.panel.statusArea.aggregateMenu._indicators.insert_child_at_index(indicator.indicators,
+                                                                          indicatorIndex);
+  }
 
+  indicator.manager = manager;
 }
 
 function disable() {
-    playerManager.destroy();
-    playerManager = null;
-    if (mediaplayerMenu instanceof Panel.MediaplayerStatusButton) {
-      mediaplayerMenu.destroy();
-      mediaplayerMenu = null;
-    }
-    else {
-      indicator.indicators.destroy();
-      indicator = null;
-    }
+  manager.destroy();
+  manager = null;
+  if (indicator instanceof Panel.PanelIndicator) {
+    indicator.destroy();
+    indicator = null;
+  }
+  else {
+    indicator.indicators.destroy();
+    indicator = null;
+  }
 }
