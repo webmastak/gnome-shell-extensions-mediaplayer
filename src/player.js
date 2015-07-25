@@ -371,44 +371,21 @@ const MPRISPlayer = new Lang.Class({
           this._refreshProperties();
         }
 
-        if (metadata["xesam:artist"]) {
-          state.trackArtist = metadata["xesam:artist"].deep_unpack();
-        }
-
-        if (metadata["xesam:album"]) {
-          state.trackAlbum = metadata["xesam:album"].unpack();
-        }
-
-        if (metadata["xesam:title"]) {
-          state.trackTitle = metadata["xesam:title"].unpack();
-        }
-
-        if (metadata["xesam:trackNumber"]) {
-          state.trackNumber = metadata["xesam:trackNumber"].unpack();
-        }
-
-        if (metadata["xesam:url"]) {
-          state.trackUrl = metadata["xesam:url"].unpack();
-        }
-
-        if (metadata["mpris:trackid"]) {
-          state.trackObj = metadata["mpris:trackid"].unpack();
-        }
+        state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : "";
+        state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
+        state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
+        state.trackNumber = metadata["xesam:trackNumber"] ? metadata["xesam:trackNumber"].unpack() : "";
+        state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
+        state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "";
+        state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
 
         let rating = 0;
         if (metadata["xesam:userRating"])
           rating = (metadata["xesam:userRating"].deep_unpack() * 5);
         // Clementine
-        if (metadata["rating"])
-          rating = metadata["rating"].deep_unpack();
+        if (metadata.rating)
+          rating = metadata.rating.deep_unpack();
         state.trackRating = parseInt(rating);
-
-        if (metadata["mpris:artUrl"]) {
-          state.trackCoverUrl = metadata["mpris:artUrl"].unpack();
-        }
-        else {
-          state.trackCoverUrl = '';
-        }
       }
     },
 
