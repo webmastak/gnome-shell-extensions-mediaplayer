@@ -115,11 +115,15 @@ const MediaplayerStatusButton = new Lang.Class({
 
     _formatStateText: function(stateText, playerState) {
       return stateText.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
-        return playerState[fieldName]  + appendText || "";
-      })
-      .replace(/&/, "&amp;")
-      .replace(/</, "&lt;")
-      .replace(/>/, "&gt;");
+        let text = "";
+        if (playerState[fieldName] !== null) {
+          text = playerState[fieldName].toString()
+                 .replace(/&/, "&amp;")
+                 .replace(/</, "&lt;")
+                 .replace(/>/, "&gt;") + appendText;
+        }
+        return text;
+      });
     },
 
     _onActivePlayerUpdate: function(manager, state) {
