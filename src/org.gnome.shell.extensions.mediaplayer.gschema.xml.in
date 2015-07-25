@@ -62,5 +62,9 @@
         <_summary>Show the media player in the volume menu</_summary>
         <_description>Whether to show the mediaplayer controls in the volume menu.</_description>
     </key>
+    <key type="s" name="trackbox-template">
+      <default>'[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "{trackAlbum}", "style_class": "track-info"}]'</default>
+      <_summary>Template to render the trackbox</_summary>
+    </key>
   </schema>
 </schemalist>

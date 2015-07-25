@@ -1,5 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 /* jshint esnext: true */
+/* jshint -W097 */
 /* global imports: false */
 /**
     This program is free software: you can redistribute it and/or modify
@@ -36,8 +37,7 @@ const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_COVER_SIZE = 'coversize';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 const MEDIAPLAYER_RATING_KEY = 'rating';
-// OLD SETTING
-const MEDIAPLAYER_VOLUME_MENU_KEY = 'volumemenu';
+const MEDIAPLAYER_TRACKBOX_TEMPLATE = 'trackbox-template';
 
 const IndicatorPosition = {
     CENTER: 0,
@@ -65,21 +65,6 @@ const IndicatorStatusType = {
 };
 
 const DEFAULT_PLAYER_OWNER = "org.gnome.shell.extensions.mediaplayer";
-
-const TRACKBOX_CONTENTS = [
-  {
-    template: '<span font="12" weight="bold">{trackArtist}</span>',
-    style_class: "track-info"
-  },
-  {
-    template: '<span weight="bold">{trackTitle}</span>',
-    style_class: "track-info"
-  },
-  {
-    template: '<span size="small">{trackAlbum}</span>',
-    style_class: "track-info"
-  },
-];
 
 let gsettings;
 
