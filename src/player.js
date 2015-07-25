@@ -350,7 +350,7 @@ const MPRISPlayer = new Lang.Class({
           this.info.app = appSys.lookup_app(entry + ".desktop");
           this.info.appInfo = Gio.DesktopAppInfo.new(entry + ".desktop");
         }
-        global.log(this.info);
+        global.log(JSON.stringify(this.info));
     },
 
     _parseMetadata: function(metadata, state) {

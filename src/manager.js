@@ -238,24 +238,23 @@ const PlayerManager = new Lang.Class({
         else if (this.nbPlayers() > 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]) {
             this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
         }
-        this._hideOrShowMenu();
     },
 
     _getPlayerPosition: function() {
       let position = 0;
       if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) == Settings.IndicatorPosition.VOLUMEMENU)
-        position = this.menu.menu.numMenuItems - 2;
+        position = this.menu.numMenuItems - 2;
       return position;
     },
 
     _addPlayerToMenu: function(owner) {
       let position = this._getPlayerPosition();
-      this.menu.menu.addMenuItem(this._players[owner].ui, position);
+      this.menu.addMenuItem(this._players[owner].ui, position);
       this._refreshActivePlayer(this._players[owner].player);
     },
 
     _getMenuItem: function(position) {
-        let items = this.menu.menu.box.get_children().map(function(actor) {
+        let items = this.menu.box.get_children().map(function(actor) {
             return actor._delegate;
         });
         if (items[position])
@@ -270,20 +269,8 @@ const PlayerManager = new Lang.Class({
             item.destroy();
     },
 
-    _hideOrShowMenu: function() {
-        // Never hide the menu in this case
-        if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT) ||
-            Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) == Settings.IndicatorPosition.VOLUMEMENU) {
-            this.menu.actor.show();
-            return;
-        }
-        // No player or just the default player
-        if (this.nbPlayers() === 0 || (this.nbPlayers() == 1 && this._players[Settings.DEFAULT_PLAYER_OWNER]))
-          this.menu.actor.hide();
-    },
-
     _getPlayerMenuPosition: function(ui) {
-        let items = this.menu.menu.box.get_children().map(function(actor) {
+        let items = this.menu.box.get_children().map(function(actor) {
             return actor._delegate;
         });
         for (let i in items) {
