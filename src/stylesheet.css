@@ -52,6 +52,15 @@
     padding-bottom: 0.2em;
 }
 
+.track-info-big {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.track-info-medium {
+  font-weight: bold;
+}
+
 .track-rating {
     padding-top: 0.2em;
     font-size: 0.9em;
