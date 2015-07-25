@@ -54,3 +54,17 @@ function initTranslations(extension) {
         Gettext.bindtextdomain('gnome-shell-extensions-mediaplayer', extension.metadata.locale);
     }
 }
+
+let compileTemplate = function(template, playerState) {
+  return template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
+    let text = "";
+    if (playerState[fieldName]) {
+      text = playerState[fieldName].toString()
+      .replace(/&/, "&amp;")
+      .replace(/</, "&lt;")
+      .replace(/>/, "&gt;") + appendText;
+    }
+    return text;
+  });
+};
+

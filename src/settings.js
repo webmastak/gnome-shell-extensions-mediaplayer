@@ -66,6 +66,21 @@ const IndicatorStatusType = {
 
 const DEFAULT_PLAYER_OWNER = "org.gnome.shell.extensions.mediaplayer";
 
+const TRACKBOX_CONTENTS = [
+  {
+    template: '<span font="12" weight="bold">{trackArtist}</span>',
+    style_class: "track-info"
+  },
+  {
+    template: '<span weight="bold">{trackTitle}</span>',
+    style_class: "track-info"
+  },
+  {
+    template: '<span size="small">{trackAlbum}</span>',
+    style_class: "track-info"
+  },
+];
+
 let gsettings;
 
 function init() {
