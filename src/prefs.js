@@ -30,7 +30,6 @@ const Lib = Me.imports.lib;
 let gsettings;
 let settings;
 let settings_indicator;
-let vbox_indicator;
 
 function init() {
     Lib.initTranslations(Me);
@@ -45,6 +44,28 @@ function init() {
                 { nick: "right", name: _("Right"), id: 1 },
                 { nick: "volume-menu", name: _("Volume menu integration"), id: 2 }
             ]
+        },
+        status_type: {
+            type: "e",
+            label: _("Appearance"),
+            list: [
+                { nick: "icon", name: _("Symbolic icon"), id: 0 },
+                { nick: "cover", name: _("Current album cover"), id: 1 }
+            ]
+        },
+        status_text: {
+            type: "s",
+            label: _("Status text"),
+            help: _("{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
+        },
+        status_size: {
+            type: "r",
+            label: _("Status text width"),
+            help: _("The the maximum width before the status text gets an ellipsis. Default is 300px."),
+            min: 100,
+            max: 900,
+            step: 5,
+            default: 300
         },
         rundefault: {
             type: "b",
@@ -69,30 +90,6 @@ function init() {
             help: _("Display the currently playing song's rating on a 0 to 5 scale")
         }
     };
-    settings_indicator = {
-        status_type: {
-            type: "e",
-            label: _("Appearance"),
-            list: [
-                { nick: "icon", name: _("Symbolic icon"), id: 0 },
-                { nick: "cover", name: _("Current album cover"), id: 1 }
-            ]
-        },
-        status_text: {
-            type: "s",
-            label: _("Status text"),
-            help: _("{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
-        },
-        status_size: {
-            type: "r",
-            label: _("Status text width"),
-            help: _("The the maximum width before the status text gets an ellipsis. Default is 300px."),
-            min: 100,
-            max: 900,
-            step: 5,
-            default: 300
-        }
-    };
 }
 
 function buildPrefsWidget() {
@@ -100,27 +97,15 @@ function buildPrefsWidget() {
                              border_width: 10});
     let vbox = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
                             margin: 20, margin_top: 10 });
-    vbox_indicator = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
-                                  margin_left: 30, margin_bottom: 10});
     let hbox;
-
-    for (let setting_indicator in settings_indicator) {
-        hbox = buildHbox(settings_indicator, setting_indicator);
-        vbox_indicator.add(hbox);
-    }
 
     for (let setting in settings) {
         hbox = buildHbox(settings, setting);
         vbox.add(hbox);
-        if (setting == "indicator_position")
-            vbox.add(vbox_indicator);
     }
 
     frame.add(vbox);
     frame.show_all();
-
-    if (gsettings.get_enum("indicator-position") == 2)
-        vbox_indicator.hide();
 
     return frame;
 }
@@ -174,13 +159,6 @@ function createEnumSetting(settings, setting) {
 
         let id = model.get_value(iter, 0);
         gsettings.set_enum(setting.replace('_', '-'), id);
-
-        if (setting == "indicator_position") {
-            if (gsettings.get_enum("indicator-position") == 2)
-                vbox_indicator.hide();
-            else
-                vbox_indicator.show();
-        }
     });
 
     if (settings[setting].help) {
