@@ -211,37 +211,30 @@ const TrackBox = new Lang.Class({
     }
 });
 
-const TrackTitle = new Lang.Class({
-    Name: "TrackTitle",
+const TrackInfo = new Lang.Class({
+    Name: "TrackInfo",
 
-    _init: function(prepend, text, style) {
-        this.actor = new St.BoxLayout({style_class: style, vertical: false});
-        this.actor._delegate = this;
+    _init: function(text, style) {
+      this.actor = new St.BoxLayout({style_class: style, vertical: false});
+      this.actor._delegate = this;
 
-        this._label = new St.Label({style_class: 'popup-inactive-menu-item'});
-        if (prepend) {
-            this._prepend = new St.Label({text: prepend + " "});
-            this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.actor.add(this._prepend);
-            this.actor.add(this._label, {expand: true});
-        }
-        else
-            this.actor.add(this._label, {expand: true});
+      this._label = new St.Label({style_class: 'popup-inactive-menu-item'});
+      this.actor.add(this._label, {expand: true});
 
-        this.setText(text);
+      this.setText(text);
     },
 
     setText: function(text) {
-        if (this._label.clutter_text) {
-            this._label.clutter_text.line_wrap = true;
-            this._label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-            this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this._label.clutter_text.set_text(text.toString());
-        }
+      if (this._label.clutter_text) {
+        this._label.clutter_text.line_wrap = true;
+        this._label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._label.clutter_text.set_markup(text);
+      }
     },
 
     getText: function() {
-        return this._label.text;
+      return this._label.text;
     }
 });
 

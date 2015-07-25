@@ -30,19 +30,6 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Lib = Me.imports.lib;
 
-let formatStateText = function(stateText, playerState) {
-  return stateText.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
-    let text = "";
-    if (playerState[fieldName]) {
-      text = playerState[fieldName].toString()
-      .replace(/&/, "&amp;")
-      .replace(/</, "&lt;")
-      .replace(/>/, "&gt;") + appendText;
-    }
-    return text;
-  });
-};
-
 const IndicatorMixin = {
 
   set manager(manager) {
@@ -91,7 +78,7 @@ const IndicatorMixin = {
       }
     }
     if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
-      let stateText = formatStateText(
+      let stateText = Lib.compileTemplate(
         Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
         state
       );

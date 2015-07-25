@@ -48,23 +48,12 @@
     padding-left: 0em;
 }
 
-.track-title {
-    padding-top: 0.2em;
-    font-size: 0.9em;
-}
-
-.track-artist {
-    font-weight: bold;
-    font-size: 1.1em;
-}
-
-.track-album {
-    padding-top: 0.2em;
-    font-size: 0.9em;
+.track-info {
+    padding-bottom: 0.2em;
 }
 
 .track-rating {
-    padding-top: 0.4em;
+    padding-top: 0.2em;
     font-size: 0.9em;
 }
 

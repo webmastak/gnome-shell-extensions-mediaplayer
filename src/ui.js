@@ -39,6 +39,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Widget = Me.imports.widget;
 const Settings = Me.imports.settings;
 const Player = Me.imports.player;
+const Lib = Me.imports.lib;
 
 const COVER_SIZE = 100;
 
@@ -214,12 +215,10 @@ const PlayerUI = new Lang.Class({
 
     if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
       this.trackBox.empty();
-      if (player.state.trackArtist)
-        this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackArtist, 'track-artist'));
-      if (player.state.trackTitle)
-        this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackTitle, 'track-title'));
-      if (player.state.trackAlbum)
-        this.trackBox.addInfo(new Widget.TrackTitle(null, player.state.trackAlbum, 'track-album'));
+      Settings.TRACKBOX_CONTENTS.forEach(Lang.bind(this, function(trackInfo) {
+        let text = Lib.compileTemplate(trackInfo.template, newState);
+        this.trackBox.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
+      }));
       if (player.state.trackRating !== null && this.showRating)
         this.trackBox.addInfo(new Widget.TrackRating(null, player.state.trackRating, 'track-rating', this.player));
     }
