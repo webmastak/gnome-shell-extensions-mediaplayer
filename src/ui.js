@@ -314,7 +314,7 @@ const PlayerUI = new Lang.Class({
         this.trackBox.showAnimate();
         if (this.showVolume)
           this.volume.actor.show();
-        if (this.showPosition)
+        if (this.showPosition && this.player.canSeek)
           this.position.actor.show();
       }
 
