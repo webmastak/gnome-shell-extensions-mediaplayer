@@ -185,9 +185,8 @@ const MPRISPlayer = new Lang.Class({
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
           let newState = new PlayerState();
 
-          if (props.Volume) {
+          if (props.Volume)
             newState.volume = props.Volume.unpack();
-          }
 
           if (props.PlaybackStatus) {
             let status = props.PlaybackStatus.unpack();
@@ -213,12 +212,6 @@ const MPRISPlayer = new Lang.Class({
           if (props.ActivePlaylist)
             this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
 
-          if (props.CanGoNext || props.CanGoPrevious || props.CanSeek) {
-            newState.canGoNext = props.CanGoNext.unpack() || true;
-            newState.canGoPrevious = props.CanGoPrevious.unpack() || true;
-            newState.canSeek = props.CanSeek.unpack() || true;
-          }
-
           this.emit('player-update', newState);
         }));
 
@@ -228,27 +221,20 @@ const MPRISPlayer = new Lang.Class({
           }
           // Banshee is buggy and always emits Seeked(0). See #34, #183,
           // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
-            else {
-                // If we caused the seek, just use the expected position.
-                // This is actually needed because even Get("Position")
-                // sometimes returns 0 immediately after seeking! *grumble*
-                if (this._wantedSeekValue > 0) {
-                    this.trackTime = this._wantedSeekValue / 1000000;
-                    this._wantedSeekValue = 0;
-                }
-                // If the seek was initiated by the player itself, query it
-                // for the new position.
-                else {
-                    this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
-                        if (err) {
-                          this.emit('player-update', new PlayerState({showPosition: false}));
-                        }
-                        else {
-                          this.trackTime = value[0].unpack() / 1000000;
-                        }
-                    }));
-                }
+          else {
+            // If we caused the seek, just use the expected position.
+            // This is actually needed because even Get("Position")
+            // sometimes returns 0 immediately after seeking! *grumble*
+            if (this._wantedSeekValue > 0) {
+              this.trackTime = this._wantedSeekValue / 1000000;
+              this._wantedSeekValue = 0;
             }
+            // If the seek was initiated by the player itself, query it
+            // for the new position.
+            else {
+              this._getPosition();
+            }
+          }
         }));
 
         this.populate();
@@ -268,8 +254,6 @@ const MPRISPlayer = new Lang.Class({
     },
 
     populate: function() {
-      this._refreshProperties();
-
       let newState = new PlayerState({
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
@@ -354,39 +338,32 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _parseMetadata: function(metadata, state) {
-      // Pragha sends a metadata dict with one
-      // value on stop
-      if (metadata !== null && Object.keys(metadata).length > 1) {
-        // Check if the track has changed
-        let trackChanged = true;
-        // Check if the URL has changed
-        if (metadata["xesam:url"] && metadata["xesam:url"].unpack() == this.state.trackUrl)
-          trackChanged = false;
-        // Reset the timer only when the track has changed
-        if (trackChanged) {
-          this._trackTime = 0;
-          if (metadata["mpris:length"])
-            state.trackLength = metadata["mpris:length"].unpack() / 1000000;
-          // refresh properties
-          this._refreshProperties();
-        }
+      // Pragha sends a metadata dict with one value on stop
+      if (metadata === null || Object.keys(metadata).length < 2)
+        return;
 
-        state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : "";
-        state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
-        state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
-        state.trackNumber = metadata["xesam:trackNumber"] ? metadata["xesam:trackNumber"].unpack() : "";
-        state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
-        state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "";
-        state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
+      state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
+      state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : "";
+      state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
+      state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
+      state.trackNumber = metadata["xesam:trackNumber"] ? metadata["xesam:trackNumber"].unpack() : "";
+      state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
+      state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "";
+      state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
 
-        let rating = 0;
-        if (metadata["xesam:userRating"])
-          rating = (metadata["xesam:userRating"].deep_unpack() * 5);
-        // Clementine
-        if (metadata.rating)
-          rating = metadata.rating.deep_unpack();
-        state.trackRating = parseInt(rating);
+      // Check if the track has changed
+      if (state.trackUrl !== this.state.trackUrl) {
+        this._getPosition();
+        this._refreshProperties();
       }
+
+      let rating = 0;
+      if (metadata["xesam:userRating"])
+        rating = (metadata["xesam:userRating"].deep_unpack() * 5);
+      // Clementine
+      if (metadata.rating)
+        rating = metadata.rating.deep_unpack();
+      state.trackRating = parseInt(rating);
     },
 
     _refreshProperties: function() {
@@ -449,6 +426,17 @@ const MPRISPlayer = new Lang.Class({
                              }
                            })
                           );
+    },
+
+    _getPosition: function() {
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
+        if (err) {
+          this.emit('player-update', new PlayerState({showPosition: false}));
+        }
+        else {
+          this.trackTime = value[0].unpack() / 1000000;
+        }
+      }));
     },
 
     _onStatusChange: function() {

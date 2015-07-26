@@ -65,7 +65,6 @@ const PlayerMenu = new Lang.Class({
    *  or by the manager when another player menu
    * is opened */
   close: function(animate, force) {
-    global.log("close: " + force);
     if (force !== true)
       return;
     this.menu._close(BoxPointer.PopupAnimation.FULL);
