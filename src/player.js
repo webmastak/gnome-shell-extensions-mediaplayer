@@ -63,8 +63,8 @@ const PlayerState = new Lang.Class({
   trackArtist: null,
   trackUrl: null,
   trackCoverUrl: null,
-  trackLength: null,
   trackCoverPath: null,
+  trackLength: null,
   trackObj: null,
   trackRating: null,
 
@@ -111,6 +111,7 @@ const MPRISPlayer = new Lang.Class({
         this._currentPlaylist = "";
         this._trackTime = 0;
         this._wantedSeekValue = 0;
+        this._trackCoverFileTmp = null;
 
         this._timerId = 0;
         this._statusId = 0;
@@ -351,6 +352,29 @@ const MPRISPlayer = new Lang.Class({
       state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "";
       state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
 
+      if (state.trackCoverUrl !== null && state.trackCoverUrl !== this.state.trackCoverUrl) {
+        if (state.trackCoverUrl) {
+          let cover_path = "";
+          // Distant cover
+          if (state.trackCoverUrl.match(/^http/)) {
+            // Copy the cover to a tmp local file
+            let cover = Gio.file_new_for_uri(decodeURIComponent(state.trackCoverUrl));
+            // Don't create multiple tmp files
+            if (!this._trackCoverFileTmp)
+              this._trackCoverFileTmp = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
+            // asynchronous copy
+            cover.read_async(null, null, Lang.bind(this, this._onReadCover));
+          }
+          // Local cover
+          else if (state.trackCoverUrl.match(/^file/)) {
+            state.trackCoverPath = decodeURIComponent(state.trackCoverUrl.substr(7));
+          }
+        }
+        else {
+          state.trackCoverPath = '';
+        }
+      }
+
       // Check if the track has changed
       if (state.trackUrl !== this.state.trackUrl) {
         this._getPosition();
@@ -364,6 +388,19 @@ const MPRISPlayer = new Lang.Class({
       if (metadata.rating)
         rating = metadata.rating.deep_unpack();
       state.trackRating = parseInt(rating);
+    },
+
+    _onReadCover: function(cover, result) {
+      let inStream = cover.read_finish(result);
+      let outStream = this._trackCoverFileTmp.replace(null, false,
+                                                      Gio.FileCreateFlags.REPLACE_DESTINATION,
+                                                      null, null);
+      outStream.splice_async(inStream, Gio.OutputStreamSpliceFlags.CLOSE_TARGET,
+                             0, null, Lang.bind(this, function(outStream, result) {
+                               outStream.splice_finish(result, null);
+                               this.emit('player-update',
+                                         new PlayerState({trackCoverPath: this._trackCoverFileTmp.get_path()}));
+                             }));
     },
 
     _refreshProperties: function() {

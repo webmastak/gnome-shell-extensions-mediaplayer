@@ -20,6 +20,7 @@
 'use strict';
 
 const Lang = imports.lang;
+const Gio = imports.gi.Gio;
 const Clutter = imports.gi.Clutter;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
@@ -77,6 +78,7 @@ const IndicatorMixin = {
         this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
       }
     }
+
     if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
       let stateText = Lib.compileTemplate(
         Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
@@ -99,6 +101,20 @@ const IndicatorMixin = {
       }
       else {
         this._thirdIndicator.clutter_text.set_width(-1);
+      }
+    }
+
+    if (state.trackCoverPath !== null) {
+      if (state.trackCoverPath &&
+          Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
+        this._primaryIndicator.gicon = new Gio.FileIcon({
+          file: Gio.File.new_for_path(state.trackCoverPath)
+        });
+        this._primaryIndicator.icon_size = 22;
+      }
+      else {
+        this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
+        this._primaryIndicator.icon_size = 16;
       }
     }
 
@@ -142,54 +158,32 @@ const PanelIndicator = new Lang.Class({
   Extends: PanelMenu.Button,
 
   _init: function() {
-      this.parent(0.0, "mediaplayer");
+    this.parent(0.0, "mediaplayer");
 
-      this._manager = null;
+    this._manager = null;
 
-      this._coverPath = "";
-      this._coverSize = 22;
-      this._state = "";
+    this.menu.actor.add_style_class_name('mediaplayer-menu');
 
-      this.menu.actor.add_style_class_name('mediaplayer-menu');
+    this.indicators = new St.BoxLayout({vertical: false, style_class: 'indicators'});
 
-      this.indicators = new St.BoxLayout({vertical: false, style_class: 'indicators'});
+    this._primaryIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
+                                          style_class: 'system-status-icon indicator'});
+    this._secondaryIndicator = new St.Icon({icon_name: 'media-playback-stop-symbolic',
+                                            style_class: 'secondary-indicator'});
+    this._secondaryIndicator.hide();
+    this._thirdIndicator = new St.Label({style_class: 'third-indicator'});
+    this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+    this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
+                                          y_align: St.Align.MIDDLE});
+    this._thirdIndicator.hide();
 
-      this._primaryIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
-                                            style_class: 'system-status-icon indicator'});
-      this._secondaryIndicator = new St.Icon({icon_name: 'media-playback-stop-symbolic',
-                                              style_class: 'secondary-indicator'});
-      this._secondaryIndicator.hide();
-      this._thirdIndicator = new St.Label({style_class: 'third-indicator'});
-      this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-      this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
-                                       y_align: St.Align.MIDDLE});
-      this._thirdIndicator.hide();
-      this.indicators.add(this._primaryIndicator);
-      this.indicators.add(this._secondaryIndicator);
-      this.indicators.add(this._thirdIndicatorBin);
+    this.indicators.add(this._primaryIndicator);
+    this.indicators.add(this._secondaryIndicator);
+    this.indicators.add(this._thirdIndicatorBin);
 
-      this.actor.add_actor(this.indicators);
-      this.actor.add_style_class_name('panel-status-button');
-      this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
-  },
-
-  _showCover: function(player) {
-      if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER &&
-              this._coverPath != player.trackCoverPath) {
-          this._coverPath = player.trackCoverPath;
-          // Change cover
-          if (this._coverPath && GLib.file_test(this._coverPath, GLib.FileTest.EXISTS)) {
-              let cover = new St.Bin();
-              let coverTexture = new Clutter.Texture({filter_quality: 2, filename: this._coverPath});
-              let [coverWidth, coverHeight] = coverTexture.get_base_size();
-              cover.height = this._coverSize;
-              cover.width = this._coverSize;
-              cover.set_child(coverTexture);
-              this._bin.set_child(cover);
-          }
-          else
-              this._bin.set_child(this._icon);
-      }
+    this.actor.add_actor(this.indicators);
+    this.actor.add_style_class_name('panel-status-button');
+    this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
   },
 
   // Override PanelMenu.Button._onEvent

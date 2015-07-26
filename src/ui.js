@@ -236,34 +236,6 @@ const PlayerUI = new Lang.Class({
       this.volume.setValue(value);
     }
 
-    if (newState.trackCoverUrl !== null && newState.trackCoverUrl !== this.trackCoverUrl) {
-      if (newState.trackCoverUrl) {
-        let cover_path = "";
-        // Distant cover
-        if (newState.trackCoverUrl.match(/^http/)) {
-          // hide current cover
-          this._hideCover();
-          // Copy the cover to a tmp local file
-          let cover = Gio.file_new_for_uri(decodeURIComponent(newState.trackCoverUrl));
-          // Don't create multiple tmp files
-          if (!this.trackCoverFileTmp)
-            this.trackCoverFileTmp = Gio.file_new_tmp('XXXXXX.mediaplayer-cover')[0];
-          // asynchronous copy
-          cover.read_async(null, null, Lang.bind(this, this._onReadCover));
-        }
-        // Local cover
-        else if (newState.trackCoverUrl.match(/^file/)) {
-          this.trackCoverPath = decodeURIComponent(newState.trackCoverUrl.substr(7));
-          this._showCover();
-        }
-      }
-      else {
-        this.trackCoverPath = false;
-        this._showCover();
-      }
-      this.trackCoverUrl = newState.trackCoverUrl;
-    }
-
     if (newState.canPause !== null) {
       if (newState.canPause)
         this.playButton.setCallback(Lang.bind(this.player, this.player.playPause));
@@ -360,24 +332,14 @@ const PlayerUI = new Lang.Class({
           playlistItem.setShowDot(false);
       });
     }
+
+    if (newState.trackCoverPath) {
+      this.hideCover();
+      this.showCover(newState.trackCoverPath);
+    }
   },
 
-  _onReadCover: function(cover, result) {
-    let inStream = cover.read_finish(result);
-    let outStream = this.trackCoverFileTmp.replace(null, false,
-                                                   Gio.FileCreateFlags.REPLACE_DESTINATION,
-                                                   null, null);
-    outStream.splice_async(inStream, Gio.OutputStreamSpliceFlags.CLOSE_TARGET,
-                           0, null, Lang.bind(this, this._onSavedCover));
-  },
-
-  _onSavedCover: function(outStream, result) {
-    outStream.splice_finish(result, null);
-    this.trackCoverPath = this.trackCoverFileTmp.get_path();
-    this._showCover();
-  },
-
-  _hideCover: function() {
+  hideCover: function() {
     Tweener.addTween(this.trackCover, {
       opacity: 0,
       time: 0.3,
@@ -385,20 +347,20 @@ const PlayerUI = new Lang.Class({
     });
   },
 
-  _showCover: function() {
+  showCover: function(coverPath) {
     Tweener.addTween(this.trackCover, {
       opacity: 0,
       time: 0.3,
       transition: 'easeOutCubic',
       onComplete: Lang.bind(this, function() {
         // Change cover
-        if (! this.trackCoverPath || ! GLib.file_test(this.trackCoverPath, GLib.FileTest.EXISTS)) {
+        if (! coverPath || ! GLib.file_test(coverPath, GLib.FileTest.EXISTS)) {
           let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
                                        icon_size: this.trackCover.child.icon_size});
           this.trackCover.child = coverIcon;
         }
         else {
-          let gicon = new Gio.FileIcon({file: Gio.File.new_for_path(this.trackCoverPath)});
+          let gicon = new Gio.FileIcon({file: Gio.File.new_for_path(coverPath)});
           let coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
                                        icon_size: this.trackCover.child.icon_size});
           this.trackCover.child = coverIcon;
