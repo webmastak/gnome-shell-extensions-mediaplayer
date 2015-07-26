@@ -197,7 +197,7 @@ const MPRISPlayer = new Lang.Class({
                 Mainloop.source_remove(this._statusId);
                 this._statusId = 0;
               }
-              this._statusId = Mainloop.timeout_add(300, Lang.bind(this, function() {
+              this._statusId = Mainloop.timeout_add(500, Lang.bind(this, function() {
                 this.emit('player-update', new PlayerState({status: status}));
               }));
             }
@@ -434,7 +434,12 @@ const MPRISPlayer = new Lang.Class({
           this.emit('player-update', new PlayerState({showPosition: false}));
         }
         else {
-          this.trackTime = value[0].unpack() / 1000000;
+          let position = value[0].unpack() / 1000000;
+          // Workaround for Banshee sending multiple Seeked
+          // signals with sometimes a value of 0
+          if (position === 0 && this.trackTime > 0)
+            return;
+          this.trackTime = position;
         }
       }));
     },
