@@ -472,10 +472,6 @@ const MPRISPlayer = new Lang.Class({
         }
         else {
           let position = value[0].unpack() / 1000000;
-          // Workaround for Banshee sending multiple Seeked
-          // signals with sometimes a value of 0
-          if (position === 0 && this.trackTime > 0)
-            return;
           this.trackTime = position;
         }
       }));
