@@ -70,12 +70,15 @@ const IndicatorMixin = {
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
+        this._thirdIndicator.show();
       }
       else if (state.status == Settings.Status.PAUSE) {
         this._secondaryIndicator.icon_name = "media-playback-pause-symbolic";
+        this._thirdIndicator.show();
       }
       else if (state.status == Settings.Status.STOP) {
         this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
+        this._thirdIndicator.hide();
       }
     }
 
@@ -84,13 +87,8 @@ const IndicatorMixin = {
         Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
         state
       );
-      if (stateText) {
-        this._thirdIndicator.clutter_text.set_markup(stateText);
-        this._thirdIndicator.show();
-      }
-      else {
-        this._thirdIndicator.hide();
-      }
+      this._thirdIndicator.clutter_text.set_markup(stateText);
+
       // If You just set width it will add blank space. This makes sure the
       // panel uses the minimum amount of space.
       let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
@@ -118,7 +116,6 @@ const IndicatorMixin = {
       }
     }
 
-    this._thirdIndicator.show();
     this._secondaryIndicator.show();
     this.indicators.show();
 
