@@ -10,7 +10,7 @@ in the GNOME Shell's system menu by default.
 
 ## Screenshot
 
-[![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/screenshot.png)]
+![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/screenshot.png)
 
 ## Features
 
