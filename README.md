@@ -2,47 +2,30 @@
 
 [![Join the chat at https://gitter.im/eonpatapon/gnome-shell-extensions-mediaplayer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eonpatapon/gnome-shell-extensions-mediaplayer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-gnome-shell-extensions-mediaplayer is a simple extension for controlling any
-MPRIS v2.1 capable media player.
+gnome-shell-extensions-mediaplayer is a gnome-shell extension for controlling
+any MPRIS v2.1 capable media player.
 
 This extension will monitor D-Bus for active players and automatically display them
-in the GNOME Shell's volume menu by default.
+in the GNOME Shell's system menu by default.
 
-## Screenshots
+## Screenshot
 
-Volume menu integration, rating support for Banshee, Rhythmbox. Support of
-playlists in Banshee (MPRIS 2.1 playlist interface)
+[Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/screenshot.png)
 
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer2.png)
+## Features
 
-- - -
-
-Indicator menu on the right with custom status text and current album cover
-
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer1.png)
-
-You can go to the next or previous track by using the mouse wheel on the status icon.
-You can also play or pause the player by clicking with the middle button on the status icon.
-
-You may also use the status icon to run your favorite media player if no player is running
-(see the ```rundefault``` setting below).
-
-The current track rating can also be displayed and changed depending of the
-player you are using (see the ```rating``` setting below).
-
-- - -
-
-Centered indicator with custom status text
-
-![Screenshot](https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/mediaplayer3.png)
+- 3 positions: center or right in its own menu, or in the system menu
+- support multiple players
+- interactive indicator icon: scroll (next/previous), middle click (play/pause)
+- playlist support (org.mpris.MediaPlayer2.Playlists interface)
+- rating support (see notes below)
+- and more...
 
 - - -
 
 gnome-shell-extensions-mediaplayer can be easily configured through
-http://extensions.gnome.org as well as command-line (all settings are
+http://extensions.gnome.org or Tweak Tool as well as command-line (all settings are
 listed below).
-
-![Screenshot](http://github.com/eonpatapon/gnome-shell-extensions-mediaplayer/raw/master/data/prefs.png)
 
 ## Installation
 
@@ -58,7 +41,7 @@ listed below).
 
 ### Manual installation
 
-Git branches `master` and `devel` work with GNOME Shell 3.10 up to 3.14.
+Git branches `master` and `devel` work with GNOME Shell 3.10 up to 3.16+.
 
 Other branches: gnome-shell-3.0, gnome-shell-3.2, gnome-shell-3.8 (for g-s 3.4 up to 3.8)
 
@@ -81,44 +64,34 @@ Restart the shell and then enable the extension.
 
 All settings can be changed from within the `gnome-shell-extension-prefs` tool, or from the command line.
 
-  * **Position of the indicator:** (default: 'volume-menu')
+ * **Position of the indicator:** (default: 'volume-menu')
 
         gsettings set org.gnome.shell.extensions.mediaplayer indicator-position 'center'|'right'|'volume-menu'
 
-  * **Start the default media player by clicking on the status icon if no player is running:** (default: false)
+ * **Show the default media player in the menu if no other player is running:** (default: false)
 
         gsettings set org.gnome.shell.extensions.mediaplayer rundefault true
 
     You can configure the default media player in GNOME System Settings, under *Details
     → Default Applications*.
 
-    Note: This setting has only effect if indicator-position is 'center' or 'right'.
-
-  * **Indicator appearance:** (default: 'icon')
+ * **Indicator appearance:** (default: 'icon')
 
         gsettings set org.gnome.shell.extensions.mediaplayer status-type 'icon'|'cover'
 
-    Note: This setting has only effect if indicator-position is 'center' or 'right'.
+ * **Hide the position slider:** (default: true)
 
-  * **Indicator status text:** (default: empty)
+        gsettings set org.gnome.shell.extensions.mediaplayer position false
 
-        gsettings set org.gnome.shell.extensions.mediaplayer status-text ' <span color="#76B0EC" font="9">{trackTitle}</span>'
-
-    The status text can be formatted with the Pango syntax. Placeholders will
-    be replace with the actual value of the playing track. Common placeholders
-    to use: trackAlbum, trackArtist, trackNumber, trackTitle...
-
-    Note: This setting has only effect if indicator-position is 'center' or 'right'.
-
-  * **Show the volume control slider of the media player:** (default: false)
+ * **Show the volume control slider of the media player:** (default: false)
 
         gsettings set org.gnome.shell.extensions.mediaplayer volume true
 
-  * **Show the playlists of the media player:** (default: false)
+ * **Show the playlists of the media player:** (default: false)
 
         gsettings set org.gnome.shell.extensions.mediaplayer playlists true
 
-  * **Show the rating of the current track:** (default: false)
+ * **Show the rating of the current track:** (default: false)
 
         gsettings set org.gnome.shell.extensions.mediaplayer rating true
 
@@ -126,6 +99,7 @@ All settings can be changed from within the `gnome-shell-extension-prefs` tool, 
 
       * Banshee (get/set)
       * Rhythmbox (get/set)
+      * Guayadeque (get/set)
       * Clementine (get)
       * Amarok (get)
 
@@ -134,13 +108,32 @@ All settings can be changed from within the `gnome-shell-extension-prefs` tool, 
     for some players there will be no support to get/set the rating from this extension.
     For example, Clementine does not offer any way to set the rating of a song except from the Clementine GUI (http://bit.ly/INFEon).
 
-  * **Hide the position slider:** (default: true)
+ * **Indicator status text template:** (default: '')
 
-        gsettings set org.gnome.shell.extensions.mediaplayer position false
+        gsettings set org.gnome.shell.extensions.mediaplayer status-text '<span color="#76B0EC" font="9">{trackTitle}</span>'
 
-  * **Set the size of the cover:** (default: 80)
+    The status template text can be formatted with the [Pango markup](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html)
+    syntax. Placeholders will be replaced with the actual value of the playing track.
 
-        gsettings set org.gnome.shell.extensions.mediaplayer coversize 100
+    Common placeholders to use: trackAlbum, trackArtist, trackNumber, trackTitle...
+
+    You can also append text to the placeholder only if it has a value.
+    For example with the template ``{trackAlbum| - }{trackTitle}`` the ``-`` will be
+    displayed only if the current track has an album defined.
+
+ * **Menu track informations template:** (default: ``'[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "{trackAlbum}", "style_class": "track-info"}]'``)
+
+    The track informations (title, album, artist) that are displayed in the menu can be customized
+    with this setting. The value must be a valid JSON string. The value is a list of objects with
+    two attributes: ``template`` and ``style_class``. ``template`` is the text of the line containing
+    placeholders that will be replaced by the current track values. ``style_class`` is the CSS classes
+    applied to the line.
+
+    For example, if you wish to include the number of the track before the track title, you can do:
+
+        gsettings --schemadir .local/share/gnome-shell/extensions/mediaplayer@patapon.info/schemas/ set org.gnome.shell.extensions.mediaplayer trackbox-template '[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackNumber|. }{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "<span color=\\"#aaa\\">{trackAlbum}</span>", "style_class": "track-info"}]'
+
+    See the previous setting for more information about template formatting.
 
 ## Compatible players
 
@@ -177,6 +170,7 @@ This extension has been tested with:
   * Totem (≥ 3.1.91, with "D-Bus Service" plugin)
   * VLC (≥ 2.0, with "dbus" control interface)
   * XBMC (with "MPRIS D-Bus interface" add-on)
+  * Lollypop
   * *and more...*
 
 ## Known bugs
