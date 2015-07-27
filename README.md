@@ -64,6 +64,9 @@ Restart the shell and then enable the extension.
 
 All settings can be changed from within the `gnome-shell-extension-prefs` tool, or from the command line.
 
+    If the extension is not installed from a package of your distribution, replace ``gsettings`` by
+    ``gsettings --schemadir .local/share/gnome-shell/extensions/mediaplayer@patapon.info/schemas/``
+
  * **Position of the indicator:** (default: 'volume-menu')
 
         gsettings set org.gnome.shell.extensions.mediaplayer indicator-position 'center'|'right'|'volume-menu'
@@ -131,7 +134,7 @@ All settings can be changed from within the `gnome-shell-extension-prefs` tool, 
 
     For example, if you wish to include the number of the track before the track title, you can do:
 
-        gsettings --schemadir .local/share/gnome-shell/extensions/mediaplayer@patapon.info/schemas/ set org.gnome.shell.extensions.mediaplayer trackbox-template '[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackNumber|. }{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "<span color=\\"#aaa\\">{trackAlbum}</span>", "style_class": "track-info"}]'
+        gsettings set org.gnome.shell.extensions.mediaplayer trackbox-template '[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackNumber|. }{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "<span color=\\"#aaa\\">{trackAlbum}</span>", "style_class": "track-info"}]'
 
     See the previous setting for more information about template formatting.
 
