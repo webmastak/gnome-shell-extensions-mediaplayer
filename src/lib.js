@@ -68,3 +68,13 @@ let compileTemplate = function(template, playerState) {
   });
 };
 
+let _extends = function(object1, object2) {
+  Object.getOwnPropertyNames(object2).forEach(function(name, index) {
+    let desc = Object.getOwnPropertyDescriptor(object2, name);
+    if (! desc.writable)
+      Object.defineProperty(object1.prototype, name, desc);
+    else {
+      object1.prototype[name] = object2[name];
+    }
+  });
+};

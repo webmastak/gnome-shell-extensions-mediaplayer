@@ -119,11 +119,11 @@ const IndicatorMixin = {
     this._secondaryIndicator.show();
     this.indicators.show();
 
-    this._onActivePlayerUpdate(manager, state);
-  },
+    try {
+      this._onActivePlayerUpdate(manager, state);
+    }
+    catch (err) {}
 
-  _onActivePlayerUpdate: function(manager, state) {
-    // for subclass
   },
 
   _commonOnActivePlayerRemove: function(manager) {
@@ -137,11 +137,10 @@ const IndicatorMixin = {
       this.indicators.hide();
     }
 
-    this._onActivePlayerRemove(manager);
-  },
-
-  _onActivePlayerRemove: function(manager) {
-    // for subclass
+    try {
+      this._onActivePlayerRemove(manager);
+    }
+    catch (err) {}
   },
 
   _clearStateText: function() {
@@ -168,7 +167,7 @@ const PanelIndicator = new Lang.Class({
     this._secondaryIndicator = new St.Icon({icon_name: 'media-playback-stop-symbolic',
                                             style_class: 'secondary-indicator'});
     this._secondaryIndicator.hide();
-    this._thirdIndicator = new St.Label({style_class: 'third-indicator'});
+    this._thirdIndicator = new St.Label({style_class: 'system-status-icon third-indicator'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
                                           y_align: St.Align.MIDDLE});
@@ -189,7 +188,7 @@ const PanelIndicator = new Lang.Class({
       this.parent(actor, event);
   }
 });
-Lang.copyProperties(IndicatorMixin, PanelIndicator.prototype);
+Lib._extends(PanelIndicator, IndicatorMixin);
 
 const AggregateMenuIndicator = new Lang.Class({
   Name: 'AggregateMenuIndicator',
@@ -202,12 +201,11 @@ const AggregateMenuIndicator = new Lang.Class({
 
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-    this._primaryIndicator.add_style_class_name('indicator');
     this._secondaryIndicator = this._addIndicator();
     this._secondaryIndicator.icon_name = 'media-playback-stop-symbolic';
     this._secondaryIndicator.style_class = 'secondary-indicator';
     this._secondaryIndicator.hide();
-    this._thirdIndicator = new St.Label({style_class: 'third-indicator'});
+    this._thirdIndicator = new St.Label({style_class: 'system-status-icon third-indicator'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this._thirdIndicator.hide();
     this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
@@ -216,6 +214,20 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
     this.indicators.style_class = 'indicators';
+  },
+
+  _onActivePlayerUpdate: function(manager, state) {
+    if (this._secondaryIndicator.visible)
+      this._primaryIndicator.add_style_class_name('indicator');
+    else
+      this._primaryIndicator.remove_style_class_name('indicator');
+  },
+
+  _onActivePlayerRemove: function(manager, state) {
+    if (this._secondaryIndicator.visible)
+      this._primaryIndicator.add_style_class_name('indicator');
+    else
+      this._primaryIndicator.remove_style_class_name('indicator');
   }
 });
-Lang.copyProperties(IndicatorMixin, AggregateMenuIndicator.prototype);
+Lib._extends(AggregateMenuIndicator, IndicatorMixin);
