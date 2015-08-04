@@ -61,13 +61,19 @@ const SEND_STOP_ON_CHANGE = [
 
 const IndicatorStatusType = {
     ICON: 0,
-    COVER: 1
+    COVER: 1,
+    PLAYER_ICON: 2
 };
 
 const DEFAULT_PLAYER_OWNER = "org.gnome.shell.extensions.mediaplayer";
 
 let gsettings;
+let icon_type;
 
 function init() {
     gsettings = Lib.getSettings(Me);
+    icon_type = gsettings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY);
+    gsettings.connect("changed::" + MEDIAPLAYER_STATUS_TYPE_KEY, function() {
+      icon_type = gsettings.get_enum(MEDIAPLAYER_STATUS_TYPE_KEY);
+    });
 }

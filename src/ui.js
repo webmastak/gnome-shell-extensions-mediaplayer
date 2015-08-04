@@ -122,6 +122,9 @@ const PlayerUI = new Lang.Class({
   _init: function(player) {
     this.parent(player.info.identity, true);
     this.player = player;
+
+    this.icon.icon_name = "audio-x-generic-symbolic";
+
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
     this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
 
@@ -409,7 +412,12 @@ const PlayerUI = new Lang.Class({
   },
 
   updateInfo: function(player, playerInfo) {
-    this.icon.gicon = playerInfo.appInfo.get_icon();
+    if (Settings.icon_type == Settings.IndicatorStatusType.PLAYER_ICON) {
+      this.icon.gicon = playerInfo.appInfo.get_icon();
+    }
+    else {
+      this.icon.icon_name = "audio-x-generic-symbolic";
+    }
     this.label.text = playerInfo.identity;
   },
 

@@ -115,6 +115,7 @@ const PlayerManager = new Lang.Class({
           this._players[owner].ui.menu.open();
       }
       this.emit('player-active-update', player.state);
+      this.emit('player-active-info-update', player.info);
     },
 
     nbPlayers: function() {
@@ -210,11 +211,13 @@ const PlayerManager = new Lang.Class({
         this._refreshActivePlayer(player);
     },
 
-    _onActivePlayerUpdate: function(player, newState) {
-      this.emit('player-active-update', newState);
+    _onPlayerInfoUpdate: function(player, playerInfo) {
+      if (player == this.activePlayer)
+        this.emit('player-active-info-update', playerInfo);
     },
 
-    _onPlayerInfoUpdate: function(player, playerInfo) {
+    _onActivePlayerUpdate: function(player, newState) {
+      this.emit('player-active-update', newState);
     },
 
     _hideOtherPlayers: function(ui) {

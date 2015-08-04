@@ -37,6 +37,7 @@ const IndicatorMixin = {
     this._manager = manager;
     this.manager.connect('player-active-update', Lang.bind(this, this._commonOnActivePlayerUpdate));
     this.manager.connect('player-active-remove', Lang.bind(this, this._commonOnActivePlayerRemove));
+    this.manager.connect('player-active-info-update', Lang.bind(this, this._onActivePlayerInfoUpdate));
   },
 
   get manager() {
@@ -103,19 +104,19 @@ const IndicatorMixin = {
     }
 
     if (state.trackCoverPath !== null) {
-      if (state.trackCoverPath &&
-          Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
+      if (state.trackCoverPath && Settings.icon_type == Settings.IndicatorStatusType.COVER) {
         this._primaryIndicator.gicon = new Gio.FileIcon({
           file: Gio.File.new_for_path(state.trackCoverPath)
         });
         this._primaryIndicator.icon_size = 22;
       }
-      else {
+      else if (Settings.icon_type != Settings.IndicatorStatusType.PLAYER_ICON) {
         this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
         this._primaryIndicator.icon_size = 16;
       }
     }
 
+    this._primaryIndicator.add_style_class_name('indicator');
     this._secondaryIndicator.show();
     this.indicators.show();
 
@@ -124,6 +125,13 @@ const IndicatorMixin = {
     }
     catch (err) {}
 
+  },
+
+  _onActivePlayerInfoUpdate: function(manager, info) {
+    if (Settings.icon_type == Settings.IndicatorStatusType.PLAYER_ICON) {
+      this._primaryIndicator.gicon = info.appInfo.get_icon();
+      this._primaryIndicator.icon_size = 16;
+    }
   },
 
   _commonOnActivePlayerRemove: function(manager) {
@@ -135,6 +143,11 @@ const IndicatorMixin = {
     }
     else {
       this.indicators.hide();
+    }
+
+    if (!this._secondaryIndicator.visible) {
+      this._primaryIndicator.remove_style_class_name('indicator');
+      this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
     }
 
     try {
@@ -214,20 +227,6 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
     this.indicators.style_class = 'indicators';
-  },
-
-  _onActivePlayerUpdate: function(manager, state) {
-    if (this._secondaryIndicator.visible)
-      this._primaryIndicator.add_style_class_name('indicator');
-    else
-      this._primaryIndicator.remove_style_class_name('indicator');
-  },
-
-  _onActivePlayerRemove: function(manager, state) {
-    if (this._secondaryIndicator.visible)
-      this._primaryIndicator.add_style_class_name('indicator');
-    else
-      this._primaryIndicator.remove_style_class_name('indicator');
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);

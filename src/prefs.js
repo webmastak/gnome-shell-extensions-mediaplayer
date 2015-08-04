@@ -50,6 +50,7 @@ function init() {
             label: _("Appearance"),
             list: [
                 { nick: "icon", name: _("Symbolic icon"), id: 0 },
+                { nick: "player-icon", name: _("Player icon"), id: 2 },
                 { nick: "cover", name: _("Current album cover"), id: 1 }
             ]
         },
