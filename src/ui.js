@@ -41,8 +41,6 @@ const Settings = Me.imports.settings;
 const Player = Me.imports.player;
 const Lib = Me.imports.lib;
 
-const COVER_SIZE = 100;
-
 
 const PlayerMenu = new Lang.Class({
   Name: 'PlayerMenu',
@@ -137,7 +135,7 @@ const PlayerUI = new Lang.Class({
                                      x_align: St.Align.START,
                                      y_align: St.Align.START,
                                      child: new St.Icon({icon_name: "media-optical-cd-audio",
-                                                         icon_size: COVER_SIZE})});
+                                                         icon_size: Settings.COVER_SIZE})});
     this.trackCover.connect('clicked', Lang.bind(this, this._toggleCover));
 
     this.trackBox = new Widget.TrackBox(this.trackCover);
