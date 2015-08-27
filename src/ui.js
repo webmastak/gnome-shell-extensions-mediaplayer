@@ -101,7 +101,7 @@ const DefaultPlayerUI = new Lang.Class({
       let appInfo = Gio.DesktopAppInfo.new(this.app.get_id());
 
       this.label = new St.Label({text: this.app.get_name()});
-      this.icon = new St.Icon({gicon: appInfo.get_icon(), style_class: 'popup-menu-icon'});
+      this.icon = new St.Icon({icon_name: 'audio-x-generic-symbolic', style_class: 'popup-menu-icon'});
 
       this.actor.add_child(this.icon);
       this.actor.add_child(this.label);
@@ -121,6 +121,7 @@ const PlayerUI = new Lang.Class({
 
   _init: function(player) {
     this.parent(player.info.identity, true);
+    this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
     this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
@@ -409,7 +410,6 @@ const PlayerUI = new Lang.Class({
   },
 
   updateInfo: function(player, playerInfo) {
-    this.icon.gicon = playerInfo.appInfo.get_icon();
     this.label.text = playerInfo.identity;
   },
 
