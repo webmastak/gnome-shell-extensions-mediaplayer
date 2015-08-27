@@ -37,17 +37,16 @@ function init() {
     settings = {
         indicator_position: {
             type: "e",
-            label: _("Position in the top panel"),
-            help: _("Restart the shell to apply this setting."),
+            label: _("Indicator position"),
             list: [
                 { nick: "center", name: _("Center"), id: 0 },
                 { nick: "right", name: _("Right"), id: 1 },
-                { nick: "volume-menu", name: _("Volume menu integration"), id: 2 }
+                { nick: "volume-menu", name: _("System menu"), id: 2 }
             ]
         },
         status_type: {
             type: "e",
-            label: _("Appearance"),
+            label: _("Indicator appearance"),
             list: [
                 { nick: "icon", name: _("Symbolic icon"), id: 0 },
                 { nick: "cover", name: _("Current album cover"), id: 1 }
@@ -55,12 +54,12 @@ function init() {
         },
         status_text: {
             type: "s",
-            label: _("Status text"),
+            label: _("Indicator status text"),
             help: _("{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
         },
         status_size: {
             type: "r",
-            label: _("Status text width"),
+            label: _("Indicator status text width"),
             help: _("The the maximum width before the status text gets an ellipsis. Default is 300px."),
             min: 100,
             max: 900,
@@ -70,7 +69,6 @@ function init() {
         rundefault: {
             type: "b",
             label: _("Allow to start the default media player"),
-            help: _("Runs the default mediaplayer by clicking on the indicator or from the menu")
         },
         volume: {
             type: "b",

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 14:54+0100\n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
 "PO-Revision-Date: 2012-11-11 15:26+0100\n"
 "Last-Translator: Agilo Kern <prdiewelt@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,126 +17,141 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/extension.js:64
-msgid "Stopped"
-msgstr "Angehalten"
-
-#: ../src/extension.js:65
-msgid "Playing"
-msgstr "Spielt gerade"
-
-#: ../src/extension.js:66
-msgid "Paused"
-msgstr "Pausiert"
-
-#: ../src/extension.js:131
-#: ../src/extension.js:160
-msgid "rating"
-msgstr "Bewertung"
-
-#: ../src/extension.js:152
-msgid "by"
-msgstr "von"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "aus"
-
-#: ../src/extension.js:202
+#: ../src/ui.js:165
 msgid "Volume"
 msgstr "Lautstärke"
 
-#: ../src/extension.js:310
+#: ../src/ui.js:177
 msgid "Playlists"
 msgstr "Wiedergabelisten"
 
-#: ../src/extension.js:378
-msgid "Unknown Artist"
-msgstr "Unbekannter Interpret"
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Angehalten"
 
-#: ../src/extension.js:382
-msgid "Unknown Album"
-msgstr "Unbekanntes Album"
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Spielt gerade"
 
-#: ../src/extension.js:386
-msgid "Unknown Title"
-msgstr "Unbekannter Titel"
-
-#: ../src/prefs.js:37
-msgid "Position in the top panel"
-msgstr "Position in oberer Leiste"
-
-#: ../src/prefs.js:38
-msgid "Restart the shell to apply this setting."
-msgstr "Diese Einstellung wird nach Neustart der Shell angewendet."
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Pausiert"
 
 #: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr ""
+
+#: ../src/prefs.js:42
 msgid "Center"
 msgstr "Mittig"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:43
 msgid "Right"
 msgstr "Rechts"
 
-#: ../src/prefs.js:42
-msgid "Volume menu integration"
-msgstr "Integration im Lautstärkemenü"
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr ""
 
-#: ../src/prefs.js:47
-msgid "Show the media player volume slider"
-msgstr "Lautstärkeregler anzeigen"
-
-#: ../src/prefs.js:51
-msgid "Show the media player position slider"
-msgstr "Suchleiste anzeigen"
-
-#: ../src/prefs.js:55
-msgid "Show media player playlists"
-msgstr "Wiedergabelisten anzeigen"
-
-#: ../src/prefs.js:59
-msgid "Display song rating"
-msgstr "Bewertung anzeigen"
-
-#: ../src/prefs.js:60
-msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr "Zeigt eine Bewertungsskala von 0 bis 5 für das aktuelle Lied an"
-
-#: ../src/prefs.js:64
-msgid "Album cover size"
-msgstr "Größe der Albumbilder"
-
-#: ../src/prefs.js:65
-msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr "Größe der Albumbilder im Menü. Standard ist eine Breite von 80px."
-
-#: ../src/prefs.js:75
-msgid "Allow to start the default media player"
-msgstr "Es zulassen, die vorgegebene Medienwiedergabe aufzurufen"
-
-#: ../src/prefs.js:76
-msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr "Beim Klick auf die Anzeige die vorgegebene Medienwiedergabe aufrufen."
-
-#: ../src/prefs.js:80
-msgid "Appearance"
+#: ../src/prefs.js:49
+#, fuzzy
+msgid "Indicator appearance"
 msgstr "Aussehen"
 
-#: ../src/prefs.js:82
+#: ../src/prefs.js:51
 msgid "Symbolic icon"
 msgstr "Symbolisches Zeichen"
 
-#: ../src/prefs.js:83
+#: ../src/prefs.js:52
 msgid "Current album cover"
 msgstr "Aktuelles Albumbild"
 
-#: ../src/prefs.js:88
-msgid "Status text"
+#: ../src/prefs.js:57
+#, fuzzy
+msgid "Indicator status text"
 msgstr "Statusanzeige"
 
-#: ../src/prefs.js:89
-msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
-msgstr "%a: Künstler, %b: Album, %t: Titel. Pango-Auszeichnung wird unterstützt."
+#: ../src/prefs.js:58
+#, fuzzy
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
+msgstr ""
+"%a: Künstler, %b: Album, %t: Titel. Pango-Auszeichnung wird unterstützt."
+
+#: ../src/prefs.js:62
+#, fuzzy
+msgid "Indicator status text width"
+msgstr "Statusanzeige"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Es zulassen, die vorgegebene Medienwiedergabe aufzurufen"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Lautstärkeregler anzeigen"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Suchleiste anzeigen"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Wiedergabelisten anzeigen"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Bewertung anzeigen"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Zeigt eine Bewertungsskala von 0 bis 5 für das aktuelle Lied an"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Position in oberer Leiste"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Diese Einstellung wird nach Neustart der Shell angewendet."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "Integration im Lautstärkemenü"
+
+#, fuzzy
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr ""
+#~ "Beim Klick auf die Anzeige die vorgegebene Medienwiedergabe aufrufen."
+
+#~ msgid "rating"
+#~ msgstr "Bewertung"
+
+#~ msgid "by"
+#~ msgstr "von"
+
+#~ msgid "from"
+#~ msgstr "aus"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Unbekannter Interpret"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Unbekanntes Album"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Unbekannter Titel"
+
+#~ msgid "Album cover size"
+#~ msgstr "Größe der Albumbilder"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr "Größe der Albumbilder im Menü. Standard ist eine Breite von 80px."
 
 #~ msgid "Show the media player in the volume menu"
 #~ msgstr "Medienwiedergabe im Lautstärkemenü anzeigen"

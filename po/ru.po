@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 14:54+0100\n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
 "PO-Revision-Date: 2012-11-11 12:25+0300\n"
 "Last-Translator: Pavel Vasin\n"
 "Language-Team: Aries-Soft Roman aries-soft@mail.ru\n"
@@ -12,126 +12,140 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: ../src/extension.js:64
-msgid "Stopped"
-msgstr "Остановлено"
-
-#: ../src/extension.js:65
-msgid "Playing"
-msgstr "Проигрывается"
-
-#: ../src/extension.js:66
-msgid "Paused"
-msgstr "Пауза"
-
-#: ../src/extension.js:131 ../src/extension.js:160
-msgid "rating"
-msgstr "оценка"
-
-#: ../src/extension.js:152
-msgid "by"
-msgstr "исполняет"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "из альбома"
-
-#: ../src/extension.js:202
+#: ../src/ui.js:165
 msgid "Volume"
 msgstr "Громкость"
 
-#: ../src/extension.js:310
+#: ../src/ui.js:177
 msgid "Playlists"
 msgstr "Плейлисты"
 
-#: ../src/extension.js:378
-msgid "Unknown Artist"
-msgstr "Неизвестный исполнитель"
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Остановлено"
 
-#: ../src/extension.js:382
-msgid "Unknown Album"
-msgstr "Неизвестный альбом"
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Проигрывается"
 
-#: ../src/extension.js:386
-msgid "Unknown Title"
-msgstr "Неизвестное название"
-
-#: ../src/prefs.js:37
-msgid "Position in the top panel"
-msgstr "Расположение на панели"
-
-#: ../src/prefs.js:38
-msgid "Restart the shell to apply this setting."
-msgstr "Для этой опции требуется перезапуск gnome-shell."
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Пауза"
 
 #: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr ""
+
+#: ../src/prefs.js:42
 msgid "Center"
 msgstr "По центру"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:43
 msgid "Right"
 msgstr "Справа"
 
-#: ../src/prefs.js:42
-msgid "Volume menu integration"
-msgstr "В индикаторе громкости"
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr ""
 
-#: ../src/prefs.js:47
-msgid "Show the media player volume slider"
-msgstr "Показывать регулятор громкости"
-
-#: ../src/prefs.js:51
-msgid "Show the media player position slider"
-msgstr "Показывать регулятор позиции"
-
-#: ../src/prefs.js:55
-msgid "Show media player playlists"
-msgstr "Показывать плейлисты"
-
-#: ../src/prefs.js:59
-msgid "Display song rating"
-msgstr "Показывать оценку песен"
-
-#: ../src/prefs.js:60
-msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr "Показывать оценку текущей песни по шкале от 0 до 5"
-
-#: ../src/prefs.js:64
-msgid "Album cover size"
-msgstr "Размер обложки альбома"
-
-#: ../src/prefs.js:65
-msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr "Размер обложки, отображаемой в меню. По умолчанию 80 пикселей."
-
-#: ../src/prefs.js:75
-msgid "Allow to start the default media player"
-msgstr "Разрешить запуск плеера по умолчанию"
-
-#: ../src/prefs.js:76
-msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr "Запуск плеера кликом по иконке индикатора"
-
-#: ../src/prefs.js:80
-msgid "Appearance"
+#: ../src/prefs.js:49
+#, fuzzy
+msgid "Indicator appearance"
 msgstr "Внешний вид"
 
-#: ../src/prefs.js:82
+#: ../src/prefs.js:51
 msgid "Symbolic icon"
 msgstr "Иконка"
 
-#: ../src/prefs.js:83
+#: ../src/prefs.js:52
 msgid "Current album cover"
 msgstr "Обложка альбома"
 
-#: ../src/prefs.js:88
-msgid "Status text"
+#: ../src/prefs.js:57
+#, fuzzy
+msgid "Indicator status text"
 msgstr "Текст статуса"
 
-#: ../src/prefs.js:89
-msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+#: ../src/prefs.js:58
+#, fuzzy
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
 msgstr ""
 "%a: исполнитель, %b: альбом, %t: название. Поддерживается разметка Pango."
+
+#: ../src/prefs.js:62
+#, fuzzy
+msgid "Indicator status text width"
+msgstr "Текст статуса"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Разрешить запуск плеера по умолчанию"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Показывать регулятор громкости"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Показывать регулятор позиции"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Показывать плейлисты"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Показывать оценку песен"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Показывать оценку текущей песни по шкале от 0 до 5"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Расположение на панели"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Для этой опции требуется перезапуск gnome-shell."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "В индикаторе громкости"
+
+#, fuzzy
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr "Запуск плеера кликом по иконке индикатора"
+
+#~ msgid "rating"
+#~ msgstr "оценка"
+
+#~ msgid "by"
+#~ msgstr "исполняет"
+
+#~ msgid "from"
+#~ msgstr "из альбома"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Неизвестный исполнитель"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Неизвестный альбом"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Неизвестное название"
+
+#~ msgid "Album cover size"
+#~ msgstr "Размер обложки альбома"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr "Размер обложки, отображаемой в меню. По умолчанию 80 пикселей."
 
 #~ msgid "Show the media player in the volume menu"
 #~ msgstr "Встроить в индикатор громкости"

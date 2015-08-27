@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 14:54+0100\n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
 "PO-Revision-Date: 2013-04-03 20:47+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@gmail.com>\n"
 "Language-Team: VDTT <vistausss@gmail.com>\n"
@@ -18,128 +18,143 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: ../src/extension.js:64
-msgid "Stopped"
-msgstr "Gestopt"
-
-#: ../src/extension.js:65
-msgid "Playing"
-msgstr "Bezig met afspelen"
-
-#: ../src/extension.js:66
-msgid "Paused"
-msgstr "Gepauzeerd"
-
-#: ../src/extension.js:131 ../src/extension.js:160
-msgid "rating"
-msgstr "waardering"
-
-#: ../src/extension.js:152
-msgid "by"
-msgstr "door"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "van"
-
-#: ../src/extension.js:202
+#: ../src/ui.js:165
 msgid "Volume"
 msgstr "Volume"
 
-#: ../src/extension.js:310
+#: ../src/ui.js:177
 msgid "Playlists"
 msgstr "Afspeellijsten"
 
-#: ../src/extension.js:378
-msgid "Unknown Artist"
-msgstr "Onbekende artiest"
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Gestopt"
 
-#: ../src/extension.js:382
-msgid "Unknown Album"
-msgstr "Onbekend album"
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Bezig met afspelen"
 
-#: ../src/extension.js:386
-msgid "Unknown Title"
-msgstr "Onbekende titel"
-
-#: ../src/prefs.js:37
-msgid "Position in the top panel"
-msgstr "Locate op paneel"
-
-#: ../src/prefs.js:38
-msgid "Restart the shell to apply this setting."
-msgstr "Herstart Shell om deze instellingen toe te passen."
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Gepauzeerd"
 
 #: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr ""
+
+#: ../src/prefs.js:42
 msgid "Center"
 msgstr "Midden"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:43
 msgid "Right"
 msgstr "Rechts"
 
-#: ../src/prefs.js:42
-msgid "Volume menu integration"
-msgstr "Geïntegreerd in volumemenu"
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr ""
 
-#: ../src/prefs.js:47
+#: ../src/prefs.js:49
+#, fuzzy
+msgid "Indicator appearance"
+msgstr "Uiterlijk"
+
+#: ../src/prefs.js:51
+msgid "Symbolic icon"
+msgstr "Symbolisch pictogram"
+
+#: ../src/prefs.js:52
+msgid "Current album cover"
+msgstr "Huidige albumhoes"
+
+#: ../src/prefs.js:57
+#, fuzzy
+msgid "Indicator status text"
+msgstr "Statustekst"
+
+#: ../src/prefs.js:58
+#, fuzzy
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
+msgstr "%a: Artiest, %b: Album, %t: Titel. Pango-opmaak wordt ondersteund."
+
+#: ../src/prefs.js:62
+#, fuzzy
+msgid "Indicator status text width"
+msgstr "Statustekst"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Sta toe om de standaard mediaspeler te starten"
+
+#: ../src/prefs.js:75
 msgid "Show the media player volume slider"
 msgstr "Toon de volumeschuif van de mediaspeler"
 
-#: ../src/prefs.js:51
+#: ../src/prefs.js:79
 msgid "Show the media player position slider"
 msgstr "Toon de positieschuif van de mediaspeler"
 
-#: ../src/prefs.js:55
+#: ../src/prefs.js:83
 msgid "Show media player playlists"
 msgstr "Toon de afspeellijsten van de mediaspeler"
 
-#: ../src/prefs.js:59
+#: ../src/prefs.js:87
 msgid "Display song rating"
 msgstr "Toon nummerwaardering"
 
-#: ../src/prefs.js:60
+#: ../src/prefs.js:88
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr ""
 "Toon de waardering van het huidige afspelende nummer op een schaal van 0 tot "
 "5"
 
-#: ../src/prefs.js:64
-msgid "Album cover size"
-msgstr "Grootte van albumhoes"
+#~ msgid "Position in the top panel"
+#~ msgstr "Locate op paneel"
 
-#: ../src/prefs.js:65
-msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr ""
-"De grootte van de getoonde hoes in het menu. Standaardwaarde is 80px breed."
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Herstart Shell om deze instellingen toe te passen."
 
-#: ../src/prefs.js:75
-msgid "Allow to start the default media player"
-msgstr "Sta toe om de standaard mediaspeler te starten"
+#~ msgid "Volume menu integration"
+#~ msgstr "Geïntegreerd in volumemenu"
 
-#: ../src/prefs.js:76
-msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr "Start de standaard mediaspeler door te klikken op de indicator"
+#, fuzzy
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr "Start de standaard mediaspeler door te klikken op de indicator"
 
-#: ../src/prefs.js:80
-msgid "Appearance"
-msgstr "Uiterlijk"
+#~ msgid "rating"
+#~ msgstr "waardering"
 
-#: ../src/prefs.js:82
-msgid "Symbolic icon"
-msgstr "Symbolisch pictogram"
+#~ msgid "by"
+#~ msgstr "door"
 
-#: ../src/prefs.js:83
-msgid "Current album cover"
-msgstr "Huidige albumhoes"
+#~ msgid "from"
+#~ msgstr "van"
 
-#: ../src/prefs.js:88
-msgid "Status text"
-msgstr "Statustekst"
+#~ msgid "Unknown Artist"
+#~ msgstr "Onbekende artiest"
 
-#: ../src/prefs.js:89
-msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
-msgstr "%a: Artiest, %b: Album, %t: Titel. Pango-opmaak wordt ondersteund."
+#~ msgid "Unknown Album"
+#~ msgstr "Onbekend album"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Onbekende titel"
+
+#~ msgid "Album cover size"
+#~ msgstr "Grootte van albumhoes"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr ""
+#~ "De grootte van de getoonde hoes in het menu. Standaardwaarde is 80px "
+#~ "breed."
 
 #~ msgid "Show the media player in the volume menu"
 #~ msgstr "Mediaplayer im Lautstärkemenü anzeigen"

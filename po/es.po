@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-02 17:38+0100\n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
 "PO-Revision-Date: 2012-02-25 19:20+0100\n"
 "Last-Translator: Cristian Beroiza <cberoiza@gmail.com>\n"
 "Language-Team: Español;Castellano <juan@shoden.es> , <cberoiza@gmail.com>\n"
@@ -18,125 +18,143 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/extension.js:64
-msgid "Stopped"
-msgstr "Detenido"
-
-#: ../src/extension.js:65
-msgid "Playing"
-msgstr "Reproduciendo"
-
-#: ../src/extension.js:66
-msgid "Paused"
-msgstr "Pausado"
-
-#: ../src/extension.js:131 ../src/extension.js:160
-msgid "rating"
-msgstr "rating"
-
-#: ../src/extension.js:152
-msgid "by"
-msgstr "por"
-
-#: ../src/extension.js:153
-msgid "from"
-msgstr "de"
-
-#: ../src/extension.js:202
+#: ../src/ui.js:165
 msgid "Volume"
 msgstr "Volumen"
 
-#: ../src/extension.js:310
+#: ../src/ui.js:177
 msgid "Playlists"
 msgstr "Listas de reproducción"
 
-#: ../src/extension.js:378
-msgid "Unknown Artist"
-msgstr "Artista desconocido"
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Detenido"
 
-#: ../src/extension.js:382
-msgid "Unknown Album"
-msgstr "Álbum desconocido"
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Reproduciendo"
 
-#: ../src/extension.js:386
-msgid "Unknown Title"
-msgstr "Título desconocido"
-
-#: ../src/prefs.js:37
-msgid "Position in the top panel"
-msgstr "Posición en el panel superior"
-
-#: ../src/prefs.js:38
-msgid "Restart the shell to apply this setting."
-msgstr "Reinicie la shell para que los cambios tengan efecto."
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Pausado"
 
 #: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr ""
+
+#: ../src/prefs.js:42
 msgid "Center"
 msgstr "Centro"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:43
 msgid "Right"
 msgstr "Derecha"
 
-#: ../src/prefs.js:42
-msgid "Volume menu integration"
-msgstr "Integración con el menú de volumen"
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr ""
 
-#: ../src/prefs.js:47
-msgid "Show the media player volume slider"
-msgstr "Mostrar el ajuste deslizante de volumen del reproductor multimedia"
-
-#: ../src/prefs.js:51
-msgid "Show the media player position slider"
-msgstr "Mostrar el ajuste deslizante de posición del reproductor multimedia"
-
-#: ../src/prefs.js:55
-msgid "Show media player playlists"
-msgstr "Mostrar las listas de reproducción del reproductor multimedia"
-
-#: ../src/prefs.js:59
-msgid "Display song rating"
-msgstr "Mostrar el rating de la canción"
-
-#: ../src/prefs.js:60
-msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr "Mostrar el rating en una escala de 0 a 5 de la canción en reproducción"
-
-#: ../src/prefs.js:64
-msgid "Album cover size"
-msgstr "Tamaño de la portada del álbum"
-
-#: ../src/prefs.js:65
-msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr "El tamaño de la portada mostrada en el menú. Por defecto son 80px de ancho."
-
-#: ../src/prefs.js:75
-msgid "Allow to start the default media player"
-msgstr "Permitir el inicio del reproductor multimedia por defecto"
-
-#: ../src/prefs.js:76
-msgid "Runs the default mediaplayer by clicking on the indicator"
-msgstr "Iniciar el reproductor multimedia por defecto haciendo click en el indicador"
-
-#: ../src/prefs.js:80
-msgid "Appearance"
+#: ../src/prefs.js:49
+#, fuzzy
+msgid "Indicator appearance"
 msgstr "Apariencia"
 
-#: ../src/prefs.js:82
+#: ../src/prefs.js:51
 msgid "Symbolic icon"
 msgstr "Íconos simbólicos"
 
-#: ../src/prefs.js:83
+#: ../src/prefs.js:52
 msgid "Current album cover"
 msgstr "Portada del álbum actual"
 
-#: ../src/prefs.js:88
-msgid "Status text"
+#: ../src/prefs.js:57
+#, fuzzy
+msgid "Indicator status text"
 msgstr "Texto de estado"
 
-#: ../src/prefs.js:89
-msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+#: ../src/prefs.js:58
+#, fuzzy
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
 msgstr "%a: Artista, %b: Álbum, %t: Título. Compatible con sintaxis de Pango."
+
+#: ../src/prefs.js:62
+#, fuzzy
+msgid "Indicator status text width"
+msgstr "Texto de estado"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Permitir el inicio del reproductor multimedia por defecto"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Mostrar el ajuste deslizante de volumen del reproductor multimedia"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Mostrar el ajuste deslizante de posición del reproductor multimedia"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Mostrar las listas de reproducción del reproductor multimedia"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Mostrar el rating de la canción"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Mostrar el rating en una escala de 0 a 5 de la canción en reproducción"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Posición en el panel superior"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Reinicie la shell para que los cambios tengan efecto."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "Integración con el menú de volumen"
+
+#, fuzzy
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr ""
+#~ "Iniciar el reproductor multimedia por defecto haciendo click en el "
+#~ "indicador"
+
+#~ msgid "rating"
+#~ msgstr "rating"
+
+#~ msgid "by"
+#~ msgstr "por"
+
+#~ msgid "from"
+#~ msgstr "de"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Artista desconocido"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Álbum desconocido"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Título desconocido"
+
+#~ msgid "Album cover size"
+#~ msgstr "Tamaño de la portada del álbum"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr ""
+#~ "El tamaño de la portada mostrada en el menú. Por defecto son 80px de "
+#~ "ancho."
 
 #~ msgid "Schema \"%s\" not found."
 #~ msgstr "Esquema \"%s\" no encontrado."

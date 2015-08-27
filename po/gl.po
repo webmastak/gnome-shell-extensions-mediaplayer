@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-10 12:25+0200\n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
 "PO-Revision-Date: 2013-10-10 12:36+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: gnome-l10n-gl@gnome.org\n"
@@ -18,82 +18,122 @@ msgstr ""
 "X-Generator: Virtaal 0.7.1\n"
 "X-Project-Style: gnome\n"
 
-#: ../src/prefs.js:37
-msgid "Position in the top panel"
-msgstr "Posición no panel superior"
+#: ../src/ui.js:165
+msgid "Volume"
+msgstr ""
 
-#: ../src/prefs.js:38
-msgid "Restart the shell to apply this setting."
-msgstr "Reinicie o shell para aplicar esta configuración."
+#: ../src/ui.js:177
+msgid "Playlists"
+msgstr ""
+
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr ""
+
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr ""
+
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr ""
 
 #: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr ""
+
+#: ../src/prefs.js:42
 msgid "Center"
 msgstr "Centrado"
 
-#: ../src/prefs.js:41
+#: ../src/prefs.js:43
 msgid "Right"
 msgstr "Dereita"
 
-#: ../src/prefs.js:42
-msgid "Volume menu integration"
-msgstr "Integración do menú de son"
-
-#: ../src/prefs.js:47
-msgid "Allow to start the default media player"
-msgstr "Permitir iniciar o reprodutor multimedia predeterminado"
-
-#: ../src/prefs.js:48
-msgid ""
-"Runs the default mediaplayer by clicking on the indicator or from the menu"
+#: ../src/prefs.js:44
+msgid "System menu"
 msgstr ""
-"Executa o reprodutor multimedia predeterminado ao premer no indicador ou no "
-"menú"
 
-#: ../src/prefs.js:52
-msgid "Show the media player volume slider"
-msgstr "Mostrar o regulador de volume do reprodutor multimedia"
-
-#: ../src/prefs.js:56
-msgid "Show the media player position slider"
-msgstr "Mostrar o regulador de posición do reprodutor multimedia"
-
-#: ../src/prefs.js:60
-msgid "Show media player playlists"
-msgstr "Mostrar as listas de reprodución do reprodutor"
-
-#: ../src/prefs.js:64
-msgid "Display song rating"
-msgstr "Mostrar cualificacións de cancións"
-
-#: ../src/prefs.js:65
-msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr "Mostrar a cualificación da canción en reprodución nunha escala de 0 a 5"
-
-#: ../src/prefs.js:69
-msgid "Album cover size"
-msgstr "Tamaño da carátula do álbum"
-
-#: ../src/prefs.js:70
-msgid "The size of the cover displayed in the menu. Default is 80px width."
-msgstr ""
-"O tamaño da carátula do álbum mostrada no menú. Por omisión é 80px de ancho."
-
-#: ../src/prefs.js:80
-msgid "Appearance"
+#: ../src/prefs.js:49
+#, fuzzy
+msgid "Indicator appearance"
 msgstr "Aparencia"
 
-#: ../src/prefs.js:82
+#: ../src/prefs.js:51
 msgid "Symbolic icon"
 msgstr "Icona simbólica"
 
-#: ../src/prefs.js:83
+#: ../src/prefs.js:52
 msgid "Current album cover"
 msgstr "Carátula do álbum actual"
 
-#: ../src/prefs.js:88
-msgid "Status text"
+#: ../src/prefs.js:57
+#, fuzzy
+msgid "Indicator status text"
 msgstr "Texto de estado"
 
-#: ../src/prefs.js:89
-msgid "%a: Artist, %b: Album, %t: Title. Pango markup supported."
+#: ../src/prefs.js:58
+#, fuzzy
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
 msgstr "%a: Artista, %b: Álbum, %t: Título. Admítese marcado Pango."
+
+#: ../src/prefs.js:62
+#, fuzzy
+msgid "Indicator status text width"
+msgstr "Texto de estado"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Permitir iniciar o reprodutor multimedia predeterminado"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Mostrar o regulador de volume do reprodutor multimedia"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Mostrar o regulador de posición do reprodutor multimedia"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Mostrar as listas de reprodución do reprodutor"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Mostrar cualificacións de cancións"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr ""
+"Mostrar a cualificación da canción en reprodución nunha escala de 0 a 5"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Posición no panel superior"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Reinicie o shell para aplicar esta configuración."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "Integración do menú de son"
+
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr ""
+#~ "Executa o reprodutor multimedia predeterminado ao premer no indicador ou "
+#~ "no menú"
+
+#~ msgid "Album cover size"
+#~ msgstr "Tamaño da carátula do álbum"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr ""
+#~ "O tamaño da carátula do álbum mostrada no menú. Por omisión é 80px de "
+#~ "ancho."
