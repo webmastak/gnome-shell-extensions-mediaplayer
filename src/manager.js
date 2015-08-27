@@ -320,7 +320,6 @@ const PlayerManager = new Lang.Class({
         )[0] || null;
       }
       else {
-        global.log("no more players!");
         this.activePlayer = null;
       }
     },

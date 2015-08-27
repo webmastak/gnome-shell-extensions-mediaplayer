@@ -178,9 +178,6 @@ const PlayerUI = new Lang.Class({
 
   update: function(player, newState) {
 
-    global.log("#######################");
-    global.log(JSON.stringify(newState));
-
     if (newState.showRating !== null) {
       this.showRating = newState.showRating;
     }
