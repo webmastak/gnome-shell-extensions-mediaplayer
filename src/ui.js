@@ -307,20 +307,24 @@ const PlayerUI = new Lang.Class({
 
     if (newState.playlists) {
       newState.playlists.forEach(Lang.bind(this, function(playlist) {
-        global.log(playlist);
         let obj = playlist[0],
             name = playlist[1];
+        // Don't add video playlists
         if (obj.toString().search('Video') > 0)
-          return;
-        if (this.playlists.menu._getMenuItems().reduce(function(acc, menuItem) { if (menuItem.actor.obj == obj) return true; }, false)) {
-          global.log("return playlist");
+              return;
+        // Check if playlist is already in the menu
+        if (this.playlists.menu._getMenuItems().
+            filter(function(menuItem) { 
+              if (menuItem.actor.obj == obj)
+                return true;
+              return false;
+            }).length > 0) {
           return;
         }
         let playlistUI = new Widget.PlaylistItem(name, obj);
         playlistUI.connect('activate', Lang.bind(this, function(playlist) {
           this.player.playPlaylist(playlist.obj);
         }));
-        global.log("add " + playlistUI);
         this.playlists.menu.addMenuItem(playlistUI);
       }));
     }
