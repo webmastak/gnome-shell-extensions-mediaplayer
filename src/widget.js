@@ -306,6 +306,11 @@ const TrackRating = new Lang.Class({
     },
 
     setRating: function(value) {
+        value = Math.round(value);
+        if (value > 5)
+          value = 5;
+        if (value < 0)
+          value = 0;
         for (let i = 0; i < 5; i++) {
             this._starButton[i].child.icon_name = "non-starred-symbolic";
             this._starButton[i]._starred = false;
