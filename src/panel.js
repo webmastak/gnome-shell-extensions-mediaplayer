@@ -214,6 +214,8 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
     this.indicators.style_class = 'indicators';
+
+    this.indicators.hide();
   },
 
   _onActivePlayerUpdate: function(manager, state) {
@@ -224,10 +226,7 @@ const AggregateMenuIndicator = new Lang.Class({
   },
 
   _onActivePlayerRemove: function(manager, state) {
-    if (this._secondaryIndicator.visible)
-      this._primaryIndicator.add_style_class_name('indicator');
-    else
-      this._primaryIndicator.remove_style_class_name('indicator');
+    this.indicators.hide();
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);
