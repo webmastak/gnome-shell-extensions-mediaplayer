@@ -136,7 +136,7 @@ option to gsettings.**
 
     For example, if you wish to include the number of the track before the track title, you can do:
 
-        gsettings set org.gnome.shell.extensions.mediaplayer trackbox-template '[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackNumber|. }{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "<span color=\\"#aaa\\">{trackAlbum}</span>", "style_class": "track-info"}]'
+        gsettings set org.gnome.shell.extensions.mediaplayer trackbox-template '[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackNumber|. }{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "<span color=\"#aaa\">{trackAlbum}</span>", "style_class": "track-info"}]'
 
     See the previous setting for more information about template formatting.
 
