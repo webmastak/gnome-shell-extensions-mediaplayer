@@ -361,10 +361,10 @@ const TrackRating = new Lang.Class({
         </node>';
         const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
 
-        if (this._player.trackUrl) {
+        if (this._player.state.trackUrl) {
             let proxy = new Rhythmbox3Proxy(Gio.DBus.session, "org.gnome.Rhythmbox3",
                                             "/org/gnome/Rhythmbox3/RhythmDB");
-            proxy.SetEntryPropertiesRemote(this._player.trackUrl, {rating: GLib.Variant.new_double(value)});
+            proxy.SetEntryPropertiesRemote(this._player.state.trackUrl, {rating: GLib.Variant.new_double(value)});
             return true;
         }
 
