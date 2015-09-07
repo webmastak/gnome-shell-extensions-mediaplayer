@@ -5,15 +5,18 @@ configure
 config.log
 config.status
 aclocal.m4
+config/
 autom4te.cache/
 po/POTFILES
 po/stamp-it
+po/*.pot
 
 *~
 *.gmo
 metadata.json
 *.gschema.xml
 *.gschema.valid
+gschemas.compiled
 _build
 zip-files
 
