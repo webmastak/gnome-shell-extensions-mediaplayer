@@ -127,7 +127,9 @@ const PlayerUI = new Lang.Class({
     this.showRating = false;
     this.showVolume = false;
     this.showPosition = false;
-    this.showPlaylists = false;
+    this.showPlaylist = false;
+
+    this.activePlaylist = null;
 
     this.trackCoverUrl = false;
     this.trackCoverFileTmp = false;
@@ -301,42 +303,45 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.playlists) {
+      this.playlists.menu.removeAll();
       newState.playlists.forEach(Lang.bind(this, function(playlist) {
         let obj = playlist[0],
             name = playlist[1];
         // Don't add video playlists
         if (obj.toString().search('Video') > 0)
               return;
-        // Check if playlist is already in the menu
-        if (this.playlists.menu._getMenuItems().
-            filter(function(menuItem) { 
-              if (menuItem.actor.obj == obj)
-                return true;
-              return false;
-            }).length > 0) {
-          return;
-        }
         let playlistUI = new Widget.PlaylistItem(name, obj);
-        playlistUI.connect('activate', Lang.bind(this, function(playlist) {
-          this.player.playPlaylist(playlist.obj);
+        playlistUI.connect('activate', Lang.bind(this, function(playlistItem) {
+          this.setActivePlaylist(playlistItem.obj);
+          this.player.playPlaylist(playlistItem.obj);
         }));
         this.playlists.menu.addMenuItem(playlistUI);
       }));
+      if (this.activePlaylist) {
+        this.setActivePlaylist(this.activePlaylist);
+      }
     }
 
     if (newState.playlist) {
-      this.playlists.menu._getMenuItems().forEach(function(playlistItem) {
-        if (playlistItem.actor.obj == newState.playlist[0])
-          playlistItem.setShowDot(true);
-        else
-          playlistItem.setShowDot(false);
-      });
+      this.setActivePlaylist(newState.playlist);
     }
 
     if (newState.trackCoverPath) {
       this.hideCover();
       this.showCover(newState.trackCoverPath);
     }
+  },
+
+  setActivePlaylist: function(objPath) {
+    this.activePlaylist = objPath;
+    this.playlists.menu._getMenuItems().forEach(function(playlistItem) {
+      if (playlistItem.obj == objPath) {
+        playlistItem.setPlaylistActive(true);
+      }
+      else {
+        playlistItem.setPlaylistActive(false);
+      }
+    });
   },
 
   hideCover: function() {

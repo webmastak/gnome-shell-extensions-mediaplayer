@@ -68,7 +68,7 @@ const PlayerState = new Lang.Class({
   trackObj: null,
   trackRating: null,
 
-  showPlaylists: null,
+  showPlaylist: null,
   showRating: null,
   showVolume: null,
   showPosition: null,
@@ -179,9 +179,13 @@ const MPRISPlayer = new Lang.Class({
         // showPlaylists setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showPlaylists: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)}));
+            this.emit('player-update', new PlayerState({showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)}));
           }))
         );
+
+        this._playlistsId = this._mediaServerPlaylists.connectSignal('PlaylistChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
+          this._getPlaylists();
+        }));
 
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
           let newState = new PlayerState();
@@ -209,9 +213,6 @@ const MPRISPlayer = new Lang.Class({
 
           if (props.Metadata)
             this._parseMetadata(props.Metadata.deep_unpack(), newState);
-
-          if (props.ActivePlaylist)
-            this._setActivePlaylist(props.ActivePlaylist.deep_unpack());
 
           this.emit('player-update', newState);
         }));
@@ -259,25 +260,20 @@ const MPRISPlayer = new Lang.Class({
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
         showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
-        showPlaylists: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
+        showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
         volume: this._mediaServerPlayer.Volume,
         status: this._mediaServerPlayer.PlaybackStatus
       });
 
-      if (this._mediaServerPlaylists.ActivePlaylist)
-        newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1];
-
-      this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, function(playlists) {
-        if (playlists && playlists[0])
-          this.emit('player-update', new PlayerState({playlists: playlists[0]}));
-        else
-          this.emit('player-update', new PlayerState({showPlaylists:false}));
-      }));
+      if (this._mediaServerPlaylists.ActivePlaylist) {
+        newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1][0];
+      }
 
       this._parseMetadata(this._mediaServerPlayer.Metadata, newState);
 
       this.emit('player-update', newState);
-
+      
+      this._getPlaylists();
       this._getPlayerInfo();
 
       this.emit('player-update-info', this.info);
@@ -315,7 +311,7 @@ const MPRISPlayer = new Lang.Class({
 
     playPlaylist: function(playlist) {
       this._mediaServerPlaylists.ActivatePlaylistRemote(playlist);
-      this.emit('player-update', new PlayerState({playlist: this._mediaServerPlaylists.ActivePlaylist[1]}));
+      this._getActivePlaylist();
     },
 
     raise: function() {
@@ -464,6 +460,30 @@ const MPRISPlayer = new Lang.Class({
                           );
     },
 
+    _getActivePlaylist: function() {
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Playlists', 'ActivePlaylist',
+                           Lang.bind(this, function(value, err) {
+                             if (!err) {
+                               let playlist = value[0].deep_unpack()[1][0];
+                               if (this.state.playlist != playlist) {
+                                 this.emit('player-update', 
+                                           new PlayerState({playlist: playlist}));
+                               }
+                             }
+                           })
+                          );
+    
+    },
+
+    _getPlaylists: function() {
+      this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, function(playlists) {
+        if (playlists && playlists[0])
+          this.emit('player-update', new PlayerState({playlists: playlists[0]}));
+        else
+          this.emit('player-update', new PlayerState({showPlaylist: false}));
+      }));
+    },
+
     _getPosition: function() {
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'Position', Lang.bind(this, function(value, err) {
         if (err) {
@@ -511,6 +531,9 @@ const MPRISPlayer = new Lang.Class({
         this._stopTimer();
         if (this._propChangedId) {
           this._prop.disconnectSignal(this._propChangedId);
+        }
+        if (this._playlistsId) {
+          this._mediaServerPlaylists.disconnectSignal(this._playlistsId);
         }
         if (this._seekedId) {
           this._mediaServerPlayer.disconnectSignal(this._seekedId);

@@ -391,5 +391,18 @@ const PlaylistItem = new Lang.Class({
         this.obj = obj;
         this.label = new St.Label({text: text});
         this.actor.add(this.label);
+    },
+
+    setPlaylistActive: function(value) {
+      if (value) {
+        this.setOrnament(PopupMenu.Ornament.DOT);
+      }
+      else {
+        this.setOrnament(PopupMenu.Ornament.NONE);
+      }
+    },
+
+    isPlaylistActive: function() {
+      return this._ornament !== PopupMenu.Ornament.NONE;
     }
 });

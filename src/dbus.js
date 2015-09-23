@@ -103,6 +103,9 @@ const MediaServer2PlaylistsIface = '<node>\
         <property name="PlaylistCount" type="u" access="read" />\
         <property name="Orderings" type="as" access="read" />\
         <property name="ActivePlaylist" type="(b(oss))" access="read" />\
+        <signal name="PlaylistChanged">\
+            <arg type="(oss)" direction="out" />\
+        </signal>\
     </interface>\
 </node>';
 const MediaServer2PlaylistsProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlaylistsIface);
