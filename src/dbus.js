@@ -1,4 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* jshint esnext: true */
+/* jshint multistr: true */
 /**
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

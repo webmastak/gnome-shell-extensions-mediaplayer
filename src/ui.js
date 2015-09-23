@@ -384,10 +384,10 @@ const PlayerUI = new Lang.Class({
     if (this.trackCover.child.has_style_class_name('track-cover')) {
       let size = this.trackCover.child.icon_size,
           targetSize;
-      if (size == COVER_SIZE)
+      if (size == Settings.COVER_SIZE)
         targetSize = size * 2;
       else
-        targetSize = COVER_SIZE;
+        targetSize = Settings.COVER_SIZE;
       Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
                                                time: 0.3,
                                                transition: 'easeInCubic'});
