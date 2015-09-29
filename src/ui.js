@@ -273,7 +273,6 @@ const PlayerUI = new Lang.Class({
 
     if (newState.status) {
       let status = newState.status;
-      this.status.text = _(status);
 
       if (status == Settings.Status.STOP) {
         this.trackBox.hideAnimate();
