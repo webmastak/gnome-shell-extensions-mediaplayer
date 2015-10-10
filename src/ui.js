@@ -293,7 +293,10 @@ const PlayerUI = new Lang.Class({
 
       if (status === Settings.Status.PLAY) {
         this.stopButton.show();
-        this.playButton.setIcon('media-playback-pause-symbolic');
+        if (player.state.canPause)
+          this.playButton.setIcon('media-playback-pause-symbolic');
+        else
+          this.playButton.hide();
       }
       else if (status === Settings.Status.PAUSE) {
         this.playButton.setIcon('media-playback-start-symbolic');
