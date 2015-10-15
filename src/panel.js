@@ -70,23 +70,24 @@ const IndicatorMixin = {
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
-        this._thirdIndicator.show();
       }
       else if (state.status == Settings.Status.PAUSE) {
         this._secondaryIndicator.icon_name = "media-playback-pause-symbolic";
-        this._thirdIndicator.show();
       }
       else if (state.status == Settings.Status.STOP) {
         this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
-        this._thirdIndicator.hide();
       }
     }
 
+    let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
+    if(stateTemplate.length == 0 || state.status == Settings.Status.STOP) {
+      this._thirdIndicator.hide();
+    } else {
+      this._thirdIndicator.show();
+    }
+
     if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
-      let stateText = Lib.compileTemplate(
-        Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY),
-        state
-      );
+      let stateText = Lib.compileTemplate(stateTemplate, state);
       this._thirdIndicator.clutter_text.set_markup(stateText);
 
       // If You just set width it will add blank space. This makes sure the
