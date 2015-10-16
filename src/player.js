@@ -257,6 +257,10 @@ const MPRISPlayer = new Lang.Class({
 
     populate: function() {
       let newState = new PlayerState({
+        canPause: this._mediaServerPlayer.CanPause,
+        canGoNext: this._mediaServerPlayer.CanGoNext,
+        canGoPrevious: this._mediaServerPlayer.CanGoPrevious,
+        canSeek: this._mediaServerPlayer.CanSeek,
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
         showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
