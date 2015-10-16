@@ -77,10 +77,12 @@ const IndicatorMixin = {
       else if (state.status == Settings.Status.STOP) {
         this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
       }
+      this._secondaryIndicator.show();
+      this.indicators.show();
     }
 
     let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
-    if(stateTemplate.length == 0 || state.status == Settings.Status.STOP) {
+    if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
       this._thirdIndicator.hide();
     } else {
       this._thirdIndicator.show();
@@ -116,9 +118,6 @@ const IndicatorMixin = {
         this._primaryIndicator.icon_size = 16;
       }
     }
-
-    this._secondaryIndicator.show();
-    this.indicators.show();
 
     try {
       this._onActivePlayerUpdate(manager, state);
@@ -220,10 +219,19 @@ const AggregateMenuIndicator = new Lang.Class({
   },
 
   _onActivePlayerUpdate: function(manager, state) {
-    if (this._secondaryIndicator.visible)
+    if (state.status && state.status === Settings.Status.STOP) {
+      this.indicators.hide();
+    }
+    else if (state.status) {
+      this.indicators.show();
+    }
+
+    if (this._secondaryIndicator.visible) {
       this._primaryIndicator.add_style_class_name('indicator');
-    else
+    }
+    else {
       this._primaryIndicator.remove_style_class_name('indicator');
+    }
   },
 
   _onActivePlayerRemove: function(manager, state) {
