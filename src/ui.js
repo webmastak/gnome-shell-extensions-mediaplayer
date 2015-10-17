@@ -118,9 +118,12 @@ const PlayerUI = new Lang.Class({
   Extends: PlayerMenu,
 
   _init: function(player) {
-    this.parent(player.info.identity, true);
-    this.icon.icon_name = 'audio-x-generic-symbolic';
+    this.parent(player.info.identity, false);
     this.player = player;
+
+    this.playerStatusIndicator = new Widget.PlayerStatusIndicator(false);
+    this.actor.insert_child_at_index(this.playerStatusIndicator, 1);
+
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
     this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
 
@@ -277,6 +280,8 @@ const PlayerUI = new Lang.Class({
       if (this.status) {
         this.status.text = _(status);
       }
+
+      this.playerStatusIndicator.updateState(newState);
 
       if (status == Settings.Status.STOP) {
         this.trackBox.hideAnimate();
