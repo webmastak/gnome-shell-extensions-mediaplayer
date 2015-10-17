@@ -489,6 +489,7 @@ const PlayerStatusIndicator = new Lang.Class({
             this._icon.style_class = 'system-status-icon indicator';
             this._statusIcon.style_class = 'secondary-indicator';
         } else {
+            this._icon.icon_size = 11;
             this._icon.style_class = 'popup-menu-icon indicator';
             this._statusIcon.style_class = 'secondary-indicator';
 
