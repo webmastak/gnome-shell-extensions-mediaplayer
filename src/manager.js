@@ -21,6 +21,7 @@
 const Mainloop = imports.mainloop;
 const Lang = imports.lang;
 const Signals = imports.signals;
+const Config = imports.misc.config;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Panel = Me.imports.panel;
@@ -242,8 +243,13 @@ const PlayerManager = new Lang.Class({
 
     _getPlayerPosition: function() {
       let position = 0;
-      if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) == Settings.IndicatorPosition.VOLUMEMENU)
-        position = this.menu.numMenuItems - 2;
+      if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) ==
+            Settings.IndicatorPosition.VOLUMEMENU) {
+        if (parseInt(Config.PACKAGE_VERSION.split(".")[1]) < 18)
+          position = this.menu.numMenuItems - 2;
+        else
+          position = this.menu.numMenuItems - 1;
+      }
       return position;
     },
 
