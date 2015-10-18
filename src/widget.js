@@ -443,7 +443,8 @@ const PlayerStatusIndicator = new Lang.Class({
         let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
         if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
             this._statusLabel.hide();
-        } else {
+        }
+        else {
             this._statusLabel.show();
         }
 
@@ -470,7 +471,8 @@ const PlayerStatusIndicator = new Lang.Class({
                     file: Gio.File.new_for_path(state.trackCoverPath)
                 });
                 this._icon.icon_size = 22;
-            } else {
+            }
+            else {
                 this._icon.icon_name = 'audio-x-generic-symbolic';
                 this._icon.icon_size = 16;
             }
@@ -488,7 +490,8 @@ const PlayerStatusIndicator = new Lang.Class({
             this.parent.style_class = 'indicators';
             this._icon.style_class = 'system-status-icon indicator';
             this._statusIcon.style_class = 'secondary-indicator';
-        } else {
+        }
+        else {
             this._icon.icon_size = 11;
             this._icon.style_class = 'popup-menu-icon indicator';
             this._statusIcon.style_class = 'secondary-indicator';
