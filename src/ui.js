@@ -277,6 +277,14 @@ const PlayerUI = new Lang.Class({
       if (this.status) {
         this.status.text = _(status);
       }
+      else {
+        if (status == Settings.Status.PLAY)
+          this.icon.icon_name = 'media-playback-start-symbolic';
+        else if (status == Settings.Status.PAUSE)
+          this.icon.icon_name = 'media-playback-pause-symbolic';
+        else if (status == Settings.Status.STOP)
+          this.icon.icon_name = 'media-playback-stop-symbolic';
+      }
 
       if (status == Settings.Status.STOP) {
         this.trackBox.hideAnimate();
