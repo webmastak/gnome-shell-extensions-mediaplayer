@@ -128,6 +128,9 @@ const AggregateMenuIndicator = new Lang.Class({
 
     this._manager = null;
     this.playerStatusIndicator = new Widget.PlayerStatusIndicator(true);
+    this.playerStatusIndicator.connect('notify::visible', Lang.bind(this, this._syncIndicatorsVisible));
+
+    this._syncIndicatorsVisible();
 
     this.indicators.add_actor(this.playerStatusIndicator);
     this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
