@@ -35,7 +35,7 @@ listed below).
 
 ### Packages
 
-  * Arch Linux - [AUR package](https://aur.archlinux.org/packages.php?ID=49367) by Alucryd
+  * Arch Linux - [AUR package](https://aur.archlinux.org/packages/gnome-shell-extension-mediaplayer-git) by Alucryd
   * Ubuntu - [webupd8 PPA](http://www.webupd8.org/2011/10/gnome-shell-mediaplayer-extension.html)
   * Frugalware - [package](http://www.frugalware.org/packages/136448) by Baste
 
