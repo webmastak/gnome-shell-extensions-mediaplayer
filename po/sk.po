@@ -1,0 +1,143 @@
+# Slovak translation for gnome-shell-extension-mediaplayer.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
+# Juraj Fiala <doctorjellyface@riseup.net>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-20 18:00+0100\n"
+"PO-Revision-Date: 2015-10-20 18:00+0100\n"
+"Last-Translator: Juraj Fiala <doctorjellyface@riseup.net>\n"
+"Language-Team: Slovak\n"
+"Language: Slovak\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bits\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: ../src/ui.js:165
+msgid "Volume"
+msgstr "Hlasitosť"
+
+#: ../src/ui.js:177
+msgid "Playlists"
+msgstr "Zoznamy skladieb"
+
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Zastavené"
+
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Prehráva sa"
+
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Pozastavené"
+
+#: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr "Umiestnenie indikátora"
+
+#: ../src/prefs.js:42
+msgid "Center"
+msgstr "Stred"
+
+#: ../src/prefs.js:43
+msgid "Right"
+msgstr "Vpravo"
+
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr "Sytémové menu"
+
+#: ../src/prefs.js:49
+msgid "Indicator appearance"
+msgstr "Vzhľad indikátora"
+
+#: ../src/prefs.js:51
+msgid "Symbolic icon"
+msgstr "Symbolická ikona"
+
+#: ../src/prefs.js:52
+msgid "Current album cover"
+msgstr "Obal aktuálneho albumu"
+
+#: ../src/prefs.js:57
+msgid "Indicator status text"
+msgstr "Text stavu indikátora"
+
+#: ../src/prefs.js:58
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
+msgstr "%a: Interpret, %b: Album, %t: Skladba. Pango syntax podporovaný."
+
+#: ../src/prefs.js:62
+msgid "Indicator status text width"
+msgstr "Šírka textu stavu indikátora"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+"Maximálna šírka pred skrátením stavového textu. Predvolená hodnota je "
+"300px."
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Povoliť zapnutie predvoleného prehrávača médií"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Ukázať ovládanie hlasitosi prehrávača médií"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Ukázať posuvník na časovej osi prehrávača médií"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Ukázať zoznamy skladieb prehrávača médií"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Ukázať hodnotenie skladby"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Ukázať hodnotenie práve hranej skladby na stupnici od 0 po 5"
+
+#, fuzzy
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr ""
+#~ "Spustí predvolený prehrávač médií pri kliknutí na indikátor alebo z menu"
+
+#~ msgid "by"
+#~ msgstr "od interpreta"
+
+#~ msgid "from"
+#~ msgstr "z albumu"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Neznámy interpret"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Neznámy album"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Neznáma skladba"
+
+#~ msgid "Album cover size"
+#~ msgstr "Velkosť obalu albumu"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr ""
+#~ "Veľkosť obalu zobrazeného v menu. Predvolená hodnota je 80px šírka."
+
+#~ msgid "Show the media player in the volume menu"
+#~ msgstr "Ukázať prehrávač médií v menu hlasitosti"
