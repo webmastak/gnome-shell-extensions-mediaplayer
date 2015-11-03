@@ -494,6 +494,11 @@ const MPRISPlayer = new Lang.Class({
           this.emit('player-update', new PlayerState({showPosition: false}));
         }
         else {
+          if (this.state.showPosition == false &&
+              this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY)) {
+            // Reenable showPosition after error
+            this.emit('player-update', new PlayerState({showPosition: true}));
+          }
           let position = value[0].unpack() / 1000000;
           this.trackTime = position;
         }
