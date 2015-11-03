@@ -9,13 +9,14 @@ msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-27 18:32+0200\n"
-"PO-Revision-Date: 2012-11-11 15:26+0100\n"
-"Last-Translator: Agilo Kern <prdiewelt@googlemail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: German\n"
+"PO-Revision-Date: 2015-10-27 13:30-0300\n"
+"Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.7.7\n"
 
 #: ../src/ui.js:165
 msgid "Volume"
@@ -39,7 +40,7 @@ msgstr "Pausiert"
 
 #: ../src/prefs.js:40
 msgid "Indicator position"
-msgstr ""
+msgstr "Indikatorposition"
 
 #: ../src/prefs.js:42
 msgid "Center"
@@ -51,12 +52,11 @@ msgstr "Rechts"
 
 #: ../src/prefs.js:44
 msgid "System menu"
-msgstr ""
+msgstr "Systemmenü"
 
 #: ../src/prefs.js:49
-#, fuzzy
 msgid "Indicator appearance"
-msgstr "Aussehen"
+msgstr "Aussehen des Indikators"
 
 #: ../src/prefs.js:51
 msgid "Symbolic icon"
@@ -67,28 +67,22 @@ msgid "Current album cover"
 msgstr "Aktuelles Albumbild"
 
 #: ../src/prefs.js:57
-#, fuzzy
 msgid "Indicator status text"
-msgstr "Statusanzeige"
+msgstr "Statustext des Indikators"
 
 #: ../src/prefs.js:58
-#, fuzzy
-msgid ""
-"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
-"markup supported."
+msgid "{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported."
 msgstr ""
-"%a: Künstler, %b: Album, %t: Titel. Pango-Auszeichnung wird unterstützt."
+"{trackArtist}: Künstler, {trackAlbum}: Album, {trackTitle}: Liedtitel. Pango-Auszeichnung wird "
+"unterstützt."
 
 #: ../src/prefs.js:62
-#, fuzzy
 msgid "Indicator status text width"
-msgstr "Statusanzeige"
+msgstr "Breite des Statustexts des Indikators"
 
 #: ../src/prefs.js:63
-msgid ""
-"The the maximum width before the status text gets an ellipsis. Default is "
-"300px."
-msgstr ""
+msgid "The the maximum width before the status text gets an ellipsis. Default is 300px."
+msgstr "Die maximale Breite bevor der Statustext abgeschnitten wird. Der Vorgabewert ist 300px."
 
 #: ../src/prefs.js:71
 msgid "Allow to start the default media player"
@@ -124,10 +118,8 @@ msgstr "Zeigt eine Bewertungsskala von 0 bis 5 für das aktuelle Lied an"
 #~ msgstr "Integration im Lautstärkemenü"
 
 #, fuzzy
-#~ msgid ""
-#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
-#~ msgstr ""
-#~ "Beim Klick auf die Anzeige die vorgegebene Medienwiedergabe aufrufen."
+#~ msgid "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr "Beim Klick auf die Anzeige die vorgegebene Medienwiedergabe aufrufen."
 
 #~ msgid "rating"
 #~ msgstr "Bewertung"
