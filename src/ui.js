@@ -332,9 +332,9 @@ const PlayerUI = new Lang.Class({
       this.setActivePlaylist(newState.playlist);
     }
 
-    if (newState.trackCoverPath) {
+    if (newState.trackCoverPath || newState.isRadio) {
       this.hideCover();
-      this.showCover(newState.trackCoverPath);
+      this.showCover(newState);
     }
   },
 
@@ -358,20 +358,25 @@ const PlayerUI = new Lang.Class({
     });
   },
 
-  showCover: function(coverPath) {
+  showCover: function(state) {
     Tweener.addTween(this.trackCover, {
       opacity: 0,
       time: 0.3,
       transition: 'easeOutCubic',
       onComplete: Lang.bind(this, function() {
         // Change cover
-        if (! coverPath || ! GLib.file_test(coverPath, GLib.FileTest.EXISTS)) {
+        if (state.isRadio) {
+          let coverIcon = new St.Icon({icon_name: "radio",
+                                       icon_size: this.trackCover.child.icon_size});
+          this.trackCover.child = coverIcon;
+        }
+        else if (! state.trackCoverPath || ! GLib.file_test(state.trackCoverPath, GLib.FileTest.EXISTS)) {
           let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
                                        icon_size: this.trackCover.child.icon_size});
           this.trackCover.child = coverIcon;
         }
         else {
-          let gicon = new Gio.FileIcon({file: Gio.File.new_for_path(coverPath)});
+          let gicon = new Gio.FileIcon({file: Gio.File.new_for_path(state.trackCoverPath)});
           let coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
                                        icon_size: this.trackCover.child.icon_size});
           this.trackCover.child = coverIcon;
