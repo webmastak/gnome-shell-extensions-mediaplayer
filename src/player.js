@@ -67,6 +67,7 @@ const PlayerState = new Lang.Class({
   trackLength: null,
   trackObj: null,
   trackRating: null,
+  isRadio: null,
 
   showPlaylist: null,
   showRating: null,
@@ -350,6 +351,7 @@ const MPRISPlayer = new Lang.Class({
       state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
       state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "";
       state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
+      state.isRadio = false;
 
       if (state.trackCoverUrl !== null && state.trackCoverUrl !== this.state.trackCoverUrl) {
         if (state.trackCoverUrl) {
@@ -371,6 +373,15 @@ const MPRISPlayer = new Lang.Class({
         }
         else {
           state.trackCoverPath = '';
+        }
+      }
+      else if (state.trackCoverUrl == '') {
+        let genres = metadata["xesam:genre"].deep_unpack();
+        for (let i in genres) {
+          if (genres[i].toLowerCase().indexOf("radio") > -1) {
+            state.isRadio = true;
+            break;
+          }
         }
       }
 
