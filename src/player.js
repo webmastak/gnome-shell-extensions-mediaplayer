@@ -375,7 +375,7 @@ const MPRISPlayer = new Lang.Class({
           state.trackCoverPath = '';
         }
       }
-      else if (state.trackCoverUrl == '') {
+      else if (state.trackCoverUrl == '' && metadata["xesam:genre"]) {
         let genres = metadata["xesam:genre"].deep_unpack();
         for (let i in genres) {
           if (genres[i].toLowerCase().indexOf("radio") > -1) {
