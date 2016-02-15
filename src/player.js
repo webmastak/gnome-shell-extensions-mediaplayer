@@ -230,6 +230,7 @@ const MPRISPlayer = new Lang.Class({
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
           if (value > 0) {
             this.trackTime = value / 1000000;
+            this._wantedSeekValue = 0;
           }
           // Banshee is buggy and always emits Seeked(0). See #34, #183,
           // also <https://bugzilla.gnome.org/show_bug.cgi?id=654524>.
