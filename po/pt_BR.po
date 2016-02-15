@@ -3,21 +3,21 @@
 # This file is distributed under the same license as the
 # gnome-shell-extension-mediaplayer package.
 # Elder Marco <eldermarco@gmail.com>, 2012.
+# Fábio Nogueira <fnogueira@gnome.org>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-27 18:32+0200\n"
-"PO-Revision-Date: 2012-11-25 14:47-0300\n"
-"Last-Translator: Elder Marco <eldermarco@gmail.com>\n"
+"PO-Revision-Date: 2016-02-04 17:26-0300\n"
+"Last-Translator: Fábio Nogueira <fnogueira@gnome.org>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Portuguese\n"
-"X-Poedit-Country: BRAZIL\n"
+"X-Generator: Poedit 1.8.6\n"
 
 #: ../src/ui.js:165
 msgid "Volume"
@@ -41,7 +41,7 @@ msgstr "Pausado"
 
 #: ../src/prefs.js:40
 msgid "Indicator position"
-msgstr ""
+msgstr "Posição do indicador"
 
 #: ../src/prefs.js:42
 msgid "Center"
@@ -53,12 +53,11 @@ msgstr "Direita"
 
 #: ../src/prefs.js:44
 msgid "System menu"
-msgstr ""
+msgstr "Menu do sistema"
 
 #: ../src/prefs.js:49
-#, fuzzy
 msgid "Indicator appearance"
-msgstr "Aparência"
+msgstr "Aparência do indicador"
 
 #: ../src/prefs.js:51
 msgid "Symbolic icon"
@@ -69,31 +68,32 @@ msgid "Current album cover"
 msgstr "Capa atual"
 
 #: ../src/prefs.js:57
-#, fuzzy
 msgid "Indicator status text"
-msgstr "Texto de status"
+msgstr "Texto de status do indicador"
 
 #: ../src/prefs.js:58
-#, fuzzy
 msgid ""
 "{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
 "markup supported."
-msgstr "%a: Artista, %b: Álbum, %t: Título. Marcação Pango suportada."
+msgstr ""
+"{trackArtist}: Artista, {trackAlbum}: Álbum, {trackTitle}: Título. Marcação "
+"Pango suportada."
 
 #: ../src/prefs.js:62
-#, fuzzy
 msgid "Indicator status text width"
-msgstr "Texto de status"
+msgstr "Tamanho do texto de status do indicador"
 
 #: ../src/prefs.js:63
 msgid ""
 "The the maximum width before the status text gets an ellipsis. Default is "
 "300px."
 msgstr ""
+"O tamanho máximo antes do texto de status recebe reticências. O padrão é "
+"300px."
 
 #: ../src/prefs.js:71
 msgid "Allow to start the default media player"
-msgstr "Permitir iniciar o media player padrão"
+msgstr "Permitir iniciar o reprodutor padrão"
 
 #: ../src/prefs.js:75
 msgid "Show the media player volume slider"
