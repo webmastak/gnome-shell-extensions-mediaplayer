@@ -335,7 +335,7 @@ const PlayerUI = new Lang.Class({
       this.setActivePlaylist(newState.playlist);
     }
 
-    if (newState.trackCoverPath || newState.isRadio) {
+    if (newState.trackCoverPath !== null || newState.isRadio !== null) {
       this.hideCover();
       this.showCover(newState);
     }

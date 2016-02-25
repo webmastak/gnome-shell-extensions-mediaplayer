@@ -363,7 +363,7 @@ const MPRISPlayer = new Lang.Class({
       state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
       state.isRadio = false;
 
-      if (state.trackCoverUrl !== null && state.trackCoverUrl !== this.state.trackCoverUrl) {
+      if (state.trackCoverUrl !== this.state.trackCoverUrl) {
         if (state.trackCoverUrl) {
           let cover_path = "";
           // Distant cover
@@ -385,7 +385,8 @@ const MPRISPlayer = new Lang.Class({
           state.trackCoverPath = '';
         }
       }
-      else if (state.trackCoverUrl == '' && metadata["xesam:genre"]) {
+
+      if (state.trackCoverUrl === '' && metadata["xesam:genre"]) {
         let genres = metadata["xesam:genre"].deep_unpack();
         for (let i in genres) {
           if (genres[i].toLowerCase().indexOf("radio") > -1) {
