@@ -210,7 +210,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.trackTitle || newState.trackArtist || newState.trackAlbum) {
+    if (newState.trackTitle !== null || newState.trackArtist !== null || newState.trackAlbum !== null) {
       this.trackBox.empty();
       JSON.parse(Settings.gsettings.get_string(Settings.MEDIAPLAYER_TRACKBOX_TEMPLATE))
       .forEach(Lang.bind(this, function(trackInfo) {
