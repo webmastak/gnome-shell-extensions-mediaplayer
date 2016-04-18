@@ -35,8 +35,10 @@ function init() {
   Lib.initTranslations(Me);
   Settings.init();
   Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {
-    disable();
-    enable();
+    if (manager) {
+      disable();
+      enable();
+    }
   });
 }
 
