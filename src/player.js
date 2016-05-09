@@ -528,6 +528,8 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _onStatusChange: function() {
+      // sync track time
+      this._getPosition();
       let status = this.state.status;
       if (status == Settings.Status.PLAY) {
         this._startTimer();
