@@ -57,6 +57,7 @@ const Status = {
 
 const SEND_STOP_ON_CHANGE = [
     "org.mpris.MediaPlayer2.banshee",
+    "org.mpris.MediaPlayer2.vlc",
     "org.mpris.MediaPlayer2.pragha"
 ];
 
