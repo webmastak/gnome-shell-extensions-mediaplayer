@@ -131,8 +131,6 @@ const PlayerUI = new Lang.Class({
 
     this.activePlaylist = null;
 
-    this.trackCoverUrl = false;
-    this.trackCoverFileTmp = false;
     this.trackCover = new St.Button({style_class: 'track-cover-container',
                                      x_align: St.Align.START,
                                      y_align: St.Align.START,
@@ -335,7 +333,7 @@ const PlayerUI = new Lang.Class({
       this.setActivePlaylist(newState.playlist);
     }
 
-    if (newState.trackCoverPath !== null || newState.isRadio !== null) {
+    if (newState.trackCoverUrl !== null || newState.isRadio !== null) {
       this.hideCover();
       this.showCover(newState);
     }
@@ -373,17 +371,19 @@ const PlayerUI = new Lang.Class({
                                        icon_size: this.trackCover.child.icon_size});
           this.trackCover.child = coverIcon;
         }
-        else if (! state.trackCoverPath || ! GLib.file_test(state.trackCoverPath, GLib.FileTest.EXISTS)) {
-          let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
-        }
-        else {
-          let gicon = new Gio.FileIcon({file: Gio.File.new_for_path(state.trackCoverPath)});
+        else if (state.trackCoverUrl) {
+          let file = Gio.File.new_for_uri(state.trackCoverUrl);
+          let gicon = new Gio.FileIcon({file: file});
           let coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
                                        icon_size: this.trackCover.child.icon_size});
           this.trackCover.child = coverIcon;
         }
+        else {
+          let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
+                                       icon_size: this.trackCover.child.icon_size});
+          this.trackCover.child = coverIcon;
+        }
+
         // Show the new cover
         Tweener.addTween(this.trackCover, {
           opacity: 255,
