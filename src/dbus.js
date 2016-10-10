@@ -100,7 +100,7 @@ const MediaServer2PlaylistsIface = '<node>\
             <arg type="u" direction="in" />\
             <arg type="s" direction="in" />\
             <arg type="b" direction="in" />\
-            <arg type="a{oss}" direction="out" />\
+            <arg type="a(oss)" direction="out" />\
         </method>\
         <property name="PlaylistCount" type="u" access="read" />\
         <property name="Orderings" type="as" access="read" />\
