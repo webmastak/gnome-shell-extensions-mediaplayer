@@ -288,7 +288,7 @@ const MPRISPlayer = new Lang.Class({
       this.emit('player-update', newState);
       
       //Delay call 100ms because some players make the interface available without data available in the beginning
-      GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, Lang.bind(this, function() {
+      Mainloop.timeout_add(100, Lang.bind(this, function() {
         this._getPlaylists();
         return false;
       }), null);
