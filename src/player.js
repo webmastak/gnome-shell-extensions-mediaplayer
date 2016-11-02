@@ -287,7 +287,12 @@ const MPRISPlayer = new Lang.Class({
 
       this.emit('player-update', newState);
       
-      this._getPlaylists();
+      //Delay call 100ms because some players make the interface available without data available in the beginning
+      Mainloop.timeout_add(100, Lang.bind(this, function() {
+        this._getPlaylists();
+        return false;
+      }), null);
+
       this._getPlayerInfo();
 
       this.emit('player-update-info', this.info);
@@ -465,10 +470,17 @@ const MPRISPlayer = new Lang.Class({
 
     _getPlaylists: function() {
       this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, function(playlists) {
-        if (playlists && playlists[0])
+        if (playlists && playlists[0]) {
+          if (this.state.showPlaylist == false &&
+              this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)) {
+            //Reenable showPlaylist after error
+            this.emit('player-update', new PlayerState({showPlaylist: true}));
+          }
           this.emit('player-update', new PlayerState({playlists: playlists[0]}));
-        else
+        } 
+        else {
           this.emit('player-update', new PlayerState({showPlaylist: false}));
+        }
       }));
     },
 
