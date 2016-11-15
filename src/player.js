@@ -509,29 +509,27 @@ const MPRISPlayer = new Lang.Class({
         this._startTimer();
       }
       else if (status == Settings.Status.PAUSE) {
-        this._pauseTimer();
+        this._stopTimer();
       }
       else if (status == Settings.Status.STOP) {
         this._stopTimer();
+        this.trackTime = 0;
       }
     },
 
     _startTimer: function() {
-      this._pauseTimer();
-      this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._startTimer));
-      this.trackTime += 1;
-    },
-
-    _pauseTimer: function() {
-      if (this._timerId !== 0) {
-        Mainloop.source_remove(this._timerId);
-        this._timerId = 0;
+      if (this._timerId === 0) {
+        this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
+          return this.trackTime += 1;
+        }));
       }
     },
 
     _stopTimer: function() {
-      this.trackTime = 0;
-      this._pauseTimer();
+      if (this._timerId !== 0) {
+        Mainloop.source_remove(this._timerId);
+        this._timerId = 0;
+      }
     },
 
     destroy: function() {
