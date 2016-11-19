@@ -383,7 +383,7 @@ const MPRISPlayer = new Lang.Class({
       }
 
       // Check if the track has changed
-      if (state.trackUrl !== this.state.trackUrl) {
+      if (state.trackUrl !== this.state.trackUrl || state.trackObj !== this.state.trackObj) {
         this._getPosition();
         this._refreshProperties();
       }
