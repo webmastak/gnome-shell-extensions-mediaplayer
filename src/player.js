@@ -202,6 +202,12 @@ const MPRISPlayer = new Lang.Class({
           if (props.CanGoPrevious)
             newState.canGoPrevious = props.CanGoPrevious.unpack();
 
+          if (props.PlaylistCount)
+            this._getPlaylists();
+
+          if (props.ActivePlaylist)
+            newState.playlist = props.ActivePlaylist.deep_unpack()[1][0];
+
           if (props.PlaybackStatus) {
             let status = props.PlaybackStatus.unpack();
             if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
