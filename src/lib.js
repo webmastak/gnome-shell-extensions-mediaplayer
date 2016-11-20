@@ -59,10 +59,8 @@ let compileTemplate = function(template, playerState) {
   return template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
     let text = "";
     if (playerState[fieldName]) {
-      text = playerState[fieldName].toString()
-      .replace(/&/, "&amp;")
-      .replace(/</, "&lt;")
-      .replace(/>/, "&gt;") + appendText;
+      text = playerState[fieldName].toString() + appendText;
+      text = GLib.markup_escape_text(text, -1);
     }
     return text;
   });
