@@ -338,8 +338,6 @@ const PlayerUI = new Lang.Class({
     let newCover = this.getCover(newState);
     if ((newState.trackCoverUrl !== null || newState.isRadio !== null)
         && newCover != this.currentCover) {
-      log("Changing cover!");
-      log(newCover);
       this.currentCover = newCover;
       this.hideCover();
       this.showCover(newState);
