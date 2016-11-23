@@ -191,23 +191,43 @@ const MPRISPlayer = new Lang.Class({
         this._propChangedId = this._prop.connectSignal('PropertiesChanged', Lang.bind(this, function(proxy, sender, [iface, props]) {
           let newState = new PlayerState();
 
-          if (props.Volume)
-            newState.volume = props.Volume.unpack();
+          if (props.Volume) {
+            let volume = props.Volume.unpack();
+            if (this.state.volume !== volume) {
+              newState.volume = volume;
+            }
+          }
 
-          if (props.CanPause)
-            newState.canPause = props.CanPause.unpack();
+          if (props.CanPause) {
+            let canPause = props.CanPause.unpack();
+            if (this.state.canPause !== canPause) {
+              newState.canPause = canPause;
+            }
+          }
 
-          if (props.CanGoNext)
-            newState.canGoNext = props.CanGoNext.unpack();
+          if (props.CanGoNext) {
+            let canGoNext = props.CanGoNext.unpack();
+            if (this.state.canGoNext !== canGoNext) {
+              newState.canGoNext = canGoNext;
+            }
+          }
 
-          if (props.CanGoPrevious)
-            newState.canGoPrevious = props.CanGoPrevious.unpack();
+          if (props.CanGoPrevious) {
+            let canGoPrevious = props.CanGoPrevious.unpack();
+            if (this.state.canGoPrevious !== canGoPrevious) {
+              newState.canGoPrevious = canGoPrevious;
+            }
+          }
 
           if (props.PlaylistCount)
             this._getPlaylists();
 
-          if (props.ActivePlaylist)
-            newState.playlist = props.ActivePlaylist.deep_unpack()[1][0];
+          if (props.ActivePlaylist) {
+            let playlist = props.ActivePlaylist.deep_unpack()[1][0];
+            if (this.state.playlist !== playlist) {
+              newState.playlist = playlist;
+            }
+          }
 
           if (props.Orderings) {
             let orderings = this._checkOrderings(props.Orderings.deep_unpack());
