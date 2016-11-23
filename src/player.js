@@ -55,6 +55,7 @@ const PlayerState = new Lang.Class({
 
   playlist: null,
   playlists: null,
+  orderings: null,
 
   trackTime: null,
   trackTitle: null,
@@ -208,6 +209,15 @@ const MPRISPlayer = new Lang.Class({
           if (props.ActivePlaylist)
             newState.playlist = props.ActivePlaylist.deep_unpack()[1][0];
 
+          if (props.Orderings) {
+            let orderings = this._checkOrderings(props.Orderings.deep_unpack());
+            if (this.state.orderings != orderings) {
+              newState.orderings = orderings;
+              this.emit('player-update', newState);
+              this._getPlaylists();
+            }
+          }
+
           if (props.PlaybackStatus) {
             let status = props.PlaybackStatus.unpack();
             if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
@@ -282,7 +292,8 @@ const MPRISPlayer = new Lang.Class({
         showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
         showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
         volume: this._mediaServerPlayer.Volume,
-        status: this._mediaServerPlayer.PlaybackStatus
+        status: this._mediaServerPlayer.PlaybackStatus,
+        orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings)
       });
 
       if (this._mediaServerPlaylists.ActivePlaylist) {
@@ -457,6 +468,20 @@ const MPRISPlayer = new Lang.Class({
                              }
                            })
                           );
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Playlists', 'Orderings',
+                           Lang.bind(this, function(value, err) {
+                             let state = new PlayerState();
+                             // default to ["Alphabetical"] if all else fails
+                             let orderings = ["Alphabetical"];
+                             if (!err)
+                               orderings = this._checkOrderings(value[0].deep_unpack());
+
+                             if (this.state.orderings != orderings) {
+                               state.orderings = orderings;
+                               this.emit('player-update', state);
+                             }
+                           })
+                          );
     },
 
     _getActivePlaylist: function() {
@@ -474,8 +499,22 @@ const MPRISPlayer = new Lang.Class({
     
     },
 
+    _checkOrderings: function(maybeOrderings) {
+      let orderings = ['Alphabetical'];
+      if (Array.isArray(maybeOrderings) && maybeOrderings.length > 0)
+        orderings = maybeOrderings;
+      return orderings;
+    },
+
     _getPlaylists: function() {
-      this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, "Alphabetical", false, Lang.bind(this, function(playlists) {
+      // Use Alphabetical as the playlist ordering
+      // unless Alphabetical is not in the Orderings,
+      // in that case use the 1st available ordering in the array.
+      let ordering = "Alphabetical";
+      let orderings = this.state.orderings;
+      if (orderings.indexOf(ordering) === -1)
+        ordering = orderings[0];
+      this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, ordering, false, Lang.bind(this, function(playlists) {
         if (playlists && playlists[0]) {
           if (this.state.showPlaylist == false &&
               this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)) {
