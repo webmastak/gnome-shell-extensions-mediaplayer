@@ -105,13 +105,12 @@ const IndicatorMixin = {
       }
     }
 
-    if (state.trackCoverPath !== null) {
-      if (state.trackCoverPath &&
+    if (state.trackCoverUrl !== null) {
+      if (state.trackCoverUrl &&
           Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
         this._primaryIndicator.gicon = new Gio.FileIcon({
-          file: Gio.File.new_for_path(state.trackCoverPath)
+          file: Gio.File.new_for_uri(state.trackCoverUrl)
         });
-        this._primaryIndicator.icon_size = 22;
       }
       else {
         this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
@@ -129,6 +128,7 @@ const IndicatorMixin = {
   _commonOnActivePlayerRemove: function(manager) {
     this._clearStateText();
     if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
+      this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
       this._thirdIndicator.hide();
       this._secondaryIndicator.hide();
       this.indicators.show();
