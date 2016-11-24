@@ -203,6 +203,14 @@ const MPRISPlayer = new Lang.Class({
           if (props.CanGoPrevious)
             newState.canGoPrevious = props.CanGoPrevious.unpack();
 
+          if (props.CanSeek) {
+            let canSeek = props.CanSeek.unpack();
+            if (this.state.canSeek !== canSeek) {
+              newState.canSeek = canSeek;
+              this._getPosition();
+            }
+          }
+
           if (props.PlaylistCount)
             this._getPlaylists();
 
