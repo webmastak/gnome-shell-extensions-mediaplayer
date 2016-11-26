@@ -33,6 +33,7 @@ const Params = imports.misc.params;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
+const Lib = Me.imports.lib;
 
 const PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
@@ -451,5 +452,131 @@ const PlaylistItem = new Lang.Class({
 
     isPlaylistActive: function() {
       return this._ornament !== PopupMenu.Ornament.NONE;
+    }
+});
+
+const PlayerStatusIndicator = new Lang.Class({
+    Name: 'PlayerStatusIndicator',
+    Extends: St.BoxLayout,
+
+    _init: function(isIndicator) {
+        this.parent({vertical: false});
+        this._status = Settings.Status.STOP;
+
+        this._icon = new St.Icon({icon_name: 'audio-x-generic-symbolic'});
+
+        this._statusIcon = new St.Icon({icon_name: 'media-playback-stop-symbolic'});
+        this._statusIcon.hide();
+
+        this._statusLabel = new St.Label({style_class: 'system-status-icon third-indicator'});
+        this._statusLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this._statusLabel.hide();
+
+        this._statusLabelBin = new St.Bin({child: this._statusLabel,
+                                          y_align: St.Align.MIDDLE});
+
+        this.add(this._icon);
+        this.add(this._statusIcon);
+        this.add(this._statusLabelBin);
+
+        this.isIndicator = isIndicator;
+    },
+
+    updateState: function(state) {
+        if(state.status) this.status = state.status;
+        if(!this.isIndicator) return;
+
+        let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
+        if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
+            this._statusLabel.hide();
+        }
+        else {
+            this._statusLabel.show();
+        }
+
+        if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
+            let stateText = Lib.compileTemplate(stateTemplate, state);
+            this._statusLabel.clutter_text.set_markup(stateText);
+
+            // If You just set width it will add blank space. This makes sure the
+            // panel uses the minimum amount of space.
+            let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+            this._statusLabel.clutter_text.set_width(-1);
+            let statusTextWidth = this._statusLabel.clutter_text.get_width();
+            if (statusTextWidth > prefWidth) {
+                this._statusLabel.clutter_text.set_width(prefWidth);
+            } else {
+                this._statusLabel.clutter_text.set_width(-1);
+            }
+        }
+
+        if (state.trackCoverPath !== null) {
+            if (state.trackCoverPath &&
+                Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
+                this._icon.gicon = new Gio.FileIcon({
+                    file: Gio.File.new_for_path(state.trackCoverPath)
+                });
+                this._icon.icon_size = 22;
+            }
+            else {
+                this._icon.icon_name = 'audio-x-generic-symbolic';
+                this._icon.icon_size = 16;
+            }
+        }
+    },
+
+    get isIndicator() {
+        return this._isIndicator;
+    },
+
+    set isIndicator(value) {
+        this._isIndicator = value;
+
+        if(value) {
+            this.parent.style_class = 'indicators';
+            this._icon.style_class = 'system-status-icon indicator';
+            this._statusIcon.style_class = 'secondary-indicator';
+        }
+        else {
+            this._icon.icon_size = 11;
+            this._icon.style_class = 'popup-menu-icon indicator';
+            this._statusIcon.style_class = 'secondary-indicator';
+
+            this._statusLabel.hide();
+        }
+    },
+
+    get status() {
+        return this._status;
+    },
+
+    set status(value) {
+        this._status = value;
+        this._statusIcon.show();
+
+        switch(value) {
+            case Settings.Status.PLAY:
+                this._statusIcon.icon_name = "media-playback-start-symbolic";
+                break;
+            case Settings.Status.PAUSE:
+                this._statusIcon.icon_name = "media-playback-pause-symbolic";
+                break;
+            case Settings.Status.STOP:
+                this._statusIcon.icon_name = "media-playback-stop-symbolic";
+                break;
+            default:
+                log("[PlayerStatusIndicator] Unknown status");
+                break;
+        }
+    },
+
+    setActivePlayerRemoved: function() {
+        this._statusIcon.hide();
+        this._statusLabel.hide();
+    },
+
+    clearStateText: function() {
+        this._statusLabel.text = "";
+        this._statusLabel.clutter_text.set_width(-1);
     }
 });
