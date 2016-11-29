@@ -46,7 +46,7 @@ const IndicatorPosition = {
 };
 
 const FADE_ANIMATION_TIME = 0.16;
-const COVER_SIZE = 100;
+const COVER_SIZE = 72;
 
 const Status = {
     STOP: N_("Stopped"),
