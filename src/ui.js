@@ -93,12 +93,17 @@ const DefaultPlayerUI = new Lang.Class({
     _init: function() {
       this.parent();
 
-      this.app = Shell.AppSystem.get_default().lookup_app(
-        Gio.app_info_get_default_for_type('audio/x-vorbis+ogg', false).get_id()
-      );
-      let appInfo = Gio.DesktopAppInfo.new(this.app.get_id());
+      let appInfo = Gio.app_info_get_default_for_type("audio/x-vorbis+ogg", false)
+      // In case there is no default audio app, don't crash, just don't have anything in the menu to launch.
+      if (!appInfo) {
+        return;
+      }
+      let appName = appInfo.get_name();
+      let appId = Gio.DesktopAppInfo.search(appName)[0][0];
 
-      this.label = new St.Label({text: this.app.get_name()});
+      this.app = Shell.AppSystem.get_default().lookup_app(appId);
+
+      this.label = new St.Label({text: appName});
       this.icon = new St.Icon({icon_name: 'audio-x-generic-symbolic', style_class: 'popup-menu-icon'});
 
       this.actor.add_child(this.icon);
