@@ -29,11 +29,6 @@
         <_summary>Show media player playlists</_summary>
         <_description>Whether to show the playlists of the mediaplayers.</_description>
     </key>
-    <key name="coversize" type="i">
-        <default>80</default>
-        <_summary>Album cover size</_summary>
-        <_description>The size of the cover displayed in the menu. Default is 80px width.</_description>
-    </key>
     <key name="rundefault" type="b">
         <default>false</default>
         <_summary>Allow to start the default media player</_summary>
@@ -57,13 +52,43 @@
         <_summary>Status text size</_summary>
         <_description>The the maximum width before the title gets an ellipsis. Default is 300px.</_description>
     </key>
+    <key name="small-cover" type="i">
+        <default>48</default>
+        <_summary>Small cover size</_summary>
+        <_description>The size of the cover when not zoomed. Default is 48px.</_description>
+    </key>
+    <key name="large-cover" type="i">
+        <default>192</default>
+        <_summary>Large cover size</_summary>
+        <_description>The size of the cover when zoomed. Default is 192px.</_description>
+    </key>
+    <key name="menu-position" type="i">
+        <default>6</default>
+        <_summary>Position in the system menu</_summary>
+        <_description>Position of the extension in the system menu from the top. Default is 6th.</_description>
+    </key>
+    <key name="num-menuitems" type="i">
+        <default>25</default>
+        <_summary>Private</_summary>
+        <_description>Total menu items</_description>
+    </key>
     <key name="volumemenu" type="b">
         <default>true</default>
         <_summary>Show the media player in the volume menu</_summary>
         <_description>Whether to show the mediaplayer controls in the volume menu.</_description>
     </key>
+    <key name="enable-scroll" type="b">
+        <default>true</default>
+        <summary>Enable Indicator scroll events</summary>
+        <description>Enables track changes on scrolling the Indicator.</description>
+    </key>
+    <key name="hide-stockmpris" type="b">
+        <default>false</default>
+        <_summary>Hide the built-in Mpris applet</_summary>
+        <_description>Whether to hide the built-in Mpris applet.</_description>
+    </key>
     <key type="s" name="trackbox-template">
-      <default>'[{"template": "{trackArtist}", "style_class": "track-info track-info-big"}, {"template": "{trackTitle}", "style_class": "track-info track-info-medium"}, {"template": "{trackAlbum}", "style_class": "track-info"}]'</default>
+      <default>'[{"template": "{trackArtist}", "style_class": "track-info-artist"}, {"template": "{trackTitle}", "style_class": "track-info-title"}, {"template": "{trackAlbum}", "style_class": "track-info-album"}]'</default>
       <_summary>Template to render the trackbox</_summary>
     </key>
   </schema>

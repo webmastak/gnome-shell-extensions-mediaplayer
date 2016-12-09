@@ -1,84 +1,56 @@
 .mediaplayer-menu {
-  width: 360px;
+  width: 24em;
 }
 
 .controls {
-    padding-top: 0.4em;
-    spacing: 8px;
-    padding-bottom: 0.4em;
+    padding-top: 0em;
+    spacing: 0.25em;
+    padding-bottom: 0em;
 }
 
-.indicator-icon {
-    padding-right: 0px;
-}
-
-.indicators {
-    spacing: 0px;
-}
-
-.indicator {
-    padding-right: 1px;
+.indicator-item {
+    padding-left: 0em;
+    padding-right: 0em;
 }
 
 .secondary-indicator {
-    icon-size: 8px;
-    padding-top: 0.5em;
-}
-
-.third-indicator {
-    icon-size: 8px;
-    padding-left: 0.5em;
+    icon-size: 1em;
 }
 
 .track-box {
-    padding-left: 2.1em;
-    padding-right: 2em;
+    padding-top: 0em;
+    spacing: 0.5em;
+    padding-bottom: 0em;
 }
 
-.track-cover {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 2px;
-}
-
-.track-infos:ltr {
-    padding-left: 0em;
-}
-
-.track-infos:rtl {
-    padding-left: 0em;
-}
-
-.track-info {
-    padding-bottom: 0.2em;
-}
-
-.track-info-big {
+.track-info-artist {
   font-weight: bold;
-  font-size: 1.1em;
 }
 
-.track-info-medium {
-  font-weight: bold;
+.track-info-title {
+  font-size: small;
+}
+
+.track-info-album {
+  font-size: x-small;
 }
 
 .track-rating {
-    padding-top: 0.2em;
-    font-size: 0.9em;
+    padding-top: 0em;
+    padding-bottom: 0em;
 }
 
-.menu-icon {
-    icon-size: 1.14em;
+.star-icon {
+    padding-top: 0em;
+    padding-bottom: 0em;
+    padding-left: 0.0625em;
+    padding-right: 0.0625em;
 }
 
-.slider-item .slider-text {
-    font-size: 0.9em;
-    width: 7em;
-}
-
-.popup-menu-item:active {
-    color: white;
-}
-
-.system-menu-action:disabled {
-    color: #999;
+.star-box {
+    padding-top: 0em;
+    spacing: 0em;
+    padding-bottom: 0em;
+    padding-left: 0em;
+    padding-right: 0em;
 }

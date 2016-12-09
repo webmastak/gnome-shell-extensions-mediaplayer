@@ -40,22 +40,31 @@ function init() {
       enable();
     }
   });
+  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_MENU_POSITION_KEY, function() {
+    if (manager) {
+      disable();
+      enable();
+    }
+  });
 }
 
 function enable() {
   let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY),
-      menu;
+      menu, desiredMenuPosition;
 
   if (position == Settings.IndicatorPosition.VOLUMEMENU) {
     indicator = new Panel.AggregateMenuIndicator();
     menu = Main.panel.statusArea.aggregateMenu.menu;
+    Settings.gsettings.set_int(Settings.MEDIAPLAYER_NUM_MENU_ITEMS_KEY, menu.numMenuItems + 1);
+    desiredMenuPosition = Settings.gsettings.get_int(Settings.MEDIAPLAYER_MENU_POSITION_KEY) - 1; 
   }
   else {
     indicator = new Panel.PanelIndicator();
     menu = indicator.menu;
+    desiredMenuPosition = 0;
   }
 
-  manager = new Manager.PlayerManager(menu);
+  manager = new Manager.PlayerManager(menu, desiredMenuPosition);
 
   if (position == Settings.IndicatorPosition.RIGHT) {
     Main.panel.addToStatusArea('mediaplayer', indicator);
@@ -80,5 +89,11 @@ function disable() {
   else {
     indicator.indicators.destroy();
     indicator = null;
+  }
+  if (Settings.MINOR_VERSION > 19) {
+    let stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
+    if (stockMpris._shouldShow()) {
+      stockMpris.actor.show();
+    }
   }
 }

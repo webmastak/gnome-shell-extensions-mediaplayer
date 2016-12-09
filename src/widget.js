@@ -55,7 +55,7 @@ const PlayerButton = new Lang.Class({
         this.icon = new St.Icon({
             icon_name: icon + '-symbolic',
         });
-        this.actor = new St.Button({style_class: 'system-menu-action',
+        this.actor = new St.Button({style_class: 'system-menu-action popup-inactive-menu-item',
                                     child: this.icon});
         this.actor._delegate = this;
 
@@ -96,15 +96,13 @@ const SliderItem = new Lang.Class({
     Name: "SliderItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(label, icon, value) {
+    _init: function(icon, value) {
         this.parent({style_class: 'slider-item'});
 
-        this._icon = new St.Icon({style_class: 'menu-icon', icon_name: icon + '-symbolic'});
+        this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(value);
-        this._label = new St.Label({style_class: 'slider-text', text: label});
 
         this.actor.add(this._icon);
-        this.actor.add(this._label);
         this.actor.add(this._slider.actor, {expand: true});
     },
 
@@ -113,12 +111,7 @@ const SliderItem = new Lang.Class({
     },
 
     setIcon: function(icon) {
-        this._icon.icon_name = icon + '-symbolic';
-    },
-
-    setLabel: function(text) {
-        if (this._label.clutter_text)
-            this._label.text = text;
+        this._icon.icon_name = icon;
     },
 
     connect: function(signal, callback) {
@@ -130,27 +123,22 @@ const TrackBox = new Lang.Class({
     Name: "TrackBox",
     Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(cover, params) {
-      params = Params.parse(params, {
-        hover: false,
-        style_class: "track-box"
-      });
-      this.parent(params);
-      // This adds an unwanted height if the PopupBaseMenuItem is empty
-      this.actor.remove_actor(this._ornamentLabel);
-
-      this._cover = cover;
-      this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
-      this.actor.add(this._cover);
-      this.actor.add(this._infos, {expand: true, y_expand: true});
+    _init: function(cover) {
+      this.parent({hover: false});
+      this._cover = cover;      
+      this.infos = new St.BoxLayout({vertical: true});
+      this._content = new St.BoxLayout({style_class: 'track-box', vertical: false}); 
+      this._content.add_child(this._cover);
+      this._content.add_child(this.infos);
+      this.actor.add(this._content, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
     addInfo: function(item, row) {
-        this._infos.add(item.actor);
+        this.infos.add(item.actor);
     },
 
     empty: function() {
-        this._infos.destroy_all_children();
+        this.infos.destroy_all_children();
     },
 
     get hidden() {
@@ -212,49 +200,116 @@ const TrackBox = new Lang.Class({
     }
 });
 
+const SecondaryInfo = new Lang.Class({
+    Name: "SecondaryInfo",
+    Extends: PopupMenu.PopupBaseMenuItem,
+
+    _init: function() {
+      this.parent({hover: false});     
+      this.infos = new St.BoxLayout({vertical: true});
+      this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+    },
+
+    addInfo: function(item, row) {
+        this.infos.add(item.actor, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+    },
+
+    empty: function() {
+        this.infos.destroy_all_children();
+    },
+
+    get hidden() {
+      return this._hidden || false;
+    },
+
+    set hidden(value) {
+      this._hidden = value;
+    },
+
+    hide: function() {
+      this.actor.hide();
+      this.actor.opacity = 0;
+      this.actor.set_height(0);
+      this.hidden = true;
+    },
+
+    show: function() {
+      this.actor.show();
+      this.actor.opacity = 255;
+      this.actor.set_height(-1);
+      this.hidden = false;
+    },
+
+    showAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden === false)
+        return;
+
+      this.actor.set_height(-1);
+      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      this.actor.set_height(0);
+      this.actor.show();
+      Tweener.addTween(this.actor, {
+        opacity: 255,
+        height: naturalHeight,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.show();
+        },
+        onCompleteScope: this
+      });
+    },
+
+    hideAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden === true)
+        return;
+
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        height: 0,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeInQuad',
+        onComplete: function() {
+          this.hide();
+        },
+        onCompleteScope: this
+      });
+    }
+});
+
+
 const TrackInfo = new Lang.Class({
     Name: "TrackInfo",
 
     _init: function(text, style) {
-      this.actor = new St.BoxLayout({style_class: style, vertical: false});
+      this.actor = new St.Label({style_class: style});
       this.actor._delegate = this;
-
-      this._label = new St.Label({style_class: 'popup-inactive-menu-item'});
-      this.actor.add(this._label, {expand: true});
 
       this.setText(text);
     },
 
     setText: function(text) {
-      if (this._label.clutter_text) {
-        this._label.clutter_text.line_wrap = true;
-        this._label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._label.clutter_text.set_markup(text);
+      if (this.actor.clutter_text) {
+        this.actor.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this.actor.clutter_text.set_markup(text);
       }
     },
 
     getText: function() {
-      return this._label.text;
+      return this.actor.text;
     }
 });
 
 const TrackRating = new Lang.Class({
     Name: "TrackRating",
+    Extends: PopupMenu.PopupBaseMenuItem,
 
-    _init: function(prepend, value, style, player) {
-        this.actor = new St.BoxLayout({style_class: style});
-        this.actor._delegate = this;
-
-        if (prepend) {
-            this._prepend = new St.Label({style_class: 'popup-inactive-menu-item', text: prepend + ": "});
-            this._prepend.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-            this.actor.add(this._prepend);
-        }
-        // Reference to our player
+    _init: function(player, value) {
         this._player = player;
-        // Current value
-        this._value = value;
+        this.parent({style_class: "track-rating", hover: false});
+        this.box = new St.BoxLayout({style_class: 'star-box'});
+        this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+        this.rate(value);
         // Supported players (except for Nuvola Player)
         this._supported = {
             "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
@@ -262,18 +317,20 @@ const TrackRating = new Lang.Class({
             "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
             "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
         };
-        // Icons
+    },
+
+    rate: function(value) {
+        this.box.destroy_all_children();
+        this._value = value;
         this._starIcon = [];
         this._starButton = [];
         for(let i=0; i < 5; i++) {
             // Create star icons
-            this._starIcon[i] = new St.Icon({style_class: 'star-icon',
-                                             icon_size: 16,
+            this._starIcon[i] = new St.Icon({style_class: 'popup-menu-icon star-icon',
                                              icon_name: 'non-starred-symbolic'
                                              });
             // Create the button with starred icon
-            this._starButton[i] = new St.Button({style_class: 'button-star',
-                                                 x_align: St.Align.START,
+            this._starButton[i] = new St.Button({x_align: St.Align.MIDDLE,
                                                  y_align: St.Align.MIDDLE,
                                                  track_hover: true,
                                                  child: this._starIcon[i]
@@ -284,7 +341,7 @@ const TrackRating = new Lang.Class({
             this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
 
             // Put the button in the box
-            this.actor.add(this._starButton[i]);
+            this.box.add_child(this._starButton[i]);
         }
         this.setRating(this._value);
     },

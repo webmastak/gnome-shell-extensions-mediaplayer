@@ -21,7 +21,6 @@
 const Mainloop = imports.mainloop;
 const Lang = imports.lang;
 const Signals = imports.signals;
-const Config = imports.misc.config;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Panel = Me.imports.panel;
@@ -34,10 +33,17 @@ const UI = Me.imports.ui;
 const PlayerManager = new Lang.Class({
     Name: 'PlayerManager',
 
-    _init: function(menu) {
+    _init: function(menu, desiredMenuPosition) {
         this._disabling = false;
         // the menu
         this.menu = menu;
+        // the desired menu position
+        this.desiredMenuPosition = desiredMenuPosition;
+        // we have to make sure that players are added
+        // to the menu from top to bottom otherwise
+        // for some strange reason it mangles spacing
+        // and alignment of the widgets
+        this._totalNumberPlayers = 0
         // players list
         this._players = {};
         // player shown in the panel
@@ -241,21 +247,10 @@ const PlayerManager = new Lang.Class({
         }
     },
 
-    _getPlayerPosition: function() {
-      let position = 0;
-      if (Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY) ==
-            Settings.IndicatorPosition.VOLUMEMENU) {
-        if (parseInt(Config.PACKAGE_VERSION.split(".")[1]) < 18)
-          position = this.menu.numMenuItems - 2;
-        else
-          position = this.menu.numMenuItems - 1;
-      }
-      return position;
-    },
-
     _addPlayerToMenu: function(owner) {
-      let position = this._getPlayerPosition();
-      this.menu.addMenuItem(this._players[owner].ui, position);
+      let actualPos = this.desiredMenuPosition + this._totalNumberPlayers;
+      this._totalNumberPlayers += 1;      
+      this.menu.addMenuItem(this._players[owner].ui, actualPos);
       this._refreshActivePlayer(this._players[owner].player);
     },
 
@@ -299,6 +294,7 @@ const PlayerManager = new Lang.Class({
               this._players[owner].player.destroy();
             delete this._players[owner];
             this._hideOrDefaultPlayer();
+            this._totalNumberPlayers -= 1;
         }
         this._refreshActivePlayer(null);
     },
