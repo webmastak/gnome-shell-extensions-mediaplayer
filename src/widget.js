@@ -133,16 +133,15 @@ const TrackBox = new Lang.Class({
     _init: function(cover, params) {
       params = Params.parse(params, {
         hover: false,
-        style_class: "track-box"
       });
       this.parent(params);
-      // This adds an unwanted height if the PopupBaseMenuItem is empty
-      this.actor.remove_actor(this._ornamentLabel);
 
       this._cover = cover;
+      this.content = new St.BoxLayout({style_class: "popup-menu-item", vertical: false});
+      this.content.add_child(this._cover);
       this._infos = new St.BoxLayout({style_class: "track-infos", vertical: true});
-      this.actor.add(this._cover);
-      this.actor.add(this._infos, {expand: true, y_expand: true});
+      this.content.add_child(this._infos);
+      this.actor.add(this.content);
     },
 
     addInfo: function(item, row) {
@@ -227,9 +226,8 @@ const TrackInfo = new Lang.Class({
 
     setText: function(text) {
       if (this._label.clutter_text) {
-        this._label.clutter_text.line_wrap = true;
-        this._label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._label.clutter_text.line_wrap = false;
+        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         this._label.clutter_text.set_markup(text);
       }
     },

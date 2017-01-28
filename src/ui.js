@@ -401,15 +401,29 @@ const PlayerUI = new Lang.Class({
 
   _toggleCover: function() {
     if (this.trackCover.child.has_style_class_name('track-cover')) {
-      let size = this.trackCover.child.icon_size,
-          targetSize;
-      if (size == Settings.COVER_SIZE)
-        targetSize = size * 2;
-      else
+        let targetSize, transition, vertical;
+      if (this.trackCover.child.icon_size == Settings.COVER_SIZE) {
+        let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY);
+        if (position == Settings.IndicatorPosition.VOLUMEMENU) { 
+          targetSize = this.trackBox.content.get_preferred_width(-1)[0];
+        }
+        else {
+          targetSize = this.trackBox.actor.get_preferred_width(-1)[0];
+        }      
+        transition = 'easeInQuad';
+        vertical = true;
+      }
+      else {
         targetSize = Settings.COVER_SIZE;
+        transition = 'easeOutQuad';
+        vertical = false;
+      }
       Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
-                                               time: 0.3,
-                                               transition: 'easeInCubic'});
+                                               time: Settings.FADE_ANIMATION_TIME,
+                                               transition: transition});
+      Tweener.addTween(this.trackBox.content, {vertical: vertical,
+                                             time: Settings.FADE_ANIMATION_TIME,
+                                             transition: transition});
     }
   },
 
