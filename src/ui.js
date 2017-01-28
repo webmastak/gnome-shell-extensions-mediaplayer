@@ -136,10 +136,12 @@ const PlayerUI = new Lang.Class({
 
     this.activePlaylist = null;
 
+    this.currentCover = "media-optical-cd-audio";
+
     this.trackCover = new St.Button({style_class: 'track-cover-container',
                                      x_align: St.Align.START,
                                      y_align: St.Align.START,
-                                     child: new St.Icon({icon_name: "media-optical-cd-audio",
+                                     child: new St.Icon({icon_name: this.currentCover,
                                                          icon_size: Settings.COVER_SIZE})});
     this.trackCover.connect('clicked', Lang.bind(this, this._toggleCover));
 
@@ -338,7 +340,10 @@ const PlayerUI = new Lang.Class({
       this.setActivePlaylist(newState.playlist);
     }
 
-    if (newState.trackCoverUrl !== null || newState.isRadio !== null) {
+    let newCover = this.getCover(newState);
+    if ((newState.trackCoverUrl !== null || newState.isRadio !== null)
+        && newCover != this.currentCover) {
+      this.currentCover = newCover;
       this.hideCover();
       this.showCover(newState);
     }
@@ -364,6 +369,14 @@ const PlayerUI = new Lang.Class({
     });
   },
 
+  getCover: function(state) {
+    if (state.isRadio)
+      return "radio";
+    if (state.trackCoverUrl)
+      return state.trackCoverUrl;
+    return "media-optical-cd-audio";
+  },
+
   showCover: function(state) {
     Tweener.addTween(this.trackCover, {
       opacity: 0,
@@ -371,23 +384,16 @@ const PlayerUI = new Lang.Class({
       transition: 'easeOutCubic',
       onComplete: Lang.bind(this, function() {
         // Change cover
-        if (state.isRadio) {
-          let coverIcon = new St.Icon({icon_name: "radio",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
-        }
-        else if (state.trackCoverUrl) {
+        let coverArgs = {icon_size: this.trackCover.child.icon_size};
+        if (this.currentCover.indexOf("://") == -1) {
+          coverArgs.icon_name = this.currentCover;
+        } else {
           let file = Gio.File.new_for_uri(state.trackCoverUrl);
           let gicon = new Gio.FileIcon({file: file});
-          let coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
+          coverArgs.gicon = gicon;
+          coverArgs.style_class = "track-cover";
         }
-        else {
-          let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
-        }
+        this.trackCover.child = new St.Icon(coverArgs);
 
         // Show the new cover
         Tweener.addTween(this.trackCover, {
