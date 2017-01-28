@@ -156,12 +156,16 @@ const PlayerUI = new Lang.Class({
     this.stopButton.hide();
     this.nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
                                               Lang.bind(this.player, this.player.next));
+    this.raiseButton = new Widget.PlayerButton('view-fullscreen-symbolic',
+                                               Lang.bind(this.player, this.player.raise));
+    this.raiseButton.hide();
 
     this.trackControls = new Widget.PlayerButtons();
     this.trackControls.addButton(this.prevButton);
     this.trackControls.addButton(this.playButton);
     this.trackControls.addButton(this.stopButton);
     this.trackControls.addButton(this.nextButton);
+    this.trackControls.addButton(this.raiseButton);
 
     this.addMenuItem(this.trackControls);
 
@@ -283,11 +287,13 @@ const PlayerUI = new Lang.Class({
 
       if (status == Settings.Status.STOP) {
         this.trackBox.hideAnimate();
+        this.raiseButton.show();
         this.volume.actor.hide();
         this.position.actor.hide();
       }
       else {
         this.trackBox.showAnimate();
+        this.raiseButton.hide();
         if (this.showVolume)
           this.volume.actor.show();
         if (this.showPosition && this.player.state.canSeek)
