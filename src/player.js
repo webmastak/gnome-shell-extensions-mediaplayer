@@ -403,9 +403,9 @@ const MPRISPlayer = new Lang.Class({
         return;
 
       state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
-      state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : "";
-      state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
-      state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
+      state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : ["Unknown artist"];
+      state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "Unknown album";
+      state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "Unknown title";
       state.trackNumber = metadata["xesam:trackNumber"] ? metadata["xesam:trackNumber"].unpack() : "";
       state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
       state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "";
