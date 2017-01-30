@@ -191,7 +191,14 @@ const PlayerUI = new Lang.Class({
     }));
     this.addMenuItem(this.volume);
 
-    this.playlists = this._createPlaylistWidget();
+    let playlistTitle = _("Playlists");
+    for (let key in Settings.ALTERNATIVE_PLAYLIST_TITLES){
+      if (key == this.player.info.identity) {
+          playlistTitle = Settings.ALTERNATIVE_PLAYLIST_TITLES[key];
+          break;
+      }
+    }
+    this.playlists = new PopupMenu.PopupSubMenuMenuItem(playlistTitle);
     this.addMenuItem(this.playlists);
 
     if (Settings.MINOR_VERSION > 19) {
@@ -488,21 +495,6 @@ const PlayerUI = new Lang.Class({
                                              }
                                            )}
     );
-  },
-
-  _createPlaylistWidget: function() {
-    let playlistTitle = _("Playlists");
-    let altPlaylistTitles = Settings.ALTERNATIVE_PLAYLIST_TITLES;
-    for (let i = 0; i < altPlaylistTitles.length; i++){
-      let obj = altPlaylistTitles[i];
-      for (let key in obj){
-        if (key == this.player.info.identity) {
-          playlistTitle = obj[key];
-          break;
-        }
-      }
-    }
-    return new PopupMenu.PopupSubMenuMenuItem(playlistTitle);
   },
 
   updateInfo: function(player, playerInfo) {

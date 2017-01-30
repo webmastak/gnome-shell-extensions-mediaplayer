@@ -69,9 +69,9 @@ const SEND_STOP_ON_CHANGE = [
     "org.mpris.MediaPlayer2.pragha"
 ];
 
-const ALTERNATIVE_PLAYLIST_TITLES = [
-    {"Pithos": _("Stations")}
-];
+const ALTERNATIVE_PLAYLIST_TITLES = {
+    "Pithos": _("Stations")
+};
 
 const PLAYERS_THAT_CANT_STOP = [
     "Pithos"
