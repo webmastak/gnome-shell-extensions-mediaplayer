@@ -22,22 +22,31 @@
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Lib = Me.imports.lib;
 
+const Config = imports.misc.config;
+
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
 const N_ = function(t) { return t; };
 
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
+const MEDIAPLAYER_NUM_MENU_ITEMS_KEY = 'num-menuitems';
+const MEDIAPLAYER_MENU_POSITION_KEY = 'menu-position';
 const MEDIAPLAYER_STATUS_TYPE_KEY = 'status-type';
 const MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
 const MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
-const MEDIAPLAYER_COVER_SIZE = 'coversize';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 const MEDIAPLAYER_RATING_KEY = 'rating';
 const MEDIAPLAYER_TRACKBOX_TEMPLATE = 'trackbox-template';
+const MEDIAPLAYER_SMALL_COVER_SIZE_KEY = 'small-cover';
+const MEDIAPLAYER_LARGE_COVER_SIZE_KEY = 'large-cover';
+const MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY = 'enable-scroll';
+const MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';
+
+const MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
 
 const IndicatorPosition = {
     CENTER: 0,
@@ -46,7 +55,6 @@ const IndicatorPosition = {
 };
 
 const FADE_ANIMATION_TIME = 0.16;
-const COVER_SIZE = 100;
 
 const Status = {
     STOP: N_("Stopped"),
@@ -59,6 +67,14 @@ const SEND_STOP_ON_CHANGE = [
     "org.mpris.MediaPlayer2.banshee",
     "org.mpris.MediaPlayer2.vlc",
     "org.mpris.MediaPlayer2.pragha"
+];
+
+const ALTERNATIVE_PLAYLIST_TITLES = [
+    {"Pithos": _("Stations")}
+];
+
+const PLAYERS_THAT_CANT_STOP = [
+    "Pithos"
 ];
 
 const IndicatorStatusType = {

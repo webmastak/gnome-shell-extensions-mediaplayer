@@ -73,6 +73,9 @@ const PlayerState = new Lang.Class({
   showRating: null,
   showVolume: null,
   showPosition: null,
+  largeCoverSize: null,
+  smallCoverSize: null,
+  hideStockMpris: null,
 
   canSeek: null,
   canGoNext: null,
@@ -115,6 +118,7 @@ const MPRISPlayer = new Lang.Class({
 
         this._timerId = 0;
         this._statusId = 0;
+        this._stockMprisId = 0;
 
         this._settings = Settings.gsettings;
         this._signalsId = [];
@@ -159,6 +163,27 @@ const MPRISPlayer = new Lang.Class({
         this.info.canRaise = this._mediaServer.CanRaise;
         this.info.canQuit = this._mediaServer.CanQuit;
 
+        if (Settings.MINOR_VERSION > 19) {
+        // Versions before 3.20 don't have Mpris built-in.
+        // hideStockMpris setting
+          this._signalsId.push(
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY, Lang.bind(this, function() {
+              this.emit('player-update', new PlayerState({hideStockMpris: this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY)}));
+            }))
+          );
+        }
+        // largeCoverSize setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({largeCoverSize: this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY)}));
+          }))
+        );
+        // smallCoverSize setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY, Lang.bind(this, function() {
+            this.emit('player-update', new PlayerState({smallCoverSize: this._settings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY)}));
+          }))
+        );
         // showVolume setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
@@ -195,6 +220,18 @@ const MPRISPlayer = new Lang.Class({
             let volume = props.Volume.unpack();
             if (this.state.volume !== volume) {
               newState.volume = volume;
+            }
+          }
+
+          if (props.CanPlay && Settings.MINOR_VERSION > 19) {
+            // We can't actually disable the stock Mpris applet.
+            // We can only hide it when it tries to show it's self.
+            // It listens for the CanPlay prop to decide if/when to show it's self.
+            // So we do also to hide it when it trys to show it's self
+            // if the user has decided they want it hidden.
+            let canPlay = props.CanPlay.unpack();
+            if (canPlay) {
+              newState.hideStockMpris = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY);
             }
           }
 
@@ -329,6 +366,10 @@ const MPRISPlayer = new Lang.Class({
       }
 
       this._parseMetadata(this._mediaServerPlayer.Metadata, newState);
+
+      if (Settings.MINOR_VERSION > 19) {
+        newState.hideStockMpris = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY);
+      }
 
       this.emit('player-update', newState);
       

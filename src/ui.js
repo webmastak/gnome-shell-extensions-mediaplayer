@@ -63,24 +63,28 @@ const PlayerMenu = new Lang.Class({
    *  or by the manager when another player menu
    * is opened */
   close: function(animate, force) {
-    if (force !== true)
+    if (force !== true) {
       return;
+    }
     this.menu._close(BoxPointer.PopupAnimation.FULL);
     this.emit('player-menu-closed');
   },
 
   open: function(animate) {
-    if (!animate)
+    if (!animate) {
       animate = BoxPointer.PopupAnimation.FULL;
+    }
     this.menu._open(animate);
     this.emit('player-menu-opened');
   },
 
   setSubmenuShown: function(open) {
-    if (open)
+    if (open) {
       this.menu.open(BoxPointer.PopupAnimation.FULL);
-    else
+    }
+    else {
       this.menu.close(BoxPointer.PopupAnimation.FULL, true);
+    }
   }
 
 });
@@ -136,16 +140,26 @@ const PlayerUI = new Lang.Class({
 
     this.activePlaylist = null;
 
-    this.trackCover = new St.Button({style_class: 'track-cover-container',
-                                     x_align: St.Align.START,
-                                     y_align: St.Align.START,
-                                     child: new St.Icon({icon_name: "media-optical-cd-audio",
-                                                         icon_size: Settings.COVER_SIZE})});
+    this.oldShouldShow = null;
+
+    this.largeCoverSize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
+    this.smallCoverSize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY);
+
+    this.trackCover = new St.Button({child: new St.Icon({icon_name: "media-optical-cd-audio",
+                                                         icon_size: this.smallCoverSize})});
     this.trackCover.connect('clicked', Lang.bind(this, this._toggleCover));
 
     this.trackBox = new Widget.TrackBox(this.trackCover);
     this.trackBox.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.trackBox);
+
+    this.trackRatings = new Widget.TrackRating(this.player, 0);
+    this.addMenuItem(this.trackRatings);
+
+    this.secondaryInfo = new Widget.SecondaryInfo();
+    this.secondaryInfo.connect('activate', Lang.bind(this.player, this.player.raise));
+    this.secondaryInfo.hide();
+    this.addMenuItem(this.secondaryInfo);        
 
     this.prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
                                               Lang.bind(this.player, this.player.previous));
@@ -165,40 +179,82 @@ const PlayerUI = new Lang.Class({
 
     this.addMenuItem(this.trackControls);
 
-    this.volume = new Widget.SliderItem(_("Volume"), "audio-volume-high-symbolic", 0);
-    this.volume.connect('value-changed', Lang.bind(this, function(item) {
-      this.player.setVolume(item._value);
-    }));
-    this.addMenuItem(this.volume);
-
-    this.position = new Widget.SliderItem("0:00 / 0:00", "document-open-recent", 0);
+    this.position = new Widget.SliderItem("document-open-recent-symbolic", 0);
     this.position.connect('value-changed', Lang.bind(this, function(item) {
       this.player.seek(item._value);
     }));
     this.addMenuItem(this.position);
 
-    this.playlists = new PopupMenu.PopupSubMenuMenuItem(_("Playlists"));
+    this.volume = new Widget.SliderItem("audio-volume-high-symbolic", 0);
+    this.volume.connect('value-changed', Lang.bind(this, function(item) {
+      this.player.setVolume(item._value);
+    }));
+    this.addMenuItem(this.volume);
+
+    this.playlists = this._createPlaylistWidget();
     this.addMenuItem(this.playlists);
+
+    if (Settings.MINOR_VERSION > 19) {
+      this.stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
+    }
+  },
+
+  shouldShowOverride: function(player, newState) {
+    return false;
   },
 
   update: function(player, newState) {
 
+    if (newState.hideStockMpris !== null) {
+      if (this.stockMpris) {
+        if (newState.hideStockMpris) {
+          this.stockMpris.actor.hide();
+        }
+        else if (this.stockMpris._shouldShow()) {
+          this.stockMpris.actor.show();
+        }
+      }
+    }
+
+    if (newState.largeCoverSize !== null) {
+      this.largeCoverSize = newState.largeCoverSize;
+      if (this.trackCover.child.icon_size !== this.smallCoverSize) {
+        this.trackCover.child.icon_size = this.largeCoverSize;
+      }              
+    }
+
+    if (newState.smallCoverSize !== null) {
+      this.smallCoverSize = newState.smallCoverSize;
+      if (this.trackCover.child.icon_size !== this.largeCoverSize) {
+        this.trackCover.child.icon_size = this.smallCoverSize;
+      }              
+    }
+
     if (newState.showRating !== null) {
       this.showRating = newState.showRating;
+      if (this.showRating) {
+        this.trackRatings.actor.show();
+      }
+      else {
+        this.trackRatings.actor.hide();
+      }              
     }
 
     if (newState.showVolume !== null) {
       this.showVolume = newState.showVolume;
-      if (this.showVolume)
+      if (this.showVolume) {
         this.volume.actor.show();
-      else
+      }
+      else {
         this.volume.actor.hide();
+      }
     }
 
     if (newState.showPosition !== null) {
       this.showPosition = newState.showPosition;
-      if (this.showPosition)
+      if (this.showPosition) {
         this.position.actor.show();
+      }
       else {
         this.position.actor.hide();
       }
@@ -206,71 +262,90 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showPlaylist !== null) {
       this.showPlaylist = newState.showPlaylist;
-      if (this.showPlaylist)
+      if (this.showPlaylist) {
         this.playlists.actor.show();
+      }
       else {
         this.playlists.actor.hide();
       }
     }
 
+    if (newState.trackRating !== null) {
+      this.trackRatings.rate(newState.trackRating);
+    }
+
     if (newState.trackTitle !== null || newState.trackArtist !== null || newState.trackAlbum !== null) {
       this.trackBox.empty();
+      this.secondaryInfo.empty();
       JSON.parse(Settings.gsettings.get_string(Settings.MEDIAPLAYER_TRACKBOX_TEMPLATE))
       .forEach(Lang.bind(this, function(trackInfo) {
         let text = Lib.compileTemplate(trackInfo.template, newState);
         this.trackBox.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
+        this.secondaryInfo.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
       }));
-      if (player.state.trackRating !== null && this.showRating)
-        this.trackBox.addInfo(new Widget.TrackRating(null, player.state.trackRating, 'track-rating', this.player));
     }
 
     if (newState.volume !== null) {
-      let value = newState.volume;
-      if (value === 0)
-          this.volume.setIcon("audio-volume-muted-symbolic");
-      if (value > 0)
-          this.volume.setIcon("audio-volume-low-symbolic");
-      if (value > 0.30)
-          this.volume.setIcon("audio-volume-medium-symbolic");
-      if (value > 0.80)
-          this.volume.setIcon("audio-volume-high-symbolic");
+      // Adapted from https://github.com/GNOME/gnome-shell/blob/master/js/ui/status/volume.js
+      // So that our icon changes match the system volume icon changes.
+      let value = newState.volume, volumeIcon;
+      if (value === 0) {
+        volumeIcon = "audio-volume-muted-symbolic";
+      }
+      else {
+        let n = Math.floor(3 * value) + 1;
+        if (n < 2) {
+          volumeIcon = "audio-volume-low-symbolic";
+        }
+        else if (n >= 3) {
+          volumeIcon = "audio-volume-high-symbolic";          
+        }
+        else {
+          volumeIcon = "audio-volume-medium-symbolic";
+        }
+      }
+      this.volume.setIcon(volumeIcon);
       this.volume.setValue(value);
     }
 
     if (newState.canPause !== null) {
-      if (newState.canPause)
+      if (newState.canPause) {
         this.playButton.setCallback(Lang.bind(this.player, this.player.playPause));
-      else
+      }
+      else {
         this.playButton.setCallback(Lang.bind(this.player, this.player.play));
+      }
     }
 
     if (newState.canGoNext !== null) {
-      if (newState.canGoNext)
+      if (newState.canGoNext) {
         this.nextButton.enable();
-      else
+      }
+      else {
         this.nextButton.disable();
+      }
     }
 
     if (newState.canGoPrevious !== null) {
-      if (newState.canGoPrevious)
+      if (newState.canGoPrevious) {
         this.prevButton.enable();
-      else
+      }
+      else {
         this.prevButton.disable();
+      }
     }
 
     if (newState.canSeek !== null) {
       if (newState.canSeek && this.showPosition &&
-          this.player.state.status != Settings.Status.STOP)
+          this.player.state.status != Settings.Status.STOP) {
         this.position.actor.show();
+      }
       else {
         this.position.actor.hide();
       }
     }
 
     if (newState.trackTime && newState.trackLength) {
-      this.position.setLabel(
-        this._formatTime(newState.trackTime) + " / " + this._formatTime(newState.trackLength)
-      );
       this.position.setValue(newState.trackTime / newState.trackLength);
     }
 
@@ -282,20 +357,32 @@ const PlayerUI = new Lang.Class({
       }
 
       if (status == Settings.Status.STOP) {
+        this.trackRatings.actor.hide();
         this.trackBox.hideAnimate();
+        this.secondaryInfo.hideAnimate();
         this.volume.actor.hide();
         this.position.actor.hide();
       }
       else {
         this.trackBox.showAnimate();
-        if (this.showVolume)
+        if (this.trackCover.child.icon_size == this.largeCoverSize) {
+          this.secondaryInfo.showAnimate();
+        }
+        if (this.showRating) {
+          this.trackRatings.actor.show();
+        }
+        if (this.showVolume) {
           this.volume.actor.show();
-        if (this.showPosition && this.player.state.canSeek)
+        }
+        if (this.showPosition && this.player.state.canSeek) {
           this.position.actor.show();
+        }
       }
 
       if (status === Settings.Status.PLAY) {
-        this.stopButton.show();
+        if (Settings.PLAYERS_THAT_CANT_STOP.indexOf(this.player.info.identity) == -1) {
+          this.stopButton.show();
+        }
         if (player.state.canPause) {
           this.playButton.setIcon('media-playback-pause-symbolic');
           this.playButton.show();
@@ -320,8 +407,9 @@ const PlayerUI = new Lang.Class({
         let obj = playlist[0],
             name = playlist[1];
         // Don't add video playlists
-        if (obj.toString().search('Video') > 0)
+        if (obj.toString().search('Video') > 0) {
               return;
+        }
         let playlistUI = new Widget.PlaylistItem(name, obj);
         playlistUI.connect('activate', Lang.bind(this, function(playlistItem) {
           this.setActivePlaylist(playlistItem.obj);
@@ -339,8 +427,7 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackCoverUrl !== null || newState.isRadio !== null) {
-      this.hideCover();
-      this.showCover(newState);
+      this.changeCover(newState);
     }
   },
 
@@ -356,80 +443,66 @@ const PlayerUI = new Lang.Class({
     });
   },
 
-  hideCover: function() {
-    Tweener.addTween(this.trackCover, {
-      opacity: 0,
-      time: 0.3,
-      transition: 'easeOutCubic',
-    });
-  },
-
-  showCover: function(state) {
-    Tweener.addTween(this.trackCover, {
-      opacity: 0,
-      time: 0.3,
-      transition: 'easeOutCubic',
-      onComplete: Lang.bind(this, function() {
-        // Change cover
-        if (state.isRadio) {
-          let coverIcon = new St.Icon({icon_name: "radio",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
-        }
-        else if (state.trackCoverUrl) {
-          let file = Gio.File.new_for_uri(state.trackCoverUrl);
-          let gicon = new Gio.FileIcon({file: file});
-          let coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
-        }
-        else {
-          let coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
-                                       icon_size: this.trackCover.child.icon_size});
-          this.trackCover.child = coverIcon;
-        }
-
-        // Show the new cover
-        Tweener.addTween(this.trackCover, {
-          opacity: 255,
-          time: 0.3,
-          transition: 'easeInCubic',
-        });
-      })
-    });
+  changeCover: function(state) {
+    let coverIcon = null
+    if (state.isRadio) {
+      coverIcon = new St.Icon({icon_name: "radio",
+                              icon_size: this.trackCover.child.icon_size});
+    }
+    else if (state.trackCoverUrl) {
+      let file = Gio.File.new_for_uri(state.trackCoverUrl);
+      if (file.query_exists(null)) {
+        let gicon = new Gio.FileIcon({file: file});
+        coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
+                                     icon_size: this.trackCover.child.icon_size});
+      }
+    }
+    if (!coverIcon) {
+      coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
+                              icon_size: this.trackCover.child.icon_size});
+    }
+    this.trackCover.child = coverIcon;
   },
 
   _toggleCover: function() {
-    if (this.trackCover.child.has_style_class_name('track-cover')) {
-      let size = this.trackCover.child.icon_size,
-          targetSize;
-      if (size == Settings.COVER_SIZE)
-        targetSize = size * 2;
-      else
-        targetSize = Settings.COVER_SIZE;
-      Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
-                                               time: 0.3,
-                                               transition: 'easeInCubic'});
+    let targetSize, transition;
+    if (this.trackCover.child.icon_size == this.smallCoverSize) {
+      targetSize = this.largeCoverSize;
+      transition = 'easeOutQuad';
+      this.trackBox.infos.hide();
+      this.secondaryInfo.showAnimate();
     }
+    else {
+      targetSize = this.smallCoverSize;
+      transition = 'easeInQuad';
+      this.secondaryInfo.hideAnimate();
+    }
+
+    Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
+                                             time: 0.3,
+                                             transition: transition,
+                                             onComplete: Lang.bind(this, function() {
+                                               if (targetSize == this.smallCoverSize) { 
+                                                 this.trackBox.infos.show();
+                                               }
+                                             }
+                                           )}
+    );
   },
 
-  _formatTime: function(s) {
-    let ms = s * 1000;
-    let msSecs = (1000);
-    let msMins = (msSecs * 60);
-    let msHours = (msMins * 60);
-    let numHours = Math.floor(ms/msHours);
-    let numMins = Math.floor((ms - (numHours * msHours)) / msMins);
-    let numSecs = Math.floor((ms - (numHours * msHours) - (numMins * msMins))/ msSecs);
-    if (numSecs < 10)
-      numSecs = "0" + numSecs.toString();
-    if (numMins < 10 && numHours > 0)
-      numMins = "0" + numMins.toString();
-    if (numHours > 0)
-      numHours = numHours.toString() + ":";
-    else
-      numHours = "";
-    return numHours + numMins.toString() + ":" + numSecs.toString();
+  _createPlaylistWidget: function() {
+    let playlistTitle = _("Playlists");
+    let altPlaylistTitles = Settings.ALTERNATIVE_PLAYLIST_TITLES;
+    for (let i = 0; i < altPlaylistTitles.length; i++){
+      let obj = altPlaylistTitles[i];
+      for (let key in obj){
+        if (key == this.player.info.identity) {
+          playlistTitle = obj[key];
+          break;
+        }
+      }
+    }
+    return new PopupMenu.PopupSubMenuMenuItem(playlistTitle);
   },
 
   updateInfo: function(player, playerInfo) {

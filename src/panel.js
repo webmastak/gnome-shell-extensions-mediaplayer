@@ -44,13 +44,15 @@ const IndicatorMixin = {
   },
 
   _onScrollEvent: function(actor, event) {
-    switch (event.get_scroll_direction()) {
-      case Clutter.ScrollDirection.UP:
-        this.manager.activePlayer.previous();
-      break;
-      case Clutter.ScrollDirection.DOWN:
-        this.manager.activePlayer.next();
-      break;
+    if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY)) {
+      switch (event.get_scroll_direction()) {
+        case Clutter.ScrollDirection.UP:
+          this.manager.activePlayer.previous();
+        break;
+        case Clutter.ScrollDirection.DOWN:
+          this.manager.activePlayer.next();
+        break;
+      }
     }
   },
 
@@ -108,13 +110,16 @@ const IndicatorMixin = {
     if (state.trackCoverUrl !== null) {
       if (state.trackCoverUrl &&
           Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
-        this._primaryIndicator.gicon = new Gio.FileIcon({
-          file: Gio.File.new_for_uri(state.trackCoverUrl)
-        });
+          let file = Gio.File.new_for_uri(state.trackCoverUrl);
+          if (file.query_exists(null)) {
+            this._primaryIndicator.gicon = new Gio.FileIcon({file: file});
+          }
+          else {
+            this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
+          }
       }
       else {
         this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-        this._primaryIndicator.icon_size = 16;
       }
     }
 
@@ -160,17 +165,16 @@ const PanelIndicator = new Lang.Class({
 
     this.menu.actor.add_style_class_name('mediaplayer-menu');
 
-    this.indicators = new St.BoxLayout({vertical: false, style_class: 'indicators'});
+    this.indicators = new St.BoxLayout({vertical: false});
 
     this._primaryIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
-                                          style_class: 'system-status-icon indicator'});
+                                          style_class: 'system-status-icon indicator-item'});
     this._secondaryIndicator = new St.Icon({icon_name: 'media-playback-stop-symbolic',
-                                            style_class: 'secondary-indicator'});
+                                            style_class: 'popup-menu-icon secondary-indicator indicator-item'});
     this._secondaryIndicator.hide();
-    this._thirdIndicator = new St.Label({style_class: 'system-status-icon third-indicator'});
+    this._thirdIndicator = new St.Label({style_class: 'system-status-icon'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-    this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
-                                          y_align: St.Align.MIDDLE});
+    this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator});
     this._thirdIndicator.hide();
 
     this.indicators.add(this._primaryIndicator);
@@ -201,11 +205,12 @@ const AggregateMenuIndicator = new Lang.Class({
 
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
+    this._primaryIndicator.style_class = 'system-status-icon indicator-item'
     this._secondaryIndicator = this._addIndicator();
     this._secondaryIndicator.icon_name = 'media-playback-stop-symbolic';
-    this._secondaryIndicator.style_class = 'secondary-indicator';
+    this._secondaryIndicator.style_class = 'popup-menu-icon secondary-indicator indicator-item';
     this._secondaryIndicator.hide();
-    this._thirdIndicator = new St.Label({style_class: 'system-status-icon third-indicator'});
+    this._thirdIndicator = new St.Label({style_class: 'system-status-icon'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this._thirdIndicator.hide();
     this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
@@ -213,7 +218,6 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.add_actor(this._thirdIndicatorBin);
     this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
-    this.indicators.style_class = 'indicators';
 
     this.indicators.hide();
   },
@@ -224,13 +228,6 @@ const AggregateMenuIndicator = new Lang.Class({
     }
     else if (state.status) {
       this.indicators.show();
-    }
-
-    if (this._secondaryIndicator.visible) {
-      this._primaryIndicator.add_style_class_name('indicator');
-    }
-    else {
-      this._primaryIndicator.remove_style_class_name('indicator');
     }
   },
 
