@@ -154,6 +154,7 @@ const PlayerUI = new Lang.Class({
     this.addMenuItem(this.trackBox);
 
     this.trackRatings = new Widget.TrackRating(this.player, 0);
+    this.trackRatings.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.trackRatings);
 
     this.secondaryInfo = new Widget.SecondaryInfo();
@@ -172,6 +173,7 @@ const PlayerUI = new Lang.Class({
                                               Lang.bind(this.player, this.player.next));
 
     this.trackControls = new Widget.PlayerButtons();
+    this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise));
     this.trackControls.addButton(this.prevButton);
     this.trackControls.addButton(this.playButton);
     this.trackControls.addButton(this.stopButton);
