@@ -39,7 +39,7 @@ const PlayerButtons = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function() {
-        this.parent({reactive: false});
+        this.parent({hover: false});
         this.box = new St.BoxLayout({style_class: 'controls'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
@@ -97,7 +97,7 @@ const SliderItem = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function(icon, value) {
-        this.parent({style_class: 'slider-item'});
+        this.parent({style_class: 'slider-item', hover: false});
 
         this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(value);
