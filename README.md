@@ -142,8 +142,8 @@ option to gsettings.**
 
 ## Compatible players
 
-Any player that supports the [MPRIS v2](http://www.mpris.org/2.1/spec/)
-spec correctly is supported.
+Any player that implements the [MPRIS v2](https://specifications.freedesktop.org/mpris-spec/latest/)
+[Player](https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html) and optionally [Playlist](https://specifications.freedesktop.org/mpris-spec/latest/Playlists_Interface.html) interface spec correctly is supported.
 
 **Note:** Many players will require you to enable the MPRIS v2 support
 manually. If your player is listed but still doesn't work, look for words
