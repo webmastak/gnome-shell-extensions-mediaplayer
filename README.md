@@ -143,7 +143,7 @@ option to gsettings.**
 ## Compatible players
 
 Any player that supports the [MPRIS v2](http://www.mpris.org/2.1/spec/)
-spec can be supported.
+spec correctly is supported.
 
 **Note:** Many players will require you to enable the MPRIS v2 support
 manually. If your player is listed but still doesn't work, look for words
