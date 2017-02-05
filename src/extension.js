@@ -18,9 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
+const Mainloop = imports.mainloop;
 const Main = imports.ui.main;
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
-
+const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Lib = Me.imports.lib;
 const Manager = Me.imports.manager;
@@ -30,22 +32,25 @@ const Settings = Me.imports.settings;
 /* global values */
 let manager;
 let indicator;
+let _fileMonitor;
+let _defaultAppsGioFile = Gio.File.new_for_path(GLib.get_home_dir() + '/.config/mimeapps.list');
 
 function init() {
   Lib.initTranslations(Me);
   Settings.init();
-  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {
-    if (manager) {
-      disable();
-      enable();
-    }
-  });
-  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_MENU_POSITION_KEY, function() {
-    if (manager) {
-      disable();
-      enable();
-    }
-  });
+  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {_reset()});
+  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_MENU_POSITION_KEY, function() {_reset()});
+  if (_defaultAppsGioFile.query_exists(null)) {
+    _fileMonitor = _defaultAppsGioFile.monitor(Gio.FileMonitorFlags.NONE, null);
+    _fileMonitor.connect('changed', function() {Mainloop.timeout_add(500, _reset)});
+  } 
+}
+
+function _reset() {
+  if (manager) {
+    disable();
+    enable();
+  }
 }
 
 function enable() {
