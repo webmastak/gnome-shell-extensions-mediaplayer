@@ -33,7 +33,7 @@ const Settings = Me.imports.settings;
 let manager;
 let indicator;
 let _fileMonitor;
-let _defaultAppsGioFile = Gio.File.new_for_path(GLib.get_home_dir() + '/.config/mimeapps.list');
+let _defaultAppsGioFile = Gio.File.new_for_path(GLib.get_user_config_dir() + '/mimeapps.list');
 
 function init() {
   Lib.initTranslations(Me);
