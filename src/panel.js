@@ -111,12 +111,7 @@ const IndicatorMixin = {
       if (state.trackCoverUrl &&
           Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
           let file = Gio.File.new_for_uri(state.trackCoverUrl);
-          if (file.query_exists(null)) {
-            this._primaryIndicator.gicon = new Gio.FileIcon({file: file});
-          }
-          else {
-            this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-          }
+          this._primaryIndicator.gicon = new Gio.FileIcon({file: file});
       }
       else {
         this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';

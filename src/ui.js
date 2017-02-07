@@ -446,20 +446,18 @@ const PlayerUI = new Lang.Class({
   },
 
   changeCover: function(state) {
-    let coverIcon = null
+    let coverIcon;
     if (state.isRadio) {
       coverIcon = new St.Icon({icon_name: "radio",
                               icon_size: this.trackCover.child.icon_size});
     }
     else if (state.trackCoverUrl) {
       let file = Gio.File.new_for_uri(state.trackCoverUrl);
-      if (file.query_exists(null)) {
-        let gicon = new Gio.FileIcon({file: file});
-        coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
-                                     icon_size: this.trackCover.child.icon_size});
-      }
+      let gicon = new Gio.FileIcon({file: file});
+      coverIcon = new St.Icon({gicon: gicon, style_class: "track-cover",
+                               icon_size: this.trackCover.child.icon_size});
     }
-    if (!coverIcon) {
+    else {
       coverIcon = new St.Icon({icon_name: "media-optical-cd-audio",
                               icon_size: this.trackCover.child.icon_size});
     }
