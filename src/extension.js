@@ -33,11 +33,18 @@ const Settings = Me.imports.settings;
 let manager;
 let indicator;
 let _fileMonitor;
+let _stockMpris;
+let _stockMprisOldShouldShow;
 let _defaultAppsGioFile = Gio.File.new_for_path(GLib.get_user_config_dir() + '/mimeapps.list');
 
 function init() {
   Lib.initTranslations(Me);
   Settings.init();
+  if (Settings.MINOR_VERSION > 19) {
+    //Monkey patch
+    _stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
+    _stockMprisOldShouldShow = _stockMpris._shouldShow;
+  }
   Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {_reset()});
   Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_MENU_POSITION_KEY, function() {_reset()});
   if (_defaultAppsGioFile.query_exists(null)) {
@@ -96,9 +103,10 @@ function disable() {
     indicator = null;
   }
   if (Settings.MINOR_VERSION > 19) {
-    let stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
-    if (stockMpris._shouldShow()) {
-      stockMpris.actor.show();
+    //Revert Monkey patch
+    _stockMpris._shouldShow = _stockMprisOldShouldShow;
+    if (_stockMpris._shouldShow()) {
+      _stockMpris.actor.show();
     }
   }
 }

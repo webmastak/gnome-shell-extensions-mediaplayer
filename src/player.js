@@ -223,18 +223,6 @@ const MPRISPlayer = new Lang.Class({
             }
           }
 
-          if (props.CanPlay && Settings.MINOR_VERSION > 19) {
-            // We can't actually disable the stock Mpris applet.
-            // We can only hide it when it tries to show it's self.
-            // It listens for the CanPlay prop to decide if/when to show it's self.
-            // So we do also to hide it when it trys to show it's self
-            // if the user has decided they want it hidden.
-            let canPlay = props.CanPlay.unpack();
-            if (canPlay) {
-              newState.hideStockMpris = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY);
-            }
-          }
-
           if (props.CanPause) {
             let canPause = props.CanPause.unpack();
             if (this.state.canPause !== canPause) {
