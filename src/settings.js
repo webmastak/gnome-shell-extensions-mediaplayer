@@ -54,7 +54,7 @@ const IndicatorPosition = {
     VOLUMEMENU: 2
 };
 
-const FADE_ANIMATION_TIME = 0.16;
+const FADE_ANIMATION_TIME = 0.25;
 
 const Status = {
     STOP: N_("Stopped"),
