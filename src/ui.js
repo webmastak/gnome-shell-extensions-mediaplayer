@@ -479,7 +479,7 @@ const PlayerUI = new Lang.Class({
     }
 
     Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
-                                             time: 0.3,
+                                             time: Settings.FADE_ANIMATION_TIME,
                                              transition: transition,
                                              onComplete: Lang.bind(this, function() {
                                                if (targetSize == this.smallCoverSize) { 
