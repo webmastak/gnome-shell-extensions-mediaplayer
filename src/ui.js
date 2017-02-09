@@ -198,11 +198,10 @@ const PlayerUI = new Lang.Class({
 
     if (Settings.MINOR_VERSION > 19) {
       this.stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
+      //Monkey patch
+      this.stockMprisOldShouldShow = this.stockMpris._shouldShow;
+      
     }
-  },
-
-  shouldShowOverride: function(player, newState) {
-    return false;
   },
 
   update: function(player, newState) {
@@ -210,10 +209,14 @@ const PlayerUI = new Lang.Class({
     if (newState.hideStockMpris !== null) {
       if (this.stockMpris) {
         if (newState.hideStockMpris) {
+          this.stockMpris._shouldShow = function() {return false;};
           this.stockMpris.actor.hide();
         }
-        else if (this.stockMpris._shouldShow()) {
-          this.stockMpris.actor.show();
+        else {
+          this.stockMpris._shouldShow = this.stockMprisOldShouldShow;
+          if (this.stockMpris._shouldShow()) {
+            this.stockMpris.actor.show();
+          }
         }
       }
     }
