@@ -179,12 +179,50 @@ const PanelIndicator = new Lang.Class({
     this.actor.add_actor(this.indicators);
     this.actor.add_style_class_name('panel-status-button');
     this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
+
+    this.indicators.hide();
+
+    if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
+      this._showIndicators();
+    }
+
+    Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
+      this._toggleIndicators();
+    })); 
   },
 
-  // Override PanelMenu.Button._onEvent
-  _onEvent: function(actor, event) {
-    if (this._onButtonEvent(actor, event) == Clutter.EVENT_PROPAGATE)
-      this.parent(actor, event);
+  _hideIndicators: function() {
+    this.indicators.hide();
+    this.actor.hide();
+  },
+
+  _showIndicators: function() {
+    this.indicators.show();
+    this.indicators.set_width(-1);
+    this.actor.show();
+    this.actor.set_width(-1);
+  },
+
+  _toggleIndicators: function(state) {
+    if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
+      this._showIndicators();
+    }
+    else {
+      this._hideIndicators();
+    }
+  },
+
+  _onActivePlayerUpdate: function(manager, state) {
+    if (state.status && state.status === Settings.Status.STOP) {
+      this._toggleIndicators();       
+    }
+    else if (state.status) {
+      this._showIndicators();
+    }
+  },
+
+  _onActivePlayerRemove: function(manager, state) {
+    this._toggleIndicators();
   }
 });
 Lib._extends(PanelIndicator, IndicatorMixin);
@@ -217,17 +255,29 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.hide();
   },
 
+  _hideIndicators: function() {
+    this.indicators.hide();
+    this.actor.hide();
+  },
+
+  _showIndicators: function(status) {
+    this.indicators.show();
+    this.indicators.set_width(-1);
+    this.actor.show();
+    this.actor.set_width(-1);
+  },
+
   _onActivePlayerUpdate: function(manager, state) {
-    if (state.status && state.status === Settings.Status.STOP) {
-      this.indicators.hide();
+    if (state) {
+      this._showIndicators();
     }
-    else if (state.status) {
-      this.indicators.show();
+    else {
+      this._hideIndicators();
     }
   },
 
   _onActivePlayerRemove: function(manager, state) {
-    this.indicators.hide();
+    this._hideIndicators();
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);
