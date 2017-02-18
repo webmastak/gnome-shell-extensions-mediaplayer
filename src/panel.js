@@ -69,6 +69,16 @@ const IndicatorMixin = {
 
   // method binded to classes below
   _commonOnActivePlayerUpdate: function(manager, state) {
+    if (this.panelIconSettingId) {
+      this._settings.disconnect(this.panelIconSettingId);
+    }
+    this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+    this.panelIconSettingId = this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TYPE_KEY,
+      Lang.bind(this, function() {
+        this.useCoverInPanel =
+          this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+        this._setPrimaryIndicatorIcon(null, null);
+    }));   
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
@@ -80,18 +90,20 @@ const IndicatorMixin = {
         this._secondaryIndicator.icon_name = "media-playback-stop-symbolic";
       }
       this._secondaryIndicator.show();
+      this._secondaryIndicator.set_width(-1);
       this.indicators.show();
     }
 
     let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
       this._thirdIndicator.hide();
+      this._thirdIndicator.set_width(0);      
     } else {
       this._thirdIndicator.show();
     }
 
     if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
-      let stateText = Lib.compileTemplate(stateTemplate, state);
+      let stateText = this.compileTemplate(stateTemplate, state);
       this._thirdIndicator.clutter_text.set_markup(stateText);
 
       // If You just set width it will add blank space. This makes sure the
@@ -101,51 +113,59 @@ const IndicatorMixin = {
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
       if (statusTextWidth > prefWidth) {
         this._thirdIndicator.clutter_text.set_width(prefWidth);
+        this._thirdIndicator.set_width(prefWidth);
       }
       else {
         this._thirdIndicator.clutter_text.set_width(-1);
+        this._thirdIndicator.set_width(-1);
       }
     }
 
     if (state.trackCoverUrl !== null) {
-      if (state.trackCoverUrl &&
-          Settings.gsettings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER) {
-          let file = Gio.File.new_for_uri(state.trackCoverUrl);
-          this._primaryIndicator.gicon = new Gio.FileIcon({file: file});
+      let desktopEntry = ''
+      if(state.desktopEntry) {
+        desktopEntry = state.desktopEntry;
       }
-      else {
-        this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-      }
+      this._setPrimaryIndicatorIcon(state.trackCoverUrl, desktopEntry);
     }
+    this._onActivePlayerUpdate(state);
+  },
 
-    try {
-      this._onActivePlayerUpdate(manager, state);
+  _setPrimaryIndicatorIcon: function(trackCoverUrl, desktopEntry) {
+    if (trackCoverUrl != null) {
+      this.currentCoverUrl = trackCoverUrl;
     }
-    catch (err) {}
-
+    if (desktopEntry != null) {
+      this.currentDesktopEntry = desktopEntry;
+    }
+    let fallbackIcon = 'audio-x-generic-symbolic';
+    if(this.currentDesktopEntry) {
+      fallbackIcon = this.getPlayerSymbolicIcon(this.currentDesktopEntry);
+    }
+    if (this.currentCoverUrl && this.useCoverInPanel) {
+        this.setCoverIconAsync(this._primaryIndicator, this.currentCoverUrl, fallbackIcon);
+    }
+    else {
+      this._primaryIndicator.icon_name = fallbackIcon;
+    }
   },
 
   _commonOnActivePlayerRemove: function(manager) {
+    this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
+    if (this.panelIconSettingId) {
+      this._settings.disconnect(this.panelIconSettingId);
+    }
     this._clearStateText();
-    if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
-      this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-      this._thirdIndicator.hide();
-      this._secondaryIndicator.hide();
-      this.indicators.show();
-    }
-    else {
-      this.indicators.hide();
-    }
-
-    try {
-      this._onActivePlayerRemove(manager);
-    }
-    catch (err) {}
+    this._thirdIndicator.set_width(0);
+    this._secondaryIndicator.set_width(0);
+    this._thirdIndicator.hide();
+    this._secondaryIndicator.hide();
+    this._onActivePlayerRemove();
   },
 
   _clearStateText: function() {
     this._thirdIndicator.text = "";
-    this._thirdIndicator.clutter_text.set_width(-1);
+    this._thirdIndicator.clutter_text.set_width(0);
   }
 };
 
@@ -157,6 +177,26 @@ const PanelIndicator = new Lang.Class({
     this.parent(0.0, "mediaplayer");
 
     this._manager = null;
+    this.compileTemplate = Lib.compileTemplate;
+    this.setCoverIconAsync = Lib.setCoverIconAsync;
+    this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
+
+    this._settings = Settings.gsettings;
+    this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+    this.panelIconSettingId = 0;
+    this.currentCoverUrl = '';
+    this.currentDesktopEntry = '';
+
+    this._settings.connect("changed::" + Settings.MEDIAPLAYER_RUN_DEFAULT,
+      Lang.bind(this, function() {
+        let runDefault = this._settings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT);
+        if (runDefault) {
+          this.actor.show();
+        }
+        else if (!this.manager.activePlayer) {
+          this.actor.hide();
+        }
+    }));
 
     this.menu.actor.add_style_class_name('mediaplayer-menu');
 
@@ -179,13 +219,29 @@ const PanelIndicator = new Lang.Class({
     this.actor.add_actor(this.indicators);
     this.actor.add_style_class_name('panel-status-button');
     this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
+    if (!this._settings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
+      this.actor.hide();
+    }
   },
 
   // Override PanelMenu.Button._onEvent
   _onEvent: function(actor, event) {
     if (this._onButtonEvent(actor, event) == Clutter.EVENT_PROPAGATE)
       this.parent(actor, event);
+  },
+
+  _onActivePlayerUpdate: function(state) {
+    if (this.manager.activePlayer) {
+      this.actor.show();
+    }
+  },
+
+  _onActivePlayerRemove: function() {
+    if (!Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
+      this.actor.hide();
+    }
   }
+
 });
 Lib._extends(PanelIndicator, IndicatorMixin);
 
@@ -197,6 +253,14 @@ const AggregateMenuIndicator = new Lang.Class({
     this.parent();
 
     this._manager = null;
+    this.compileTemplate = Lib.compileTemplate;
+    this.setCoverIconAsync = Lib.setCoverIconAsync;
+    this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
+    this._settings = Settings.gsettings;
+    this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+    this.panelIconSettingId = 0;
+    this.currentCoverUrl = '';
+    this.currentDesktopEntry = '';
 
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
@@ -217,16 +281,18 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.hide();
   },
 
-  _onActivePlayerUpdate: function(manager, state) {
+  _onActivePlayerUpdate: function(state) {
     if (state.status && state.status === Settings.Status.STOP) {
       this.indicators.hide();
+      this.indicators.set_width(0);
     }
     else if (state.status) {
       this.indicators.show();
+      this.indicators.set_width(-1);
     }
   },
 
-  _onActivePlayerRemove: function(manager, state) {
+  _onActivePlayerRemove: function() {
     this.indicators.hide();
   }
 });

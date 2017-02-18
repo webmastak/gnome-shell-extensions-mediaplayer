@@ -58,6 +58,7 @@ const MediaServer2Iface = '<node>\
         <method name="Raise" />\
         <method name="Quit" />\
         <property name="CanRaise" type="b" access="read" />\
+        <property name="HasTrackList" type="b" access="read" />\
         <property name="CanQuit" type="b" access="read" />\
         <property name="Identity" type="s" access="read" />\
         <property name="DesktopEntry" type="s" access="read" />\
@@ -112,6 +113,35 @@ const MediaServer2PlaylistsIface = '<node>\
 </node>';
 const MediaServer2PlaylistsProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2PlaylistsIface);
 
+const MediaServer2TracklistIface = '<node>\
+    <interface name="org.mpris.MediaPlayer2.TrackList">\
+        <method name="GetTracksMetadata">\
+            <arg type="ao" direction="in" />\
+            <arg type="aa{sv}" direction="out" />\
+        </method>\
+        <method name="GoTo">\
+            <arg type="o" direction="in" />\
+        </method>\
+        <property name="Tracks" type="ao" access="read" />\
+        <signal name="TrackListReplaced">\
+            <arg type="ao" direction="out" />\
+            <arg type="o" direction="out" />\
+        </signal>\
+        <signal name="TrackAdded">\
+            <arg type="a{sv}" direction="out" />\
+            <arg type="o" direction="out" />\
+        </signal>\
+        <signal name="TrackRemoved">\
+            <arg type="o" direction="out" />\
+        </signal>\
+        <signal name="TrackMetadataChanged">\
+            <arg type="o" direction="out" />\
+            <arg type="a{sv}" direction="out" />\
+        </signal>\
+    </interface>\
+</node>';
+const MediaServer2TracklistProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2TracklistIface);
+
 function DBus() {
     return new DBusProxy(Gio.DBus.session, 'org.freedesktop.DBus',
                          '/org/freedesktop/DBus');
@@ -137,6 +167,12 @@ function MediaServer2Player(owner, callback) {
 
 function MediaServer2Playlists(owner, callback) {
     new MediaServer2PlaylistsProxy(Gio.DBus.session, owner,
+                                   '/org/mpris/MediaPlayer2',
+                                   callback);
+}
+
+function MediaServer2Tracklist(owner, callback) {
+    new MediaServer2TracklistProxy(Gio.DBus.session, owner,
                                    '/org/mpris/MediaPlayer2',
                                    callback);
 }

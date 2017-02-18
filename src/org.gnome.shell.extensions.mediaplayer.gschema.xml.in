@@ -29,6 +29,11 @@
         <_summary>Show media player playlists</_summary>
         <_description>Whether to show the playlists of the mediaplayers.</_description>
     </key>
+    <key name="tracklist" type="b">
+        <default>false</default>
+        <_summary>Show media player tracklist</_summary>
+        <_description>Whether to show the tracklist of the mediaplayers.</_description>
+    </key>
     <key name="rundefault" type="b">
         <default>false</default>
         <_summary>Allow to start the default media player</_summary>
@@ -38,6 +43,11 @@
     	<default>false</default>
     	<_summary>Display song rating</_summary>
 	    <_description>Display the currently playing song's rating on a 0 to 5 scale</_description>
+    </key>
+    <key type="b" name="tracklist-rating">
+    	<default>false</default>
+    	<_summary>Display song ratings in the tracklist</_summary>
+	    <_description>Display the ratings of the songs in tracklist on a 0 to 5 scale</_description>
     </key>
     <key name="status-type" enum="org.gnome.shell.extensions.mediaplayer.status-type">
     	<default>'icon'</default>
