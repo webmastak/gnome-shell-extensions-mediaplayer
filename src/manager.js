@@ -37,6 +37,11 @@ const PlayerManager = new Lang.Class({
         this._disabling = false;
         // the menu
         this.menu = menu;
+        this.menu.connect('open-state-changed', Lang.bind(this, function(menu, active) {
+          if (active == true) {
+            this.showActivePlayer();
+          }
+        }));
         // the desired menu position
         this.desiredMenuPosition = desiredMenuPosition;
         // players list
@@ -111,12 +116,23 @@ const PlayerManager = new Lang.Class({
       this._activePlayer = player;
       this._activePlayerId = this._activePlayer.connect('player-update',
                                                         Lang.bind(this, this._onActivePlayerUpdate));
-      for (let owner in this._players) {
-        if (this._players[owner].player == player &&
-            this._players[owner].ui.menu)
-          this._players[owner].ui.menu.open();
+      this.showActivePlayer();
+      if (player.info.desktopEntry) {
+        player.state.desktopEntry = player.info.desktopEntry
       }
       this.emit('player-active-update', player.state);
+    },
+
+    showActivePlayer: function() {
+      if (!this._activePlayer) {
+        return;
+      }
+      for (let owner in this._players) {
+        if (this._players[owner].player == this._activePlayer && this._players[owner].ui.menu) {
+          this._players[owner].ui.menu.open();
+          break;
+        }
+      }
     },
 
     nbPlayers: function() {
@@ -182,19 +198,6 @@ const PlayerManager = new Lang.Class({
                     Lang.bind(this, this._onPlayerUpdate)
                 )
             );
-            this._players[owner].signals.push(
-                this._players[owner].player.connect('player-update-info',
-                    Lang.bind(this, this._onPlayerInfoUpdate)
-                )
-            );
-            this._players[owner].signalsUI.push(
-                /* Close all other players menu when a player menu is opened */
-                this._players[owner].ui.connect('player-menu-opened',
-                    Lang.bind(this, function(ui) {
-                      this._hideOtherPlayers(ui);
-                    })
-                )
-            );
 
             let NewPlayerName = busName.split('.')[3].toLowerCase().replace('-', ' ');
             let defaultPlayerName = '';
@@ -217,20 +220,11 @@ const PlayerManager = new Lang.Class({
     },
 
     _onActivePlayerUpdate: function(player, newState) {
+      if (player.info.desktopEntry) {
+        newState.desktopEntry = player.info.desktopEntry
+      }
       this.emit('player-active-update', newState);
     },
-
-    _onPlayerInfoUpdate: function(player, playerInfo) {
-    },
-
-    _hideOtherPlayers: function(ui) {
-      for (let owner in this._players) {
-        if (this._players[owner].ui.menu && this._players[owner].ui != ui) {
-          this._players[owner].ui.menu.close(true, true);
-        }
-      }
-    },
-
 
     _toggleDefaultPlayer: function() {
       if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {

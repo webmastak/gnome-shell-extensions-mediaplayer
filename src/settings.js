@@ -38,6 +38,8 @@ const MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
+const MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
+const MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';
 const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 const MEDIAPLAYER_RATING_KEY = 'rating';
 const MEDIAPLAYER_TRACKBOX_TEMPLATE = 'trackbox-template';
@@ -71,6 +73,10 @@ const SEND_STOP_ON_CHANGE = [
 
 const ALTERNATIVE_PLAYLIST_TITLES = [
     {"Pithos": _("Stations")}
+];
+
+const ALTERNATIVE_TRACKLIST_TITLES = [
+    {"Pithos": _("Current Playlist")}
 ];
 
 const PLAYERS_THAT_CANT_STOP = [

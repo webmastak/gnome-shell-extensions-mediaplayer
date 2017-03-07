@@ -26,6 +26,8 @@ const PopupMenu = imports.ui.popupMenu;
 const Slider = imports.ui.slider;
 const Pango = imports.gi.Pango;
 const GLib = imports.gi.GLib;
+const Clutter = imports.gi.Clutter;
+const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
@@ -33,6 +35,7 @@ const Params = imports.misc.params;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
+const Lib = Me.imports.lib;
 
 const PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
@@ -125,6 +128,7 @@ const TrackBox = new Lang.Class({
 
     _init: function(cover) {
       this.parent({hover: false});
+      this._hidden = false;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
       this._content = new St.BoxLayout({style_class: 'track-box', vertical: false}); 
@@ -284,7 +288,6 @@ const TrackInfo = new Lang.Class({
     _init: function(text, style) {
       this.actor = new St.Label({style_class: style});
       this.actor._delegate = this;
-
       this.setText(text);
     },
 
@@ -306,6 +309,8 @@ const TrackRating = new Lang.Class({
 
     _init: function(player, value) {
         this._player = player;
+        this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
+        this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
         this.parent({style_class: "track-rating", hover: false});
         this.box = new St.BoxLayout({style_class: 'star-box'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
@@ -321,7 +326,7 @@ const TrackRating = new Lang.Class({
 
     rate: function(value) {
         this.box.destroy_all_children();
-        this._value = value;
+        this._value = Math.min(Math.max(0, value), 5);
         this._starIcon = [];
         this._starButton = [];
         for(let i=0; i < 5; i++) {
@@ -365,11 +370,6 @@ const TrackRating = new Lang.Class({
     },
 
     setRating: function(value) {
-        value = Math.round(value);
-        if (value > 5)
-          value = 5;
-        if (value < 0)
-          value = 0;
         for (let i = 0; i < 5; i++) {
             this._starButton[i].child.icon_name = "non-starred-symbolic";
             this._starButton[i]._starred = false;
@@ -394,7 +394,7 @@ const TrackRating = new Lang.Class({
             let applyFunc = Lang.bind(this, this._supported[this._player.busName]);
             applied = applyFunc(rateValue);
         }
-        else if (this.getNuvolaRatingProxy()) {
+        else if (this._nuvolaRatingProxy) {
             applied = this.applyNuvolaRating(rateValue);
         }
         if (applied) {
@@ -418,6 +418,19 @@ const TrackRating = new Lang.Class({
     },
 
     applyRhythmbox3Rating: function(value) {
+        if (this._rhythmbox3Proxy && this._player.state.trackUrl) {
+            this._rhythmbox3Proxy.SetEntryPropertiesRemote(this._player.state.trackUrl,
+                                                           {rating: GLib.Variant.new_double(value)});
+            return true;
+        }
+
+        return false;
+    },
+
+    getRhythmbox3Proxy: function() {
+        if (this._player.busName != 'org.mpris.MediaPlayer2.rhythmbox') {
+          return false;
+        }
         const Rhythmbox3Iface = '<node>\
             <interface name="org.gnome.Rhythmbox3.RhythmDB">\
                 <method name="SetEntryProperties">\
@@ -427,27 +440,14 @@ const TrackRating = new Lang.Class({
             </interface>\
         </node>';
         const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
-
-        if (this._player.state.trackUrl) {
-            let proxy = new Rhythmbox3Proxy(Gio.DBus.session, "org.gnome.Rhythmbox3",
-                                            "/org/gnome/Rhythmbox3/RhythmDB");
-            proxy.SetEntryPropertiesRemote(this._player.state.trackUrl, {rating: GLib.Variant.new_double(value)});
-            return true;
-        }
-
-        return false;
+        let proxy = new Rhythmbox3Proxy(Gio.DBus.session, "org.gnome.Rhythmbox3",
+                                        "/org/gnome/Rhythmbox3/RhythmDB");
+        return proxy;
     },
 
     getNuvolaRatingProxy: function() {
-        if (this._nuvolaRatingProxy === false) {
-            return false;
-        }
-        if (this._nuvolaRatingProxy) {
-            return this._nuvolaRatingProxy;
-        }
         /* Web apps running in the Nuvola Player runtime are named "org.mpris.MediaPlayer2.NuvolaAppFooBarBaz" */
         if (this._player.busName.indexOf("org.mpris.MediaPlayer2.NuvolaApp") !== 0) {
-            this._nuvolaRatingProxy = false;
             return false;
         }
         const NuvolaRatingIface = '<node>\
@@ -459,13 +459,13 @@ const TrackRating = new Lang.Class({
             </interface>\
         </node>';
         const NuvolaRatingProxy = Gio.DBusProxy.makeProxyWrapper(NuvolaRatingIface);
-        this._nuvolaRatingProxy = new NuvolaRatingProxy(Gio.DBus.session, this._player.busName,
+        let proxy = new NuvolaRatingProxy(Gio.DBus.session, this._player.busName,
                                                         "/org/mpris/MediaPlayer2");
-        return this._nuvolaRatingProxy;
+        return proxy;
     },
     
     nuvolaRatingSupported: function() {
-        let proxy = this.getNuvolaRatingProxy();
+        let proxy = this._nuvolaRatingProxy;
         if (proxy) {
             return proxy.NuvolaCanRate;
         }
@@ -473,7 +473,7 @@ const TrackRating = new Lang.Class({
     },
     
     applyNuvolaRating: function(value) {
-        let proxy = this.getNuvolaRatingProxy();
+        let proxy = this._nuvolaRatingProxy;
         if (proxy && proxy.NuvolaCanRate) {
             proxy.NuvolaSetRatingRemote(value / 5.0);
             return true;
@@ -486,9 +486,299 @@ const TrackRating = new Lang.Class({
     },
 });
 
+const ListSubMenu = new Lang.Class({
+  Name: 'ListSubMenu',
+  Extends: PopupMenu.PopupSubMenuMenuItem,
+
+  _init: function(label) {
+    this.parent(label, false);
+    this.activeObject = null;
+    this._hidden = false;
+    this.menu.close = Lang.bind(this, this.close);
+    this.menu.open = Lang.bind(this, this.open);
+  },
+
+  close: function(animate) {
+    if (!this.menu.isOpen) {
+      return;
+    }
+    this.menu.isOpen = false;
+    if (this.menu._activeMenuItem) {
+      this.menu._activeMenuItem.setActive(false);
+    }
+    this.menu.actor._arrowRotation = this.menu._arrow.rotation_angle_z;
+    Tweener.addTween(this.menu.actor,
+                     { _arrowRotation: 0,
+                       height: 0,
+                       time: 0.25,
+                       onUpdateScope: this,
+                       onUpdate: function() {
+                         this.menu._arrow.rotation_angle_z = this.menu.actor._arrowRotation;
+                       },
+                       onCompleteScope: this,
+                       onComplete: function() {
+                       this.menu.actor.hide();
+                       this.menu.actor.set_height(-1);
+                         }
+                     });
+  },
+
+
+  open: function(animate) {
+    if (this.menu.isOpen || this._hidden || this.menu.isEmpty()) {
+      return;
+    }
+    this.menu.isOpen = true;
+    this.emit('ListSubMenu-opened');
+    this.menu.actor.show();
+    let targetAngle = this.menu.actor.text_direction == Clutter.TextDirection.RTL ? -90 : 90;
+    if (!this.updateScrollbarPolicy()) {
+      let menuHeight = this.menu.actor.get_preferred_height(-1)[1];
+      this.menu.actor.height = 0;
+      this.menu.actor._arrowRotation = this.menu._arrow.rotation_angle_z;
+      Tweener.addTween(this.menu.actor,
+                       { _arrowRotation: targetAngle,
+                         height: menuHeight,
+                         time: 0.25,
+                         onUpdateScope: this,
+                         onUpdate: function() {
+                           this.menu._arrow.rotation_angle_z = this.menu.actor._arrowRotation;
+                         },
+                         onCompleteScope: this,
+                         onComplete: function() {
+                           this.menu.actor.set_height(-1);
+                         }
+                       });
+    }
+    else {
+      this.menu._arrow.rotation_angle_z = targetAngle;
+    }   
+  },
+
+  show: function() {
+    this._hidden = false;
+    this.actor.show();
+  },
+
+  hide: function() {
+    this._hidden = true;
+    this.close();
+    this.actor.hide();
+  },
+
+  setScrollbarPolicyAllways: function() {
+    this.menu.actor.vscrollbar_policy = Gtk.PolicyType.ALWAYS;
+  },
+
+  updateScrollbarPolicy: function(adjustment) {
+    if (!this.menu.isOpen) {
+      return;
+    }
+    this.menu.actor.vscrollbar_policy = Gtk.PolicyType.NEVER; 
+    let goingToNeedScrollbar = this.needsScrollbar(adjustment);
+    this.menu.actor.vscrollbar_policy = 
+      goingToNeedScrollbar ? Gtk.PolicyType.ALWAYS : Gtk.PolicyType.NEVER;
+
+    if (goingToNeedScrollbar) {
+      this.menu.actor.add_style_pseudo_class('scrolled');
+      return true;
+    }
+    else {
+      this.menu.actor.remove_style_pseudo_class('scrolled');
+      return false;
+    }
+  },
+
+  needsScrollbar: function(adjustment) {
+    //GNOME Shell is really bad at deciding when to reserve space for a scrollbar...
+    //This is a reimplementation of:
+    //https://github.com/GNOME/gnome-shell/blob/30e17036e8bec8dd47f68eb6b1d3cfe3ca037caf/js/ui/popupMenu.js#L925
+    //That takes into account the size of the menu items and optionally takes and adjustment value to see if we
+    //need a scrollbar in the future. It's not perfect but it works better than default implementation for our purposes.
+    if (!adjustment) {
+      adjustment = 0;
+    }
+    let topMenu = this._getTopMenu();
+    let numMenuItems = this.menu._getMenuItems().length;
+    if (numMenuItems < 1) {
+      numMenuItems = 1;
+    }
+    let [topMinHeight, topNaturalHeight] = topMenu.actor.get_preferred_height(-1);
+    let [widgetMinHeight, widgetNaturalHeight] = this.menu.actor.get_preferred_height(-1);
+    let averageMenuItemSize = widgetNaturalHeight / numMenuItems;
+    let topThemeNode = topMenu.actor.get_theme_node();
+    let topMaxHeight = topThemeNode.get_max_height();
+    return topMaxHeight >= 0 && topNaturalHeight + adjustment > topMaxHeight + averageMenuItemSize;
+  },
+
+  setObjectActive: function(objPath) {
+    this.activeObject = objPath;
+    this.menu._getMenuItems().forEach(function(listItem) {
+      if (listItem.obj == objPath) {
+        listItem.setOrnament(PopupMenu.Ornament.DOT);
+      }
+      else {
+        listItem.setOrnament(PopupMenu.Ornament.NONE);
+      }
+    });
+  }
+
+});
+
+const TrackList = new Lang.Class({
+    Name: "Tracklist",
+    Extends: ListSubMenu,
+
+  _init: function(label, player) {
+    this.parent(label);
+    this.player = player;
+    this.parseMetadata = Lib.parseMetadata;
+  },
+
+  metadataMap: function() {
+    let metadata = {
+      trackTitle: 'Unknown title',
+      trackNumber: '',
+      trackAlbum: 'Unknown album',
+      trackArtist: ['Unknown artist'],
+      trackUrl: '',
+      trackCoverUrl: '',
+      trackLength: 0,
+      trackObj: '/org/mpris/MediaPlayer2/TrackList/NoTrack',
+      trackRating: 0,
+      isRadio: false,
+      fallbackIcon: 'media-optical-cd-audio',
+      showRatings: false,
+    }
+    return metadata;
+  },
+
+  showRatings: function(value) {
+    this.setScrollbarPolicyAllways();
+    this.menu._getMenuItems().forEach(function(tracklistItem) {
+      tracklistItem.showRatings(value);
+    });
+    this.updateScrollbarPolicy();
+  },
+
+  updateMetadata: function(UpdatedMetadata) {
+    let metadata = this.metadataMap();
+    this.parseMetadata(UpdatedMetadata, metadata);
+    if (!metadata.trackObj || metadata.trackObj == '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
+      return;
+    }
+    if (Array.isArray(metadata.trackArtist)) {
+      metadata.trackArtist = metadata.trackArtist[0];
+    }
+    if (metadata.isRadio) {
+      metadata.fallbackIcon = 'radio';
+    }
+    this.menu._getMenuItems().some(function(tracklistItem) {
+      if (tracklistItem.obj == metadata.trackObj) {
+        tracklistItem.updateMetadata(metadata);
+        return true;
+      }
+    });
+    if (this.activeObject) {
+      this.setObjectActive(this.activeObject);
+    }
+  },
+
+  loadTracklist: function(trackListMetaData, showRatings) {
+    this.menu.removeAll();
+    this.setScrollbarPolicyAllways();
+    trackListMetaData.forEach(Lang.bind(this, function(trackMetadata) {
+      let metadata = this.metadataMap();
+      metadata.showRatings = showRatings;
+      this.parseMetadata(trackMetadata, metadata);
+      if (!metadata.trackObj || metadata.trackObj == '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
+        return;
+      }
+      if (Array.isArray(metadata.trackArtist)) {
+        metadata.trackArtist = metadata.trackArtist[0];
+      }
+      if (metadata.isRadio) {
+        metadata.fallbackIcon = 'radio';
+      } 
+
+      let trackUI = new TracklistItem(metadata);
+      trackUI.connect('activate', Lang.bind(this, function() {
+        this.player.playTrack(trackUI.obj);
+      }));
+      this.menu.addMenuItem(trackUI);
+    }));
+    if (this.activeObject) {
+      this.setObjectActive(this.activeObject);
+    }
+    this.updateScrollbarPolicy();
+  }
+
+});
+
+const Playlists = new Lang.Class({
+    Name: "Playlists",
+    Extends: ListSubMenu,
+
+  _init: function(label, player) {
+    this.parent(label);
+    this.player = player;
+  },
+
+  loadPlaylists: function(playlists) {
+    this.menu.removeAll();
+    this.setScrollbarPolicyAllways();
+    playlists.forEach(Lang.bind(this, function(playlist) {
+      let [obj, name] = playlist;
+      //Don't add playlists with just "/" as the object path.
+      //Playlist object paths that just contain "/" are a way to
+      //indicate invalid playlists as per spec.
+      if (obj == '/') {
+        return;
+      }
+      let playlistUI = new PlaylistItem(name, obj);
+      playlistUI.connect('activate', Lang.bind(this, function() {
+        this.player.playPlaylist(playlistUI.obj);
+      }));
+      this.menu.addMenuItem(playlistUI);
+    }));
+    if (this.activeObject) {
+      this.setObjectActive(this.activeObject);
+    }
+    this.updateScrollbarPolicy();
+  },
+
+  updatePlaylist: function(UpdatedPlaylist) {
+    let [obj, name] = UpdatedPlaylist;
+    this.menu._getMenuItems().some(function(playlistItem) {
+      if (playlistItem.obj == obj) {
+        playlistItem.updatePlaylistName(name);
+        return true;
+      }
+    });
+    if (this.activeObject) {
+      this.setObjectActive(this.activeObject);
+    }
+  }
+
+});
+
+const ListSubMenuItem = new Lang.Class({
+    Name: "ListSubMenuItem",
+    Extends: PopupMenu.PopupBaseMenuItem,
+
+    _init: function () {
+        this.parent();
+        // We have to replace the _ornamentLabel so that it's vertically centered.
+        this.actor.remove_actor(this._ornamentLabel);
+        this._ornamentLabel = new St.Label({style_class: 'popup-menu-ornament'});
+        this.actor.add(this._ornamentLabel, {y_expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+    }
+
+});
+
 const PlaylistItem = new Lang.Class({
     Name: "PlaylistItem",
-    Extends: PopupMenu.PopupBaseMenuItem,
+    Extends: ListSubMenuItem,
 
     _init: function (text, obj) {
         this.parent();
@@ -497,16 +787,95 @@ const PlaylistItem = new Lang.Class({
         this.actor.add(this.label);
     },
 
-    setPlaylistActive: function(value) {
-      if (value) {
-        this.setOrnament(PopupMenu.Ornament.DOT);
+    updatePlaylistName: function(name) {
+      if (this.label.text != name) {
+        this.label.text = name;
       }
-      else {
-        this.setOrnament(PopupMenu.Ornament.NONE);
+    }
+
+});
+
+const TracklistItem = new Lang.Class({
+    Name: "TracklistItem",
+    Extends: ListSubMenuItem,
+
+    _init: function (metadata) {
+        this.parent();
+        this.obj = metadata.trackObj;
+        this._setCoverIconAsync = Lib.setCoverIconAsync;
+        this._rating = null;
+        this._coverIcon = new St.Icon({icon_name: metadata.fallbackIcon, icon_size: 24});
+        this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'tracklist-artist'});
+        this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-album'});
+        this._ratingBox = new St.BoxLayout({style_class: 'star-box'});
+        this._ratingBox.hide();
+        this._box = new St.BoxLayout({vertical: true});
+        this._box.add_child(this._artistLabel);
+        this._box.add_child(this._titleLabel);
+        this._box.add_child(this._ratingBox);
+        this.actor.add(this._coverIcon);
+        this.actor.add(this._box);
+        this._setRating(metadata.trackRating);
+        this.showRatings(metadata.showRatings);
+        this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
+    },
+
+    updateMetadata: function(metadata) {
+      this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
+      this._setArtist(metadata.trackArtist);
+      this._setTitle(metadata.trackTitle);
+      this._setRating(metadata.trackRating);
+    },
+
+    _setArtist: function(artist) {
+      if (this._artistLabel.text != artist) {
+        this._artistLabel.text = artist;
       }
     },
 
-    isPlaylistActive: function() {
-      return this._ornament !== PopupMenu.Ornament.NONE;
+    _setTitle: function(title) {
+      if (this._titleLabel.text != title) {
+        this._titleLabel.text = title;
+      }
+    },
+
+    _setCoverIcon: function(coverUrl, fallbackIcon) {
+      if (coverUrl) {
+        this._setCoverIconAsync(this._coverIcon, coverUrl, fallbackIcon);
+      }
+      else {
+        this._coverIcon.icon_name = fallbackIcon;
+      }
+    },
+
+    _setRating: function(value) {
+      value = Math.min(Math.max(0, value), 5);
+      if (this._rating != value) {
+        this._rating = value;
+        this._ratingBox.destroy_all_children();
+        for (let i = 0; i < 5; i++) {
+          let starIcon;
+          let icon_name = 'non-starred-symbolic';
+          if (i < value) {
+            icon_name = 'starred-symbolic';
+          }
+          starIcon = new St.Icon({style_class: 'popup-menu-icon star-icon',
+                                  icon_name: icon_name
+                                 });
+          this._ratingBox.add_child(starIcon);
+        }
+      }
+    },
+
+  showRatings: function(value) {
+    if (value) {
+      this._ratingBox.show();
+      this._coverIcon.icon_size = 48;
     }
+    else {
+      this._ratingBox.hide();
+      this._coverIcon.icon_size = 24;
+    }
+  }
+
 });

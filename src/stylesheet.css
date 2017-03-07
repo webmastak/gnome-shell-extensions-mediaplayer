@@ -27,6 +27,11 @@
   font-weight: bold;
 }
 
+.tracklist-artist {
+  font-weight: bold;
+  font-size: x-small;
+}
+
 .track-info-title {
   font-size: small;
 }
