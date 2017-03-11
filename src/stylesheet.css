@@ -8,6 +8,10 @@
     padding-bottom: 0em;
 }
 
+.no-padding {
+    padding: 0px;
+}
+
 .indicator-item {
     padding-left: 0em;
     padding-right: 0em;

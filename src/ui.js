@@ -141,8 +141,11 @@ const PlayerUI = new Lang.Class({
     this.largeCoverSize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
     this.smallCoverSize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY);
 
-    this.trackCover = new St.Button({child: new St.Icon({icon_name: "media-optical-cd-audio",
+    this.trackCover = new St.Button({child: new St.Icon({icon_name: "media-optical-cd-audio-symbolic",
                                                          icon_size: this.smallCoverSize})});
+    if (Settings.MINOR_VERSION > 19) {
+      this.trackCover.child.add_style_class_name('media-message-cover-icon fallback no-padding');
+    }
     this.trackCover.connect('clicked', Lang.bind(this, this._toggleCover));
 
     this.trackBox = new Widget.TrackBox(this.trackCover);
@@ -156,23 +159,29 @@ const PlayerUI = new Lang.Class({
     this.secondaryInfo = new Widget.SecondaryInfo();
     this.secondaryInfo.connect('activate', Lang.bind(this.player, this.player.raise));
     this.secondaryInfo.hide();
-    this.addMenuItem(this.secondaryInfo);        
+    this.addMenuItem(this.secondaryInfo);
+        
+    this.trackControls = new Widget.PlayerButtons();
+    this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise))
 
     this.prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
                                               Lang.bind(this.player, this.player.previous));
+    this.trackControls.addButton(this.prevButton);
+
     this.playButton = new Widget.PlayerButton('media-playback-start-symbolic',
                                               Lang.bind(this.player, this.player.playPause));
-    this.stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
-                                              Lang.bind(this.player, this.player.stop));
-    this.stopButton.hide();
+    this.trackControls.addButton(this.playButton);
+
+    this.stopButton = null;
+    if (Settings.PLAYERS_THAT_CANT_STOP.indexOf(this.player.info.identity) == -1) {
+      this.stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
+                                                Lang.bind(this.player, this.player.stop));
+      this.stopButton.hide();
+      this.trackControls.addButton(this.stopButton)
+    }
+    
     this.nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
                                               Lang.bind(this.player, this.player.next));
-
-    this.trackControls = new Widget.PlayerButtons();
-    this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise));
-    this.trackControls.addButton(this.prevButton);
-    this.trackControls.addButton(this.playButton);
-    this.trackControls.addButton(this.stopButton);
     this.trackControls.addButton(this.nextButton);
 
     this.addMenuItem(this.trackControls);
@@ -416,7 +425,7 @@ const PlayerUI = new Lang.Class({
       }
 
       if (status === Settings.Status.PLAY) {
-        if (Settings.PLAYERS_THAT_CANT_STOP.indexOf(this.player.info.identity) == -1) {
+        if (this.stopButton) {
           this.stopButton.show();
         }
         if (player.state.canPause) {
@@ -431,7 +440,9 @@ const PlayerUI = new Lang.Class({
         this.playButton.setIcon('media-playback-start-symbolic');
       }
       else if (status == Settings.Status.STOP) {
-        this.stopButton.hide();
+        if (this.stopButton) {
+          this.stopButton.hide();
+        }
         this.playButton.show();
         this.playButton.setIcon('media-playback-start-symbolic');
       }
@@ -472,9 +483,9 @@ const PlayerUI = new Lang.Class({
   },
 
   changeCover: function(state) {
-    let fallback_icon_name = "media-optical-cd-audio";
+    let fallback_icon_name = "media-optical-cd-audio-symbolic";
     if (state.isRadio) {
-      fallback_icon_name = "radio";
+      fallback_icon_name = "application-rss+xml-symbolic";
     }
     if (state.trackCoverUrl) {
       this.setCoverIconAsync(this.trackCover.child, state.trackCoverUrl, fallback_icon_name);

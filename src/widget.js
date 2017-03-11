@@ -55,13 +55,10 @@ const PlayerButton = new Lang.Class({
     Name: "PlayerButton",
 
     _init: function(icon, callback) {
-        this.icon = new St.Icon({
-            icon_name: icon + '-symbolic',
-        });
+        this.icon = new St.Icon({icon_name: icon});
         this.actor = new St.Button({style_class: 'system-menu-action popup-inactive-menu-item',
                                     child: this.icon});
         this.actor._delegate = this;
-
         this._callback_id = this.actor.connect('clicked', callback);
     },
 
@@ -510,7 +507,7 @@ const ListSubMenu = new Lang.Class({
     Tweener.addTween(this.menu.actor,
                      { _arrowRotation: 0,
                        height: 0,
-                       time: 0.25,
+                       time: Settings.FADE_ANIMATION_TIME,
                        onUpdateScope: this,
                        onUpdate: function() {
                          this.menu._arrow.rotation_angle_z = this.menu.actor._arrowRotation;
@@ -539,7 +536,7 @@ const ListSubMenu = new Lang.Class({
       Tweener.addTween(this.menu.actor,
                        { _arrowRotation: targetAngle,
                          height: menuHeight,
-                         time: 0.25,
+                         time: Settings.FADE_ANIMATION_TIME,
                          onUpdateScope: this,
                          onUpdate: function() {
                            this.menu._arrow.rotation_angle_z = this.menu.actor._arrowRotation;
@@ -647,7 +644,7 @@ const TrackList = new Lang.Class({
       trackObj: '/org/mpris/MediaPlayer2/TrackList/NoTrack',
       trackRating: 0,
       isRadio: false,
-      fallbackIcon: 'media-optical-cd-audio',
+      fallbackIcon: 'media-optical-cd-audio-symbolic',
       showRatings: false,
     }
     return metadata;
@@ -671,7 +668,7 @@ const TrackList = new Lang.Class({
       metadata.trackArtist = metadata.trackArtist[0];
     }
     if (metadata.isRadio) {
-      metadata.fallbackIcon = 'radio';
+      metadata.fallbackIcon = 'application-rss+xml-symbolic';
     }
     this.menu._getMenuItems().some(function(tracklistItem) {
       if (tracklistItem.obj == metadata.trackObj) {
@@ -698,7 +695,7 @@ const TrackList = new Lang.Class({
         metadata.trackArtist = metadata.trackArtist[0];
       }
       if (metadata.isRadio) {
-        metadata.fallbackIcon = 'radio';
+        metadata.fallbackIcon = 'application-rss+xml-symbolic';
       } 
 
       let trackUI = new TracklistItem(metadata);
@@ -805,6 +802,9 @@ const TracklistItem = new Lang.Class({
         this._setCoverIconAsync = Lib.setCoverIconAsync;
         this._rating = null;
         this._coverIcon = new St.Icon({icon_name: metadata.fallbackIcon, icon_size: 24});
+        if (Settings.MINOR_VERSION > 19) {
+          this._coverIcon.add_style_class_name('media-message-cover-icon fallback no-padding');
+        }
         this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'tracklist-artist'});
         this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-album'});
         this._ratingBox = new St.BoxLayout({style_class: 'star-box'});
@@ -813,8 +813,8 @@ const TracklistItem = new Lang.Class({
         this._box.add_child(this._artistLabel);
         this._box.add_child(this._titleLabel);
         this._box.add_child(this._ratingBox);
-        this.actor.add(this._coverIcon);
-        this.actor.add(this._box);
+        this.actor.add(this._coverIcon, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
+        this.actor.add(this._box, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         this._setRating(metadata.trackRating);
         this.showRatings(metadata.showRatings);
         this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
