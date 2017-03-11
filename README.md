@@ -18,6 +18,7 @@ in the GNOME Shell's system menu by default.
 - support multiple players
 - interactive indicator icon: scroll (next/previous), middle click (play/pause)
 - playlist support (org.mpris.MediaPlayer2.Playlists interface)
+- tracklist support (org.mpris.MediaPlayer2.TrackList interface)
 - rating support (see notes below)
 - and more...
 
@@ -143,7 +144,7 @@ option to gsettings.**
 ## Compatible players
 
 Any player that implements the [MPRIS v2](https://specifications.freedesktop.org/mpris-spec/latest/)
-[Player](https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html) and optionally [Playlist](https://specifications.freedesktop.org/mpris-spec/latest/Playlists_Interface.html) interface spec correctly is supported.
+[Player](https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html) and optionally [Playlists](https://specifications.freedesktop.org/mpris-spec/latest/Playlists_Interface.html) or [Tracklist](https://specifications.freedesktop.org/mpris-spec/latest/Track_List_Interface.html) interface spec <b>correctly</b> is supported.
 
 **Note:** Many players will require you to enable the MPRIS v2 support
 manually. If your player is listed but still doesn't work, look for words
@@ -189,6 +190,15 @@ the position slider when the song is seeked from the extension or the player.
   * Exaile – fixed in 3.3.0 ([bug report](https://bugs.launchpad.net/exaile/+bug/1021645))
   * VLC – fixed in 2.x? ([bug report](https://trac.videolan.org/vlc/ticket/6802))
   * Spotify
+
+### GNOME Music crashes if the GoTo method on the Tracklist interface is called.
+  * Until this is fixed users will not be able to switch songs via the track list with GNOME Music, since the GoTo method has been blacklisted for GNOME music.
+  * [bug report](https://bugzilla.gnome.org/show_bug.cgi?id=779052)
+
+### GNOME Music does not provide complete metadata for the Tracklist interface.(No cover art for upcoming songs)
+  * [bug report](https://bugzilla.gnome.org/show_bug.cgi?id=779215)
+
+### Clementine *claims* to support the  Tracklist interface but due to internal errors always returns an empty tracklist.
 
 ## *Not* supported players
 
