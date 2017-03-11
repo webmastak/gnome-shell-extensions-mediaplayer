@@ -198,7 +198,14 @@ const PanelIndicator = new Lang.Class({
         }
     }));
 
-    this.menu.actor.add_style_class_name('mediaplayer-menu');
+    this._setMenuWidth();
+
+    this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY,
+      Lang.bind(this, this._setMenuWidth));
+    this._settings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_MENU_PADDING_KEY,
+      Lang.bind(this, this._setMenuWidth));
+    this._settings.connect("changed::" + Settings.MEDIAPLAYER_MIN_INDICATOR_MENU_WIDTH_KEY,
+      Lang.bind(this, this._setMenuWidth));
 
     this.indicators = new St.BoxLayout({vertical: false});
 
@@ -223,6 +230,14 @@ const PanelIndicator = new Lang.Class({
       this.actor.hide();
     }
   },
+
+  _setMenuWidth: function() {
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
+    let padding = this._settings.get_int(Settings.MEDIAPLAYER_INDICATOR_MENU_PADDING_KEY) * 2;
+    let minMenuWidth = this._settings.get_int(Settings.MEDIAPLAYER_MIN_INDICATOR_MENU_WIDTH_KEY);
+    let newMenuSize = Math.max(largeCoverSize + padding, minMenuWidth);  
+    this.menu.actor.set_width(newMenuSize);  
+ },
 
   // Override PanelMenu.Button._onEvent
   _onEvent: function(actor, event) {
