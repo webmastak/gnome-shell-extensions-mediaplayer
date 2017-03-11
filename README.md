@@ -144,7 +144,7 @@ option to gsettings.**
 ## Compatible players
 
 Any player that implements the [MPRIS v2](https://specifications.freedesktop.org/mpris-spec/latest/)
-[Player](https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html) and optionally [Playlists](https://specifications.freedesktop.org/mpris-spec/latest/Playlists_Interface.html) or [Tracklist](https://specifications.freedesktop.org/mpris-spec/latest/Track_List_Interface.html) interface spec <b>correctly</b> is supported.
+[Player](https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html) and optionally the [Playlists](https://specifications.freedesktop.org/mpris-spec/latest/Playlists_Interface.html) and/or [Tracklist](https://specifications.freedesktop.org/mpris-spec/latest/Track_List_Interface.html) interface(s) spec <b>correctly</b> is supported.
 
 **Note:** Many players will require you to enable the MPRIS v2 support
 manually. If your player is listed but still doesn't work, look for words
