@@ -46,7 +46,6 @@ function init() {
     _stockMprisOldShouldShow = _stockMpris._shouldShow;
   }
   Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {_reset()});
-  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_MENU_POSITION_KEY, function() {_reset()});
   if (_defaultAppsGioFile.query_exists(null)) {
     _fileMonitor = _defaultAppsGioFile.monitor(Gio.FileMonitorFlags.NONE, null);
     _fileMonitor.connect('changed', function() {Mainloop.timeout_add(500, _reset)});
@@ -67,8 +66,7 @@ function enable() {
   if (position == Settings.IndicatorPosition.VOLUMEMENU) {
     indicator = new Panel.AggregateMenuIndicator();
     menu = Main.panel.statusArea.aggregateMenu.menu;
-    Settings.gsettings.set_int(Settings.MEDIAPLAYER_NUM_MENU_ITEMS_KEY, menu.numMenuItems + 1);
-    desiredMenuPosition = Settings.gsettings.get_int(Settings.MEDIAPLAYER_MENU_POSITION_KEY) - 1; 
+    desiredMenuPosition = Main.panel.statusArea.aggregateMenu.menu._getMenuItems().indexOf(Main.panel.statusArea.aggregateMenu._rfkill.menu);
   }
   else {
     indicator = new Panel.PanelIndicator();

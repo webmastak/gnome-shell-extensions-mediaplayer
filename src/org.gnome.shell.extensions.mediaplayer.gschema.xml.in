@@ -72,16 +72,6 @@
         <_summary>Large cover size</_summary>
         <_description>The size of the cover when zoomed. Default is 192px.</_description>
     </key>
-    <key name="menu-position" type="i">
-        <default>6</default>
-        <_summary>Position in the system menu</_summary>
-        <_description>Position of the extension in the system menu from the top. Default is 6th.</_description>
-    </key>
-    <key name="num-menuitems" type="i">
-        <default>25</default>
-        <_summary>Private</_summary>
-        <_description>Total menu items</_description>
-    </key>
     <key name="volumemenu" type="b">
         <default>true</default>
         <_summary>Show the media player in the volume menu</_summary>

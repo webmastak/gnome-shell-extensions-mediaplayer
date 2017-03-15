@@ -30,8 +30,6 @@ const N_ = function(t) { return t; };
 
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
-const MEDIAPLAYER_NUM_MENU_ITEMS_KEY = 'num-menuitems';
-const MEDIAPLAYER_MENU_POSITION_KEY = 'menu-position';
 const MEDIAPLAYER_STATUS_TYPE_KEY = 'status-type';
 const MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
 const MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';

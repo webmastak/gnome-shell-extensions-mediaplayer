@@ -37,13 +37,12 @@ const PlayerManager = new Lang.Class({
         this._disabling = false;
         // the menu
         this.menu = menu;
+        this.desiredMenuPosition = desiredMenuPosition;
         this.menu.connect('open-state-changed', Lang.bind(this, function(menu, active) {
           if (active == true) {
             this.showActivePlayer();
           }
         }));
-        // the desired menu position
-        this.desiredMenuPosition = desiredMenuPosition;
         // players list
         this._players = {};
         // player shown in the panel
@@ -90,6 +89,8 @@ const PlayerManager = new Lang.Class({
                 this._toggleDefaultPlayer();
             }))
         );
+        this._defaultInMenu = false;
+        this._createDefaultPlayer();
         this._toggleDefaultPlayer();
     },
 
@@ -205,6 +206,7 @@ const PlayerManager = new Lang.Class({
               defaultPlayerName = this._players[Settings.DEFAULT_PLAYER_OWNER].ui.app.get_name().toLowerCase();
             }
             if (NewPlayerName == defaultPlayerName) {
+              this._defaultInMenu = true;
               this._hideDefaultPlayer();
               this._addPlayerToMenu(true, owner);
             }
@@ -235,14 +237,18 @@ const PlayerManager = new Lang.Class({
       }
     },
 
+    _createDefaultPlayer: function() {
+        let ui = new UI.DefaultPlayerUI();
+        this._players[Settings.DEFAULT_PLAYER_OWNER] = {ui: ui, signalsUI: [], signals: [], player: null};
+        this._addPlayerToMenu(true, Settings.DEFAULT_PLAYER_OWNER);
+    },
+
     _showDefaultPlayer: function() {
       if (this._disabling) {
         return;
       }
-      if (!this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-        let ui = new UI.DefaultPlayerUI();
-        this._players[Settings.DEFAULT_PLAYER_OWNER] = {ui: ui, signalsUI: [], signals: [], player: null};
-        this._addPlayerToMenu(true, Settings.DEFAULT_PLAYER_OWNER);
+      if (this._players[Settings.DEFAULT_PLAYER_OWNER] && !this._defaultInMenu) {
+        this._players[Settings.DEFAULT_PLAYER_OWNER].ui.show();
       }
     },
 
@@ -251,7 +257,7 @@ const PlayerManager = new Lang.Class({
         return;
       }
       if (this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-        this._removePlayerFromMenu(null, Settings.DEFAULT_PLAYER_OWNER);
+        this._players[Settings.DEFAULT_PLAYER_OWNER].ui.hide();
       }
     },
 
@@ -313,6 +319,7 @@ const PlayerManager = new Lang.Class({
               this._players[owner].player.destroy();
             delete this._players[owner];
             if (removedPlayerName == defaultPlayerName) {
+              this._defaultInMenu = false;
               this._toggleDefaultPlayer();
             }
         }
