@@ -109,6 +109,14 @@ const DefaultPlayerUI = new Lang.Class({
       this.connect('activate', Lang.bind(this, this.run));
     },
 
+    hide: function() {
+      this.actor.hide();
+    },
+
+    show: function() {
+      this.actor.show();
+    },
+
     run: function() {
       this.app.activate_full(-1, 0);
     }

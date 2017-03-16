@@ -33,7 +33,6 @@ let settings_indicator;
 function init() {
     Lib.initTranslations(Me);
     gsettings = Lib.getSettings(Me);
-    let maxMenuPosition  = gsettings.get_int('num-menuitems');
     settings = {
         indicator_position: {
             type: "e",
@@ -56,15 +55,6 @@ function init() {
             type: "s",
             label: _("Indicator status text"),
             help: _("{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
-        },
-        menu_position: {
-            type: "i",
-            label: _("Position in the system menu"),
-            help: _("Position of the extension in the system menu from top to bottom. Default is 9th."),
-            min: 1,
-            max: maxMenuPosition,
-            step: 1,
-            default: 9
         },
         status_size: {
             type: "i",
