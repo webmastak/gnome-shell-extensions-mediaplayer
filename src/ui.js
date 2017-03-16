@@ -392,7 +392,7 @@ const PlayerUI = new Lang.Class({
       this.position.setReactive(newState.canSeek)
     }
 
-    if (newState.trackTime && newState.trackLength) {
+    if (newState.trackTime !== null && newState.trackLength !== null) {
       if (newState.trackLength === 0) {
         this.position.actor.hide();
       }
