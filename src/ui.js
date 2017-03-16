@@ -381,17 +381,16 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.canSeek !== null) {
-      if (newState.canSeek && this.showPosition &&
-          this.player.state.status != Settings.Status.STOP) {
-        this.position.actor.show();
-      }
-      else {
-        this.position.actor.hide();
-      }
+      this.position.setReactive(newState.canSeek)
     }
 
     if (newState.trackTime && newState.trackLength) {
-      this.position.setValue(newState.trackTime / newState.trackLength);
+      if (newState.trackLength === 0) {
+        this.position.actor.hide();
+      }
+      else {
+        this.position.setValue(newState.trackTime / newState.trackLength);
+      }
     }
 
     if (newState.status) {

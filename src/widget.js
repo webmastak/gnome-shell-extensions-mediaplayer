@@ -106,6 +106,10 @@ const SliderItem = new Lang.Class({
         this.actor.add(this._slider.actor, {expand: true});
     },
 
+    setReactive: function(reactive) {
+        this._slider.actor.reactive = reactive;
+    },
+
     setValue: function(value) {
         this._slider.setValue(value);
     },

@@ -402,7 +402,7 @@ const MPRISPlayer = new Lang.Class({
         canPause: this._mediaServerPlayer.CanPause || true,
         canGoNext: this._mediaServerPlayer.CanGoNext || true,
         canGoPrevious: this._mediaServerPlayer.CanGoPrevious || true,
-        canSeek: this._mediaServerPlayer.CanSeek || true,
+        canSeek: this._mediaServerPlayer.CanSeek || false,
         hasTrackList: this._mediaServer.HasTrackList || false,
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
@@ -508,12 +508,9 @@ const MPRISPlayer = new Lang.Class({
       this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'CanSeek',
                            Lang.bind(this, function(value, err) {
                              let state = new PlayerState();
-                             let canSeek = true;
+                             let canSeek = false;
                              if (!err)
                                canSeek = value[0].unpack();
-
-                             if (this.state.trackLength === 0)
-                               canSeek = false;
 
                              if (this.state.canSeek != canSeek) {
                                state.canSeek = canSeek;
