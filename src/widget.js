@@ -507,21 +507,8 @@ const ListSubMenu = new Lang.Class({
     if (this.menu._activeMenuItem) {
       this.menu._activeMenuItem.setActive(false);
     }
-    this.menu.actor._arrowRotation = this.menu._arrow.rotation_angle_z;
-    Tweener.addTween(this.menu.actor,
-                     { _arrowRotation: 0,
-                       height: 0,
-                       time: Settings.FADE_ANIMATION_TIME,
-                       onUpdateScope: this,
-                       onUpdate: function() {
-                         this.menu._arrow.rotation_angle_z = this.menu.actor._arrowRotation;
-                       },
-                       onCompleteScope: this,
-                       onComplete: function() {
-                       this.menu.actor.hide();
-                       this.menu.actor.set_height(-1);
-                         }
-                     });
+    this.menu.actor.hide();
+    this.menu._arrow.rotation_angle_z = 0;
   },
 
 
@@ -532,28 +519,8 @@ const ListSubMenu = new Lang.Class({
     this.menu.isOpen = true;
     this.emit('ListSubMenu-opened');
     this.menu.actor.show();
-    let targetAngle = this.menu.actor.text_direction == Clutter.TextDirection.RTL ? -90 : 90;
-    if (!this.updateScrollbarPolicy()) {
-      let menuHeight = this.menu.actor.get_preferred_height(-1)[1];
-      this.menu.actor.height = 0;
-      this.menu.actor._arrowRotation = this.menu._arrow.rotation_angle_z;
-      Tweener.addTween(this.menu.actor,
-                       { _arrowRotation: targetAngle,
-                         height: menuHeight,
-                         time: Settings.FADE_ANIMATION_TIME,
-                         onUpdateScope: this,
-                         onUpdate: function() {
-                           this.menu._arrow.rotation_angle_z = this.menu.actor._arrowRotation;
-                         },
-                         onCompleteScope: this,
-                         onComplete: function() {
-                           this.menu.actor.set_height(-1);
-                         }
-                       });
-    }
-    else {
-      this.menu._arrow.rotation_angle_z = targetAngle;
-    }   
+    this.updateScrollbarPolicy();
+    this.menu._arrow.rotation_angle_z = this.menu.actor.text_direction == Clutter.TextDirection.RTL ? -90 : 90;   
   },
 
   show: function() {
@@ -594,22 +561,16 @@ const ListSubMenu = new Lang.Class({
     //GNOME Shell is really bad at deciding when to reserve space for a scrollbar...
     //This is a reimplementation of:
     //https://github.com/GNOME/gnome-shell/blob/30e17036e8bec8dd47f68eb6b1d3cfe3ca037caf/js/ui/popupMenu.js#L925
-    //That takes into account the size of the menu items and optionally takes and adjustment value to see if we
-    //need a scrollbar in the future. It's not perfect but it works better than default implementation for our purposes.
+    //That takes an optional and adjustment value to see if we need a scrollbar in the future.
+    //It's not perfect but it works better than default implementation for our purposes.
     if (!adjustment) {
       adjustment = 0;
     }
     let topMenu = this._getTopMenu();
-    let numMenuItems = this.menu._getMenuItems().length;
-    if (numMenuItems < 1) {
-      numMenuItems = 1;
-    }
     let [topMinHeight, topNaturalHeight] = topMenu.actor.get_preferred_height(-1);
-    let [widgetMinHeight, widgetNaturalHeight] = this.menu.actor.get_preferred_height(-1);
-    let averageMenuItemSize = widgetNaturalHeight / numMenuItems;
     let topThemeNode = topMenu.actor.get_theme_node();
     let topMaxHeight = topThemeNode.get_max_height();
-    return topMaxHeight >= 0 && topNaturalHeight + adjustment > topMaxHeight + averageMenuItemSize;
+    return topMaxHeight >= 0 && topNaturalHeight + adjustment > topMaxHeight;
   },
 
   setObjectActive: function(objPath) {
