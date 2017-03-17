@@ -76,7 +76,9 @@ const PlayerMenu = new Lang.Class({
     if (this.menu.isOpen) {
       return;
     }
-    this.menu._open(animate);
+    //If we animate the open GNOME Shell gets confused
+    //and our menus can overflow off screen.
+    this.menu._open(BoxPointer.PopupAnimation.NONE);
     this.emit('player-menu-opened');
   }
 
