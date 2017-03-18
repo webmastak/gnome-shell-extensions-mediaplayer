@@ -267,7 +267,7 @@ const PlayerManager = new Lang.Class({
         actualPos = this.desiredMenuPosition;
       }
       else {
-        actualPos = this.desiredMenuPosition + this.nbPlayers() - 1;
+        actualPos = this.desiredMenuPosition + this.nbPlayers();
       }    
       this.menu.addMenuItem(this._players[owner].ui, actualPos);
       this._refreshActivePlayer(this._players[owner].player);
