@@ -640,6 +640,9 @@ const TrackList = new Lang.Class({
         tracklistItem.updateMetadata(metadata);
         return true;
       }
+      else {
+        return false;
+      }
     });
     if (this.activeObject) {
       this.setObjectActive(this.activeObject);
@@ -715,6 +718,9 @@ const Playlists = new Lang.Class({
       if (playlistItem.obj == obj) {
         playlistItem.updatePlaylistName(name);
         return true;
+      }
+      else {
+        return false;
       }
     });
     if (this.activeObject) {
