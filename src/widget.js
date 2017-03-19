@@ -495,6 +495,9 @@ const ListSubMenu = new Lang.Class({
     this.parent(label, false);
     this.activeObject = null;
     this._hidden = false;
+    //We have to MonkeyPatch open and close
+    //So our nested menus don't close their parent menu
+    //and to completely disable animation.
     this.menu.close = Lang.bind(this, this.close);
     this.menu.open = Lang.bind(this, this.open);
   },
@@ -549,11 +552,9 @@ const ListSubMenu = new Lang.Class({
 
     if (goingToNeedScrollbar) {
       this.menu.actor.add_style_pseudo_class('scrolled');
-      return true;
     }
     else {
       this.menu.actor.remove_style_pseudo_class('scrolled');
-      return false;
     }
   },
 
@@ -561,8 +562,8 @@ const ListSubMenu = new Lang.Class({
     //GNOME Shell is really bad at deciding when to reserve space for a scrollbar...
     //This is a reimplementation of:
     //https://github.com/GNOME/gnome-shell/blob/30e17036e8bec8dd47f68eb6b1d3cfe3ca037caf/js/ui/popupMenu.js#L925
-    //That takes an optional and adjustment value to see if we need a scrollbar in the future.
-    //It's not perfect but it works better than default implementation for our purposes.
+    //That takes an optional adjustment value to see if we're going to need a scrollbar in the future.
+    //It's not perfect but it works better than the default implementation for our purposes.
     if (!adjustment) {
       adjustment = 0;
     }
@@ -583,6 +584,27 @@ const ListSubMenu = new Lang.Class({
         listItem.setOrnament(PopupMenu.Ornament.NONE);
       }
     });
+  },
+  
+  getItem: function(obj) {    
+    return this.menu._getMenuItems().filter(function(item) {
+      return item.obj === obj;
+    })[0];
+  },
+
+  hasUniqueObjPaths: function(objects, isTracklistMetadata) {
+    //Check for unique values in the playlist and tracklist object paths.
+    let unique = objects.reduce(function(values, object) {
+      if (isTracklistMetadata) {
+        object = object["mpris:trackid"] ? object["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
+      }
+      else {
+        object = object[0];
+      }
+      values[object] = true;
+      return values;
+    }, {});
+    return Object.keys(unique).length === objects.length;
   }
 
 });
@@ -597,24 +619,6 @@ const TrackList = new Lang.Class({
     this.parseMetadata = Lib.parseMetadata;
   },
 
-  metadataMap: function() {
-    let metadata = {
-      trackTitle: 'Unknown title',
-      trackNumber: '',
-      trackAlbum: 'Unknown album',
-      trackArtist: ['Unknown artist'],
-      trackUrl: '',
-      trackCoverUrl: '',
-      trackLength: 0,
-      trackObj: '/org/mpris/MediaPlayer2/TrackList/NoTrack',
-      trackRating: 0,
-      isRadio: false,
-      fallbackIcon: 'media-optical-cd-audio-symbolic',
-      showRatings: false,
-    }
-    return metadata;
-  },
-
   showRatings: function(value) {
     this.setScrollbarPolicyAllways();
     this.menu._getMenuItems().forEach(function(tracklistItem) {
@@ -624,58 +628,54 @@ const TrackList = new Lang.Class({
   },
 
   updateMetadata: function(UpdatedMetadata) {
-    let metadata = this.metadataMap();
+    let metadata = {};
     this.parseMetadata(UpdatedMetadata, metadata);
-    if (!metadata.trackObj || metadata.trackObj == '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
-      return;
-    }
-    if (Array.isArray(metadata.trackArtist)) {
-      metadata.trackArtist = metadata.trackArtist[0];
-    }
-    if (metadata.isRadio) {
-      metadata.fallbackIcon = 'application-rss+xml-symbolic';
-    }
-    this.menu._getMenuItems().some(function(tracklistItem) {
-      if (tracklistItem.obj == metadata.trackObj) {
-        tracklistItem.updateMetadata(metadata);
-        return true;
-      }
-      else {
-        return false;
-      }
-    });
-    if (this.activeObject) {
-      this.setObjectActive(this.activeObject);
-    }
-  },
-
-  loadTracklist: function(trackListMetaData, showRatings) {
-    this.menu.removeAll();
-    this.setScrollbarPolicyAllways();
-    trackListMetaData.forEach(Lang.bind(this, function(trackMetadata) {
-      let metadata = this.metadataMap();
-      metadata.showRatings = showRatings;
-      this.parseMetadata(trackMetadata, metadata);
-      if (!metadata.trackObj || metadata.trackObj == '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
-        return;
-      }
+    let trackListItem = this.getItem(metadata.trackObj);
+    if (trackListItem) {
+      metadata.fallbackIcon = 'media-optical-cd-audio-symbolic';
       if (Array.isArray(metadata.trackArtist)) {
         metadata.trackArtist = metadata.trackArtist[0];
       }
       if (metadata.isRadio) {
         metadata.fallbackIcon = 'application-rss+xml-symbolic';
-      } 
-
-      let trackUI = new TracklistItem(metadata);
-      trackUI.connect('activate', Lang.bind(this, function() {
-        this.player.playTrack(trackUI.obj);
-      }));
-      this.menu.addMenuItem(trackUI);
-    }));
-    if (this.activeObject) {
-      this.setObjectActive(this.activeObject);
+      }
+      trackListItem.updateMetadata(metadata);
     }
-    this.updateScrollbarPolicy();
+  },
+
+  loadTracklist: function(trackListMetaData, showRatings) {
+    this.menu.removeAll();
+    //As per spec all object paths MUST be unique.
+    //If we don't have unique object paths reject the whole array.
+    let hasUniqueObjPaths = this.hasUniqueObjPaths(trackListMetaData, true);
+    if (hasUniqueObjPaths) {
+      this.setScrollbarPolicyAllways();
+      trackListMetaData.forEach(Lang.bind(this, function(trackMetadata) {
+        let metadata = {};
+        this.parseMetadata(trackMetadata, metadata);
+        //Don't add tracks with "/org/mpris/MediaPlayer2/TrackList/NoTrack" as the object path.
+        //As per spec the "/org/mpris/MediaPlayer2/TrackList/NoTrack" object path means it's not a valid track.
+        if (metadata.trackObj !== '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
+          metadata.showRatings = showRatings;
+          metadata.fallbackIcon = 'media-optical-cd-audio-symbolic';
+          if (Array.isArray(metadata.trackArtist)) {
+            metadata.trackArtist = metadata.trackArtist[0];
+          }
+          if (metadata.isRadio) {
+            metadata.fallbackIcon = 'application-rss+xml-symbolic';
+          }
+          let trackUI = new TracklistItem(metadata);
+          trackUI.connect('activate', Lang.bind(this, function() {
+            this.player.playTrack(trackUI.obj);
+          }));
+          this.menu.addMenuItem(trackUI);
+        }
+      }));
+      if (this.activeObject) {
+        this.setObjectActive(this.activeObject);
+      }
+      this.updateScrollbarPolicy();
+    }
   }
 
 });
@@ -691,40 +691,36 @@ const Playlists = new Lang.Class({
 
   loadPlaylists: function(playlists) {
     this.menu.removeAll();
-    this.setScrollbarPolicyAllways();
-    playlists.forEach(Lang.bind(this, function(playlist) {
-      let [obj, name] = playlist;
-      //Don't add playlists with just "/" as the object path.
-      //Playlist object paths that just contain "/" are a way to
-      //indicate invalid playlists as per spec.
-      if (obj == '/') {
-        return;
-      }
-      let playlistUI = new PlaylistItem(name, obj);
-      playlistUI.connect('activate', Lang.bind(this, function() {
-        this.player.playPlaylist(playlistUI.obj);
+    //As per spec all object paths MUST be unique.
+    //If we don't have unique object paths reject the whole array.
+    let hasUniqueObjPaths = this.hasUniqueObjPaths(playlists);
+    if (hasUniqueObjPaths) {
+      this.setScrollbarPolicyAllways();
+      playlists.forEach(Lang.bind(this, function(playlist) {
+        let [obj, name] = playlist;
+        //Don't add playlists with just "/" as the object path.
+        //Playlist object paths that just contain "/" are a way to
+        //indicate invalid playlists as per spec.
+        if (obj !== '/') {
+          let playlistUI = new PlaylistItem(name, obj);
+          playlistUI.connect('activate', Lang.bind(this, function() {
+            this.player.playPlaylist(playlistUI.obj);
+          }));
+          this.menu.addMenuItem(playlistUI);
+          }
       }));
-      this.menu.addMenuItem(playlistUI);
-    }));
-    if (this.activeObject) {
-      this.setObjectActive(this.activeObject);
+      if (this.activeObject) {
+        this.setObjectActive(this.activeObject);
+      }
+      this.updateScrollbarPolicy();
     }
-    this.updateScrollbarPolicy();
   },
 
   updatePlaylist: function(UpdatedPlaylist) {
     let [obj, name] = UpdatedPlaylist;
-    this.menu._getMenuItems().some(function(playlistItem) {
-      if (playlistItem.obj == obj) {
-        playlistItem.updatePlaylistName(name);
-        return true;
-      }
-      else {
-        return false;
-      }
-    });
-    if (this.activeObject) {
-      this.setObjectActive(this.activeObject);
+    let playlistItem = this.getItem(obj);
+    if (playlistItem) {
+      playlistItem.updatePlaylistName(name);
     }
   }
 
