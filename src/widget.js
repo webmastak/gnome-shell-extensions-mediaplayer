@@ -655,7 +655,7 @@ const TrackList = new Lang.Class({
         this.parseMetadata(trackMetadata, metadata);
         //Don't add tracks with "/org/mpris/MediaPlayer2/TrackList/NoTrack" as the object path.
         //As per spec the "/org/mpris/MediaPlayer2/TrackList/NoTrack" object path means it's not a valid track.
-        if (metadata.trackObj !== '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
+        if (metadata.trackObj && metadata.trackObj !== '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
           metadata.showRatings = showRatings;
           metadata.fallbackIcon = 'media-optical-cd-audio-symbolic';
           if (Array.isArray(metadata.trackArtist)) {
