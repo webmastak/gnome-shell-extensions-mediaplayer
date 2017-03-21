@@ -87,6 +87,10 @@ function getPlayerSymbolicIcon(desktopEntry) {
 }
 
 function parseMetadata(metadata, state) {
+  // Pragha sends a metadata dict with one value on stop
+  if (metadata === null || Object.keys(metadata).length < 2) {
+    return;
+  }
   state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
   state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : ["Unknown artist"];
   state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "Unknown album";
