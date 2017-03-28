@@ -1,0 +1,147 @@
+# Norwegian Bokmål Translation for gnome-shell-extension-mediaplayer package.
+# Copyright (C) 2017 gnome-shell-extension-mediaplayer package.
+# This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
+# Lars Andre Landås <landas@gmail.com>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-29 01:30+0100\n"
+"PO-Revision-Date: 2017-03-29 01:30+0100\n"
+"Last-Translator: Lars Andre Landås <landas@gmail.com>\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: \n"
+
+#: ../src/ui.js:165
+msgid "Volume"
+msgstr "Volum"
+
+#: ../src/ui.js:177
+msgid "Playlists"
+msgstr "Spilleliste"
+
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Stoppet"
+
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Spiller"
+
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Pauset"
+
+#: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr "Indikatorposisjon"
+
+#: ../src/prefs.js:42
+msgid "Center"
+msgstr "Midten"
+
+#: ../src/prefs.js:43
+msgid "Right"
+msgstr "Høyre"
+
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr "System-meny"
+
+#: ../src/prefs.js:49
+msgid "Indicator appearance"
+msgstr "Indikatorutseende"
+
+#: ../src/prefs.js:51
+msgid "Symbolic icon"
+msgstr "Symbolikon"
+
+#: ../src/prefs.js:52
+msgid "Current album cover"
+msgstr "Spillende albumomslag"
+
+#: ../src/prefs.js:57
+msgid "Indicator status text"
+msgstr "Statustekst på indikator"
+
+#: ../src/prefs.js:58
+msgid "{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported."
+msgstr ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Tittel. Pango markup er støttet."
+"unterstützt."
+
+#: ../src/prefs.js:62
+msgid "Indicator status text width"
+msgstr "Bredde på statustekst på indikator"
+
+#: ../src/prefs.js:63
+msgid "The the maximum width before the status text gets an ellipsis. Default is 300px."
+msgstr "Maksbredde på statustekst før ellipsen. Standard er 300px."
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Tillat å starte standard medieavspiller"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Vis medieavspillerens volumkontroller"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Vis medieavspillerens posisjonskontroller"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Vis medieavspilleren spilleliste"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Vis sangenes popularitet"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Vis nåværende sangs popularitet på en skala fra 0 til 5"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Posisjon i paneltopp"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Gnome shell trenger en omstart for å endre innstilling."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "Integrer lydnivåmeny"
+
+#, fuzzy
+#~ msgid "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr "Starter standard medieavspiller når du klikker på indikatoren eller fra menyen"
+
+#~ msgid "rating"
+#~ msgstr "popularitet"
+
+#~ msgid "by"
+#~ msgstr "av"
+
+#~ msgid "from"
+#~ msgstr "fra"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Ukjent artist"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Ukjent album"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Ukjent tittel"
+
+#~ msgid "Album cover size"
+#~ msgstr "Størrelse på albumomslag"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr "Størrelse på albumomslaget som vises i menyen. Standard er bredde på 80px."
+
+#~ msgid "Show the media player in the volume menu"
+#~ msgstr "Vis medieavspillerem i lydnivåmeny"
