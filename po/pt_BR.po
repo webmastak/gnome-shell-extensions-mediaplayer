@@ -9,69 +9,49 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 18:32+0200\n"
-"PO-Revision-Date: 2016-02-04 17:26-0300\n"
+"POT-Creation-Date: 2017-03-31 10:05-0300\n"
+"PO-Revision-Date: 2017-03-31 10:27-0300\n"
 "Last-Translator: Fábio Nogueira <fnogueira@gnome.org>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 1.8.11\n"
 
-#: ../src/ui.js:165
-msgid "Volume"
-msgstr "Volume"
-
-#: ../src/ui.js:177
-msgid "Playlists"
-msgstr "Playlists"
-
-#: ../src/settings.js:51
-msgid "Stopped"
-msgstr "Parado"
-
-#: ../src/settings.js:52
-msgid "Playing"
-msgstr "Reproduzindo"
-
-#: ../src/settings.js:53
-msgid "Paused"
-msgstr "Pausado"
-
-#: ../src/prefs.js:40
+#: prefs.js:39
 msgid "Indicator position"
 msgstr "Posição do indicador"
 
-#: ../src/prefs.js:42
+#: prefs.js:41
 msgid "Center"
 msgstr "Centro"
 
-#: ../src/prefs.js:43
+#: prefs.js:42
 msgid "Right"
 msgstr "Direita"
 
-#: ../src/prefs.js:44
+#: prefs.js:43
 msgid "System menu"
 msgstr "Menu do sistema"
 
-#: ../src/prefs.js:49
+#: prefs.js:48
 msgid "Indicator appearance"
 msgstr "Aparência do indicador"
 
-#: ../src/prefs.js:51
+#: prefs.js:50
 msgid "Symbolic icon"
 msgstr "Ícone simbólico"
 
-#: ../src/prefs.js:52
+#: prefs.js:51
 msgid "Current album cover"
 msgstr "Capa atual"
 
-#: ../src/prefs.js:57
+#: prefs.js:56
 msgid "Indicator status text"
 msgstr "Texto de status do indicador"
 
-#: ../src/prefs.js:58
+#: prefs.js:57
 msgid ""
 "{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
 "markup supported."
@@ -79,41 +59,146 @@ msgstr ""
 "{trackArtist}: Artista, {trackAlbum}: Álbum, {trackTitle}: Título. Marcação "
 "Pango suportada."
 
-#: ../src/prefs.js:62
+#: prefs.js:61
 msgid "Indicator status text width"
 msgstr "Tamanho do texto de status do indicador"
 
-#: ../src/prefs.js:63
+#: prefs.js:62
 msgid ""
-"The the maximum width before the status text gets an ellipsis. Default is "
-"300px."
+"The maximum width before the status text gets an ellipsis. Default is 300px."
 msgstr ""
-"O tamanho máximo antes do texto de status recebe reticências. O padrão é "
+"A largura máxima antes do texto de status recebe uma reticência. O padrão é "
 "300px."
 
-#: ../src/prefs.js:71
-msgid "Allow to start the default media player"
-msgstr "Permitir iniciar o reprodutor padrão"
+#: prefs.js:70
+msgid "Large cover size"
+msgstr "Tamanho da capa grande"
 
-#: ../src/prefs.js:75
+#: prefs.js:71
+msgid "The size of the cover when zoomed. Default is 192px."
+msgstr "O tamanho da capa ao aplicar o zoom. O padrão é 192px."
+
+#: prefs.js:79
+msgid "Small cover size"
+msgstr "Tamanho da capa pequena"
+
+#: prefs.js:80
+msgid "The size of the cover when not zoomed. Default is 48px."
+msgstr "O tamanho da capa sem zoom. O padrão é 48px."
+
+#: prefs.js:88
+msgid "Allow the starting of the default media player"
+msgstr "Permitir iniciar o reprodutor padrão de mídia"
+
+#: prefs.js:92
 msgid "Show the media player volume slider"
 msgstr "Exibir o controle de volume do reprodutor"
 
-#: ../src/prefs.js:79
+#: prefs.js:96
 msgid "Show the media player position slider"
 msgstr "Exibir o controle de posição do reprodutor"
 
-#: ../src/prefs.js:83
-msgid "Show media player playlists"
-msgstr "Exibir playlists do reprodutor"
+#: prefs.js:100
+msgid "Show the media player playlists"
+msgstr "Exibir playlists do reprodutor de mídia"
 
-#: ../src/prefs.js:87
-msgid "Display song rating"
-msgstr "Mostrar a avaliação da música"
+#: prefs.js:101
+msgid "Few players currently support the Mpris Playlist Interface."
+msgstr "Atualmente poucos reprodutores suportam a interface Mpris de Playlist."
 
-#: ../src/prefs.js:88
+#: prefs.js:105
+msgid "Show the media player tracklist"
+msgstr "Mostrar a lista de faixas do reprodutor de mídia"
+
+#: prefs.js:106
+msgid "Very few players currently support the Mpris Tracklist Interface."
+msgstr ""
+"Atualmente muito poucos reprodutores suportam a interface Mpris de Playlist."
+
+#: prefs.js:110
+msgid "Display the current song's rating"
+msgstr "Exibir a avaliação da música atual"
+
+#: prefs.js:111
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr "Mostra a avaliação da música que está tocando em uma escala de 0 a 5"
+
+#: prefs.js:115
+msgid "Display song ratings in the tracklist"
+msgstr "Exibe avalições das músicas na lista de faixas"
+
+#: prefs.js:116
+msgid "Display the ratings of the songs in tracklist on a 0 to 5 scale"
+msgstr ""
+"Exibe as avaliações das músicas na lista de faixas numa escala de 0 a 5"
+
+#: prefs.js:120
+msgid "Enable Indicator scroll events"
+msgstr "Habilitar indicador de evetos de rolagem"
+
+#: prefs.js:121
+msgid "Enables track changes on scrolling the Indicator."
+msgstr "Permite alterações da faixa no deslocamento do indicador."
+
+#: prefs.js:128
+msgid "Hide the built-in Mpris controls (Experimental)"
+msgstr "Ocultar os controles internos Mpris (Experimental)"
+
+#: prefs.js:129
+msgid ""
+"Whether to hide the built-in Mpris controls.\n"
+"This depends on implementation details within GNOME Shell that may change."
+msgstr ""
+"Se permite ocultar os controles internos Mpris.\n"
+"Isto depende dos detalhes de implementação no GNOME Shell que podem ser "
+"alterados."
+
+#: settings.js:60
+msgid "Stopped"
+msgstr "Parado"
+
+#: settings.js:61
+msgid "Playing"
+msgstr "Reproduzindo"
+
+#: settings.js:62
+msgid "Paused"
+msgstr "Pausado"
+
+#: settings.js:73
+msgid "Stations"
+msgstr "Estações"
+
+#: settings.js:77
+msgid "Current Playlist"
+msgstr "Playlist atual"
+
+#: ui.js:539
+msgid "Playlists"
+msgstr "Playlists"
+
+#: ui.js:554
+msgid "Tracks"
+msgstr "Faixas"
+
+#~ msgid "Volume"
+#~ msgstr "Volume"
+
+#~ msgid ""
+#~ "The the maximum width before the status text gets an ellipsis. Default is "
+#~ "300px."
+#~ msgstr ""
+#~ "O tamanho máximo antes do texto de status recebe reticências. O padrão é "
+#~ "300px."
+
+#~ msgid "Allow to start the default media player"
+#~ msgstr "Permitir iniciar o reprodutor padrão"
+
+#~ msgid "Show media player playlists"
+#~ msgstr "Exibir playlists do reprodutor"
+
+#~ msgid "Display song rating"
+#~ msgstr "Mostrar a avaliação da música"
 
 #~ msgid "Position in the top panel"
 #~ msgstr "Posição no painel superior"
