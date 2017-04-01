@@ -179,7 +179,7 @@ This extension has been tested with:
   * Lollypop
   * *and more...*
 
-## Known bugs
+## Known Player Bugs
 
 ### Track position is not updated correctly
 
@@ -199,6 +199,12 @@ the position slider when the song is seeked from the extension or the player.
   * [bug report](https://bugzilla.gnome.org/show_bug.cgi?id=779215)
 
 ### Clementine *claims* to support the  Tracklist interface but due to internal errors always returns an empty tracklist.
+
+### gmusicbrowser sends invalid/mangled album cover uri's. Resulting in no album art in the extension more often than not.
+  * [bug report](https://github.com/squentin/gmusicbrowser/issues/138)
+
+### RhythmBox does not implement the PlaylistChanged signal. Changing a playlist's name in RhythmBox is not reflected in the extension.
+  * [bug report](https://bugzilla.gnome.org/show_bug.cgi?id=775207)
 
 ## *Not* supported players
 
