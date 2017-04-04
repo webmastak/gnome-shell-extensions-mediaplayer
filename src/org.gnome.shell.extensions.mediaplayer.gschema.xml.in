@@ -87,6 +87,16 @@
         <_summary>Hide the built-in Mpris applet</_summary>
         <_description>Whether to hide the built-in Mpris applet.</_description>
     </key>
+    <key name="menu-padding" type="i">
+        <default>40</default>
+        <_summary>Indicator menu padding</_summary>
+        <_description>The amount of padding between the edge of the large cover and the edge of the indicator menu.</_description>
+    </key>
+    <key name="min-width" type="i">
+        <default>256</default>
+        <_summary>Minimum width of the indicator menu</_summary>
+        <_description>Default is 256px.</_description>
+    </key>
     <key type="s" name="trackbox-template">
       <default>'[{"template": "{trackArtist}", "style_class": "track-info-artist"}, {"template": "{trackTitle}", "style_class": "track-info-title"}, {"template": "{trackAlbum}", "style_class": "track-info-album"}]'</default>
       <_summary>Template to render the trackbox</_summary>

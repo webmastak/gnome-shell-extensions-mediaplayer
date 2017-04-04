@@ -83,6 +83,24 @@ function init() {
             step: 1,
             default: 48
         },
+        min_width: {
+            type: "i",
+            label: _("Minimum width of the indicator menu"),
+            help: _("Default is 256px.\nHas no effect if the extension is in the system menu."),
+            min: 128,
+            max: 512,
+            step: 1,
+            default: 256
+        },
+        menu_padding: {
+            type: "i",
+            label: _("Indicator menu padding"),
+            help: _("The amount of padding in the indicator menu. Default is 40px.\nHas no effect if the extension is in the system menu."),
+            min: 0,
+            max: 100,
+            step: 1,
+            default: 40
+        },
         rundefault: {
             type: "b",
             label: _("Allow the starting of the default media player")
@@ -132,21 +150,30 @@ function init() {
 }
 
 function buildPrefsWidget() {
-    let frame = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
-                             border_width: 10});
-    let vbox = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL,
-                            margin: 20, margin_top: 10 });
+    let frame = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
+    let listBox = new Gtk.ListBox({expand: true});
+    listBox.set_header_func(this.on_listbox_update_header);
+    let scrolledWindow = new Gtk.ScrolledWindow({hadjustment: null, vadjustment: null});
+    scrolledWindow.set_min_content_width(600);
+    scrolledWindow.set_min_content_height(400);
+    scrolledWindow.add_with_viewport(listBox);
+
     let hbox;
 
     for (let setting in settings) {
         hbox = buildHbox(settings, setting);
-        vbox.add(hbox);
+        listBox.add(hbox);
     }
-
-    frame.add(vbox);
+    frame.add(scrolledWindow);
     frame.show_all();
 
     return frame;
+}
+
+function on_listbox_update_header(row, before) {
+    if (before && !row.get_header()) {
+        row.set_header(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL}));
+    }        
 }
 
 function buildHbox(settings, setting) {

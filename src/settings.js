@@ -45,6 +45,8 @@ const MEDIAPLAYER_SMALL_COVER_SIZE_KEY = 'small-cover';
 const MEDIAPLAYER_LARGE_COVER_SIZE_KEY = 'large-cover';
 const MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY = 'enable-scroll';
 const MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';
+const MEDIAPLAYER_INDICATOR_MENU_PADDING_KEY = 'menu-padding';
+const MEDIAPLAYER_MIN_INDICATOR_MENU_WIDTH_KEY = 'min-width';
 
 const MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
 
