@@ -5,16 +5,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-27 18:32+0200\n"
-"PO-Revision-Date: 2012-01-12 20:17+0100\n"
-"Last-Translator: Fabio <fbmail74-abc@yahoo.it>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2017-04-17 15:47+0200\n"
+"Last-Translator: Giuseppe Pignataro (Fastbyte01) <rogepix@gmail.com>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.0.1\n"
 
 #: ../src/ui.js:165
 msgid "Volume"
@@ -22,11 +23,11 @@ msgstr "Volume"
 
 #: ../src/ui.js:177
 msgid "Playlists"
-msgstr "Playlists"
+msgstr "Playlist"
 
 #: ../src/settings.js:51
 msgid "Stopped"
-msgstr "Arrestato"
+msgstr "Fermato"
 
 #: ../src/settings.js:52
 msgid "Playing"
@@ -38,78 +39,81 @@ msgstr "In Pausa"
 
 #: ../src/prefs.js:40
 msgid "Indicator position"
-msgstr ""
+msgstr "Posizione indicatore"
 
 #: ../src/prefs.js:42
 msgid "Center"
-msgstr ""
+msgstr "Centro"
 
 #: ../src/prefs.js:43
 msgid "Right"
-msgstr ""
+msgstr "Destra"
 
 #: ../src/prefs.js:44
 msgid "System menu"
-msgstr ""
+msgstr "Menu di sistema"
 
 #: ../src/prefs.js:49
 msgid "Indicator appearance"
-msgstr ""
+msgstr "Aspetto indicatore"
 
 #: ../src/prefs.js:51
 msgid "Symbolic icon"
-msgstr ""
+msgstr "Icona simbolica"
 
 #: ../src/prefs.js:52
 msgid "Current album cover"
-msgstr ""
+msgstr "Copertina album corrente"
 
 #: ../src/prefs.js:57
 msgid "Indicator status text"
-msgstr ""
+msgstr "Testo indicatore di stato"
 
 #: ../src/prefs.js:58
 msgid ""
 "{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
 "markup supported."
 msgstr ""
+"{trackArtist}: Artista, {trackAlbum}: Album, {trackTitle}: Titolo. Markup "
+"Pango supportato."
 
 #: ../src/prefs.js:62
 msgid "Indicator status text width"
-msgstr ""
+msgstr "Larghezza testo indicatore di stato"
 
 #: ../src/prefs.js:63
 msgid ""
 "The the maximum width before the status text gets an ellipsis. Default is "
 "300px."
 msgstr ""
+"La larghezza massima prima che il testo dello stato diventino dei "
+"puntini. Default è 300px."
 
 #: ../src/prefs.js:71
 msgid "Allow to start the default media player"
-msgstr ""
+msgstr "Permette di avviare il media player di default"
 
 #: ../src/prefs.js:75
-#, fuzzy
 msgid "Show the media player volume slider"
-msgstr "Playlists"
+msgstr "Mostra il cursore del volume del media player"
 
 #: ../src/prefs.js:79
-#, fuzzy
 msgid "Show the media player position slider"
-msgstr "Playlists"
+msgstr "Mostra la posizione del cursore del media player"
 
 #: ../src/prefs.js:83
-#, fuzzy
 msgid "Show media player playlists"
-msgstr "Playlists"
+msgstr "Mostra le playlist del media player"
 
 #: ../src/prefs.js:87
 msgid "Display song rating"
-msgstr ""
+msgstr "Mostra il voto della canzone"
 
 #: ../src/prefs.js:88
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
 msgstr ""
+"Mostra il voto della canzone attualmente in esecuzione su una scala da 0 "
+"a 5"
 
 #~ msgid "by"
 #~ msgstr "di"
