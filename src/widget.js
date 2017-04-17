@@ -321,6 +321,7 @@ const TrackRating = new Lang.Class({
             "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
             "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
             "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
+            "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
             "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
         };
     },
@@ -410,6 +411,12 @@ const TrackRating = new Lang.Class({
 
     applyGuayadequeRating: function(value) {
         GLib.spawn_command_line_async("guayadeque --set-rating=%s".format(value));
+        return true;
+    },
+
+    applyQuodLibetRating: function(value) {
+        // Quod Libet works on 0.0 to 1.0 scores
+        GLib.spawn_command_line_async("quodlibet --set-rating=%f".format(value / 5.0));
         return true;
     },
 
