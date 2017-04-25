@@ -38,7 +38,6 @@ const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
 const MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';
-const MEDIAPLAYER_RUN_DEFAULT = 'rundefault';
 const MEDIAPLAYER_RATING_KEY = 'rating';
 const MEDIAPLAYER_TRACKBOX_TEMPLATE = 'trackbox-template';
 const MEDIAPLAYER_SMALL_COVER_SIZE_KEY = 'small-cover';

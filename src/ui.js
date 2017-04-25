@@ -84,47 +84,6 @@ const PlayerMenu = new Lang.Class({
 
 });
 
-
-const DefaultPlayerUI = new Lang.Class({
-    Name: 'DefaultPlayerUI',
-    Extends: PopupMenu.PopupBaseMenuItem,
-
-    _init: function() {
-      this.parent();
-
-      let appInfo = Gio.app_info_get_default_for_type("audio/x-vorbis+ogg", false)
-      // In case there is no default audio app, don't crash, just don't have anything in the menu to launch.
-      if (!appInfo) {
-        return;
-      }
-      let appName = appInfo.get_name();
-      let appId = Gio.DesktopAppInfo.search(appName)[0][0];
-
-      this.app = Shell.AppSystem.get_default().lookup_app(appId);
-
-      this.label = new St.Label({text: appName});
-      this.icon = new St.Icon({icon_name: 'audio-x-generic-symbolic', style_class: 'popup-menu-icon'});
-
-      this.actor.add_child(this.icon);
-      this.actor.add_child(this.label);
-
-      this.connect('activate', Lang.bind(this, this.run));
-    },
-
-    hide: function() {
-      this.actor.hide();
-    },
-
-    show: function() {
-      this.actor.show();
-    },
-
-    run: function() {
-      this.app.activate_full(-1, 0);
-    }
-});
-
-
 const PlayerUI = new Lang.Class({
   Name: 'PlayerUI',
   Extends: PlayerMenu,

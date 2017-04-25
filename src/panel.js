@@ -187,17 +187,6 @@ const PanelIndicator = new Lang.Class({
     this.currentCoverUrl = '';
     this.currentDesktopEntry = '';
 
-    this._settings.connect("changed::" + Settings.MEDIAPLAYER_RUN_DEFAULT,
-      Lang.bind(this, function() {
-        let runDefault = this._settings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT);
-        if (runDefault) {
-          this.actor.show();
-        }
-        else if (!this.manager.activePlayer) {
-          this.actor.hide();
-        }
-    }));
-
     this.menu.actor.add_style_class_name('mediaplayer-menu');
 
     this.indicators = new St.BoxLayout({vertical: false});
@@ -219,9 +208,7 @@ const PanelIndicator = new Lang.Class({
     this.actor.add_actor(this.indicators);
     this.actor.add_style_class_name('panel-status-button');
     this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
-    if (!this._settings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
-      this.actor.hide();
-    }
+    this.actor.hide();
   },
 
   // Override PanelMenu.Button._onEvent
@@ -237,9 +224,7 @@ const PanelIndicator = new Lang.Class({
   },
 
   _onActivePlayerRemove: function() {
-    if (!Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
-      this.actor.hide();
-    }
+    this.actor.hide();
   }
 
 });
@@ -294,6 +279,7 @@ const AggregateMenuIndicator = new Lang.Class({
 
   _onActivePlayerRemove: function() {
     this.indicators.hide();
+    this.indicators.set_width(0);
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);

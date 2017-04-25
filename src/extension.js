@@ -35,7 +35,6 @@ let indicator;
 let _fileMonitor;
 let _stockMpris;
 let _stockMprisOldShouldShow;
-let _defaultAppsGioFile = Gio.File.new_for_path(GLib.get_user_config_dir() + '/mimeapps.list');
 
 function init() {
   Lib.initTranslations(Me);
@@ -45,11 +44,7 @@ function init() {
     _stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
     _stockMprisOldShouldShow = _stockMpris._shouldShow;
   }
-  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {_reset()});
-  if (_defaultAppsGioFile.query_exists(null)) {
-    _fileMonitor = _defaultAppsGioFile.monitor(Gio.FileMonitorFlags.NONE, null);
-    _fileMonitor.connect('changed', function() {Mainloop.timeout_add(500, _reset)});
-  } 
+  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {_reset()}); 
 }
 
 function _reset() {

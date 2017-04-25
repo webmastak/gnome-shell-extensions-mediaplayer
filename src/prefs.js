@@ -83,10 +83,6 @@ function init() {
             step: 1,
             default: 48
         },
-        rundefault: {
-            type: "b",
-            label: _("Allow the starting of the default media player")
-        },
         volume: {
             type: "b",
             label: _("Show the media player volume slider")

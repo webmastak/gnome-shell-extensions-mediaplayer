@@ -83,15 +83,6 @@ const PlayerManager = new Lang.Class({
                 }
             }
         ));
-        this._signalsId = [];
-        this._signalsId.push(
-            Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_RUN_DEFAULT, Lang.bind(this, function() {
-                this._toggleDefaultPlayer();
-            }))
-        );
-        this._defaultInMenu = false;
-        this._createDefaultPlayer();
-        this._toggleDefaultPlayer();
     },
 
     get activePlayer() {
@@ -199,20 +190,7 @@ const PlayerManager = new Lang.Class({
                     Lang.bind(this, this._onPlayerUpdate)
                 )
             );
-
-            let NewPlayerName = busName.split('.')[3].toLowerCase().replace('-', ' ');
-            let defaultPlayerName = '';
-            if (this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-              defaultPlayerName = this._players[Settings.DEFAULT_PLAYER_OWNER].ui.app.get_name().toLowerCase();
-            }
-            if (NewPlayerName == defaultPlayerName) {
-              this._defaultInMenu = true;
-              this._hideDefaultPlayer();
-              this._addPlayerToMenu(true, owner);
-            }
-            else {
-              this._addPlayerToMenu(false, owner);
-            }
+            this._addPlayerToMenu(owner);
         }
     },
 
@@ -228,47 +206,8 @@ const PlayerManager = new Lang.Class({
       this.emit('player-active-update', newState);
     },
 
-    _toggleDefaultPlayer: function() {
-      if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT)) {
-        this._showDefaultPlayer();
-      }
-      else {
-        this._hideDefaultPlayer();
-      }
-    },
-
-    _createDefaultPlayer: function() {
-        let ui = new UI.DefaultPlayerUI();
-        this._players[Settings.DEFAULT_PLAYER_OWNER] = {ui: ui, signalsUI: [], signals: [], player: null};
-        this._addPlayerToMenu(true, Settings.DEFAULT_PLAYER_OWNER);
-    },
-
-    _showDefaultPlayer: function() {
-      if (this._disabling) {
-        return;
-      }
-      if (this._players[Settings.DEFAULT_PLAYER_OWNER] && !this._defaultInMenu) {
-        this._players[Settings.DEFAULT_PLAYER_OWNER].ui.show();
-      }
-    },
-
-    _hideDefaultPlayer: function() {
-      if (this._disabling) {
-        return;
-      }
-      if (this._players[Settings.DEFAULT_PLAYER_OWNER]) {
-        this._players[Settings.DEFAULT_PLAYER_OWNER].ui.hide();
-      }
-    },
-
-    _addPlayerToMenu: function(isDefaultPlayer, owner) {
-      let actualPos;
-      if (isDefaultPlayer) {
-        actualPos = this.desiredMenuPosition;
-      }
-      else {
-        actualPos = this.desiredMenuPosition + this.nbPlayers();
-      }    
+    _addPlayerToMenu: function(owner) {
+      let actualPos = this.desiredMenuPosition + this.nbPlayers();  
       this.menu.addMenuItem(this._players[owner].ui, actualPos);
       this._refreshActivePlayer(this._players[owner].player);
     },
@@ -301,13 +240,6 @@ const PlayerManager = new Lang.Class({
     },
 
     _removePlayerFromMenu: function(busName, owner) {
-        let runDefault = Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RUN_DEFAULT);
-        let removedPlayerName = '';
-        if (busName) {
-          removedPlayerName = busName.split('.')[3].toLowerCase().replace('-', ' ');
-        }
-        let ui = new UI.DefaultPlayerUI();
-        let defaultPlayerName = ui.app.get_name().toLowerCase();
         if (this._players[owner]) {
             for (let id in this._players[owner].signals)
                 this._players[owner].player.disconnect(this._players[owner].signals[id]);
@@ -318,10 +250,6 @@ const PlayerManager = new Lang.Class({
             if (this._players[owner].player)
               this._players[owner].player.destroy();
             delete this._players[owner];
-            if (removedPlayerName == defaultPlayerName) {
-              this._defaultInMenu = false;
-              this._toggleDefaultPlayer();
-            }
         }
         this._refreshActivePlayer(null);
     },
@@ -357,8 +285,6 @@ const PlayerManager = new Lang.Class({
         this._disabling = true;
         if (this._ownerChangedId)
             this._dbus.disconnectSignal(this._ownerChangedId);
-        for (let id in this._signalsId)
-            Settings.gsettings.disconnect(this._signalsId[id]);
         for (let owner in this._players)
             this._removePlayerFromMenu(null, owner);
     }
