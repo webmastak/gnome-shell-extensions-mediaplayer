@@ -13,6 +13,11 @@
         <default>'volume-menu'</default>
         <_summary>Where to display the indicator (center, right, volume menu)</_summary>
     </key>
+    <key name="hide-aggindicator" type="b">
+        <default>false</default>
+        <_summary>Always hide the indicator in the system menu</_summary>
+        <_description>Whether to always hide the indicator in the system menu.</_description>
+    </key>
     <key name="volume" type="b">
         <default>false</default>
         <_summary>Show the media player volume slider</_summary>

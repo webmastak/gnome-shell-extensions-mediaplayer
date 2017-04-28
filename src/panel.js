@@ -264,14 +264,26 @@ const AggregateMenuIndicator = new Lang.Class({
     this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
 
     this.indicators.hide();
+    this._settings.connect("changed::" + Settings.MEDIAPLAYER_HIDE_AGGINDICATOR_KEY, Lang.bind(this, function() {
+      let alwaysHide = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_AGGINDICATOR_KEY);
+      if (alwaysHide) {
+        this.indicators.hide();
+        this.indicators.set_width(0);
+      }
+      else if (this.manager.activePlayer && this.manager.activePlayer.state.status != Settings.Status.STOP) {
+        this.indicators.show();
+        this.indicators.set_width(-1);
+      }
+    }));
   },
 
   _onActivePlayerUpdate: function(state) {
-    if (state.status && state.status === Settings.Status.STOP) {
+    let alwaysHide = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_AGGINDICATOR_KEY);
+    if (state.status && state.status === Settings.Status.STOP || alwaysHide) {
       this.indicators.hide();
       this.indicators.set_width(0);
     }
-    else if (state.status) {
+    else if (state.status && !alwaysHide) {
       this.indicators.show();
       this.indicators.set_width(-1);
     }

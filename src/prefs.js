@@ -83,6 +83,11 @@ function init() {
             step: 1,
             default: 48
         },
+        hide_aggindicator: {
+            type: "b",
+            label: _("Always hide the indicator in the system menu"),
+            help: _("Whether to always hide the panel indicator when the extension is in the system menu.")
+        },
         volume: {
             type: "b",
             label: _("Show the media player volume slider")
