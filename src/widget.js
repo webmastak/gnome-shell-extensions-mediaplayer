@@ -593,10 +593,13 @@ const ListSubMenu = new Lang.Class({
     });
   },
   
-  getItem: function(obj) {    
-    return this.menu._getMenuItems().filter(function(item) {
-      return item.obj === obj;
+  getItem: function(obj) {        
+    let menuItem = this.menu._getMenuItems().filter(function(item) {
+        return item.obj === obj;  
     })[0];
+    if (menuItem) {
+      return menuItem;
+    }
   },
 
   hasUniqueObjPaths: function(objects, isTracklistMetadata) {
