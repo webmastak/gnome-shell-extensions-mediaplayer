@@ -121,12 +121,8 @@ const IndicatorMixin = {
       }
     }
 
-    if (state.trackCoverUrl !== null) {
-      let desktopEntry = ''
-      if(state.desktopEntry) {
-        desktopEntry = state.desktopEntry;
-      }
-      this._setPrimaryIndicatorIcon(state.trackCoverUrl, desktopEntry);
+    if (state.trackCoverUrl !== null || state.desktopEntry !== null) {
+      this._setPrimaryIndicatorIcon(state.trackCoverUrl, state.desktopEntry);
     }
     this._onActivePlayerUpdate(state);
   },
