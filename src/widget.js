@@ -597,7 +597,7 @@ const ListSubMenu = new Lang.Class({
     let menuItems = this.menu._getMenuItems().filter(function(item) {
         return item.obj === obj;  
     });
-    if (menuItems) {
+    if (menuItems && menuItems[0]) {
       return menuItems[0];
     }
     else {

@@ -110,7 +110,10 @@ const PlayerManager = new Lang.Class({
                                                         Lang.bind(this, this._onActivePlayerUpdate));
       this.showActivePlayer();
       if (player.info.desktopEntry) {
-        player.state.desktopEntry = player.info.desktopEntry
+        player.state.desktopEntry = player.info.desktopEntry;
+      }
+      else {
+        player.state.desktopEntry = null;
       }
       this.emit('player-active-update', player.state);
     },
