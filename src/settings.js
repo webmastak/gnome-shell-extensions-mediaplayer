@@ -78,7 +78,12 @@ const ALTERNATIVE_TRACKLIST_TITLES = [
 ];
 
 const PLAYERS_THAT_CANT_STOP = [
-    "Pithos"
+    "Pithos",
+    "Spotify"
+];
+
+const BROKEN_PLAYERS = [
+    "Spotify"
 ];
 
 const IndicatorStatusType = {
