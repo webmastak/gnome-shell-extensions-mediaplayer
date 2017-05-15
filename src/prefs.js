@@ -83,6 +83,16 @@ function init() {
             step: 1,
             default: 48
         },
+        start_zoomed: {
+            type: "b",
+            label: _("Start with the cover zoomed"),
+            help: _("Always start with the cover zoomed out (Large).")
+        },
+        raise_click: {
+            type: "b",
+            label: _("Raise the Player when the cover is clicked"),
+            help: _("Raise the Player when the cover is clicked instead of zooming in or out.")
+        },
         hide_aggindicator: {
             type: "b",
             label: _("Always hide the indicator in the system menu"),

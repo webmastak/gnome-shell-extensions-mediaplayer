@@ -86,6 +86,16 @@
         <_summary>Hide the built-in Mpris applet</_summary>
         <_description>Whether to hide the built-in Mpris applet.</_description>
     </key>
+    <key name="raise-click" type="b">
+        <default>false</default>
+        <_summary>Raise the Player when the cover is clicked</_summary>
+        <_description>Raise the Player when the cover is clicked instead of zooming in or out.</_description>
+    </key>
+    <key name="start-zoomed" type="b">
+        <default>false</default>
+        <_summary>Start with the cover zoomed</_summary>
+        <_description>Start with the cover zoomed.</_description>
+    </key>
     <key type="s" name="trackbox-template">
       <default>'[{"template": "{trackArtist}", "style_class": "track-info-artist"}, {"template": "{trackTitle}", "style_class": "track-info-title"}, {"template": "{trackAlbum}", "style_class": "track-info-album"}]'</default>
       <_summary>Template to render the trackbox</_summary>

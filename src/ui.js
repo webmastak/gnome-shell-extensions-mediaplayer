@@ -117,7 +117,15 @@ const PlayerUI = new Lang.Class({
     if (Settings.MINOR_VERSION > 19) {
       this.trackCover.child.add_style_class_name('media-message-cover-icon fallback no-padding');
     }
-    this.trackCover.connect('clicked', Lang.bind(this, this._toggleCover));
+
+    this.trackCover.connect('clicked', Lang.bind(this, function(actor, button) {
+      if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RAISE_ON_CLICK_KEY)) {
+        this.player.raise();
+      }
+      else {
+        this._toggleCover();
+      }
+    }));
 
     this.trackBox = new Widget.TrackBox(this.trackCover);
     this.trackBox.connect('activate', Lang.bind(this.player, this.player.raise));
@@ -202,6 +210,10 @@ const PlayerUI = new Lang.Class({
       //Monkey patch
       this.stockMprisOldShouldShow = this.stockMpris._shouldShow;
       
+    }
+
+    if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_START_ZOOMED_KEY)) {
+      this._toggleCover();
     }
   },
 
