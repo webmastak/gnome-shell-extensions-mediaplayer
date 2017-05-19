@@ -212,7 +212,7 @@ const PlayerUI = new Lang.Class({
 
     if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_START_ZOOMED_KEY)) {
       this.trackCover.child.icon_size = this.largeCoverSize;
-      this.trackBox.infos.hide()      
+      this.trackBox.infos.hide();      
     }
     else {
       this.trackCover.child.icon_size = this.smallCoverSize;

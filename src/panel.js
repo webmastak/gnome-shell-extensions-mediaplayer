@@ -25,6 +25,7 @@ const Clutter = imports.gi.Clutter;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const PanelMenu = imports.ui.panelMenu;
+const Main = imports.ui.main;
 const GLib = imports.gi.GLib;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -78,6 +79,13 @@ const IndicatorMixin = {
         this.useCoverInPanel =
           this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
         this._setPrimaryIndicatorIcon(null, null);
+    }));
+    if (this.menuResizeId) {
+      this._settings.disconnect(this.menuResizeId);
+    }
+    this._setMenuWidth();
+    this.menuResizeId = this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY, Lang.bind(this, function() {
+      this._setMenuWidth();
     }));   
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
@@ -151,6 +159,9 @@ const IndicatorMixin = {
     if (this.panelIconSettingId) {
       this._settings.disconnect(this.panelIconSettingId);
     }
+    if (this.menuResizeId) {
+      this._settings.disconnect(this.menuResizeId);
+    }    
     this._clearStateText();
     this._thirdIndicator.set_width(0);
     this._secondaryIndicator.set_width(0);
@@ -180,10 +191,9 @@ const PanelIndicator = new Lang.Class({
     this._settings = Settings.gsettings;
     this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
     this.panelIconSettingId = 0;
+    this.menuResizeId = 0;
     this.currentCoverUrl = '';
     this.currentDesktopEntry = '';
-
-    this.menu.actor.add_style_class_name('mediaplayer-menu');
 
     this.indicators = new St.BoxLayout({vertical: false});
 
@@ -221,6 +231,16 @@ const PanelIndicator = new Lang.Class({
 
   _onActivePlayerRemove: function() {
     this.actor.hide();
+  },
+
+  _setMenuWidth: function() {
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
+    let padding = Math.min(Math.max(80, largeCoverSize / 2), 96);
+    let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+    let minMenuWidth = (largeCoverSize + padding) * scaleFactor;
+    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
+    let [minWidth, naturalWidth] = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1);
+    this.menu.actor.width = Math.max(naturalWidth, minMenuWidth);
   }
 
 });
@@ -240,6 +260,7 @@ const AggregateMenuIndicator = new Lang.Class({
     this._settings = Settings.gsettings;
     this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
     this.panelIconSettingId = 0;
+    this.menuResizeId = 0;
     this.currentCoverUrl = '';
     this.currentDesktopEntry = '';
 
@@ -288,6 +309,17 @@ const AggregateMenuIndicator = new Lang.Class({
   _onActivePlayerRemove: function() {
     this.indicators.hide();
     this.indicators.set_width(0);
+    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
+  },
+
+  _setMenuWidth: function() {
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
+    let padding = Math.min(Math.max(80, largeCoverSize / 2), 96);
+    let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+    let minMenuWidth = (largeCoverSize + padding) * scaleFactor;
+    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
+    let [minWidth, naturalWidth] = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1);
+    Main.panel.statusArea.aggregateMenu.menu.actor.width = Math.max(naturalWidth, minMenuWidth);
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);

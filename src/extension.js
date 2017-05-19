@@ -93,6 +93,7 @@ function disable() {
   }
   else {
     indicator.indicators.destroy();
+    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
     indicator = null;
   }
   if (Settings.MINOR_VERSION > 19) {
