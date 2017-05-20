@@ -104,6 +104,7 @@ const PlayerUI = new Lang.Class({
     this.showTracklist = false;
     this.showTracklistRating = false;
     this.hasTrackList = false;
+    this.trackLength = 0;
 
     this.oldShouldShow = null;
     //Broken Players never get anything beyond the most basic functionality
@@ -272,7 +273,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showPosition !== null && this.position !== null) {
       this.showPosition = newState.showPosition;
-      if (this.showPosition && newState.trackLength && newState.trackLength !== 0) {
+      if (this.showPosition && this.trackLength !== 0) {
         this.position.actor.show();
       }
       else {
@@ -375,16 +376,20 @@ const PlayerUI = new Lang.Class({
       }
     }
 
+    if (newState.trackLength !== null) {
+      this.trackLength = newState.trackLength;
+    }
+
     if (newState.canSeek !== null && this.position !== null) {
       this.position.setReactive(newState.canSeek)
     }
 
     if (newState.trackTime !== null && this.position !== null) {
-      if (!newState.trackLength || newState.trackLength === 0) {
+      if (this.trackLength === 0) {
         this.position.actor.hide();
       }
       else {
-        this.position.setValue(newState.trackTime / newState.trackLength);
+        this.position.setValue(newState.trackTime / this.trackLength);
       }
     }
 
