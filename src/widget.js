@@ -210,7 +210,8 @@ const SecondaryInfo = new Lang.Class({
     Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function() {
-      this.parent({hover: false});     
+      this.parent({hover: false});
+      this._hidden = false;     
       this.infos = new St.BoxLayout({vertical: true});
       this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
