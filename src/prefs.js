@@ -154,6 +154,15 @@ function buildPrefsWidget() {
         vbox.add(hbox);
     }
 
+    let githubHbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,
+                                  margin_top: 5});
+
+    let githubButton = new Gtk.LinkButton({label: _("Visit the GitHub page to file a bug report or request a feature."),
+                                           uri: 'https://github.com/eonpatapon/gnome-shell-extensions-mediaplayer'});
+
+    githubHbox.pack_start(githubButton, true, true, 0);
+    vbox.add(githubHbox);
+
     frame.add(vbox);
     frame.show_all();
 
