@@ -234,13 +234,14 @@ const PanelIndicator = new Lang.Class({
   },
 
   _setMenuWidth: function() {
-    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
-    let padding = Math.min(Math.max(80, largeCoverSize / 2), 96);
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let minMenuWidth = (largeCoverSize + padding) * scaleFactor;
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) * scaleFactor;
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    let [minWidth, naturalWidth] = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1);
-    this.menu.actor.width = Math.max(naturalWidth, minMenuWidth);
+    let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
+    let naturalAggWidth = Main.panel.statusArea.aggregateMenu.actor.get_preferred_width(-1)[1];
+    let padding = (naturalMenuWidth - naturalAggWidth) / 2;
+    let minMenuWidth = largeCoverSize + padding;
+    this.menu.actor.width = Math.max(naturalMenuWidth, minMenuWidth);
   }
 
 });
@@ -313,13 +314,14 @@ const AggregateMenuIndicator = new Lang.Class({
   },
 
   _setMenuWidth: function() {
-    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
-    let padding = Math.min(Math.max(80, largeCoverSize / 2), 96);
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let minMenuWidth = (largeCoverSize + padding) * scaleFactor;
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) * scaleFactor;
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    let [minWidth, naturalWidth] = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1);
-    Main.panel.statusArea.aggregateMenu.menu.actor.width = Math.max(naturalWidth, minMenuWidth);
+    let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
+    let naturalAggWidth = Main.panel.statusArea.aggregateMenu.actor.get_preferred_width(-1)[1];
+    let padding = (naturalMenuWidth - naturalAggWidth) / 2;
+    let minMenuWidth = largeCoverSize + padding;
+    Main.panel.statusArea.aggregateMenu.menu.actor.width = Math.max(naturalMenuWidth, minMenuWidth);
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);
