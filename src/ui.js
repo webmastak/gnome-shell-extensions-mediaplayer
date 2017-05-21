@@ -271,6 +271,10 @@ const PlayerUI = new Lang.Class({
       }
     }
 
+    if (newState.trackLength !== null) {
+      this.trackLength = newState.trackLength;
+    }
+
     if (newState.showPosition !== null && this.position !== null) {
       this.showPosition = newState.showPosition;
       if (this.showPosition && this.trackLength !== 0) {
@@ -374,10 +378,6 @@ const PlayerUI = new Lang.Class({
       else {
         this.prevButton.disable();
       }
-    }
-
-    if (newState.trackLength !== null) {
-      this.trackLength = newState.trackLength;
     }
 
     if (newState.canSeek !== null && this.position !== null) {
