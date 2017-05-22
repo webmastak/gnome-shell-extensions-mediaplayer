@@ -235,12 +235,12 @@ const PanelIndicator = new Lang.Class({
 
   _setMenuWidth: function() {
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) * scaleFactor;
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
     let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
     let naturalAggWidth = Main.panel.statusArea.aggregateMenu.actor.get_preferred_width(-1)[1];
     let padding = (naturalMenuWidth - naturalAggWidth) / 2;
-    let minMenuWidth = largeCoverSize + padding;
+    let minMenuWidth = (largeCoverSize + padding) * scaleFactor;
     this.menu.actor.width = Math.max(naturalMenuWidth, minMenuWidth);
   }
 
@@ -315,12 +315,12 @@ const AggregateMenuIndicator = new Lang.Class({
 
   _setMenuWidth: function() {
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) * scaleFactor;
+    let largeCoverSize = this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
     let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
     let naturalAggWidth = Main.panel.statusArea.aggregateMenu.actor.get_preferred_width(-1)[1];
     let padding = (naturalMenuWidth - naturalAggWidth) / 2;
-    let minMenuWidth = largeCoverSize + padding;
+    let minMenuWidth = (largeCoverSize + padding) * scaleFactor;
     Main.panel.statusArea.aggregateMenu.menu.actor.width = Math.max(naturalMenuWidth, minMenuWidth);
   }
 });
