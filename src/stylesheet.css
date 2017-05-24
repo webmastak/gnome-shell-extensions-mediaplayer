@@ -1,7 +1,8 @@
+/* em's don't scale? */
 .controls {
-    padding-top: 0em;
-    spacing: 0.25em;
-    padding-bottom: 0em;
+    padding-top: 0px;
+    spacing: 5px;
+    padding-bottom: 0px;
 }
 
 .no-padding {
@@ -9,18 +10,18 @@
 }
 
 .indicator-item {
-    padding-left: 0em;
-    padding-right: 0em;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 .secondary-indicator {
-    icon-size: 1em;
+    icon-size: 10px;
 }
 
 .track-box {
-    padding-top: 0em;
-    spacing: 0.5em;
-    padding-bottom: 0em;
+    padding-top: 0px;
+    spacing: 5px;
+    padding-bottom: 0px;
 }
 
 .track-info-artist {
@@ -41,21 +42,21 @@
 }
 
 .track-rating {
-    padding-top: 0em;
-    padding-bottom: 0em;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 .star-icon {
-    padding-top: 0em;
-    padding-bottom: 0em;
-    padding-left: 0.0625em;
-    padding-right: 0.0625em;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0.5px;
+    padding-right: 0.5px;
 }
 
 .star-box {
-    padding-top: 0em;
-    spacing: 0em;
-    padding-bottom: 0em;
-    padding-left: 0em;
-    padding-right: 0em;
+    padding-top: 0px;
+    spacing: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
