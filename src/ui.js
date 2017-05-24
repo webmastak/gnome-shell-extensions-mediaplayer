@@ -174,13 +174,15 @@ const PlayerUI = new Lang.Class({
     this.playlists = null;
     if (!this.playerIsBroken) {
       this.position = new Widget.SliderItem("document-open-recent-symbolic", 0);
-      this.position.connect('value-changed', Lang.bind(this, function(item) {
+      this.position.connect('activate', Lang.bind(this.player, this.player.raise))
+      this.position.sliderConnect('value-changed', Lang.bind(this, function(item) {
         this.player.seek(item._value);
       }));
       this.addMenuItem(this.position);
 
       this.volume = new Widget.SliderItem("audio-volume-high-symbolic", 0);
-      this.volume.connect('value-changed', Lang.bind(this, function(item) {
+      this.volume.connect('activate', Lang.bind(this.player, this.player.raise))
+      this.volume.sliderConnect('value-changed', Lang.bind(this, function(item) {
         this.player.setVolume(item._value);
       }));
       this.addMenuItem(this.volume);

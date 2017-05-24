@@ -43,6 +43,7 @@ const PlayerButtons = new Lang.Class({
 
     _init: function() {
         this.parent({hover: false});
+        this.actor.add_style_pseudo_class = function() {return null;}
         this.box = new St.BoxLayout({style_class: 'controls'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
@@ -98,7 +99,7 @@ const SliderItem = new Lang.Class({
 
     _init: function(icon, value) {
         this.parent({style_class: 'slider-item', hover: false});
-
+        this.actor.add_style_pseudo_class = function() {return null;}
         this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(value);
 
@@ -118,7 +119,7 @@ const SliderItem = new Lang.Class({
         this._icon.icon_name = icon;
     },
 
-    connect: function(signal, callback) {
+    sliderConnect: function(signal, callback) {
         this._slider.connect(signal, callback);
     }
 });
@@ -129,6 +130,7 @@ const TrackBox = new Lang.Class({
 
     _init: function(cover) {
       this.parent({hover: false});
+      this.actor.add_style_pseudo_class = function() {return null;}
       this._hidden = false;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
@@ -211,6 +213,7 @@ const SecondaryInfo = new Lang.Class({
 
     _init: function() {
       this.parent({hover: false});
+      this.actor.add_style_pseudo_class = function() {return null;}
       this._hidden = false;     
       this.infos = new St.BoxLayout({vertical: true});
       this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
@@ -314,6 +317,7 @@ const TrackRating = new Lang.Class({
         this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
         this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
         this.parent({style_class: "track-rating", hover: false});
+        this.actor.add_style_pseudo_class = function() {return null;}
         this.box = new St.BoxLayout({style_class: 'star-box'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this.rate(value);
