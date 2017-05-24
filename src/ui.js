@@ -120,6 +120,7 @@ const PlayerUI = new Lang.Class({
 
     this.trackCover.connect('clicked', Lang.bind(this, function(actor, button) {
       if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RAISE_ON_CLICK_KEY)) {
+        this.menu._getTopMenu().close();
         this.player.raise();
       }
       else {
