@@ -80,6 +80,8 @@ const MediaServer2PlayerIface = '<node>\
         </method>\
         <property name="CanPause" type="b" access="read" />\
         <property name="CanSeek" type="b" access="read" />\
+        <property name="CanGoNext" type="b" access="read" />\
+        <property name="CanGoPrevious" type="b" access="read" />\
         <property name="Metadata" type="a{sv}" access="read" />\
         <property name="Volume" type="d" access="readwrite" />\
         <property name="PlaybackStatus" type="s" access="read" />\
