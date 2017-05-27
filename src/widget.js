@@ -20,7 +20,6 @@
 
 'use strict';
 
-const Mainloop = imports.mainloop;
 const St = imports.gi.St;
 const PopupMenu = imports.ui.popupMenu;
 const Slider = imports.ui.slider;
@@ -31,20 +30,32 @@ const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
-const Params = imports.misc.params;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Lib = Me.imports.lib;
 
+const BaseContainer = new Lang.Class({
+    Name: "BaseContainer",
+    Extends: PopupMenu.PopupBaseMenuItem,
+
+    _init: function(parms) {
+      this.parent(parms);
+      //We don't want our BaseContainers to be highlighted when clicked,
+      //they're not really menu items in the traditional sense.
+      //We want to maintain the illusion that they are normal UI containers,
+      //and that our main track UI area is one big container.
+      this.actor.add_style_pseudo_class = function() {return null;}
+    }
+});
+
 const PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
-    Extends: PopupMenu.PopupBaseMenuItem,
+    Extends: BaseContainer,
 
     _init: function() {
         this.parent({hover: false});
-        this.actor.add_style_pseudo_class = function() {return null;}
-        this.box = new St.BoxLayout({style_class: 'controls'});
+        this.box = new St.BoxLayout();
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
     addButton: function(button) {
@@ -56,9 +67,15 @@ const PlayerButton = new Lang.Class({
     Name: "PlayerButton",
 
     _init: function(icon, callback) {
-        this.icon = new St.Icon({icon_name: icon});
-        this.actor = new St.Button({style_class: 'system-menu-action popup-inactive-menu-item',
-                                    child: this.icon});
+        let style_class;
+        if (Settings.MINOR_VERSION > 19) {
+          style_class = 'message-media-control player-button';
+        }
+        else {
+          style_class = 'system-menu-action popup-inactive-menu-item';
+        }
+        this.icon = new St.Icon({icon_name: icon, icon_size: 16});
+        this.actor = new St.Button({style_class: style_class, child: this.icon});
         this.actor._delegate = this;
         this._callback_id = this.actor.connect('clicked', callback);
     },
@@ -73,14 +90,10 @@ const PlayerButton = new Lang.Class({
     },
 
     enable: function() {
-        this.actor.remove_style_pseudo_class('disabled');
-        this.actor.can_focus = true;
         this.actor.reactive = true;
     },
 
     disable: function() {
-        this.actor.add_style_pseudo_class('disabled');
-        this.actor.can_focus = false;
         this.actor.reactive = false;
     },
 
@@ -95,11 +108,10 @@ const PlayerButton = new Lang.Class({
 
 const SliderItem = new Lang.Class({
     Name: "SliderItem",
-    Extends: PopupMenu.PopupBaseMenuItem,
+    Extends: BaseContainer,
 
     _init: function(icon, value) {
-        this.parent({style_class: 'slider-item', hover: false});
-        this.actor.add_style_pseudo_class = function() {return null;}
+        this.parent({hover: false});
         this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(value);
 
@@ -126,11 +138,10 @@ const SliderItem = new Lang.Class({
 
 const TrackBox = new Lang.Class({
     Name: "TrackBox",
-    Extends: PopupMenu.PopupBaseMenuItem,
+    Extends: BaseContainer,
 
     _init: function(cover) {
       this.parent({hover: false});
-      this.actor.add_style_pseudo_class = function() {return null;}
       this._hidden = false;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
@@ -209,11 +220,10 @@ const TrackBox = new Lang.Class({
 
 const SecondaryInfo = new Lang.Class({
     Name: "SecondaryInfo",
-    Extends: PopupMenu.PopupBaseMenuItem,
+    Extends: BaseContainer,
 
     _init: function() {
-      this.parent({hover: false});
-      this.actor.add_style_pseudo_class = function() {return null;}
+      this.parent({hover: false, style_class: 'no-padding-bottom'});
       this._hidden = false;     
       this.infos = new St.BoxLayout({vertical: true});
       this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
@@ -310,15 +320,14 @@ const TrackInfo = new Lang.Class({
 
 const TrackRating = new Lang.Class({
     Name: "TrackRating",
-    Extends: PopupMenu.PopupBaseMenuItem,
+    Extends: BaseContainer,
 
     _init: function(player, value) {
         this._player = player;
         this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
         this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
         this.parent({style_class: "track-rating", hover: false});
-        this.actor.add_style_pseudo_class = function() {return null;}
-        this.box = new St.BoxLayout({style_class: 'star-box'});
+        this.box = new St.BoxLayout({style_class: 'no-padding'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this.rate(value);
         // Supported players (except for Nuvola Player)
@@ -792,7 +801,7 @@ const TracklistItem = new Lang.Class({
         }
         this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'tracklist-artist'});
         this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-album'});
-        this._ratingBox = new St.BoxLayout({style_class: 'star-box'});
+        this._ratingBox = new St.BoxLayout({style_class: 'no-padding'});
         this._ratingBox.hide();
         this._box = new St.BoxLayout({vertical: true});
         this._box.add_child(this._artistLabel);
