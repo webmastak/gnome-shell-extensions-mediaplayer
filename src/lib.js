@@ -21,6 +21,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Gettext = imports.gettext;
+const Pango = imports.gi.Pango;
 
 function getSettings(extension) {
     let schemaName = 'org.gnome.shell.extensions.mediaplayer';
@@ -122,7 +123,7 @@ function parseMetadata(metadata, state) {
 };
 
 let compileTemplate = function(template, playerState) {
-  return template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
+  let escapedText = template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
     let text = "";
     if (playerState[fieldName]) {
       text = playerState[fieldName].toString() + appendText;
@@ -130,6 +131,17 @@ let compileTemplate = function(template, playerState) {
     }
     return text;
   });
+  //Validate Pango markup.
+  try {
+    let validMarkup = Pango.parse_markup(escapedText, -1, '')[0];
+      if (!validMarkup) {
+        escapedText = 'Invalid Syntax';
+      }        
+    }
+    catch(err) {
+      escapedText = 'Invalid Syntax';
+    }
+  return escapedText;
 };
 
 let _extends = function(object1, object2) {
