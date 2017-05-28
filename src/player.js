@@ -52,6 +52,7 @@ const PlayerState = new Lang.Class({
     }
   },
 
+  playerName: null,
   status: null,
 
   playlist: null,
@@ -62,7 +63,6 @@ const PlayerState = new Lang.Class({
 
   trackTime: null,
   trackTitle: null,
-  trackNumber: null,
   trackAlbum: null,
   trackArtist: null,
   trackUrl: null,
@@ -416,7 +416,8 @@ const MPRISPlayer = new Lang.Class({
         showTracklistRating: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY),
         volume: this._mediaServerPlayer.Volume || 0.0,
         status: this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP,
-        orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings)
+        orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings),
+        playerName: this._mediaServer.Identity || ''
       });
       if (this._mediaServerPlaylists.ActivePlaylist) {
         newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1][0];
