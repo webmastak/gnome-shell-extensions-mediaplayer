@@ -45,6 +45,7 @@ const PlayerManager = new Lang.Class({
         }));
         // players list
         this._players = {};
+        this._addPlayerTimeOutIds = {};
         // player shown in the panel
         this._activePlayer = null;
         this._activePlayerId = null;
@@ -73,12 +74,15 @@ const PlayerManager = new Lang.Class({
             function(proxy, sender, [name, old_owner, new_owner]) {
                 if (name_regex.test(name)) {
                     if (!this._disabling) {
-                        if (new_owner && !old_owner)
-                            this._addPlayer(name, new_owner);
-                        else if (old_owner && !new_owner)
+                        if (new_owner && !old_owner) {
+                          this._addPlayer(name, new_owner);
+                        }
+                        else if (old_owner && !new_owner) {
                             this._removePlayerFromMenu(name, old_owner);
-                        else
+                        }
+                        else {
                             this._changePlayerOwner(name, old_owner, new_owner);
+                        }
                     }
                 }
             }
@@ -165,36 +169,45 @@ const PlayerManager = new Lang.Class({
                 /^org\.mpris\.MediaPlayer2\.vlc-\d+$/.test(busName);
     },
 
-    _addPlayer: function(busName, owner) {        
-        if (this._players[owner]) {
-            let prevName = this._players[owner].player.busName;
-            // HAVE:       ADDING:     ACTION:
-            // master      master      reject, cannot happen
-            // master      instance    upgrade to instance
-            // instance    master      reject, duplicate
-            // instance    instance    reject, cannot happen
-            if (this._isInstance(busName) && !this._isInstance(prevName))
-                this._players[owner].player.busName = busName;
-            else
-                return;
-        }
-        else if (owner) {
-            let player = new Player.MPRISPlayer(busName, owner);
-            let ui = new UI.PlayerUI(player);
-            this._players[owner] = {
-              player: player,
-              ui: ui,
-              signals: [],
-              signalsUI: []
-            };
+    _addPlayer: function(busName, owner) {
+      // Give players 1 sec to populate their interfaces before actually adding them.
+      if (this._addPlayerTimeOutIds[busName] && this._addPlayerTimeOutIds[busName] !== 0) {
+        Mainloop.source_remove(this._addPlayerTimeOutIds[busName]);
+        this._addPlayerTimeOutIds[busName] = 0;
+      }
+      this._addPlayerTimeOutIds[busName] = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
+          this._addPlayerTimeOutIds[busName] = 0;       
+          if (this._players[owner]) {
+              let prevName = this._players[owner].player.busName;
+              // HAVE:       ADDING:     ACTION:
+              // master      master      reject, cannot happen
+              // master      instance    upgrade to instance
+              // instance    master      reject, duplicate
+              // instance    instance    reject, cannot happen
+              if (this._isInstance(busName) && !this._isInstance(prevName))
+                  this._players[owner].player.busName = busName;
+              else
+                  return false;
+          }
+          else if (owner) {
+              let player = new Player.MPRISPlayer(busName, owner);
+              let ui = new UI.PlayerUI(player);
+              this._players[owner] = {
+                player: player,
+                ui: ui,
+                signals: [],
+                signalsUI: []
+              };
 
-            this._players[owner].signals.push(
-                this._players[owner].player.connect('player-update',
-                    Lang.bind(this, this._onPlayerUpdate)
-                )
-            );
-            this._addPlayerToMenu(owner);
-        }
+              this._players[owner].signals.push(
+                  this._players[owner].player.connect('player-update',
+                      Lang.bind(this, this._onPlayerUpdate)
+                  )
+              );
+              this._addPlayerToMenu(owner);
+          }
+          return false;
+      }));
     },
 
     _onPlayerUpdate: function(player, newState) {
@@ -290,6 +303,13 @@ const PlayerManager = new Lang.Class({
             this._dbus.disconnectSignal(this._ownerChangedId);
         for (let owner in this._players)
             this._removePlayerFromMenu(null, owner);
+        // Cancel all pending timeouts. Wouldn't want to try to add a player if we're disabled.
+        for (let busName in this._addPlayerTimeOutIds) {
+            if (this._addPlayerTimeOutIds[busName] !== 0) {
+                Mainloop.source_remove(this._addPlayerTimeOutIds[busName]);
+                this._addPlayerTimeOutIds[busName] = 0;
+            }
+        }
     }
 });
 Signals.addSignalMethods(PlayerManager.prototype);
