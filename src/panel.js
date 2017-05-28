@@ -195,14 +195,14 @@ const PanelIndicator = new Lang.Class({
     this.currentCoverUrl = '';
     this.currentDesktopEntry = '';
 
-    this.indicators = new St.BoxLayout({vertical: false});
+    this.indicators = new St.BoxLayout({vertical: false, style_class: 'system-status-icon'});
 
     this._primaryIndicator = new St.Icon({icon_name: 'audio-x-generic-symbolic',
-                                          style_class: 'system-status-icon indicator-item'});
+                                          style_class: 'system-status-icon no-padding'});
     this._secondaryIndicator = new St.Icon({icon_name: 'media-playback-stop-symbolic',
-                                            style_class: 'popup-menu-icon secondary-indicator indicator-item'});
+                                            style_class: 'system-status-icon no-padding'});
     this._secondaryIndicator.hide();
-    this._thirdIndicator = new St.Label({style_class: 'system-status-icon'});
+    this._thirdIndicator = new St.Label({style_class: 'system-status-icon no-padding'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator});
     this._thirdIndicator.hide();
@@ -264,12 +264,12 @@ const AggregateMenuIndicator = new Lang.Class({
 
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-    this._primaryIndicator.style_class = 'system-status-icon indicator-item'
+    this._primaryIndicator.style_class = 'system-status-icon no-padding'
     this._secondaryIndicator = this._addIndicator();
     this._secondaryIndicator.icon_name = 'media-playback-stop-symbolic';
-    this._secondaryIndicator.style_class = 'popup-menu-icon secondary-indicator indicator-item';
+    this._secondaryIndicator.style_class = 'system-status-icon no-padding';
     this._secondaryIndicator.hide();
-    this._thirdIndicator = new St.Label({style_class: 'system-status-icon'});
+    this._thirdIndicator = new St.Label({style_class: 'system-status-icon no-padding'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this._thirdIndicator.hide();
     this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
