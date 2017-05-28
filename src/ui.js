@@ -120,8 +120,8 @@ const PlayerUI = new Lang.Class({
 
     this.trackCover.connect('clicked', Lang.bind(this, function(actor, button) {
       if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RAISE_ON_CLICK_KEY)) {
-        this.menu._getTopMenu().close();
         this.player.raise();
+        this.menu._getTopMenu().close();
       }
       else {
         this._toggleCover();
@@ -396,14 +396,14 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.status) {
-      let status = newState.status;
-      // g-s 3.16
-      if (this.status) {
-        this.status.text = _(status);
-      }
+    if (newState.status !== null) {
 
-      if (status == Settings.Status.STOP) {
+      if (newState.status === Settings.Status.STOP) {
+        if (this.stopButton) {
+          this.stopButton.hide();
+        }
+        this.playButton.show();
+        this.playButton.setIcon('media-playback-start-symbolic');
         this.trackBox.hideAnimate();
         this.secondaryInfo.hideAnimate();
         if (!this.playerIsBroken) {
@@ -430,7 +430,7 @@ const PlayerUI = new Lang.Class({
         }
       }
 
-      if (status === Settings.Status.PLAY) {
+      if (newState.status === Settings.Status.PLAY) {
         if (this.stopButton) {
           this.stopButton.show();
         }
@@ -442,14 +442,7 @@ const PlayerUI = new Lang.Class({
           this.playButton.hide();
         }
       }
-      else if (status === Settings.Status.PAUSE) {
-        this.playButton.setIcon('media-playback-start-symbolic');
-      }
-      else if (status == Settings.Status.STOP) {
-        if (this.stopButton) {
-          this.stopButton.hide();
-        }
-        this.playButton.show();
+      if (newState.status === Settings.Status.PAUSE) {
         this.playButton.setIcon('media-playback-start-symbolic');
       }
     }
