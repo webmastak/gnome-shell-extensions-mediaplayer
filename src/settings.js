@@ -26,7 +26,6 @@ const Config = imports.misc.config;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
-const N_ = function(t) { return t; };
 
 const MEDIAPLAYER_SETTINGS_SCHEMA = 'org.gnome.shell.extensions.mediaplayer';
 const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
@@ -59,10 +58,9 @@ const IndicatorPosition = {
 const FADE_ANIMATION_TIME = 0.25;
 
 const Status = {
-    STOP: N_("Stopped"),
-    PLAY: N_("Playing"),
-    PAUSE: N_("Paused"),
-    RUN: "Run"
+    STOP: "Stopped",
+    PLAY: "Playing",
+    PAUSE: "Paused"
 };
 
 const SEND_STOP_ON_CHANGE = [
@@ -92,8 +90,6 @@ const IndicatorStatusType = {
     ICON: 0,
     COVER: 1
 };
-
-const DEFAULT_PLAYER_OWNER = "org.gnome.shell.extensions.mediaplayer";
 
 let gsettings;
 
