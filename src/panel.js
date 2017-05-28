@@ -70,6 +70,10 @@ const IndicatorMixin = {
 
   // method binded to classes below
   _commonOnActivePlayerUpdate: function(manager, state) {
+    if (state.playerName !== null) {
+      this._playerName = state.playerName;
+    }
+
     if (this.panelIconSettingId) {
       this._settings.disconnect(this.panelIconSettingId);
     }
@@ -110,7 +114,8 @@ const IndicatorMixin = {
       this._thirdIndicator.show();
     }
 
-    if (state.trackTitle || state.trackArtist || state.trackAlbum || state.trackNumber) {
+    if (state.trackTitle || state.trackArtist || state.trackAlbum) {
+      state.playerName = this._playerName;
       let stateText = this.compileTemplate(stateTemplate, state);
       this._thirdIndicator.clutter_text.set_markup(stateText);
 
@@ -194,6 +199,7 @@ const PanelIndicator = new Lang.Class({
     this.menuResizeId = 0;
     this.currentCoverUrl = '';
     this.currentDesktopEntry = '';
+    this._playerName = '';
 
     this.indicators = new St.BoxLayout({vertical: false, style_class: 'system-status-icon'});
 
@@ -261,6 +267,7 @@ const AggregateMenuIndicator = new Lang.Class({
     this.menuResizeId = 0;
     this.currentCoverUrl = '';
     this.currentDesktopEntry = '';
+    this._playerName = '';
 
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';

@@ -96,7 +96,6 @@ function parseMetadata(metadata, state) {
   state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : ["Unknown artist"];
   state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "Unknown album";
   state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "Unknown title";
-  state.trackNumber = metadata["xesam:trackNumber"] ? metadata["xesam:trackNumber"].unpack() : "";
   state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
   state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
   state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";

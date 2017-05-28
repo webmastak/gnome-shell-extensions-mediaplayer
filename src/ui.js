@@ -327,9 +327,12 @@ const PlayerUI = new Lang.Class({
       this.secondaryInfo.empty();
       JSON.parse(Settings.gsettings.get_string(Settings.MEDIAPLAYER_TRACKBOX_TEMPLATE))
       .forEach(Lang.bind(this, function(trackInfo) {
-        let text = this.compileTemplate(trackInfo.template, newState);
-        this.trackBox.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
-        this.secondaryInfo.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
+        let template = trackInfo.template;
+        if (template != '{playerName}') {
+          let text = this.compileTemplate(template, newState);
+          this.trackBox.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
+          this.secondaryInfo.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
+        }
       }));
     }
 

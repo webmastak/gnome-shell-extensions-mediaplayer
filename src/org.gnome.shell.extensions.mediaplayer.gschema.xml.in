@@ -97,7 +97,7 @@
         <_description>Start with the cover zoomed.</_description>
     </key>
     <key type="s" name="trackbox-template">
-      <default>'[{"template": "{trackArtist}", "style_class": "track-info-artist"}, {"template": "{trackTitle}", "style_class": "track-info-title"}, {"template": "{trackAlbum}", "style_class": "track-info-album"}]'</default>
+      <default>'[{"template": "{playerName}", "style_class": "track-info-artist"}, {"template": "{trackArtist}", "style_class": "track-info-artist"}, {"template": "{trackTitle}", "style_class": "track-info-title"}, {"template": "{trackAlbum}", "style_class": "track-info-album"}]'</default>
       <_summary>Template to render the trackbox</_summary>
     </key>
   </schema>
