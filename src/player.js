@@ -331,15 +331,17 @@ const MPRISPlayer = new Lang.Class({
 
           if (props.PlaybackStatus) {
             let status = props.PlaybackStatus.unpack();
-            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1) {
+            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1 && status == Settings.Status.STOP) {
               // Some players send a "PlaybackStatus: Stopped" signal when changing
-              // tracks, so wait a little before refreshing.
+              // tracks, so wait a little before refreshing if they send a "Stopped" signal.
               if (this._statusId !== 0) {
                 Mainloop.source_remove(this._statusId);
                 this._statusId = 0;
               }
-              this._statusId = Mainloop.timeout_add(500, Lang.bind(this, function() {
-                this.emit('player-update', new PlayerState({status: status}));
+              this._statusId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
+                this._getPlayBackStatus();
+                this._statusId = 0;
+                return false;
               }));
             }
             else {
@@ -399,9 +401,9 @@ const MPRISPlayer = new Lang.Class({
 
     populate: function() {
       let newState = new PlayerState({
-        canPause: this._mediaServerPlayer.CanPause || true,
-        canGoNext: this._mediaServerPlayer.CanGoNext || true,
-        canGoPrevious: this._mediaServerPlayer.CanGoPrevious || true,
+        canPause: this._mediaServerPlayer.CanPause || false,
+        canGoNext: this._mediaServerPlayer.CanGoNext || false,
+        canGoPrevious: this._mediaServerPlayer.CanGoPrevious || false,
         canSeek: this._mediaServerPlayer.CanSeek || false,
         hasTrackList: this._mediaServer.HasTrackList || false,
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
@@ -410,11 +412,10 @@ const MPRISPlayer = new Lang.Class({
         showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
         showTracklist: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY),
         showTracklistRating: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY),
-        volume: this._mediaServerPlayer.Volume,
-        status: this._mediaServerPlayer.PlaybackStatus,
+        volume: this._mediaServerPlayer.Volume || 0,
+        status: this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP,
         orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings)
       });
-
       if (this._mediaServerPlaylists.ActivePlaylist) {
         newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1][0];
       }
@@ -427,14 +428,14 @@ const MPRISPlayer = new Lang.Class({
 
       this.emit('player-update', newState);
       
-      //Delay call 100ms because some players make the interface available without data available in the beginning
-      Mainloop.timeout_add(100, Lang.bind(this, function() {
+      //Delay call 1 sec because some players make the interface available without data available in the beginning
+      Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
         this._getPlaylists();
         if (this.state.hasTrackList) {
           this._getTracklist();
         }
         return false;
-      }), null);
+      }));
 
       this._getPlayerInfo();
 
@@ -596,6 +597,21 @@ const MPRISPlayer = new Lang.Class({
                                if (this.state.playlist != playlist) {
                                  this.emit('player-update', 
                                            new PlayerState({playlist: playlist}));
+                               }
+                             }
+                           })
+                          );
+    
+    },
+
+    _getPlayBackStatus: function() {
+      this._prop.GetRemote('org.mpris.MediaPlayer2.Player', 'PlaybackStatus',
+                           Lang.bind(this, function(value, err) {
+                             if (!err) {
+                               let status = value[0].unpack();
+                               if (this.state.status != status) {
+                                 this.emit('player-update', 
+                                           new PlayerState({status: status}));
                                }
                              }
                            })
