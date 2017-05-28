@@ -1,27 +1,21 @@
 /* em's don't scale? */
-.controls {
-    padding-top: 0px;
-    spacing: 5px;
-    padding-bottom: 0px;
+.player-button {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .no-padding {
     padding: 0px;
 }
 
-.indicator-item {
-    padding-left: 0px;
-    padding-right: 0px;
-}
-
-.secondary-indicator {
-    icon-size: 12px;
+.no-padding-bottom {
+    padding-bottom: 0px;
 }
 
 .track-box {
-    padding-top: 0px;
     spacing: 5px;
-    padding-bottom: 0px;
 }
 
 .track-info-artist {
@@ -51,12 +45,4 @@
     padding-bottom: 0px;
     padding-left: 0.5px;
     padding-right: 0.5px;
-}
-
-.star-box {
-    padding-top: 0px;
-    spacing: 0px;
-    padding-bottom: 0px;
-    padding-left: 0px;
-    padding-right: 0px;
 }
