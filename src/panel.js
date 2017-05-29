@@ -243,10 +243,14 @@ const PanelIndicator = new Lang.Class({
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
     let minMenuWidth = (this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) + 80) * scaleFactor;
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
-    this.menu.actor.width = Math.max(naturalMenuWidth, minMenuWidth);
+    let naturalAggMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
+    this.menu.actor.set_width(-1);
+    let naturalMenuWidth = this.menu.actor.get_preferred_width(-1)[1];
+    let desiredwidth = Math.max(naturalAggMenuWidth, minMenuWidth);
+    if (desiredwidth != naturalMenuWidth) {
+      this.menu.actor.width = desiredwidth;
+    }
   }
-
 });
 Lib._extends(PanelIndicator, IndicatorMixin);
 
@@ -322,8 +326,10 @@ const AggregateMenuIndicator = new Lang.Class({
     let minMenuWidth = (this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) + 80) * scaleFactor;
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
     let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
-    Main.panel.statusArea.aggregateMenu.menu.actor.width = Math.max(naturalMenuWidth, minMenuWidth);
-
+    let desiredwidth = Math.max(naturalMenuWidth, minMenuWidth);
+    if (desiredwidth != naturalMenuWidth) {
+      Main.panel.statusArea.aggregateMenu.menu.actor.width = desiredwidth;
+    }
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);
