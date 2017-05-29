@@ -151,8 +151,9 @@ const TrackBox = new Lang.Class({
       this.actor.add(this._content, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
-    addInfo: function(item, row) {
-        this.infos.add(item.actor);
+    addInfo: function(text, style_class) {
+        let info = new St.Label({text: text, style_class: style_class});
+        this.infos.add(info);
     },
 
     empty: function() {
@@ -229,8 +230,9 @@ const SecondaryInfo = new Lang.Class({
       this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
-    addInfo: function(item, row) {
-        this.infos.add(item.actor, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+    addInfo: function(text, style_class) {
+        let info = new St.Label({text: text, style_class: style_class});
+        this.infos.add(info, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
     empty: function() {
@@ -293,28 +295,6 @@ const SecondaryInfo = new Lang.Class({
         },
         onCompleteScope: this
       });
-    }
-});
-
-
-const TrackInfo = new Lang.Class({
-    Name: "TrackInfo",
-
-    _init: function(text, style) {
-      this.actor = new St.Label({style_class: style});
-      this.actor._delegate = this;
-      this.setText(text);
-    },
-
-    setText: function(text) {
-      if (this.actor.clutter_text) {
-        this.actor.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-        this.actor.clutter_text.set_markup(text);
-      }
-    },
-
-    getText: function() {
-      return this.actor.text;
     }
 });
 
