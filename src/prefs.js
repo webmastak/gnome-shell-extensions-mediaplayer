@@ -54,7 +54,7 @@ function init() {
         status_text: {
             type: "s",
             label: _("Indicator status text"),
-            help: _("{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
+            help: _("{playerName}: Player Name, {trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
         },
         status_size: {
             type: "i",
