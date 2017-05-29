@@ -145,23 +145,26 @@ const TrackBox = new Lang.Class({
       this._hidden = false;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
+      this._artistLabel = new St.Label({style_class: 'track-info-artist'});
+      this._titleLabel = new St.Label({style_class: 'track-info-title'});
+      this._albumLabel = new St.Label({style_class: 'track-info-album'});
+      this.infos.add(this._artistLabel);
+      this.infos.add(this._titleLabel);
+      this.infos.add(this._albumLabel);
       this._content = new St.BoxLayout({style_class: 'track-box', vertical: false}); 
-      this._content.add_child(this._cover);
-      this._content.add_child(this.infos);
+      this._content.add(this._cover);
+      this._content.add(this.infos);
       this.actor.add(this._content, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
-    addInfo: function(text, style_class) {
-        let info = new St.Label({text: text, style_class: style_class});
-        this.infos.add(info);
-    },
-
-    empty: function() {
-        this.infos.destroy_all_children();
+    updateInfo: function(state) {
+      this._artistLabel.text = state.trackArtist.toString();
+      this._titleLabel.text = state.trackTitle.toString();
+      this._albumLabel.text = state.trackAlbum.toString();
     },
 
     get hidden() {
-      return this._hidden || false;
+      return this._hidden;
     },
 
     set hidden(value) {
@@ -183,7 +186,7 @@ const TrackBox = new Lang.Class({
     },
 
     showAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden === false)
+      if (!this.actor.get_stage() || !this._hidden)
         return;
 
       this.actor.set_height(-1);
@@ -203,7 +206,7 @@ const TrackBox = new Lang.Class({
     },
 
     hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden === true)
+      if (!this.actor.get_stage() || this._hidden)
         return;
 
       Tweener.addTween(this.actor, {
@@ -227,20 +230,23 @@ const SecondaryInfo = new Lang.Class({
       this.parent({hover: false, style_class: 'no-padding-bottom'});
       this._hidden = false;     
       this.infos = new St.BoxLayout({vertical: true});
+      this._artistLabel = new St.Label({style_class: 'track-info-artist'});
+      this._titleLabel = new St.Label({style_class: 'track-info-title'});
+      this._albumLabel = new St.Label({style_class: 'track-info-album'});
+      this.infos.add(this._artistLabel, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+      this.infos.add(this._titleLabel, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+      this.infos.add(this._albumLabel, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
       this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
-    addInfo: function(text, style_class) {
-        let info = new St.Label({text: text, style_class: style_class});
-        this.infos.add(info, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-    },
-
-    empty: function() {
-        this.infos.destroy_all_children();
+    updateInfo: function(state) {
+      this._artistLabel.text = state.trackArtist.toString();
+      this._titleLabel.text = state.trackTitle.toString();
+      this._albumLabel.text = state.trackAlbum.toString();
     },
 
     get hidden() {
-      return this._hidden || false;
+      return this._hidden;
     },
 
     set hidden(value) {
@@ -262,7 +268,7 @@ const SecondaryInfo = new Lang.Class({
     },
 
     showAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden === false)
+      if (!this.actor.get_stage() || !this._hidden)
         return;
 
       this.actor.set_height(-1);
@@ -282,7 +288,7 @@ const SecondaryInfo = new Lang.Class({
     },
 
     hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden === true)
+      if (!this.actor.get_stage() || this._hidden)
         return;
 
       Tweener.addTween(this.actor, {

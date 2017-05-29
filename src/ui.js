@@ -321,18 +321,9 @@ const PlayerUI = new Lang.Class({
       this.trackRatings.rate(newState.trackRating);
     }
 
-    if (newState.trackTitle !== null || newState.trackArtist !== null || newState.trackAlbum !== null) {
-      this.trackBox.empty();
-      this.secondaryInfo.empty();
-      let artist = newState.trackArtist.toString();
-      let title = newState.trackTitle.toString();
-      let album = newState.trackAlbum.toString();
-      this.trackBox.addInfo(artist, 'track-info-artist');
-      this.secondaryInfo.addInfo(artist,'track-info-artist');
-      this.trackBox.addInfo(title, 'track-info-title');
-      this.secondaryInfo.addInfo(title, 'track-info-title');
-      this.trackBox.addInfo(album, 'track-info-album');
-      this.secondaryInfo.addInfo(album, 'track-info-album');
+    if (newState.trackArtist !== null) {
+      this.trackBox.updateInfo(newState);
+      this.secondaryInfo.updateInfo(newState);
     }
 
     if (newState.volume !== null && this.volume !== null) {
