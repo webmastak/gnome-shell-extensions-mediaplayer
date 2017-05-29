@@ -93,7 +93,6 @@ const PlayerUI = new Lang.Class({
     this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
-    this.compileTemplate = Lib.compileTemplate;
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
     this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
 
@@ -325,15 +324,15 @@ const PlayerUI = new Lang.Class({
     if (newState.trackTitle !== null || newState.trackArtist !== null || newState.trackAlbum !== null) {
       this.trackBox.empty();
       this.secondaryInfo.empty();
-      JSON.parse(Settings.gsettings.get_string(Settings.MEDIAPLAYER_TRACKBOX_TEMPLATE))
-      .forEach(Lang.bind(this, function(trackInfo) {
-        let template = trackInfo.template;
-        if (template != '{playerName}') {
-          let text = this.compileTemplate(template, newState);
-          this.trackBox.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
-          this.secondaryInfo.addInfo(new Widget.TrackInfo(text, trackInfo.style_class));
-        }
-      }));
+      let artist = newState.trackArtist.toString();
+      let title = newState.trackTitle.toString();
+      let album = newState.trackAlbum.toString();
+      this.trackBox.addInfo(artist, 'track-info-artist');
+      this.secondaryInfo.addInfo(artist,'track-info-artist');
+      this.trackBox.addInfo(title, 'track-info-title');
+      this.secondaryInfo.addInfo(title, 'track-info-title');
+      this.trackBox.addInfo(album, 'track-info-album');
+      this.secondaryInfo.addInfo(album, 'track-info-album');
     }
 
     if (newState.volume !== null && this.volume !== null) {
