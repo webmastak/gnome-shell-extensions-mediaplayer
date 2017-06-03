@@ -34,5 +34,6 @@ in the GNOME Shell's system menu by default.
 
   * eonpatapon (Jean-Philippe Braun)
   * grawity (Mantas Mikulėnas)
+  * JasonLG1979 (Jason Gray)
 
 Based on the work of horazont (Jonas Wielicki).
