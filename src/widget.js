@@ -159,8 +159,26 @@ const TrackBox = new Lang.Class({
 
     updateInfo: function(state) {
       this._artistLabel.text = state.trackArtist.toString();
+      if (this._artistLabel.text == "") {
+        this._artistLabel.hide();
+      }
+      else {
+        this._artistLabel.show();
+      }        
       this._titleLabel.text = state.trackTitle.toString();
+      if (this._titleLabel.text == "") {
+        this._titleLabel.hide();
+      }
+      else {
+        this._titleLabel.show();
+      }
       this._albumLabel.text = state.trackAlbum.toString();
+      if (this._albumLabel.text == "") {
+        this._albumLabel.hide();
+      }
+      else {
+        this._albumLabel.show();
+      }
     },
 
     get hidden() {
@@ -241,8 +259,26 @@ const SecondaryInfo = new Lang.Class({
 
     updateInfo: function(state) {
       this._artistLabel.text = state.trackArtist.toString();
+      if (this._artistLabel.text == "") {
+        this._artistLabel.hide();
+      }
+      else {
+        this._artistLabel.show();
+      }        
       this._titleLabel.text = state.trackTitle.toString();
+      if (this._titleLabel.text == "") {
+        this._titleLabel.hide();
+      }
+      else {
+        this._titleLabel.show();
+      }
       this._albumLabel.text = state.trackAlbum.toString();
+      if (this._albumLabel.text == "") {
+        this._albumLabel.hide();
+      }
+      else {
+        this._albumLabel.show();
+      }
     },
 
     get hidden() {
