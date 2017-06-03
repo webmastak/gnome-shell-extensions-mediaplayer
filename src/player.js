@@ -403,9 +403,9 @@ const MPRISPlayer = new Lang.Class({
 
     populate: function() {
       let newState = new PlayerState({
-        canPause: this._mediaServerPlayer.CanPause || false,
-        canGoNext: this._mediaServerPlayer.CanGoNext || false,
-        canGoPrevious: this._mediaServerPlayer.CanGoPrevious || false,
+        canPause: this._mediaServerPlayer.CanPause ? this._mediaServerPlayer.CanPause === (true || false): true,
+        canGoNext: this._mediaServerPlayer.CanGoNext ? this._mediaServerPlayer.CanGoNext === (true || false): true,
+        canGoPrevious: this._mediaServerPlayer.CanGoPrevious ? this._mediaServerPlayer.CanGoPrevious === (true || false): true,
         canSeek: this._mediaServerPlayer.CanSeek || false,
         hasTrackList: this._mediaServer.HasTrackList || false,
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
