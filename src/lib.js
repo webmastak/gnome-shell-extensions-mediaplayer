@@ -124,7 +124,7 @@ function parseMetadata(metadata, state) {
 let compileTemplate = function(template, playerState) {
   let escapedText = template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
     let text = "";
-    if (playerState[fieldName]) {
+    if (playerState[fieldName] && playerState[fieldName].toString() !== "") {
       text = playerState[fieldName].toString() + appendText;
       text = GLib.markup_escape_text(text, -1);
     }
@@ -133,13 +133,13 @@ let compileTemplate = function(template, playerState) {
   //Validate Pango markup.
   try {
     let validMarkup = Pango.parse_markup(escapedText, -1, '')[0];
-      if (!validMarkup) {
-        escapedText = 'Invalid Syntax';
-      }        
-    }
-    catch(err) {
+    if (!validMarkup) {
       escapedText = 'Invalid Syntax';
-    }
+    }        
+  }
+  catch(err) {
+    escapedText = 'Invalid Syntax';
+  }
   return escapedText;
 };
 
