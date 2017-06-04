@@ -137,8 +137,7 @@ const IndicatorMixin = {
 
     let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
-      this._thirdIndicator.hide();
-      this._thirdIndicator.set_width(0);      
+      this._thirdIndicator.hide();      
     } else {
       this._thirdIndicator.show();
     }
@@ -174,6 +173,7 @@ const IndicatorMixin = {
         this._primaryIndicator.icon_name = fallbackIcon;
       }
     }
+    this._setMenuWidth();
   },
 
   _commonOnActivePlayerRemove: function(manager) {
@@ -249,6 +249,7 @@ const PanelIndicator = new Lang.Class({
 
   _onActivePlayerRemove: function() {
     this.actor.hide();
+    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
   },
 
   _setMenuWidth: function() {
@@ -315,17 +316,14 @@ const AggregateMenuIndicator = new Lang.Class({
     let alwaysHide = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_AGGINDICATOR_KEY);
     if (state.status && state.status === Settings.Status.STOP || alwaysHide) {
       this.indicators.hide();
-      this.indicators.set_width(0);
     }
     else if (state.status && !alwaysHide) {
       this.indicators.show();
-      this.indicators.set_width(-1);
     }
   },
 
   _onActivePlayerRemove: function() {
     this.indicators.hide();
-    this.indicators.set_width(0);
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
   },
 
