@@ -32,6 +32,29 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Lib = Me.imports.lib;
 
+const PanelState = new Lang.Class({
+  Name: 'PanelState',
+
+  _init: function(params) {
+    this.update(params || {});
+  },
+
+  update: function(state) {
+    for (let key in state) {
+      if (state[key] !== null && this[key] !== undefined)
+        this[key] = state[key];
+    }
+  },
+
+  playerName: null,
+  status: null,
+  trackTitle: null,
+  trackAlbum: null,
+  trackArtist: null,
+  trackCoverUrl: null,
+  desktopEntry: null,
+});
+
 const IndicatorMixin = {
 
   set manager(manager) {
@@ -70,27 +93,33 @@ const IndicatorMixin = {
 
   // method binded to classes below
   _commonOnActivePlayerUpdate: function(manager, state) {
-    if (state.playerName !== null) {
-      this._playerName = state.playerName;
+    this.panelState.update(state);
+    for (let id in this._signalsId) {
+      this._settings.disconnect(this._signalsId[id]);
     }
-
-    if (this.panelIconSettingId) {
-      this._settings.disconnect(this.panelIconSettingId);
-    }
+    this._signalsId = [];
     this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
-    this.panelIconSettingId = this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TYPE_KEY,
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TYPE_KEY,
       Lang.bind(this, function() {
         this.useCoverInPanel =
           this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
-        this._setPrimaryIndicatorIcon(null, null);
-    }));
-    if (this.menuResizeId) {
-      this._settings.disconnect(this.menuResizeId);
-    }
-    this._setMenuWidth();
-    this.menuResizeId = this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY, Lang.bind(this, function() {
+        this._updatePanel();
+    })));
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY, Lang.bind(this, function() {
       this._setMenuWidth();
-    }));   
+    })));
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TEXT_KEY, Lang.bind(this, function() {
+      this._updatePanel();
+    })));
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_SIZE_KEY, Lang.bind(this, function() {
+      this._updatePanel();
+    })));  
+    this._updatePanel();
+    this._onActivePlayerUpdate(state);
+  },
+
+  _updatePanel: function() {
+    let state = this.panelState;
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
@@ -115,7 +144,6 @@ const IndicatorMixin = {
     }
 
     if (state.trackTitle || state.trackArtist || state.trackAlbum) {
-      state.playerName = this._playerName;
       let stateText = this.compileTemplate(stateTemplate, state);
       this._thirdIndicator.clutter_text.set_markup(stateText);
 
@@ -135,38 +163,25 @@ const IndicatorMixin = {
     }
 
     if (state.trackCoverUrl !== null || state.desktopEntry !== null) {
-      this._setPrimaryIndicatorIcon(state.trackCoverUrl, state.desktopEntry);
-    }
-    this._onActivePlayerUpdate(state);
-  },
-
-  _setPrimaryIndicatorIcon: function(trackCoverUrl, desktopEntry) {
-    if (trackCoverUrl != null) {
-      this.currentCoverUrl = trackCoverUrl;
-    }
-    if (desktopEntry != null) {
-      this.currentDesktopEntry = desktopEntry;
-    }
-    let fallbackIcon = 'audio-x-generic-symbolic';
-    if(this.currentDesktopEntry) {
-      fallbackIcon = this.getPlayerSymbolicIcon(this.currentDesktopEntry);
-    }
-    if (this.currentCoverUrl && this.useCoverInPanel) {
-        this.setCoverIconAsync(this._primaryIndicator, this.currentCoverUrl, fallbackIcon);
-    }
-    else {
-      this._primaryIndicator.icon_name = fallbackIcon;
+      let fallbackIcon = 'audio-x-generic-symbolic';
+      if(state.desktopEntry) {
+        fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry);
+      }
+      if (state.trackCoverUrl && this.useCoverInPanel) {
+          this.setCoverIconAsync(this._primaryIndicator, state.trackCoverUrl, fallbackIcon);
+      }
+      else {
+        this._primaryIndicator.icon_name = fallbackIcon;
+      }
     }
   },
 
   _commonOnActivePlayerRemove: function(manager) {
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-    if (this.panelIconSettingId) {
-      this._settings.disconnect(this.panelIconSettingId);
+    for (let id in this._signalsId) {
+      this._settings.disconnect(this._signalsId[id]);
     }
-    if (this.menuResizeId) {
-      this._settings.disconnect(this.menuResizeId);
-    }    
+    this._signalsId = [];    
     this._clearStateText();
     this._thirdIndicator.set_width(0);
     this._secondaryIndicator.set_width(0);
@@ -192,14 +207,11 @@ const PanelIndicator = new Lang.Class({
     this.compileTemplate = Lib.compileTemplate;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
+    this.panelState = new PanelState();
 
     this._settings = Settings.gsettings;
     this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
-    this.panelIconSettingId = 0;
-    this.menuResizeId = 0;
-    this.currentCoverUrl = '';
-    this.currentDesktopEntry = '';
-    this._playerName = '';
+    this._signalsId = [];
 
     this.indicators = new St.BoxLayout({vertical: false, style_class: 'system-status-icon'});
 
@@ -266,13 +278,9 @@ const AggregateMenuIndicator = new Lang.Class({
     this.setCoverIconAsync = Lib.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
     this._settings = Settings.gsettings;
+    this.panelState = new PanelState();
     this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
-    this.panelIconSettingId = 0;
-    this.menuResizeId = 0;
-    this.currentCoverUrl = '';
-    this.currentDesktopEntry = '';
-    this._playerName = '';
-
+    this._signalsId = [];
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
     this._primaryIndicator.style_class = 'system-status-icon no-padding'
