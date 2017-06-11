@@ -6,6 +6,11 @@
     padding-right: 10px;
 }
 
+/* for the panel indicator will be overridden by the large cover size setting */
+.dummy-style-class {
+  width: 128px;
+}
+
 .no-padding {
     padding: 0px;
 }

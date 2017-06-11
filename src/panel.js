@@ -53,6 +53,7 @@ const PanelState = new Lang.Class({
   trackArtist: null,
   trackCoverUrl: null,
   desktopEntry: null,
+  largeCoverSize: null,
 });
 
 const IndicatorMixin = {
@@ -94,6 +95,13 @@ const IndicatorMixin = {
   // method binded to classes below
   _commonOnActivePlayerUpdate: function(manager, state) {
     this.panelState.update(state);
+    if (this.themeChangeId != 0) {
+      this.themeContext.disconnect(this.themeChangeId);
+      this.themeChangeId = 0;
+    }
+    this.themeChangeId = this.themeContext.connect('changed', Lang.bind(this, function() {
+      this._setMenuWidth(null);
+    }));
     for (let id in this._signalsId) {
       this._settings.disconnect(this._signalsId[id]);
     }
@@ -104,9 +112,6 @@ const IndicatorMixin = {
         this.useCoverInPanel =
           this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
         this._updatePanel();
-    })));
-    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY, Lang.bind(this, function() {
-      this._setMenuWidth();
     })));
     this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TEXT_KEY, Lang.bind(this, function() {
       this._updatePanel();
@@ -173,11 +178,17 @@ const IndicatorMixin = {
         this._primaryIndicator.icon_name = fallbackIcon;
       }
     }
-    this._setMenuWidth();
+    if (state.largeCoverSize !== null) {
+      this._setMenuWidth(state.largeCoverSize);
+    }
   },
 
   _commonOnActivePlayerRemove: function(manager) {
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
+    if (this.themeChangeId != 0) {
+      this.themeContext.disconnect(this.themeChangeId);
+      this.themeChangeId = 0;
+    }
     for (let id in this._signalsId) {
       this._settings.disconnect(this._signalsId[id]);
     }
@@ -204,6 +215,11 @@ const PanelIndicator = new Lang.Class({
     this.parent(0.0, "mediaplayer");
 
     this._manager = null;
+    this.actor.add_style_class_name('panel-status-button');
+    this.menu.actor.add_style_class_name('aggregate-menu dummy-style-class');
+    this.menu.actor.width = Main.panel.statusArea.aggregateMenu.menu.actor.width;
+    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
+    this.themeChangeId = 0;
     this.compileTemplate = Lib.compileTemplate;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
@@ -230,7 +246,6 @@ const PanelIndicator = new Lang.Class({
     this.indicators.add(this._thirdIndicatorBin);
 
     this.actor.add_actor(this.indicators);
-    this.actor.add_style_class_name('panel-status-button');
     this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.actor.hide();
   },
@@ -249,19 +264,30 @@ const PanelIndicator = new Lang.Class({
 
   _onActivePlayerRemove: function() {
     this.actor.hide();
-    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
   },
 
-  _setMenuWidth: function() {
+  _setMenuWidth: function(largeCoverSize) {
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let minMenuWidth = (this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) + 80) * scaleFactor;
-    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    let naturalAggMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
+    let coverSize = largeCoverSize || this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
+    let padding = 80 * scaleFactor;
     this.menu.actor.set_width(-1);
-    let naturalMenuWidth = this.menu.actor.get_preferred_width(-1)[1];
-    let desiredwidth = Math.max(naturalAggMenuWidth, minMenuWidth);
-    if (desiredwidth != naturalMenuWidth) {
+    let menuChildren = this.menu.box.get_children().map(function(actor) {
+      return actor._delegate;
+    });
+    for (let i = 0; i < menuChildren.length; i++) {
+      if (menuChildren[i]._ornamentLabel) {
+        let leftPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.LEFT);
+        let rightPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.RIGHT);
+        padding = (menuChildren[i]._ornamentLabel.width * scaleFactor) + ((leftPadding + rightPadding) * 2);
+        break
+      }
+    }
+    let minMenuWidth = Math.round((coverSize * scaleFactor) + padding);
+    let menuWidth = this.menu.actor.width;
+    let desiredwidth = Math.max(menuWidth, minMenuWidth);
+    if (desiredwidth != menuWidth) {
       this.menu.actor.width = desiredwidth;
+      
     }
   }
 });
@@ -275,6 +301,8 @@ const AggregateMenuIndicator = new Lang.Class({
     this.parent();
 
     this._manager = null;
+    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
+    this.themeChangeId = 0;
     this.compileTemplate = Lib.compileTemplate;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
@@ -327,14 +355,27 @@ const AggregateMenuIndicator = new Lang.Class({
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
   },
 
-  _setMenuWidth: function() {
+  _setMenuWidth: function(largeCoverSize) {
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let minMenuWidth = (this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY) + 80) * scaleFactor;
+    let coverSize = largeCoverSize || this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
+    let padding = 80 * scaleFactor;
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    let naturalMenuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.get_preferred_width(-1)[1];
-    let desiredwidth = Math.max(naturalMenuWidth, minMenuWidth);
-    if (desiredwidth != naturalMenuWidth) {
-      Main.panel.statusArea.aggregateMenu.menu.actor.width = desiredwidth;
+    let menuChildren = Main.panel.statusArea.aggregateMenu.menu.box.get_children().map(function(actor) {
+      return actor._delegate;
+    });
+    for (let i = 0; i < menuChildren.length; i++) {
+      if (menuChildren[i]._ornamentLabel) {
+        let leftPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.LEFT);
+        let rightPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.RIGHT);
+        padding = (menuChildren[i]._ornamentLabel.width * scaleFactor) + ((leftPadding + rightPadding) * 2);
+        break
+      }
+    }
+    let minMenuWidth = Math.round((coverSize * scaleFactor) + padding);
+    let menuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.width;
+    let desiredwidth = Math.max(menuWidth, minMenuWidth);
+    if (desiredwidth != menuWidth) {
+      Main.panel.statusArea.aggregateMenu.menu.actor.width = desiredwidth;      
     }
   }
 });

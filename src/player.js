@@ -414,6 +414,7 @@ const MPRISPlayer = new Lang.Class({
         showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
         showTracklist: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY),
         showTracklistRating: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY),
+        largeCoverSize: this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY),
         volume: this._mediaServerPlayer.Volume || 0.0,
         status: this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP,
         orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings),
