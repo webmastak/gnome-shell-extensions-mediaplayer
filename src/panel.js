@@ -256,7 +256,7 @@ const PanelIndicator = new Lang.Class({
   _setMenuWidth: function(largeCoverSize) {
     let menu = this.menu
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let padding = 80 * scaleFactor;
+    let padding = 80;
     let menuChildren = menu.box.get_children().map(function(actor) {
       return actor._delegate;
     });
@@ -269,11 +269,11 @@ const PanelIndicator = new Lang.Class({
         break
       }
     }
-    let minMenuWidth = Math.round(largeCoverSize + padding);
-    let menuWidth = Math.round(menu.actor.get_theme_node().get_length('min-width'));
+    let minMenuWidth = Math.round((largeCoverSize + padding) * scaleFactor);
+    let menuWidth = menu.actor.width;
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     if (desiredwidth != menuWidth) {
-      menu.actor.width = Math.round(desiredwidth * scaleFactor);      
+      menu.actor.width = desiredwidth;      
     }
   }
 });
@@ -342,7 +342,7 @@ const AggregateMenuIndicator = new Lang.Class({
   _setMenuWidth: function(largeCoverSize) {
     let menu = Main.panel.statusArea.aggregateMenu.menu
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let padding = 80 * scaleFactor;
+    let padding = 80;
     let menuChildren = menu.box.get_children().map(function(actor) {
       return actor._delegate;
     });
@@ -355,11 +355,11 @@ const AggregateMenuIndicator = new Lang.Class({
         break
       }
     }
-    let minMenuWidth = Math.round(largeCoverSize + padding);
-    let menuWidth = Math.round(menu.actor.get_theme_node().get_length('min-width'));
+    let minMenuWidth = Math.round((largeCoverSize + padding) * scaleFactor);
+    let menuWidth = menu.actor.width;
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     if (desiredwidth != menuWidth) {
-      menu.actor.width = Math.round(desiredwidth * scaleFactor);      
+      menu.actor.width = desiredwidth;      
     }
   }
 });
