@@ -31,6 +31,7 @@ const GLib = imports.gi.GLib;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Lib = Me.imports.lib;
+const UI = Me.imports.ui;
 
 const PanelState = new Lang.Class({
   Name: 'PanelState',
@@ -95,13 +96,6 @@ const IndicatorMixin = {
   // method binded to classes below
   _commonOnActivePlayerUpdate: function(manager, state) {
     this.panelState.update(state);
-    if (this.themeChangeId != 0) {
-      this.themeContext.disconnect(this.themeChangeId);
-      this.themeChangeId = 0;
-    }
-    this.themeChangeId = this.themeContext.connect('changed', Lang.bind(this, function() {
-      this._setMenuWidth(null);
-    }));
     for (let id in this._signalsId) {
       this._settings.disconnect(this._signalsId[id]);
     }
@@ -185,10 +179,6 @@ const IndicatorMixin = {
 
   _commonOnActivePlayerRemove: function(manager) {
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-    if (this.themeChangeId != 0) {
-      this.themeContext.disconnect(this.themeChangeId);
-      this.themeChangeId = 0;
-    }
     for (let id in this._signalsId) {
       this._settings.disconnect(this._signalsId[id]);
     }
@@ -217,9 +207,6 @@ const PanelIndicator = new Lang.Class({
     this._manager = null;
     this.actor.add_style_class_name('panel-status-button');
     this.menu.actor.add_style_class_name('aggregate-menu dummy-style-class');
-    this.menu.actor.width = Main.panel.statusArea.aggregateMenu.menu.actor.width;
-    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
-    this.themeChangeId = 0;
     this.compileTemplate = Lib.compileTemplate;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
@@ -267,27 +254,26 @@ const PanelIndicator = new Lang.Class({
   },
 
   _setMenuWidth: function(largeCoverSize) {
+    let menu = this.menu
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let coverSize = largeCoverSize || this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
     let padding = 80 * scaleFactor;
-    this.menu.actor.set_width(-1);
-    let menuChildren = this.menu.box.get_children().map(function(actor) {
+    let menuChildren = menu.box.get_children().map(function(actor) {
       return actor._delegate;
     });
     for (let i = 0; i < menuChildren.length; i++) {
-      if (menuChildren[i]._ornamentLabel) {
+      if (menuChildren[i] instanceof UI.PlayerUI) {
         let leftPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.LEFT);
         let rightPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.RIGHT);
-        padding = (menuChildren[i]._ornamentLabel.width * scaleFactor) + ((leftPadding + rightPadding) * 2);
+        let ornamentLabelWidth = menuChildren[i]._ornamentLabel.get_theme_node().get_length('width');
+        padding = ornamentLabelWidth + ((leftPadding + rightPadding) * 2);
         break
       }
     }
-    let minMenuWidth = Math.round((coverSize * scaleFactor) + padding);
-    let menuWidth = this.menu.actor.width;
+    let minMenuWidth = Math.round(largeCoverSize + padding);
+    let menuWidth = Math.round(menu.actor.get_theme_node().get_length('min-width'));
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     if (desiredwidth != menuWidth) {
-      this.menu.actor.width = desiredwidth;
-      
+      menu.actor.width = desiredwidth * scaleFactor;      
     }
   }
 });
@@ -301,8 +287,6 @@ const AggregateMenuIndicator = new Lang.Class({
     this.parent();
 
     this._manager = null;
-    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
-    this.themeChangeId = 0;
     this.compileTemplate = Lib.compileTemplate;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
@@ -356,26 +340,26 @@ const AggregateMenuIndicator = new Lang.Class({
   },
 
   _setMenuWidth: function(largeCoverSize) {
+    let menu = Main.panel.statusArea.aggregateMenu.menu
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    let coverSize = largeCoverSize || this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
     let padding = 80 * scaleFactor;
-    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    let menuChildren = Main.panel.statusArea.aggregateMenu.menu.box.get_children().map(function(actor) {
+    let menuChildren = menu.box.get_children().map(function(actor) {
       return actor._delegate;
     });
     for (let i = 0; i < menuChildren.length; i++) {
-      if (menuChildren[i]._ornamentLabel) {
+      if (menuChildren[i] instanceof UI.PlayerUI) {
         let leftPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.LEFT);
         let rightPadding = menuChildren[i].actor.get_theme_node().get_padding(St.Side.RIGHT);
-        padding = (menuChildren[i]._ornamentLabel.width * scaleFactor) + ((leftPadding + rightPadding) * 2);
+        let ornamentLabelWidth = menuChildren[i]._ornamentLabel.get_theme_node().get_length('width');
+        padding = ornamentLabelWidth + ((leftPadding + rightPadding) * 2);
         break
       }
     }
-    let minMenuWidth = Math.round((coverSize * scaleFactor) + padding);
-    let menuWidth = Main.panel.statusArea.aggregateMenu.menu.actor.width;
+    let minMenuWidth = Math.round(largeCoverSize + padding);
+    let menuWidth = Math.round(menu.actor.get_theme_node().get_length('min-width'));
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     if (desiredwidth != menuWidth) {
-      Main.panel.statusArea.aggregateMenu.menu.actor.width = desiredwidth;      
+      menu.actor.width = desiredwidth * scaleFactor;      
     }
   }
 });
