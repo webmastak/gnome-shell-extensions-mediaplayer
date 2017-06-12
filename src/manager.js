@@ -37,10 +37,21 @@ const PlayerManager = new Lang.Class({
         this._disabling = false;
         // the menu
         this.menu = menu;
+        this._settings = Settings.gsettings;
         this.desiredMenuPosition = desiredMenuPosition;
         this.menu.connect('open-state-changed', Lang.bind(this, function(menu, active) {
-          if (active == true) {
+          let keepActiveOpen = this._settings.get_boolean(Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY);
+          if (active == true && keepActiveOpen) {
             this.showActivePlayer();
+          }
+        }));
+        this._settings.connect("changed::" + Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY, Lang.bind(this, function() {
+          let keepActiveOpen = this._settings.get_boolean(Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY);
+          if (keepActiveOpen) {
+            this.showActivePlayer();
+          }
+          else {
+            this.closeAllPlayers();
           }
         }));
         // players list
@@ -112,7 +123,10 @@ const PlayerManager = new Lang.Class({
       this._activePlayer = player;
       this._activePlayerId = this._activePlayer.connect('player-update',
                                                         Lang.bind(this, this._onActivePlayerUpdate));
-      this.showActivePlayer();
+      let keepActiveOpen = this._settings.get_boolean(Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY);
+      if (keepActiveOpen) {
+        this.showActivePlayer();
+      }
       if (player.info.desktopEntry) {
         player.state.desktopEntry = player.info.desktopEntry;
       }
@@ -123,13 +137,21 @@ const PlayerManager = new Lang.Class({
     },
 
     showActivePlayer: function() {
-      if (!this._activePlayer) {
+      if (!this._activePlayer || !this.menu.actor.visible) {
         return;
       }
       for (let owner in this._players) {
         if (this._players[owner].player == this._activePlayer && this._players[owner].ui.menu) {
           this._players[owner].ui.menu.open();
           break;
+        }
+      }
+    },
+
+    closeAllPlayers: function() {
+      for (let owner in this._players) {
+        if (this._players[owner].ui.menu) {
+          this._players[owner].ui.menu.close();
         }
       }
     },

@@ -130,6 +130,11 @@ function init() {
             type: "b",
             label: _("Enable Indicator scroll events"),
             help: _("Enables track changes on scrolling the Indicator.")
+        },
+        active_open: {
+            type: "b",
+            label: _("Always keep the active player open"),
+            help: _("Always keep the active player open when you open the indicator or system menu.")
         }
     };
 

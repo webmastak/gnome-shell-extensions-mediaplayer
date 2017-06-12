@@ -96,5 +96,10 @@
         <_summary>Start with the cover zoomed</_summary>
         <_description>Start with the cover zoomed.</_description>
     </key>
+    <key name="active-open" type="b">
+        <default>true</default>
+        <_summary>Always keep the active player menu open</_summary>
+        <_description>Always keep the active player menu open.</_description>
+    </key>
   </schema>
 </schemalist>
