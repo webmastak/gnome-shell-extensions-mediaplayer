@@ -273,7 +273,7 @@ const PanelIndicator = new Lang.Class({
     let menuWidth = Math.round(menu.actor.get_theme_node().get_length('min-width'));
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     if (desiredwidth != menuWidth) {
-      menu.actor.width = desiredwidth * scaleFactor;      
+      menu.actor.width = Math.round(desiredwidth * scaleFactor);      
     }
   }
 });
@@ -359,7 +359,7 @@ const AggregateMenuIndicator = new Lang.Class({
     let menuWidth = Math.round(menu.actor.get_theme_node().get_length('min-width'));
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     if (desiredwidth != menuWidth) {
-      menu.actor.width = desiredwidth * scaleFactor;      
+      menu.actor.width = Math.round(desiredwidth * scaleFactor);      
     }
   }
 });
