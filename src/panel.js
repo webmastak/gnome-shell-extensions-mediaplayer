@@ -69,6 +69,8 @@ const IndicatorMixin = {
     this._manager = manager;
     this.manager.connect('player-active-update', Lang.bind(this, this._commonOnActivePlayerUpdate));
     this.manager.connect('player-active-remove', Lang.bind(this, this._commonOnActivePlayerRemove));
+    this.manager.connect('connect-signals', Lang.bind(this, this._connectSignals));
+    this.manager.connect('disconnect-signals', Lang.bind(this, this._disconnectSignals));
   },
 
   get manager() {
@@ -99,33 +101,11 @@ const IndicatorMixin = {
     return Clutter.EVENT_PROPAGATE;
   },
 
-  // method binded to classes below
-  _commonOnActivePlayerUpdate: function(manager, state) {
-    if (state.largeCoverSize !== null) {
-      this._setMenuWidth(state.largeCoverSize);
-    }
-    if (this.panelChangeId != 0) {
-      this.panelState.disconnect(this.panelChangeId);
-      this.panelChangeId = 0;
-    }
-    this.panelChangeId = this.panelState.connect('changed', Lang.bind(this, this._updatePanel)); 
-    this.panelState.update(state);
-    this._onActivePlayerUpdate(state);
-  },
-
-  _updatePanel: function() {
-    if (this.themeChangeId != 0) {
-      this.themeContext.disconnect(this.themeChangeId);
-      this.themeChangeId = 0;
-    }
+  _connectSignals: function() {
+    this.panelChangeId = this.panelState.connect('changed', Lang.bind(this, this._updatePanel));
     this.themeChangeId = this.themeContext.connect('changed', Lang.bind(this, function() {
       this._setMenuWidth(this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY));
     }));
-    for (let id in this._signalsId) {
-      this._settings.disconnect(this._signalsId[id]);
-    }
-    this._signalsId = [];
-    this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
     this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TYPE_KEY,
       Lang.bind(this, function() {
         this.useCoverInPanel =
@@ -138,6 +118,33 @@ const IndicatorMixin = {
     this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_SIZE_KEY, Lang.bind(this, function() {
       this._updatePanel();
     })));
+  },
+
+  _disconnectSignals: function() {
+    if (this.themeChangeId != 0) {
+      this.themeContext.disconnect(this.themeChangeId);
+      this.themeChangeId = 0;
+    }
+    if (this.panelChangeId != 0) {
+      this.panelState.disconnect(this.panelChangeId);
+      this.panelChangeId = 0;
+    }
+    for (let id in this._signalsId) {
+      this._settings.disconnect(this._signalsId[id]);
+    }
+    this._signalsId = [];
+  },
+
+  // method binded to classes below
+  _commonOnActivePlayerUpdate: function(manager, state) {
+    if (state.largeCoverSize !== null) {
+      this._setMenuWidth(state.largeCoverSize);
+    } 
+    this.panelState.update(state);
+    this._onActivePlayerUpdate(state);
+  },
+
+  _updatePanel: function() {
     let state = this.panelState.values;
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
@@ -195,19 +202,7 @@ const IndicatorMixin = {
   },
 
   _commonOnActivePlayerRemove: function(manager) {
-    this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
-    if (this.themeChangeId != 0) {
-      this.themeContext.disconnect(this.themeChangeId);
-      this.themeChangeId = 0;
-    }
-    if (this.panelChangeId != 0) {
-      this.panelState.disconnect(this.panelChangeId);
-      this.panelChangeId = 0;
-    }
-    for (let id in this._signalsId) {
-      this._settings.disconnect(this._signalsId[id]);
-    }
-    this._signalsId = [];    
+    this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';    
     this._clearStateText();
     this._thirdIndicator.set_width(0);
     this._secondaryIndicator.set_width(0);

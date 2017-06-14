@@ -220,7 +220,9 @@ const PlayerManager = new Lang.Class({
                 signals: [],
                 signalsUI: []
               };
-
+              if (this.nbPlayers() === 1) {
+                this.emit('connect-signals');
+              } 
               this._players[owner].signals.push(
                   this._players[owner].player.connect('player-update',
                       Lang.bind(this, this._onPlayerUpdate)
@@ -290,6 +292,9 @@ const PlayerManager = new Lang.Class({
             delete this._players[owner];
         }
         this._refreshActivePlayer(null);
+        if (this.nbPlayers() === 0) {
+          this.emit('disconnect-signals');
+       }
     },
 
     _changePlayerOwner: function(busName, oldOwner, newOwner) {
