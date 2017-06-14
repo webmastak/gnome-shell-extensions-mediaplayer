@@ -59,7 +59,7 @@ function init() {
         status_size: {
             type: "i",
             label: _("Indicator status text width"),
-            help: _("The maximum width before the status text gets an ellipsis. Default is 300px."),
+            help: _("The maximum width before the status text gets an ellipsis. Default is 300px.\nAll Pixel values are relative to the UI scale factor."),
             min: 100,
             max: 900,
             step: 5,
@@ -68,7 +68,7 @@ function init() {
         large_cover: {
             type: "i",
             label: _("Large cover size"),
-            help: _("The size of the cover when zoomed. Default is 128px."),
+            help: _("The size of the cover when zoomed. Default is 128px.\nAll Pixel values are relative to the UI scale factor."),
             min: 128,
             max: 256,
             step: 1,
@@ -77,7 +77,7 @@ function init() {
         small_cover: {
             type: "i",
             label: _("Small cover size"),
-            help: _("The size of the cover when not zoomed. Default is 48px."),
+            help: _("The size of the cover when not zoomed. Default is 48px.\nAll Pixel values are relative to the UI scale factor."),
             min: 32,
             max: 96,
             step: 1,
