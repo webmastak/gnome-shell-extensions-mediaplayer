@@ -171,20 +171,13 @@ const IndicatorMixin = {
     if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
       let stateText = this.compileTemplate(stateTemplate, state);
       this._thirdIndicator.clutter_text.set_markup(stateText);
-
-      // If You just set width it will add blank space. This makes sure the
-      // panel uses the minimum amount of space.
       let prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
       this._thirdIndicator.clutter_text.set_width(-1);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
-      if (statusTextWidth > prefWidth) {
-        this._thirdIndicator.clutter_text.set_width(prefWidth);
-        this._thirdIndicator.set_width(prefWidth);
-      }
-      else {
-        this._thirdIndicator.clutter_text.set_width(-1);
-        this._thirdIndicator.set_width(-1);
-      }
+      let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+      let desiredwidth = Math.round(Math.min(prefWidth, statusTextWidth) * scaleFactor);
+      this._thirdIndicator.clutter_text.set_width(desiredwidth);
+      this._thirdIndicator.set_width(desiredwidth);
     }
 
     if (state.trackCoverUrl !== null || state.desktopEntry !== null) {
