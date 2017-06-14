@@ -27,6 +27,7 @@ const St = imports.gi.St;
 const PanelMenu = imports.ui.panelMenu;
 const Main = imports.ui.main;
 const GLib = imports.gi.GLib;
+const Signals = imports.signals;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
@@ -35,25 +36,32 @@ const Lib = Me.imports.lib;
 const PanelState = new Lang.Class({
   Name: 'PanelState',
 
-  _init: function(params) {
-    this.update(params || {});
-  },
-
-  update: function(state) {
-    for (let key in state) {
-      if (state[key] !== null && this[key] !== undefined)
-        this[key] = state[key];
+  _init: function() {
+    this.values = {
+      playerName: null,
+      status: null,
+      trackTitle: null,
+      trackAlbum: null,
+      trackArtist: null,
+      trackCoverUrl: null,
+      desktopEntry: null
     }
   },
 
-  playerName: null,
-  status: null,
-  trackTitle: null,
-  trackAlbum: null,
-  trackArtist: null,
-  trackCoverUrl: null,
-  desktopEntry: null,
+  update: function(state) {
+    let changed = false;
+    for (let key in state) {
+      if (state[key] !== null && this.values[key] !== undefined && this.values[key] !== state[key]) {
+        this.values[key] = state[key];
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.emit('changed');
+    }
+  }
 });
+Signals.addSignalMethods(PanelState.prototype);
 
 const IndicatorMixin = {
 
@@ -83,7 +91,7 @@ const IndicatorMixin = {
   _onButtonEvent: function(actor, event) {
     if (event.type() == Clutter.EventType.BUTTON_PRESS) {
       let button = event.get_button();
-      if (button == 2 && this.manager.activePlayer) {
+      if (button == 3 && this.manager.activePlayer) {
         this.manager.activePlayer.playPause();
         return Clutter.EVENT_STOP;
       }
@@ -96,6 +104,16 @@ const IndicatorMixin = {
     if (state.largeCoverSize !== null) {
       this._setMenuWidth(state.largeCoverSize);
     }
+    if (this.panelChangeId != 0) {
+      this.panelState.disconnect(this.panelChangeId);
+      this.panelChangeId = 0;
+    }
+    this.panelChangeId = this.panelState.connect('changed', Lang.bind(this, this._updatePanel)); 
+    this.panelState.update(state);
+    this._onActivePlayerUpdate(state);
+  },
+
+  _updatePanel: function() {
     if (this.themeChangeId != 0) {
       this.themeContext.disconnect(this.themeChangeId);
       this.themeChangeId = 0;
@@ -120,13 +138,7 @@ const IndicatorMixin = {
     this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_SIZE_KEY, Lang.bind(this, function() {
       this._updatePanel();
     })));
-    this.panelState.update(state);  
-    this._updatePanel();
-    this._onActivePlayerUpdate(state);
-  },
-
-  _updatePanel: function() {
-    let state = this.panelState;
+    let state = this.panelState.values;
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
@@ -142,20 +154,20 @@ const IndicatorMixin = {
       this.indicators.show();
     }
 
-    let stateTemplate = Settings.gsettings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
+    let stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
       this._thirdIndicator.hide();      
     } else {
       this._thirdIndicator.show();
     }
 
-    if (state.trackTitle || state.trackArtist || state.trackAlbum) {
+    if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
       let stateText = this.compileTemplate(stateTemplate, state);
       this._thirdIndicator.clutter_text.set_markup(stateText);
 
       // If You just set width it will add blank space. This makes sure the
       // panel uses the minimum amount of space.
-      let prefWidth = Settings.gsettings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+      let prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
       this._thirdIndicator.clutter_text.set_width(-1);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
       if (statusTextWidth > prefWidth) {
@@ -188,6 +200,10 @@ const IndicatorMixin = {
       this.themeContext.disconnect(this.themeChangeId);
       this.themeChangeId = 0;
     }
+    if (this.panelChangeId != 0) {
+      this.panelState.disconnect(this.panelChangeId);
+      this.panelChangeId = 0;
+    }
     for (let id in this._signalsId) {
       this._settings.disconnect(this._signalsId[id]);
     }
@@ -215,6 +231,7 @@ const PanelIndicator = new Lang.Class({
 
     this._manager = null;
     this.themeChangeId = 0;
+    this.panelChangeId = 0;
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.actor.add_style_class_name('panel-status-button');
     this.menu.actor.add_style_class_name('aggregate-menu dummy-style-class');
@@ -284,6 +301,7 @@ const AggregateMenuIndicator = new Lang.Class({
 
     this._manager = null;
     this.themeChangeId = 0;
+    this.panelChangeId = 0;
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.compileTemplate = Lib.compileTemplate;
     this.setCoverIconAsync = Lib.setCoverIconAsync;
