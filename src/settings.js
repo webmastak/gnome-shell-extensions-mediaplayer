@@ -78,7 +78,10 @@ const ALTERNATIVE_TRACKLIST_TITLES = [
 
 const PLAYERS_THAT_CANT_STOP = [
     "Pithos",
-    "Spotify"
+    "Spotify",
+    "Quodlibet",
+    "Lollypop",
+    "GnomeMusic"
 ];
 
 const BROKEN_PLAYERS = [
