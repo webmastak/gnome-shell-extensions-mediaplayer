@@ -68,11 +68,11 @@ function init() {
         large_cover: {
             type: "i",
             label: _("Large cover size"),
-            help: _("The size of the cover when zoomed. Default is 192px."),
+            help: _("The size of the cover when zoomed. Default is 128px."),
             min: 128,
             max: 256,
             step: 1,
-            default: 192
+            default: 128
         },
         small_cover: {
             type: "i",

@@ -67,9 +67,9 @@
         <_description>The size of the cover when not zoomed. Default is 48px.</_description>
     </key>
     <key name="large-cover" type="i">
-        <default>192</default>
+        <default>128</default>
         <_summary>Large cover size</_summary>
-        <_description>The size of the cover when zoomed. Default is 192px.</_description>
+        <_description>The size of the cover when zoomed. Default is 128px.</_description>
     </key>
     <key name="volumemenu" type="b">
         <default>true</default>

@@ -280,7 +280,7 @@ const PanelIndicator = new Lang.Class({
     let menu = this.menu
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
     let menuWidth = menu.actor.get_theme_node().get_min_width();
-    let minMenuWidth = largeCoverSize + 80;
+    let minMenuWidth = largeCoverSize + 96;
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     menu.actor.width = Math.round(desiredwidth * scaleFactor);
   }
@@ -352,7 +352,7 @@ const AggregateMenuIndicator = new Lang.Class({
     let menu = Main.panel.statusArea.aggregateMenu.menu
     let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
     let menuWidth = menu.actor.get_theme_node().get_min_width();
-    let minMenuWidth = largeCoverSize + 80;
+    let minMenuWidth = largeCoverSize + 96;
     let desiredwidth = Math.max(menuWidth, minMenuWidth);
     menu.actor.width = Math.round(desiredwidth * scaleFactor);
   }
