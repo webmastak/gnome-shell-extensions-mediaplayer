@@ -93,7 +93,7 @@ const IndicatorMixin = {
   _onButtonEvent: function(actor, event) {
     if (event.type() == Clutter.EventType.BUTTON_PRESS) {
       let button = event.get_button();
-      if (button == 3 && this.manager.activePlayer) {
+      if (button == 2 && this.manager.activePlayer) {
         this.manager.activePlayer.playPause();
         return Clutter.EVENT_STOP;
       }
