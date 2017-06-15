@@ -53,6 +53,7 @@ const PlayerState = new Lang.Class({
   },
 
   playerName: null,
+  desktopEntry: null,
   status: null,
 
   playlist: null,
@@ -107,8 +108,7 @@ const MPRISPlayer = new Lang.Class({
             appInfo: null,
             // Guess a name based on the dbus path
             identity: baseName.charAt(0).toUpperCase() + baseName.slice(1),
-            canRaise: false,
-            canQuit: false
+            canRaise: false
         };
 
         this.state = new PlayerState();
@@ -174,7 +174,6 @@ const MPRISPlayer = new Lang.Class({
             return;
 
         this.info.canRaise = this._mediaServer.CanRaise;
-        this.info.canQuit = this._mediaServer.CanQuit;
 
         if (Settings.MINOR_VERSION > 19) {
         // Versions before 3.20 don't have Mpris built-in.
@@ -418,7 +417,8 @@ const MPRISPlayer = new Lang.Class({
         volume: this._mediaServerPlayer.Volume || 0.0,
         status: this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP,
         orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings),
-        playerName: this._mediaServer.Identity || ''
+        playerName: this._mediaServer.Identity || '',
+        desktopEntry: this._mediaServer.DesktopEntry || ''
       });
       if (this._mediaServerPlaylists.ActivePlaylist) {
         newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1][0];
@@ -504,10 +504,10 @@ const MPRISPlayer = new Lang.Class({
 
     _getPlayerInfo: function() {
         if (this._mediaServer.Identity) {
-          this.info.identity = this._mediaServer.Identity;
+          this.info.identity = this._mediaServer.Identity || '';
         }
         if (this._mediaServer.DesktopEntry) {
-          this.info.desktopEntry = this._mediaServer.DesktopEntry;
+          this.info.desktopEntry = this._mediaServer.DesktopEntry || '';
           let appSys = Shell.AppSystem.get_default();
           this.info.app = appSys.lookup_app(this.info.desktopEntry + ".desktop");
           this.info.appInfo = Gio.DesktopAppInfo.new(this.info.desktopEntry + ".desktop");

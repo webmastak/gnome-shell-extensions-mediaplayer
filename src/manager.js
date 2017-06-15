@@ -127,12 +127,6 @@ const PlayerManager = new Lang.Class({
       if (keepActiveOpen) {
         this.showActivePlayer();
       }
-      if (player.info.desktopEntry) {
-        player.state.desktopEntry = player.info.desktopEntry;
-      }
-      else {
-        player.state.desktopEntry = null;
-      }
       this.emit('player-active-update', player.state);
     },
 
@@ -240,9 +234,6 @@ const PlayerManager = new Lang.Class({
     },
 
     _onActivePlayerUpdate: function(player, newState) {
-      if (player.info.desktopEntry) {
-        newState.desktopEntry = player.info.desktopEntry
-      }
       this.emit('player-active-update', newState);
     },
 
