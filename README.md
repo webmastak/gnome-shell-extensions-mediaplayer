@@ -3,6 +3,13 @@
 gnome-shell-extensions-mediaplayer is a gnome-shell extension for controlling
 any MPRIS v2.1 capable media player.
 
+## Please see the Wiki for:
+  * [Bug Reports and Feature Requests](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Bug-Reports-and-Feature-Requests)
+  * [Installation](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Installation)
+  * [Settings](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Settings)
+  * [Compatible players](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Compatible-players)
+  * [Known Player Bugs](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Known-Player-Bugs)
+
 ## Screenshot
 
 ![Screenshot](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/raw/master/data/screenshot.png)
@@ -16,15 +23,6 @@ any MPRIS v2.1 capable media player.
 - rating support (Not a part of the MPRIS spec, limited support with player specifc code)
 - and more...
 
-- - -
-## Please see the Wiki for:
-  * [Bug Reports and Feature Requests](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Bug-Reports-and-Feature-Requests)
-  * [Installation](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Installation)
-  * [Settings](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Settings)
-  * [Compatible players](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Compatible-players)
-  * [Known Player Bugs](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Known-Player-Bugs)
-
-- - -
 ## Authors
 
   * eonpatapon (Jean-Philippe Braun)
