@@ -32,3 +32,5 @@ any MPRIS v2.1 capable media player.
   * JasonLG1979 (Jason Gray)
 
 Based on the work of horazont (Jonas Wielicki).
+
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
