@@ -61,7 +61,7 @@ function enable() {
   if (position == Settings.IndicatorPosition.VOLUMEMENU) {
     indicator = new Panel.AggregateMenuIndicator();
     menu = Main.panel.statusArea.aggregateMenu.menu;
-    desiredMenuPosition = Main.panel.statusArea.aggregateMenu.menu._getMenuItems().indexOf(Main.panel.statusArea.aggregateMenu._rfkill.menu) + 1;
+    desiredMenuPosition = Main.panel.statusArea.aggregateMenu.menu._getMenuItems().indexOf(Main.panel.statusArea.aggregateMenu._rfkill.menu);
   }
   else {
     indicator = new Panel.PanelIndicator();
