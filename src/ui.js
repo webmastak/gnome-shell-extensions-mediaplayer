@@ -490,7 +490,8 @@ const PlayerUI = new Lang.Class({
   _toggleCover: function() {
     let targetSize, transition;
     if (this.trackCover.child.icon_size == this.smallCoverSize) {
-      let adjustment = this.largeCoverSize - this.smallCoverSize;
+      let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+      let adjustment = Math.round((this.largeCoverSize - this.smallCoverSize) * scaleFactor);
       targetSize = this.largeCoverSize;
       transition = 'easeOutQuad';
       this.trackBox.infos.hide();
