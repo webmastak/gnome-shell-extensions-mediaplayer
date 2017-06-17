@@ -308,8 +308,7 @@ const AggregateMenuIndicator = new Lang.Class({
     this._thirdIndicator = new St.Label({style_class: 'system-status-icon no-padding'});
     this._thirdIndicator.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     this._thirdIndicator.hide();
-    this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator,
-                                     y_align: St.Align.MIDDLE});
+    this._thirdIndicatorBin = new St.Bin({child: this._thirdIndicator});
     this.indicators.add_actor(this._thirdIndicatorBin);
     this.indicators.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.indicators.connect('button-press-event', Lang.bind(this, this._onButtonEvent));
