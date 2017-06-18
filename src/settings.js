@@ -68,6 +68,10 @@ const SEND_STOP_ON_CHANGE = [
     "org.mpris.MediaPlayer2.pragha"
 ];
 
+const WRONG_VOLUME_SCALING = [
+    "org.mpris.MediaPlayer2.quodlibet"
+];
+
 const ALTERNATIVE_PLAYLIST_TITLES = [
     {"Pithos": _("Stations")}
 ];
@@ -85,8 +89,7 @@ const PLAYERS_THAT_CANT_STOP = [
 ];
 
 const BROKEN_PLAYERS = [
-    "Spotify",
-    "Quodlibet"
+    "Spotify"
 ];
 
 const IndicatorStatusType = {

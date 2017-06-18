@@ -174,6 +174,8 @@ const MPRISPlayer = new Lang.Class({
             return;
 
         this.info.canRaise = this._mediaServer.CanRaise;
+        this.sendsStopOnSongChange = Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1;
+        this.hasWrongVolumeScaling = Settings.WRONG_VOLUME_SCALING.indexOf(this.busName) != -1;
 
         if (Settings.MINOR_VERSION > 19) {
         // Versions before 3.20 don't have Mpris built-in.
@@ -270,6 +272,9 @@ const MPRISPlayer = new Lang.Class({
           if (props.Volume) {
             let volume = props.Volume.unpack();
             if (this.state.volume !== volume) {
+              if (this.hasWrongVolumeScaling) {
+                volume = Math.pow(volume, 1 / 3);
+              }
               newState.volume = volume;
             }
           }
@@ -332,7 +337,7 @@ const MPRISPlayer = new Lang.Class({
 
           if (props.PlaybackStatus) {
             let status = props.PlaybackStatus.unpack();
-            if (Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1 && status == Settings.Status.STOP) {
+            if (this.sendsStopOnSongChange && status == Settings.Status.STOP) {
               // Some players send a "PlaybackStatus: Stopped" signal when changing
               // tracks, so wait a little before refreshing if they send a "Stopped" signal.
               if (this._statusId !== 0) {
@@ -420,6 +425,9 @@ const MPRISPlayer = new Lang.Class({
         playerName: this._mediaServer.Identity || '',
         desktopEntry: this._mediaServer.DesktopEntry || ''
       });
+      if (this.hasWrongVolumeScaling) {
+        newState.volume = Math.pow(newState.volume, 1 / 3);
+      }
       if (this._mediaServerPlaylists.ActivePlaylist) {
         newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1][0];
       }
@@ -479,6 +487,9 @@ const MPRISPlayer = new Lang.Class({
     },
 
     setVolume: function(volume) {
+      if (this.hasWrongVolumeScaling) {
+        volume = Math.pow(volume, 3);
+      }
       this._mediaServerPlayer.Volume = volume;
     },
 
