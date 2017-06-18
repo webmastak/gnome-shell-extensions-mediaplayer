@@ -65,21 +65,24 @@ const PlayerManager = new Lang.Class({
         // player DBus name pattern
         let name_regex = /^org\.mpris\.MediaPlayer2\./;
         // load players
-        this._dbus.ListNamesRemote(Lang.bind(this,
-            function(names) {
-                for (let n in names[0]) {
-                    let name = names[0][n];
-                    if (name_regex.test(name)) {
-                        this._dbus.GetNameOwnerRemote(name, Lang.bind(this,
-                            function(owner) {
-                                if (!this._disabling)
-                                    this._addPlayer(name, owner);
-                            }
-                        ));
-                    }
-                }
+        this._dbus.ListNamesRemote(Lang.bind(this, function(names) {
+          let playerNames = [];
+          for (let n in names[0]) {
+            let name = names[0][n];
+            if (name_regex.test(name)) {
+              playerNames.push(name);
             }
-        ));
+          }
+          playerNames.sort();
+          for (let i in playerNames) {
+            let player = playerNames[i];
+            this._dbus.GetNameOwnerRemote(player, Lang.bind(this, function(owner) {
+              if (!this._disabling) {
+                this._addPlayer(player, owner);
+              }
+            }));
+          }
+        }));
         // watch players
         this._ownerChangedId = this._dbus.connectSignal('NameOwnerChanged', Lang.bind(this,
             function(proxy, sender, [name, old_owner, new_owner]) {
