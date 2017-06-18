@@ -85,7 +85,8 @@ const PLAYERS_THAT_CANT_STOP = [
 ];
 
 const BROKEN_PLAYERS = [
-    "Spotify"
+    "Spotify",
+    "Quodlibet"
 ];
 
 const IndicatorStatusType = {
