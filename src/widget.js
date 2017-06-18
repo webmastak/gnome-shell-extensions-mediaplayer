@@ -351,7 +351,6 @@ const TrackRating = new Lang.Class({
         this.parent({style_class: "track-rating", hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-        this.rate(value);
         // Supported players (except for Nuvola Player)
         this._supported = {
             "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
@@ -360,61 +359,71 @@ const TrackRating = new Lang.Class({
             "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
             "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
         };
+        this._buildStars(value);
     },
 
-    rate: function(value) {
-        this.box.destroy_all_children();
+    _buildStars: function(value) {
         this._value = Math.min(Math.max(0, value), 5);
-        this._starIcon = [];
         this._starButton = [];
         for(let i=0; i < 5; i++) {
+            let icon_name = 'non-starred-symbolic';
+            let starred = false;
+            if (i < this._value) {
+                icon_name = 'starred-symbolic';
+                starred = true;
+            }
             // Create star icons
-            this._starIcon[i] = new St.Icon({style_class: 'popup-menu-icon star-icon',
-                                             icon_name: 'non-starred-symbolic'
+            let starIcon = new St.Icon({style_class: 'popup-menu-icon star-icon',
+                                             icon_name: icon_name
                                              });
             // Create the button with starred icon
             this._starButton[i] = new St.Button({x_align: St.Align.MIDDLE,
                                                  y_align: St.Align.MIDDLE,
                                                  track_hover: true,
-                                                 child: this._starIcon[i]
+                                                 child: starIcon
                                                 });
             this._starButton[i]._rateValue = i + 1;
-            this._starButton[i]._starred = false;
+            this._starButton[i]._starred = starred;
             this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
             this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
 
             // Put the button in the box
             this.box.add_child(this._starButton[i]);
         }
-        this.setRating(this._value);
     },
 
     newRating: function(button) {
         if (this._supported[this._player.busName] || this.nuvolaRatingSupported()) {
-            if (button.hover)
+            if (button.hover) {
                 this.hoverRating(button._rateValue);
-            else
-                this.setRating(this._value);
+            }
+            else {
+                this.rate(this._value);
+            }
         }
     },
 
     hoverRating: function(value) {
         for (let i = 0; i < 5; i++) {
-            this._starButton[i].child.icon_name = "non-starred-symbolic";
-        }
-        for (let i = 0; i < value; i++) {
-            this._starButton[i].child.icon_name = "starred-symbolic";
+            let icon_name = 'non-starred-symbolic';
+            if (i < value) {
+                icon_name = 'starred-symbolic';
+            }
+            this._starButton[i].child.icon_name = icon_name;
         }
     },
 
-    setRating: function(value) {
+    rate: function(value) {
+        value = Math.min(Math.max(0, value), 5);
         for (let i = 0; i < 5; i++) {
-            this._starButton[i].child.icon_name = "non-starred-symbolic";
-            this._starButton[i]._starred = false;
-        }
-        for (let i = 0; i < value; i++) {
-            this._starButton[i].child.icon_name = "starred-symbolic";
-            this._starButton[i]._starred = true;
+            let icon_name = 'non-starred-symbolic';
+            let starred = false;
+            if (i < value) {
+                icon_name = 'starred-symbolic';
+                starred = true;
+            }
+            this._starButton[i].child.icon_name = icon_name;
+            this._starButton[i]._starred = starred;
         }
         this._value = value;
     },
@@ -436,7 +445,7 @@ const TrackRating = new Lang.Class({
             applied = this.applyNuvolaRating(rateValue);
         }
         if (applied) {
-            this.setRating(rateValue);
+            this.rate(rateValue);
         }
     },
 
@@ -831,7 +840,7 @@ const TracklistItem = new Lang.Class({
         this._box.add_child(this._ratingBox);
         this.actor.add(this._coverIcon, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
-        this._setRating(metadata.trackRating);
+        this._buildStars(metadata.trackRating);
         this.showRatings(metadata.showRatings);
         this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
     },
@@ -864,24 +873,36 @@ const TracklistItem = new Lang.Class({
       }
     },
 
-    _setRating: function(value) {
+    _buildStars: function(value) {
       value = Math.min(Math.max(0, value), 5);
-      if (this._rating != value) {
-        this._rating = value;
-        this._ratingBox.destroy_all_children();
-        for (let i = 0; i < 5; i++) {
-          let starIcon;
-          let icon_name = 'non-starred-symbolic';
-          if (i < value) {
+      this._starIcon = [];
+      for(let i=0; i < 5; i++) {
+        let icon_name = 'non-starred-symbolic';
+        if (i < value) {
             icon_name = 'starred-symbolic';
-          }
-          starIcon = new St.Icon({style_class: 'popup-menu-icon star-icon',
-                                  icon_name: icon_name
-                                 });
-          this._ratingBox.add_child(starIcon);
         }
+        // Create star icons
+        this._starIcon[i] = new St.Icon({style_class: 'popup-menu-icon star-icon',
+                                    icon_name: icon_name
+                                    });
+        this._ratingBox.add_child(this._starIcon[i]);
       }
+      this._rating = value;
     },
+
+  _setRating: function(value) {
+    value = Math.min(Math.max(0, value), 5);
+    if (this._rating != value) {
+      this._rating = value;
+      for (let i = 0; i < 5; i++) {
+        let icon_name = 'non-starred-symbolic';
+        if (i < value) {
+            icon_name = 'starred-symbolic';
+        }
+        this._starIcon[i].icon_name = icon_name;
+      }
+    }
+  },
 
   showRatings: function(value) {
     if (value) {
