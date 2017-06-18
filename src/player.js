@@ -271,10 +271,10 @@ const MPRISPlayer = new Lang.Class({
 
           if (props.Volume) {
             let volume = props.Volume.unpack();
+            if (this.hasWrongVolumeScaling) {
+              volume = Math.pow(volume, 1 / 3);
+            }
             if (this.state.volume !== volume) {
-              if (this.hasWrongVolumeScaling) {
-                volume = Math.pow(volume, 1 / 3);
-              }
               newState.volume = volume;
             }
           }
