@@ -158,21 +158,21 @@ const TrackBox = new Lang.Class({
     },
 
     updateInfo: function(state) {
-      this._artistLabel.text = state.trackArtist.toString();
+      this._artistLabel.text = state.trackArtist;
       if (this._artistLabel.text == "") {
         this._artistLabel.hide();
       }
       else {
         this._artistLabel.show();
       }        
-      this._titleLabel.text = state.trackTitle.toString();
+      this._titleLabel.text = state.trackTitle;
       if (this._titleLabel.text == "") {
         this._titleLabel.hide();
       }
       else {
         this._titleLabel.show();
       }
-      this._albumLabel.text = state.trackAlbum.toString();
+      this._albumLabel.text = state.trackAlbum;
       if (this._albumLabel.text == "") {
         this._albumLabel.hide();
       }
@@ -690,13 +690,6 @@ const TrackList = new Lang.Class({
     this.parseMetadata(UpdatedMetadata, metadata);
     let trackListItem = this.getItem(metadata.trackObj);
     if (trackListItem) {
-      metadata.fallbackIcon = 'media-optical-cd-audio-symbolic';
-      if (Array.isArray(metadata.trackArtist)) {
-        metadata.trackArtist = metadata.trackArtist[0];
-      }
-      if (metadata.isRadio) {
-        metadata.fallbackIcon = 'application-rss+xml-symbolic';
-      }
       trackListItem.updateMetadata(metadata);
     }
   },
@@ -715,13 +708,6 @@ const TrackList = new Lang.Class({
         //As per spec the "/org/mpris/MediaPlayer2/TrackList/NoTrack" object path means it's not a valid track.
         if (metadata.trackObj && metadata.trackObj !== '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
           metadata.showRatings = showRatings;
-          metadata.fallbackIcon = 'media-optical-cd-audio-symbolic';
-          if (Array.isArray(metadata.trackArtist)) {
-            metadata.trackArtist = metadata.trackArtist[0];
-          }
-          if (metadata.isRadio) {
-            metadata.fallbackIcon = 'application-rss+xml-symbolic';
-          }
           let trackUI = new TracklistItem(metadata);
           trackUI.connect('activate', Lang.bind(this, function() {
             this.player.playTrack(trackUI.obj);

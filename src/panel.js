@@ -51,7 +51,10 @@ const PanelState = new Lang.Class({
   update: function(state) {
     let changed = false;
     for (let key in state) {
-      if (state[key] !== null && this.values[key] !== undefined && this.values[key] !== state[key]) {
+      if (state[key] !== null
+          && state[key].constructor === String
+          && this.values[key] !== undefined
+          && this.values[key] !== state[key]) {
         this.values[key] = state[key];
         changed = true;
       }

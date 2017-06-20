@@ -461,7 +461,7 @@ const PlayerUI = new Lang.Class({
       this.playlists.updatePlaylist(newState.updatedPlaylist);
     }
 
-    if (newState.trackCoverUrl !== null || newState.isRadio !== null) {
+    if (newState.trackCoverUrl !== null) {
       this.changeCover(newState);
     }
 
@@ -475,15 +475,11 @@ const PlayerUI = new Lang.Class({
   },
 
   changeCover: function(state) {
-    let fallback_icon_name = "media-optical-cd-audio-symbolic";
-    if (state.isRadio) {
-      fallback_icon_name = "application-rss+xml-symbolic";
-    }
     if (state.trackCoverUrl) {
-      this.setCoverIconAsync(this.trackCover.child, state.trackCoverUrl, fallback_icon_name);
+      this.setCoverIconAsync(this.trackCover.child, state.trackCoverUrl, state.fallbackIcon);
     }
     else {
-      this.trackCover.child.icon_name = fallback_icon_name;
+      this.trackCover.child.icon_name = state.fallbackIcon;
     }
   },
 

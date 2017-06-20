@@ -93,18 +93,18 @@ function parseMetadata(metadata, state) {
     return;
   }
   state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
-  state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack() : ["Unknown artist"];
-  state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "Unknown album";
-  state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "Unknown title";
+  state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack().join(', ') : "";
+  state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
+  state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
   state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
   state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
   state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
-
-  if (state.trackCoverUrl === '' && metadata["xesam:genre"]) {
+  state.fallbackIcon = 'media-optical-cd-audio-symbolic';
+  if (metadata["xesam:genre"]) {
     let genres = metadata["xesam:genre"].deep_unpack();
     for (let i in genres) {
       if (genres[i].toLowerCase().indexOf("radio") > -1) {
-        state.isRadio = true;
+        state.fallbackIcon = 'application-rss+xml-symbolic';
         break;
       }
     }

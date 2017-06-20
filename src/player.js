@@ -71,7 +71,7 @@ const PlayerState = new Lang.Class({
   trackLength: null,
   trackObj: null,
   trackRating: null,
-  isRadio: null,
+  fallbackIcon: null,
 
   showPlaylist: null,
   showTracklist: null,
