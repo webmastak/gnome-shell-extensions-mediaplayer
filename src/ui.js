@@ -131,10 +131,18 @@ const PlayerUI = new Lang.Class({
     this.trackBox.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.trackBox);
     this.trackRatings = null;
+    this.pithosRatings = null;
     if (!this.playerIsBroken) {
-      this.trackRatings = new Widget.TrackRating(this.player, 0);
-      this.trackRatings.connect('activate', Lang.bind(this.player, this.player.raise));
-      this.addMenuItem(this.trackRatings);
+      if (this.player._pithosRatings) {
+        this.pithosRatings = new Widget.PithosRatings(this.player);
+        this.pithosRatings.connect('activate', Lang.bind(this.player, this.player.raise));
+        this.addMenuItem(this.pithosRatings);
+      }
+      else {
+        this.trackRatings = new Widget.TrackRating(this.player, 0);
+        this.trackRatings.connect('activate', Lang.bind(this.player, this.player.raise));
+        this.addMenuItem(this.trackRatings);
+      }
     }
 
     this.secondaryInfo = new Widget.SecondaryInfo();
@@ -253,13 +261,23 @@ const PlayerUI = new Lang.Class({
       }              
     }
 
-    if (newState.showRating !== null && this.trackRatings !== null) {
+    if (newState.showRating !== null) {
       this.showRating = newState.showRating;
-      if (this.showRating) {
-        this.trackRatings.actor.show();
+      if (this.trackRatings !== null) {
+        if (this.showRating) {
+          this.trackRatings.actor.show();
+        }
+        else {
+          this.trackRatings.actor.hide();
+        }
       }
-      else {
-        this.trackRatings.actor.hide();
+      if (this.pithosRatings !== null) {
+        if (this.showRating) {
+          this.pithosRatings.actor.show();
+        }
+        else {
+          this.pithosRatings.actor.hide();
+        }
       }              
     }
 
@@ -319,6 +337,10 @@ const PlayerUI = new Lang.Class({
 
     if (newState.trackRating !== null && this.trackRatings !== null) {
       this.trackRatings.rate(newState.trackRating);
+    }
+
+    if (newState.pithosRating !== null && this.pithosRatings !== null) {
+      this.pithosRatings.rate(newState.pithosRating);
     }
 
     if (newState.trackArtist !== null) {
@@ -400,7 +422,12 @@ const PlayerUI = new Lang.Class({
         this.trackBox.hideAnimate();
         this.secondaryInfo.hideAnimate();
         if (!this.playerIsBroken) {
-          this.trackRatings.actor.hide();
+          if (this.trackRatings) {
+            this.trackRatings.actor.hide();
+          }
+          if (this.pithosRatings) {
+            this.pithosRatings.actor.hide();
+          }
           this.volume.actor.hide();
           this.position.actor.hide();
         }
@@ -412,7 +439,12 @@ const PlayerUI = new Lang.Class({
         }
         if (!this.playerIsBroken) {
           if (this.showRating) {
-            this.trackRatings.actor.show();
+            if (this.trackRatings) {
+              this.trackRatings.actor.show();
+            }
+            if (this.pithosRatings) {
+              this.pithosRatings.actor.show();
+            }
           }
           if (this.showVolume) {
             this.volume.actor.show();

@@ -142,6 +142,25 @@ const MediaServer2TracklistIface = '<node>\
 </node>';
 const MediaServer2TracklistProxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2TracklistIface);
 
+const PithosRatingsIface = '<node>\
+    <interface name="org.mpris.MediaPlayer2.ExtensionPithosRatings">\
+        <method name="LoveSong">\
+            <arg type="o" direction="in" />\
+        </method>\
+        <method name="BanSong">\
+            <arg type="o" direction="in" />\
+        </method>\
+        <method name="TiredSong">\
+            <arg type="o" direction="in" />\
+        </method>\
+        <method name="UnRateSong">\
+            <arg type="o" direction="in" />\
+        </method>\
+        <property name="HasPithosExtension" type="b" access="read" />\
+    </interface>\
+</node>';
+const PithosRatingsProxy = Gio.DBusProxy.makeProxyWrapper(PithosRatingsIface);
+
 function DBus() {
     return new DBusProxy(Gio.DBus.session, 'org.freedesktop.DBus',
                          '/org/freedesktop/DBus');
@@ -175,4 +194,20 @@ function MediaServer2Tracklist(owner, callback) {
     new MediaServer2TracklistProxy(Gio.DBus.session, owner,
                                    '/org/mpris/MediaPlayer2',
                                    callback);
+}
+
+function PithosRatings(owner, callback) {
+    if (owner != 'org.mpris.MediaPlayer2.pithos') {
+      callback(false);
+    }
+    else {
+      let proxy = new PithosRatingsProxy(Gio.DBus.session, owner,
+                                         '/org/mpris/MediaPlayer2');
+      if (proxy.HasPithosExtension) {
+        callback(proxy);
+      }
+      else {
+        callback(false);
+      }
+    }
 }

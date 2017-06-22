@@ -30,6 +30,8 @@ const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 const Tweener = imports.ui.tweener;
+const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
+const _ = Gettext.gettext;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
@@ -337,6 +339,68 @@ const SecondaryInfo = new Lang.Class({
         },
         onCompleteScope: this
       });
+    }
+});
+
+const PithosRatings = new Lang.Class({
+    Name: "PithosRatings",
+    Extends: BaseContainer,
+
+    _init: function(player) {
+        this._player = player;
+        this.parent({style_class: "track-rating", hover: false});
+        this._box = new St.BoxLayout({style_class: "track-box"});
+        this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon star-icon', icon_size: 12});
+        this._unRateButton = new St.Button({child: this._ratingsIcon});
+        this._box.add(this._unRateButton);
+        this._loveButton = new St.Button();
+        this._box.add(this._loveButton);
+        this._banButton = new St.Button();
+        this._box.add(this._banButton);
+        this._tiredButton = new St.Button();
+        this._box.add(this._tiredButton);
+        this._loveButton.label = _("Love");
+        this._banButton.label = _("Ban");
+        this._tiredButton.label = _("Tired");
+        this._callbackId = 0;
+        this._unRateButton.connect('clicked', Lang.bind(this, function() {
+            this._player.pithosUnRate();
+        }));
+        this._banButton.connect('clicked', Lang.bind(this, function() {
+            this._player.pithosBan();
+        }));
+        this._tiredButton.connect('clicked', Lang.bind(this, function() {
+            this._player.pithosTired();
+        }));
+        this._unRateButton.hide();
+        this._box.set_width(-1);        
+        this.actor.add(this._box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+    },
+
+    rate: function(rating) {
+       if (this._callbackId!== 0) {
+           this._loveButton.disconnect(this._callbackId);
+       }
+       // Tired or banned song won't show up in the trackbox,
+       // and if a song is banned or set tired it will be skipped automatically.
+       // The only ratings we need to worry about are unrated and loved.
+       if (rating == '') {
+           this._ratingsIcon.icon_name = null;
+           this._unRateButton.hide();
+           this._loveButton.label = _("Love");
+           this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+               this._player.pithosLove();
+           }));
+       }
+       else if (rating == 'love') {
+           this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
+           this._unRateButton.show();
+           this._loveButton.label = _("UnLove");
+           this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+               this._player.pithosUnRate();
+           }));
+       }
+       this._box.set_width(-1);      
     }
 });
 
@@ -708,7 +772,7 @@ const TrackList = new Lang.Class({
         //As per spec the "/org/mpris/MediaPlayer2/TrackList/NoTrack" object path means it's not a valid track.
         if (metadata.trackObj && metadata.trackObj !== '/org/mpris/MediaPlayer2/TrackList/NoTrack') {
           metadata.showRatings = showRatings;
-          let trackUI = new TracklistItem(metadata);
+          let trackUI = new TracklistItem(metadata, this.player);
           trackUI.connect('activate', Lang.bind(this, function() {
             this.player.playTrack(trackUI.obj);
           }));
@@ -807,8 +871,12 @@ const TracklistItem = new Lang.Class({
     Name: "TracklistItem",
     Extends: ListSubMenuItem,
 
-    _init: function (metadata) {
+    _init: function (metadata, player) {
         this.parent();
+        this._player = player;
+        this._loveCallbackId = 0;
+        this._banCallbackId = 0;
+        this._tiredCallbackId = 0;
         this.obj = metadata.trackObj;
         this._setCoverIconAsync = Lib.setCoverIconAsync;
         this._rating = null;
@@ -818,7 +886,11 @@ const TracklistItem = new Lang.Class({
         }
         this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'tracklist-artist'});
         this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-album'});
-        this._ratingBox = new St.BoxLayout({style_class: 'no-padding'});
+        let style_class = 'no-padding';
+        if (this._player._pithosRatings) {
+          style_class = 'track-box';
+        }
+        this._ratingBox = new St.BoxLayout({style_class: style_class});
         this._ratingBox.hide();
         this._box = new St.BoxLayout({vertical: true});
         this._box.add_child(this._artistLabel);
@@ -826,7 +898,12 @@ const TracklistItem = new Lang.Class({
         this._box.add_child(this._ratingBox);
         this.actor.add(this._coverIcon, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
-        this._buildStars(metadata.trackRating);
+        if (this._player._pithosRatings) {
+          this._buildPithosRatings(metadata.pithosRating);
+        }
+        else {
+          this._buildStars(metadata.trackRating);
+        }
         this.showRatings(metadata.showRatings);
         this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
     },
@@ -835,7 +912,12 @@ const TracklistItem = new Lang.Class({
       this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
       this._setArtist(metadata.trackArtist);
       this._setTitle(metadata.trackTitle);
-      this._setRating(metadata.trackRating);
+      if (this._player._pithosRatings) {
+        this._setPithosRating(metadata.pithosRating);
+      }
+      else {
+        this._setRating(metadata.trackRating);
+      }
     },
 
     _setArtist: function(artist) {
@@ -874,6 +956,106 @@ const TracklistItem = new Lang.Class({
         this._ratingBox.add_child(this._starIcon[i]);
       }
       this._rating = value;
+    },
+
+    _buildPithosRatings: function(rating) {
+      this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon star-icon', icon_size: 12});
+      this._unRateButton = new St.Button({child: this._ratingsIcon});
+      this._ratingBox.add(this._unRateButton);
+      this._loveButton = new St.Button();
+      this._ratingBox.add(this._loveButton);
+      this._banButton = new St.Button();
+      this._ratingBox.add(this._banButton);
+      this._tiredButton = new St.Button();
+      this._ratingBox.add(this._tiredButton);
+      this._unrateCallbackId = this._unRateButton.connect('clicked', Lang.bind(this, function() {
+        this._player.pithosUnRate(this.obj);
+      }));
+      this._unRateButton.hide();
+      this._ratingsIcon.set_width(-1);
+      this._setPithosRating(rating);
+    },
+
+    _setPithosRating(rating) {
+      if (this._rating == rating) {
+        return;
+      }
+      if (this._loveCallbackId !== 0) {
+        this._loveButton.disconnect(this._loveCallbackId);
+      }
+      if (this._banCallbackId !== 0) {
+        this._banButton.disconnect(this._banCallbackId);
+      }
+      if (this._tiredCallbackId !== 0) {
+        this._tiredButton.disconnect(this._tiredCallbackId);
+      }
+      if (rating == '') {
+        this._ratingsIcon.icon_name = null;
+        this._unRateButton.hide();
+        this._loveButton.label = _("Love");
+        this._banButton.label = _("Ban");
+        this._tiredButton.label = _("Tired");
+        this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosLove(this.obj);
+        }));
+        this._banCallbackId = this._banButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosBan(this.obj);
+        }));
+        this._tiredCallbackId = this._tiredButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosTired(this.obj);
+        }));
+      }
+
+      else if (rating == 'love') {
+        this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
+        this._unRateButton.show();
+        this._loveButton.label = _("UnLove");
+        this._banButton.label = _("Ban");
+        this._tiredButton.label = _("Tired");
+        this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosUnRate(this.obj);
+        }));
+        this._banCallbackId = this._banButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosBan(this.obj);
+        }));
+        this._tiredCallbackId = this._tiredButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosTired(this.obj);
+        }));
+      }
+      else if (rating == 'ban') {
+        this._ratingsIcon.icon_name = 'dialog-error-symbolic'
+        this._unRateButton.show();
+        this._loveButton.label = _("Love");
+        this._banButton.label = _("UnBan");
+        this._tiredButton.label = _("Tired");
+        this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosLove(this.obj);
+        }));
+        this._banCallbackId = this._banButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosUnRate(this.obj);
+        }));
+        this._tiredCallbackId = this._tiredButton.connect('clicked', Lang.bind(this, function() {
+          this._player.pithosTired(this.obj);
+        }));
+      }
+      else if (rating == 'tired') {
+        if (this._unrateCallbackId !== 0) {
+          this._unRateButton.disconnect(this._unrateCallbackId);
+          this._unrateCallbackId = 0
+        }
+        // Once a song has been set tired it's rating can't be changed.
+        // No need to connect button signals.
+        this._ratingsIcon.icon_name = 'go-jump-symbolic';
+        this._unRateButton.show();
+        this._loveButton.label = _("Love");
+        this._banButton.label = _("Ban");
+        this._tiredButton.label = _("Tired");
+        this._loveCallbackId = 0;
+        this._banCallbackId = 0;
+        this._tiredCallbackId = 0;
+      }
+      this._ratingsIcon.set_width(-1);
+      this._rating = rating;
     },
 
   _setRating: function(value) {

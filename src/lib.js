@@ -89,8 +89,8 @@ function getPlayerSymbolicIcon(desktopEntry) {
 
 function parseMetadata(metadata, state) {
   // Pragha sends a metadata dict with one value on stop
-  if (metadata === null || Object.keys(metadata).length < 2) {
-    return;
+  if (!metadata || Object.keys(metadata).length < 2) {
+    metadata = {};
   }
   state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
   state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack().join(', ') : "";
@@ -99,6 +99,7 @@ function parseMetadata(metadata, state) {
   state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
   state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
   state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
+  state.pithosRating = metadata["pithos:rating"] ? metadata["pithos:rating"].unpack() : "";
   state.fallbackIcon = 'media-optical-cd-audio-symbolic';
   if (metadata["xesam:genre"]) {
     let genres = metadata["xesam:genre"].deep_unpack();

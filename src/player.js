@@ -92,6 +92,7 @@ const PlayerState = new Lang.Class({
   canPause: null,
 
   volume: null,
+  pithosRating: null,
 });
 
 
@@ -132,7 +133,12 @@ const MPRISPlayer = new Lang.Class({
         this._tracklistSignalsId = [];
 
         this.parent(this._identity, true);
-
+        this._mediaServer = null;
+        this._mediaServerPlayer = null;
+        this._mediaServerPlaylists = null;
+        this._mediaServerTracklist = null;
+        this._prop = null;
+        this._pithosRatings = null;
         new DBusIface.MediaServer2(busName,
                                    Lang.bind(this, function(proxy) {
                                         this._mediaServer = proxy;
@@ -153,6 +159,11 @@ const MPRISPlayer = new Lang.Class({
                                                this._mediaServerTracklist = proxy;
                                                this._init2();
                                             }));
+        new DBusIface.PithosRatings(busName,
+                                    Lang.bind(this, function(proxy) {
+                                        this._pithosRatings = proxy;
+                                        this._init2();
+                                    }));
         new DBusIface.Properties(busName,
                                  Lang.bind(this, function(proxy) {
                                     this._prop = proxy;
@@ -169,14 +180,21 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _init2: function() {
-        // Wait all DBus callbacks to continue
-        if (!this._mediaServer || !this._mediaServerPlayer || !this._mediaServerPlaylists || !this._mediaServerTracklist || !this._prop)
-            return;
+        // Wait for all DBus callbacks to continue
+        if (this._mediaServer !== null
+            && this._mediaServerPlayer !== null
+            && this._mediaServerPlaylists !== null
+            && this._mediaServerTracklist !== null
+            && this._prop !== null
+            && this._pithosRatings !== null) {
+            this._init3();
+        }
+    },
 
+    _init3: function() {
         this.info.canRaise = this._mediaServer.CanRaise;
         this.sendsStopOnSongChange = Settings.SEND_STOP_ON_CHANGE.indexOf(this.busName) != -1;
         this.hasWrongVolumeScaling = Settings.WRONG_VOLUME_SCALING.indexOf(this.busName) != -1;
-
         if (Settings.MINOR_VERSION > 19) {
         // Versions before 3.20 don't have Mpris built-in.
         // hideStockMpris setting
@@ -511,6 +529,50 @@ const MPRISPlayer = new Lang.Class({
         this.info.app.activate_full(-1, 0);
       else if (this.info.canRaise)
         this._mediaServer.RaiseRemote();
+    },
+
+    pithosLove: function(track) {
+      if (!this._pithosRatings) {
+        return;
+      }
+      let trackId = track || this.state.trackObj;
+      if (!trackId) {
+        return;
+      }
+      this._pithosRatings.LoveSongRemote(trackId);
+    },
+
+    pithosBan: function(track) {
+      if (!this._pithosRatings) {
+        return;
+      }
+      let trackId = track || this.state.trackObj;
+      if (!trackId) {
+        return;
+      }
+      this._pithosRatings.BanSongRemote(trackId);
+    },
+
+    pithosTired: function(track) {
+      if (!this._pithosRatings) {
+        return;
+      }
+      let trackId = track || this.state.trackObj;
+      if (!trackId) {
+        return;
+      }
+      this._pithosRatings.TiredSongRemote(trackId);
+    },
+
+    pithosUnRate: function(track) {
+      if (!this._pithosRatings) {
+        return;
+      }
+      let trackId = track || this.state.trackObj;
+      if (!trackId) {
+        return;
+      }
+      this._pithosRatings.UnRateSongRemote(trackId);
     },
 
     _getPlayerInfo: function() {
