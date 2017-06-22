@@ -383,6 +383,7 @@ const PithosRatings = new Lang.Class({
        }
        // Tired or banned song won't show up in the trackbox,
        // and if a song is banned or set tired it will be skipped automatically.
+       // Pithos doesn't even send metadata updates for the current song if it's banned or set tired.
        // The only ratings we need to worry about are unrated and loved.
        if (rating == '') {
            this._ratingsIcon.icon_name = null;
@@ -1041,15 +1042,15 @@ const TracklistItem = new Lang.Class({
       else if (rating == 'tired') {
         if (this._unrateCallbackId !== 0) {
           this._unRateButton.disconnect(this._unrateCallbackId);
-          this._unrateCallbackId = 0
         }
         // Once a song has been set tired it's rating can't be changed.
         // No need to connect button signals.
         this._ratingsIcon.icon_name = 'go-jump-symbolic';
         this._unRateButton.show();
-        this._loveButton.label = _("Love");
-        this._banButton.label = _("Ban");
-        this._tiredButton.label = _("Tired");
+        this._loveButton.label = _("Tired… (Can't be Changed)");
+        this._banButton.hide();
+        this._tiredButton.hide();
+        this._unrateCallbackId = 0
         this._loveCallbackId = 0;
         this._banCallbackId = 0;
         this._tiredCallbackId = 0;
