@@ -342,89 +342,38 @@ const SecondaryInfo = new Lang.Class({
     }
 });
 
-const PithosRatings = new Lang.Class({
-    Name: "PithosRatings",
-    Extends: BaseContainer,
-
-    _init: function(player) {
-        this._player = player;
-        this.parent({style_class: "track-rating", hover: false});
-        this._box = new St.BoxLayout({style_class: "track-box"});
-        this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon star-icon', icon_size: 12});
-        this._unRateButton = new St.Button({child: this._ratingsIcon});
-        this._box.add(this._unRateButton);
-        this._loveButton = new St.Button();
-        this._box.add(this._loveButton);
-        this._banButton = new St.Button();
-        this._box.add(this._banButton);
-        this._tiredButton = new St.Button();
-        this._box.add(this._tiredButton);
-        this._loveButton.label = _("Love");
-        this._banButton.label = _("Ban");
-        this._tiredButton.label = _("Tired");
-        this._callbackId = 0;
-        this._unRateButton.connect('clicked', Lang.bind(this, function() {
-            this._player.pithosUnRate();
-        }));
-        this._banButton.connect('clicked', Lang.bind(this, function() {
-            this._player.pithosBan();
-        }));
-        this._tiredButton.connect('clicked', Lang.bind(this, function() {
-            this._player.pithosTired();
-        }));
-        this._unRateButton.hide();
-        this._box.set_width(-1);        
-        this.actor.add(this._box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-    },
-
-    rate: function(rating) {
-       if (this._callbackId!== 0) {
-           this._loveButton.disconnect(this._callbackId);
-       }
-       // Tired or banned song won't show up in the trackbox,
-       // and if a song is banned or set tired it will be skipped automatically.
-       // Pithos doesn't even send metadata updates for the current song if it's banned or set tired.
-       // The only ratings we need to worry about are unrated and loved.
-       if (rating == '') {
-           this._ratingsIcon.icon_name = null;
-           this._unRateButton.hide();
-           this._loveButton.label = _("Love");
-           this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
-               this._player.pithosLove();
-           }));
-       }
-       else if (rating == 'love') {
-           this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
-           this._unRateButton.show();
-           this._loveButton.label = _("UnLove");
-           this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
-               this._player.pithosUnRate();
-           }));
-       }
-       this._box.set_width(-1);      
-    }
-});
-
 const TrackRating = new Lang.Class({
     Name: "TrackRating",
     Extends: BaseContainer,
 
     _init: function(player, value) {
         this._player = player;
-        this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
-        this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
         this.parent({style_class: "track-rating", hover: false});
-        this.box = new St.BoxLayout({style_class: 'no-padding'});
+        let style_class = 'no-padding';
+        if (this._player._pithosRatings) {
+          style_class = 'track-box';
+        }
+        this.box = new St.BoxLayout({style_class: style_class});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-        // Supported players (except for Nuvola Player)
-        this._supported = {
-            "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
-            "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
-            "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
-            "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
-            "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
-        };
-        this._buildStars(value);
+        if (this._player._pithosRatings) {
+          this._rating = null;
+          this.rate = this._ratePithos;
+          this._buildPithosRatings();
+        }
+        else {
+          this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
+          this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
+          // Supported players (except for Nuvola Player)
+          this._supported = {
+              "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
+              "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
+              "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
+              "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
+              "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
+          };
+          this.rate = this._rate;
+          this._buildStars(value);
+        }
     },
 
     _buildStars: function(value) {
@@ -457,6 +406,33 @@ const TrackRating = new Lang.Class({
         }
     },
 
+    _buildPithosRatings: function() {
+        this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon star-icon', icon_size: 12});
+        this._unRateButton = new St.Button({child: this._ratingsIcon});
+        this.box.add(this._unRateButton);
+        this._loveButton = new St.Button();
+        this.box.add(this._loveButton);
+        this._banButton = new St.Button();
+        this.box.add(this._banButton);
+        this._tiredButton = new St.Button();
+        this.box.add(this._tiredButton);
+        this._loveButton.label = _("Love");
+        this._banButton.label = _("Ban");
+        this._tiredButton.label = _("Tired");
+        this._callbackId = 0;
+        this._unRateButton.connect('clicked', Lang.bind(this, function() {
+            this._player._pithosRatings.UnRateSongRemote(this._player.state.trackObj);
+        }));
+        this._banButton.connect('clicked', Lang.bind(this, function() {
+            this._player._pithosRatings.BanSongRemote(this._player.state.trackObj);
+        }));
+        this._tiredButton.connect('clicked', Lang.bind(this, function() {
+            this._player._pithosRatings.TiredSongRemote(this._player.state.trackObj);
+        }));
+        this._unRateButton.hide();
+        this.box.set_width(-1);
+    },
+
     newRating: function(button) {
         if (this._supported[this._player.busName] || this.nuvolaRatingSupported()) {
             if (button.hover) {
@@ -478,7 +454,38 @@ const TrackRating = new Lang.Class({
         }
     },
 
-    rate: function(value) {
+    _ratePithos: function(rating) {
+        if (this._rating == rating) {
+          return;
+        }
+         if (this._callbackId!== 0) {
+             this._loveButton.disconnect(this._callbackId);
+         }
+         // Tired or banned song won't show up in the trackbox,
+         // and if a song is banned or set tired it will be skipped automatically.
+         // Pithos doesn't even send metadata updates for the current song if it's banned or set tired.
+         // The only ratings we need to worry about are unrated and loved.
+         if (rating == '') {
+             this._ratingsIcon.icon_name = null;
+             this._unRateButton.hide();
+             this._loveButton.label = _("Love");
+             this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+                 this._player._pithosRatings.LoveSongRemote(this._player.state.trackObj);
+             }));
+         }
+         else if (rating == 'love') {
+             this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
+             this._unRateButton.show();
+             this._loveButton.label = _("UnLove");
+             this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
+                 this._player._pithosRatings.UnRateSongRemote(this._player.state.trackObj);
+             }));
+         }
+         this._rating = rating;
+         this.box.set_width(-1);      
+    },
+
+    _rate: function(value) {
         value = Math.min(Math.max(0, value), 5);
         for (let i = 0; i < 5; i++) {
             let icon_name = 'non-starred-symbolic';
@@ -970,7 +977,7 @@ const TracklistItem = new Lang.Class({
       this._tiredButton = new St.Button();
       this._ratingBox.add(this._tiredButton);
       this._unrateCallbackId = this._unRateButton.connect('clicked', Lang.bind(this, function() {
-        this._player.pithosUnRate(this.obj);
+        this._player._pithosRatings.UnRateSongRemote(this.obj);
       }));
       this._unRateButton.hide();
       this._ratingsIcon.set_width(-1);
@@ -997,13 +1004,13 @@ const TracklistItem = new Lang.Class({
         this._banButton.label = _("Ban");
         this._tiredButton.label = _("Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosLove(this.obj);
+          this._player._pithosRatings.LoveSongRemote(this.obj);
         }));
         this._banCallbackId = this._banButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosBan(this.obj);
+          this._player._pithosRatings.BanSongRemote(this.obj);
         }));
         this._tiredCallbackId = this._tiredButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosTired(this.obj);
+          this._player._pithosRatings.TiredSongRemote(this.obj);
         }));
       }
 
@@ -1014,13 +1021,13 @@ const TracklistItem = new Lang.Class({
         this._banButton.label = _("Ban");
         this._tiredButton.label = _("Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosUnRate(this.obj);
+          this._player._pithosRatings.UnRateSongRemote(this.obj);
         }));
         this._banCallbackId = this._banButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosBan(this.obj);
+          this._player._pithosRatings.BanSongRemote(this.obj);
         }));
         this._tiredCallbackId = this._tiredButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosTired(this.obj);
+          this._player._pithosRatings.TiredSongRemote(this.obj);
         }));
       }
       else if (rating == 'ban') {
@@ -1030,13 +1037,13 @@ const TracklistItem = new Lang.Class({
         this._banButton.label = _("UnBan");
         this._tiredButton.label = _("Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosLove(this.obj);
+          this._player._pithosRatings.LoveSongRemote(this.obj);
         }));
         this._banCallbackId = this._banButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosUnRate(this.obj);
+          this._player._pithosRatings.UnRateSongRemote(this.obj);
         }));
         this._tiredCallbackId = this._tiredButton.connect('clicked', Lang.bind(this, function() {
-          this._player.pithosTired(this.obj);
+          this._player._pithosRatings.TiredSongRemote(this.obj);
         }));
       }
       else if (rating == 'tired') {
@@ -1048,6 +1055,8 @@ const TracklistItem = new Lang.Class({
         this._ratingsIcon.icon_name = 'go-jump-symbolic';
         this._unRateButton.show();
         this._loveButton.label = _("Tired… (Can't be Changed)");
+        this._loveButton.reactive = false;
+        this._unRateButton.reactive = false;
         this._banButton.hide();
         this._tiredButton.hide();
         this._unrateCallbackId = 0

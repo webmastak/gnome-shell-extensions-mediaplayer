@@ -531,50 +531,6 @@ const MPRISPlayer = new Lang.Class({
         this._mediaServer.RaiseRemote();
     },
 
-    pithosLove: function(track) {
-      if (!this._pithosRatings) {
-        return;
-      }
-      let trackId = track || this.state.trackObj;
-      if (!trackId) {
-        return;
-      }
-      this._pithosRatings.LoveSongRemote(trackId);
-    },
-
-    pithosBan: function(track) {
-      if (!this._pithosRatings) {
-        return;
-      }
-      let trackId = track || this.state.trackObj;
-      if (!trackId) {
-        return;
-      }
-      this._pithosRatings.BanSongRemote(trackId);
-    },
-
-    pithosTired: function(track) {
-      if (!this._pithosRatings) {
-        return;
-      }
-      let trackId = track || this.state.trackObj;
-      if (!trackId) {
-        return;
-      }
-      this._pithosRatings.TiredSongRemote(trackId);
-    },
-
-    pithosUnRate: function(track) {
-      if (!this._pithosRatings) {
-        return;
-      }
-      let trackId = track || this.state.trackObj;
-      if (!trackId) {
-        return;
-      }
-      this._pithosRatings.UnRateSongRemote(trackId);
-    },
-
     _getPlayerInfo: function() {
         if (this._mediaServer.Identity) {
           this.info.identity = this._mediaServer.Identity || '';
