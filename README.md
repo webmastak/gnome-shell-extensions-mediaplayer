@@ -7,7 +7,8 @@ any MPRIS v2.1 capable media player.
   * [Bug Reports and Feature Requests](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Bug-Reports-and-Feature-Requests)
   * [Installation](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Installation)
   * [Settings](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Settings)
-  * [Compatible players](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Compatible-players)
+  * [Compatible Players](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Compatible-players)
+  * [Ratings Support](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Ratings-Support)
   * [Known Player Bugs](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Known-Player-Bugs)
 
 ## Screenshot
