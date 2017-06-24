@@ -36,6 +36,7 @@ const _ = Gettext.gettext;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Lib = Me.imports.lib;
+const DBusIface = Me.imports.dbus;
 
 const BaseContainer = new Lang.Class({
     Name: "BaseContainer",
@@ -358,27 +359,30 @@ const TrackRating = new Lang.Class({
         this._applyFunc = null;
         if (this._player._pithosRatings) {
           this._value = null;
-          this._nuvolaRatingProxy = false;
+          this._isNuvolaPlayer = false;
           this._rhythmbox3Proxy = false;
           this.rate = this._ratePithos;
           this._buildPithosRatings();
         }
         else {
-          this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
-          this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
-          // Supported players (except for Nuvola Player & Pithos)
-          let supported = {
-              "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
-              "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
-              "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
-              "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
-              "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
-          };
-          if (supported[this._player.busName]) {
-            this._applyFunc = supported[this._player.busName];
-          }
-          else if (this._nuvolaRatingProxy) {
+          this._isNuvolaPlayer = this._player.busName.indexOf("org.mpris.MediaPlayer2.NuvolaApp") != -1;
+          if (this._isNuvolaPlayer) {
+            this._rhythmbox3Proxy = false;
             this._applyFunc = this.applyNuvolaRating;
+          }
+          else {
+            // Supported players (except for Nuvola Player & Pithos)
+            let supported = {
+                "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
+                "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
+                "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
+                "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
+                "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
+            };
+            if (supported[this._player.busName]) {
+              this._rhythmbox3Proxy = new DBusIface.RhythmboxRatings();
+              this._applyFunc = supported[this._player.busName];
+            }
           }
           this.rate = this._rate;
           this._buildStars(value);
@@ -444,7 +448,7 @@ const TrackRating = new Lang.Class({
     },
 
     newRating: function(button) {
-        if (!this._nuvolaRatingProxy || this.nuvolaRatingSupported()) {
+        if (!this._isNuvolaPlayer || this.player._mediaServerPlayer.NuvolaCanRate) {
             if (button.hover) {
                 this.hoverRating(button._rateValue);
             }
@@ -556,55 +560,10 @@ const TrackRating = new Lang.Class({
 
         return false;
     },
-
-    getRhythmbox3Proxy: function() {
-        if (this._player.busName != 'org.mpris.MediaPlayer2.rhythmbox') {
-          return false;
-        }
-        const Rhythmbox3Iface = '<node>\
-            <interface name="org.gnome.Rhythmbox3.RhythmDB">\
-                <method name="SetEntryProperties">\
-                    <arg type="s" direction="in" />\
-                    <arg type="a{sv}" direction="in" />\
-                </method>\
-            </interface>\
-        </node>';
-        const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
-        let proxy = new Rhythmbox3Proxy(Gio.DBus.session, "org.gnome.Rhythmbox3",
-                                        "/org/gnome/Rhythmbox3/RhythmDB");
-        return proxy;
-    },
-
-    getNuvolaRatingProxy: function() {
-        /* Web apps running in the Nuvola Player runtime are named "org.mpris.MediaPlayer2.NuvolaAppFooBarBaz" */
-        if (this._player.busName.indexOf("org.mpris.MediaPlayer2.NuvolaApp") !== 0) {
-            return false;
-        }
-        const NuvolaRatingIface = '<node>\
-            <interface name="org.mpris.MediaPlayer2.Player">\
-                <method name="NuvolaSetRating">\
-                    <arg type="d" direction="in" />\
-                </method>\
-                <property name="NuvolaCanRate" type="b" access="read" />\
-            </interface>\
-        </node>';
-        const NuvolaRatingProxy = Gio.DBusProxy.makeProxyWrapper(NuvolaRatingIface);
-        let proxy = new NuvolaRatingProxy(Gio.DBus.session, this._player.busName,
-                                                        "/org/mpris/MediaPlayer2");
-        return proxy;
-    },
-    
-    nuvolaRatingSupported: function() {
-        let proxy = this._nuvolaRatingProxy;
-        if (proxy) {
-            return proxy.NuvolaCanRate;
-        }
-        return false;
-    },
     
     applyNuvolaRating: function(value) {
-        if (this._nuvolaRatingProxy.NuvolaCanRate) {
-            this._nuvolaRatingProxy.NuvolaSetRatingRemote(value / 5.0);
+        if (this.player._mediaServerPlayer.NuvolaCanRate) {
+            this.player._mediaServerPlayer.NuvolaSetRatingRemote(value / 5.0);
             return true;
         }
         return false;

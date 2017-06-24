@@ -64,6 +64,12 @@ const MediaServer2Iface = '<node>\
 </node>';
 const MediaServer2Proxy = Gio.DBusProxy.makeProxyWrapper(MediaServer2Iface);
 
+
+// For some reason the Nuvola dev was told to scab in a non-spec
+// prop and method for the support of setting ratings instead of
+// making a seperate ratings extension interface.
+// Oh well, they really don't hurt anything. No other player will try
+// to use them anyway...
 const MediaServer2PlayerIface = '<node>\
     <interface name="org.mpris.MediaPlayer2.Player">\
         <method name="PlayPause" />\
@@ -76,6 +82,10 @@ const MediaServer2PlayerIface = '<node>\
             <arg type="o" direction="in" />\
             <arg type="x" direction="in" />\
         </method>\
+        <method name="NuvolaSetRating">\
+            <arg type="d" direction="in" />\
+        </method>\
+        <property name="NuvolaCanRate" type="b" access="read" />\
         <property name="CanPause" type="b" access="read" />\
         <property name="CanSeek" type="b" access="read" />\
         <property name="CanGoNext" type="b" access="read" />\
@@ -161,6 +171,17 @@ const PithosRatingsIface = '<node>\
 </node>';
 const PithosRatingsProxy = Gio.DBusProxy.makeProxyWrapper(PithosRatingsIface);
 
+const Rhythmbox3Iface = '<node>\
+    <interface name="org.gnome.Rhythmbox3.RhythmDB">\
+        <method name="SetEntryProperties">\
+            <arg type="s" direction="in" />\
+            <arg type="a{sv}" direction="in" />\
+        </method>\
+    </interface>\
+ </node>';
+
+const Rhythmbox3Proxy = Gio.DBusProxy.makeProxyWrapper(Rhythmbox3Iface);
+
 function DBus() {
     return new DBusProxy(Gio.DBus.session, 'org.freedesktop.DBus',
                          '/org/freedesktop/DBus');
@@ -209,5 +230,15 @@ function PithosRatings(owner, callback) {
       else {
         callback(false);
       }
+    }
+}
+
+function RhythmboxRatings(owner) {
+    if (owner != 'org.mpris.MediaPlayer2.rhythmbox') {
+      return false;
+    }
+    else {
+      return new Rhythmbox3Proxy(Gio.DBus.session, "org.gnome.Rhythmbox3",
+                                 "/org/gnome/Rhythmbox3/RhythmDB");
     }
 }
