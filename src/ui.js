@@ -253,7 +253,7 @@ const PlayerUI = new Lang.Class({
       }              
     }
 
-    if (newState.showRating !== null && this.showRating !== null) {
+    if (newState.showRating !== null && this.trackRatings !== null) {
       this.showRating = newState.showRating;
       if (this.showRating) {
         this.trackRatings.actor.show();
