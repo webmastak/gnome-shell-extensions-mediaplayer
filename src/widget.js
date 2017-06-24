@@ -355,22 +355,31 @@ const TrackRating = new Lang.Class({
         }
         this.box = new St.BoxLayout({style_class: style_class});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+        this._applyFunc = null;
         if (this._player._pithosRatings) {
-          this._rating = null;
+          this._value = null;
+          this._nuvolaRatingProxy = false;
+          this._rhythmbox3Proxy = false;
           this.rate = this._ratePithos;
           this._buildPithosRatings();
         }
         else {
           this._nuvolaRatingProxy = this.getNuvolaRatingProxy();
           this._rhythmbox3Proxy = this.getRhythmbox3Proxy();
-          // Supported players (except for Nuvola Player)
-          this._supported = {
+          // Supported players (except for Nuvola Player & Pithos)
+          let supported = {
               "org.mpris.MediaPlayer2.banshee": this.applyBansheeRating,
               "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
               "org.mpris.MediaPlayer2.guayadeque": this.applyGuayadequeRating,
               "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
               "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
           };
+          if (supported[this._player.busName]) {
+            this._applyFunc = supported[this._player.busName];
+          }
+          else if (this._nuvolaRatingProxy) {
+            this._applyFunc = this.applyNuvolaRating;
+          }
           this.rate = this._rate;
           this._buildStars(value);
         }
@@ -398,9 +407,10 @@ const TrackRating = new Lang.Class({
                                                 });
             this._starButton[i]._rateValue = i + 1;
             this._starButton[i]._starred = starred;
-            this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
-            this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
-
+            if (this._applyFunc) {
+                this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
+                this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
+            }
             // Put the button in the box
             this.box.add_child(this._starButton[i]);
         }
@@ -434,7 +444,7 @@ const TrackRating = new Lang.Class({
     },
 
     newRating: function(button) {
-        if (this._supported[this._player.busName] || this.nuvolaRatingSupported()) {
+        if (!this._nuvolaRatingProxy || this.nuvolaRatingSupported()) {
             if (button.hover) {
                 this.hoverRating(button._rateValue);
             }
@@ -455,7 +465,7 @@ const TrackRating = new Lang.Class({
     },
 
     _ratePithos: function(rating) {
-        if (this._rating == rating) {
+        if (this._value == rating) {
           return;
         }
          if (this._callbackId!== 0) {
@@ -481,7 +491,7 @@ const TrackRating = new Lang.Class({
                  this._player._pithosRatings.UnRateSongRemote(this._player.state.trackObj);
              }));
          }
-         this._rating = rating;
+         this._value = rating;
          this.box.set_width(-1);      
     },
 
@@ -503,19 +513,14 @@ const TrackRating = new Lang.Class({
     applyRating: function(button) {
         let rateValue;
         // Click on a already starred icon, unrates
-        if (button._starred && button._rateValue == this._value)
+        if (button._starred && button._rateValue == this._value) {
             rateValue = 0;
-        else
+        }
+        else {
             rateValue = button._rateValue;
+        }
         // Apply the rating in the player
-        let applied = false;
-        if (this._supported[this._player.busName]) {
-            let applyFunc = Lang.bind(this, this._supported[this._player.busName]);
-            applied = applyFunc(rateValue);
-        }
-        else if (this._nuvolaRatingProxy) {
-            applied = this.applyNuvolaRating(rateValue);
-        }
+        let applied = this._applyFunc(rateValue);
         if (applied) {
             this.rate(rateValue);
         }
@@ -598,16 +603,11 @@ const TrackRating = new Lang.Class({
     },
     
     applyNuvolaRating: function(value) {
-        let proxy = this._nuvolaRatingProxy;
-        if (proxy && proxy.NuvolaCanRate) {
-            proxy.NuvolaSetRatingRemote(value / 5.0);
+        if (this._nuvolaRatingProxy.NuvolaCanRate) {
+            this._nuvolaRatingProxy.NuvolaSetRatingRemote(value / 5.0);
             return true;
         }
         return false;
-    },
-    
-    destroy: function() {
-        this.actor.destroy();
     },
 });
 
