@@ -1051,12 +1051,12 @@ const TracklistItem = new Lang.Class({
 
   showRatings: function(value) {
     if (value) {
-      this._albumLabel.hide()
+      this._albumLabel.hide();
       this._ratingBox.show();
     }
     else {
       this._ratingBox.hide();
-      this._albumLabel.show()
+      this._albumLabel.show();
     }
   }
 
