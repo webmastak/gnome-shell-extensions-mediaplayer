@@ -1,9 +1,9 @@
 /* em's don't scale? */
 .player-button {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 /* for the panel indicator will be overridden by the large cover size setting */
@@ -17,10 +17,6 @@
 
 .no-padding-bottom {
     padding-bottom: 0px;
-}
-
-.track-box {
-    spacing: 5px;
 }
 
 .track-info-artist {

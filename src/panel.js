@@ -177,8 +177,7 @@ const IndicatorMixin = {
       let prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
       this._thirdIndicator.clutter_text.set_width(-1);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
-      let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-      let desiredwidth = Math.round(Math.min(prefWidth, statusTextWidth) * scaleFactor);
+      let desiredwidth = Math.min(prefWidth, statusTextWidth);
       this._thirdIndicator.clutter_text.set_width(desiredwidth);
       this._thirdIndicator.set_width(desiredwidth);
     }
@@ -273,12 +272,11 @@ const PanelIndicator = new Lang.Class({
   },
 
   _setMenuWidth: function(largeCoverSize) {
-    let menu = this.menu
-    let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+    // Not sure how scale factor plays into this?
+    let menu = this.menu;
     let menuWidth = menu.actor.get_theme_node().get_min_width();
     let minMenuWidth = largeCoverSize + 96;
-    let desiredwidth = Math.max(menuWidth, minMenuWidth);
-    menu.actor.width = Math.round(desiredwidth * scaleFactor);
+    menu.actor.width = Math.max(menuWidth, minMenuWidth);
   }
 });
 Lib._extends(PanelIndicator, IndicatorMixin);
@@ -344,12 +342,11 @@ const AggregateMenuIndicator = new Lang.Class({
   },
 
   _setMenuWidth: function(largeCoverSize) {
+    // Not sure how scale factor plays into this?
     let menu = Main.panel.statusArea.aggregateMenu.menu
-    let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
     let menuWidth = menu.actor.get_theme_node().get_min_width();
     let minMenuWidth = largeCoverSize + 96;
-    let desiredwidth = Math.max(menuWidth, minMenuWidth);
-    menu.actor.width = Math.round(desiredwidth * scaleFactor);
+    menu.actor.width = Math.max(menuWidth, minMenuWidth);
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);

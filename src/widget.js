@@ -154,7 +154,7 @@ const TrackBox = new Lang.Class({
       this.infos.add(this._artistLabel);
       this.infos.add(this._titleLabel);
       this.infos.add(this._albumLabel);
-      this._content = new St.BoxLayout({style_class: 'track-box', vertical: false}); 
+      this._content = new St.BoxLayout({style_class: 'popup-menu-item no-padding', vertical: false}); 
       this._content.add(this._cover);
       this._content.add(this.infos);
       this.actor.add(this._content, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
@@ -350,11 +350,7 @@ const TrackRating = new Lang.Class({
     _init: function(player, value) {
         this._player = player;
         this.parent({style_class: "track-rating", hover: false});
-        let style_class = 'no-padding';
-        if (this._player._pithosRatings) {
-          style_class = 'track-box';
-        }
-        this.box = new St.BoxLayout({style_class: style_class});
+        this.box = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this._applyFunc = null;
         if (this._player._pithosRatings) {
@@ -416,7 +412,7 @@ const TrackRating = new Lang.Class({
                 this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
             }
             // Put the button in the box
-            this.box.add_child(this._starButton[i]);
+            this.box.add(this._starButton[i]);
         }
     },
 
@@ -430,9 +426,10 @@ const TrackRating = new Lang.Class({
         this.box.add(this._banButton);
         this._tiredButton = new St.Button();
         this.box.add(this._tiredButton);
-        this._loveButton.label = _("Love");
-        this._banButton.label = _("Ban");
-        this._tiredButton.label = _("Tired");
+        // Translators: The spaces are important. They act as padding.
+        this._loveButton.label = _("Love ");
+        this._banButton.label = _(" Ban ");
+        this._tiredButton.label = _(" Tired");
         this._callbackId = 0;
         this._unRateButton.connect('clicked', Lang.bind(this, function() {
             this._player._pithosRatings.UnRateSongRemote(this._player.state.trackObj);
@@ -482,7 +479,8 @@ const TrackRating = new Lang.Class({
          if (rating == '') {
              this._ratingsIcon.icon_name = null;
              this._unRateButton.hide();
-             this._loveButton.label = _("Love");
+             // Translators: The spaces are important. They act as padding.
+             this._loveButton.label = _("Love ");
              this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
                  this._player._pithosRatings.LoveSongRemote(this._player.state.trackObj);
              }));
@@ -490,7 +488,8 @@ const TrackRating = new Lang.Class({
          else if (rating == 'love') {
              this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
              this._unRateButton.show();
-             this._loveButton.label = _("UnLove");
+             // Translators: The spaces are important. They act as padding.
+             this._loveButton.label = _(" UnLove ");
              this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
                  this._player._pithosRatings.UnRateSongRemote(this._player.state.trackObj);
              }));
@@ -847,22 +846,20 @@ const TracklistItem = new Lang.Class({
         this.obj = metadata.trackObj;
         this._setCoverIconAsync = Lib.setCoverIconAsync;
         this._rating = null;
-        this._coverIcon = new St.Icon({icon_name: metadata.fallbackIcon, icon_size: 24});
+        this._coverIcon = new St.Icon({icon_name: metadata.fallbackIcon, icon_size: 48});
         if (Settings.MINOR_VERSION > 19) {
           this._coverIcon.add_style_class_name('media-message-cover-icon fallback no-padding');
         }
-        this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'tracklist-artist'});
-        this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-album'});
-        let style_class = 'no-padding';
-        if (this._player._pithosRatings) {
-          style_class = 'track-box';
-        }
-        this._ratingBox = new St.BoxLayout({style_class: style_class});
+        this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'track-info-artist'});
+        this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-title'});
+        this._albumLabel = new St.Label({text: metadata.trackAlbum, style_class: 'track-info-album'});
+        this._ratingBox = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this._ratingBox.hide();
         this._box = new St.BoxLayout({vertical: true});
-        this._box.add_child(this._artistLabel);
-        this._box.add_child(this._titleLabel);
-        this._box.add_child(this._ratingBox);
+        this._box.add(this._artistLabel);
+        this._box.add(this._titleLabel);
+        this._box.add(this._albumLabel);
+        this._box.add(this._ratingBox);
         this.actor.add(this._coverIcon, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         if (this._player._pithosRatings) {
@@ -879,6 +876,7 @@ const TracklistItem = new Lang.Class({
       this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
       this._setArtist(metadata.trackArtist);
       this._setTitle(metadata.trackTitle);
+      this._setAlbum(metadata.trackAlbum);
       if (this._player._pithosRatings) {
         this._setPithosRating(metadata.pithosRating);
       }
@@ -896,6 +894,12 @@ const TracklistItem = new Lang.Class({
     _setTitle: function(title) {
       if (this._titleLabel.text != title) {
         this._titleLabel.text = title;
+      }
+    },
+
+    _setAlbum: function(album) {
+      if (this._albumLabel.text != album) {
+        this._albumLabel.text = album;
       }
     },
 
@@ -920,7 +924,7 @@ const TracklistItem = new Lang.Class({
         this._starIcon[i] = new St.Icon({style_class: 'popup-menu-icon star-icon',
                                     icon_name: icon_name
                                     });
-        this._ratingBox.add_child(this._starIcon[i]);
+        this._ratingBox.add(this._starIcon[i]);
       }
       this._rating = value;
     },
@@ -959,9 +963,10 @@ const TracklistItem = new Lang.Class({
       if (rating == '') {
         this._ratingsIcon.icon_name = null;
         this._unRateButton.hide();
-        this._loveButton.label = _("Love");
-        this._banButton.label = _("Ban");
-        this._tiredButton.label = _("Tired");
+        // Translators: The spaces are important. They act as padding.
+        this._loveButton.label = _("Love ");
+        this._banButton.label = _(" Ban ");
+        this._tiredButton.label = _(" Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
           this._player._pithosRatings.LoveSongRemote(this.obj);
         }));
@@ -976,9 +981,10 @@ const TracklistItem = new Lang.Class({
       else if (rating == 'love') {
         this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
         this._unRateButton.show();
-        this._loveButton.label = _("UnLove");
-        this._banButton.label = _("Ban");
-        this._tiredButton.label = _("Tired");
+        // Translators: The spaces are important. They act as padding.
+        this._loveButton.label = _(" UnLove ");
+        this._banButton.label = _(" Ban ");
+        this._tiredButton.label = _(" Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
           this._player._pithosRatings.UnRateSongRemote(this.obj);
         }));
@@ -992,9 +998,10 @@ const TracklistItem = new Lang.Class({
       else if (rating == 'ban') {
         this._ratingsIcon.icon_name = 'dialog-error-symbolic'
         this._unRateButton.show();
-        this._loveButton.label = _("Love");
-        this._banButton.label = _("UnBan");
-        this._tiredButton.label = _("Tired");
+        // Translators: The spaces are important. They act as padding.
+        this._loveButton.label = _(" Love ");
+        this._banButton.label = _(" UnBan ");
+        this._tiredButton.label = _(" Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
           this._player._pithosRatings.LoveSongRemote(this.obj);
         }));
@@ -1013,7 +1020,8 @@ const TracklistItem = new Lang.Class({
         // No need to connect button signals.
         this._ratingsIcon.icon_name = 'go-jump-symbolic';
         this._unRateButton.show();
-        this._loveButton.label = _("Tired… (Can't be Changed)");
+        // Translators: The spaces are important. They act as padding.
+        this._loveButton.label = _(" Tired… (Can't be Changed)");
         this._loveButton.reactive = false;
         this._unRateButton.reactive = false;
         this._banButton.hide();
@@ -1023,7 +1031,7 @@ const TracklistItem = new Lang.Class({
         this._banCallbackId = 0;
         this._tiredCallbackId = 0;
       }
-      this._ratingsIcon.set_width(-1);
+      this._box.set_width(-1);
       this._rating = rating;
     },
 
@@ -1043,12 +1051,12 @@ const TracklistItem = new Lang.Class({
 
   showRatings: function(value) {
     if (value) {
+      this._albumLabel.hide()
       this._ratingBox.show();
-      this._coverIcon.icon_size = 48;
     }
     else {
       this._ratingBox.hide();
-      this._coverIcon.icon_size = 24;
+      this._albumLabel.show()
     }
   }
 
