@@ -261,21 +261,21 @@ const SecondaryInfo = new Lang.Class({
     },
 
     updateInfo: function(state) {
-      this._artistLabel.text = state.trackArtist.toString();
+      this._artistLabel.text = state.trackArtist;
       if (this._artistLabel.text == "") {
         this._artistLabel.hide();
       }
       else {
         this._artistLabel.show();
       }        
-      this._titleLabel.text = state.trackTitle.toString();
+      this._titleLabel.text = state.trackTitle;
       if (this._titleLabel.text == "") {
         this._titleLabel.hide();
       }
       else {
         this._titleLabel.show();
       }
-      this._albumLabel.text = state.trackAlbum.toString();
+      this._albumLabel.text = state.trackAlbum;
       if (this._albumLabel.text == "") {
         this._albumLabel.hide();
       }
