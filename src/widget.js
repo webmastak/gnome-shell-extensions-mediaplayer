@@ -822,23 +822,9 @@ const Playlists = new Lang.Class({
 
 });
 
-const ListSubMenuItem = new Lang.Class({
-    Name: "ListSubMenuItem",
-    Extends: PopupMenu.PopupBaseMenuItem,
-
-    _init: function () {
-        this.parent();
-        // We want the _ornamentLabel vertically centered.
-        this.actor.child_set_property(this._ornamentLabel, "y-fill", false);
-        this.actor.child_set_property(this._ornamentLabel, "y-expand", true);
-        this.actor.child_set_property(this._ornamentLabel, "y-align", St.Align.MIDDLE);
-    }
-
-});
-
 const PlaylistItem = new Lang.Class({
     Name: "PlaylistItem",
-    Extends: ListSubMenuItem,
+    Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function (text, obj) {
         this.parent();
@@ -857,10 +843,12 @@ const PlaylistItem = new Lang.Class({
 
 const TracklistItem = new Lang.Class({
     Name: "TracklistItem",
-    Extends: ListSubMenuItem,
+    Extends: PopupMenu.PopupBaseMenuItem,
 
     _init: function (metadata, player) {
         this.parent();
+        this.actor.child_set_property(this._ornamentLabel, "y-fill", false);
+        this.actor.child_set_property(this._ornamentLabel, "y-align", St.Align.MIDDLE);
         this._player = player;
         this._loveCallbackId = 0;
         this._banCallbackId = 0;
