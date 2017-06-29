@@ -167,26 +167,26 @@ const IndicatorMixin = {
     let stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
       this._thirdIndicator.hide();      
-    } else {
-      this._thirdIndicator.show();
     }
-
-    if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
+    else if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
+      this._thirdIndicator.show();
       let stateText = this.compileTemplate(stateTemplate, state);
-      this._thirdIndicator.clutter_text.set_markup(stateText);
+      if (this._thirdIndicator.clutter_text.text != stateText) {
+        this._thirdIndicator.clutter_text.set_markup(stateText);
+      }
+      if (this._thirdIndicator.clutter_text.text) {
+        this._thirdIndicator.clutter_text.set_width(-1);
+      }
       let prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
-      this._thirdIndicator.clutter_text.set_width(-1);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
       let desiredwidth = Math.min(prefWidth, statusTextWidth);
-      this._thirdIndicator.clutter_text.set_width(desiredwidth);
-      this._thirdIndicator.set_width(desiredwidth);
+      if (statusTextWidth != desiredwidth) {
+        this._thirdIndicator.clutter_text.set_width(desiredwidth);
+      }
     }
 
-    if (state.trackCoverUrl !== null || state.desktopEntry !== null) {
-      let fallbackIcon = 'audio-x-generic-symbolic';
-      if(state.desktopEntry) {
-        fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry);
-      }
+    if (state.trackCoverUrl || state.desktopEntry) {
+      let fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry);
       if (state.trackCoverUrl && this.useCoverInPanel) {
           this.setCoverIconAsync(this._primaryIndicator, state.trackCoverUrl, fallbackIcon);
       }

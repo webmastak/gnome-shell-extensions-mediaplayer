@@ -151,36 +151,48 @@ const TrackBox = new Lang.Class({
       this._artistLabel = new St.Label({style_class: 'track-info-artist'});
       this._titleLabel = new St.Label({style_class: 'track-info-title'});
       this._albumLabel = new St.Label({style_class: 'track-info-album'});
-      this.infos.add(this._artistLabel);
-      this.infos.add(this._titleLabel);
-      this.infos.add(this._albumLabel);
+      this.infos.add(this._artistLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+      this.infos.add(this._titleLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+      this.infos.add(this._albumLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
       this._content = new St.BoxLayout({style_class: 'popup-menu-item no-padding', vertical: false}); 
-      this._content.add(this._cover);
-      this._content.add(this.infos);
+      this._content.add(this._cover, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+      this._content.add(this.infos, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
       this.actor.add(this._content, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
 
     updateInfo: function(state) {
-      this._artistLabel.text = state.trackArtist;
-      if (this._artistLabel.text == "") {
-        this._artistLabel.hide();
+      if (this._artistLabel.text != state.trackArtist) {
+        this._artistLabel.text = state.trackArtist;
+        if (this._artistLabel.text == "") {
+          this._artistLabel.hide();
+        }
+        else {
+          this._artistLabel.show();
+        }
       }
-      else {
-        this._artistLabel.show();
-      }        
-      this._titleLabel.text = state.trackTitle;
-      if (this._titleLabel.text == "") {
-        this._titleLabel.hide();
+      if (this._titleLabel.text != state.trackTitle) {        
+        this._titleLabel.text = state.trackTitle;
+        if (this._titleLabel.text == "") {
+          this._titleLabel.hide();
+        }
+        else {
+          this._titleLabel.show();
+        }
       }
-      else {
-        this._titleLabel.show();
+      if (this._albumLabel.text != state.trackAlbum) {
+        this._albumLabel.text = state.trackAlbum;
+        if (this._albumLabel.text == "") {
+          this._albumLabel.hide();
+        }
+        else {
+          this._albumLabel.show();
+        }
       }
-      this._albumLabel.text = state.trackAlbum;
-      if (this._albumLabel.text == "") {
-        this._albumLabel.hide();
+      if (!this._artistLabel.text && !this._titleLabel.text && !this._albumLabel.text) {
+        this.infos.hide();
       }
-      else {
-        this._albumLabel.show();
+      else if (this._cover.child.icon_size == Settings.gsettings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY)){
+        this.infos.show();
       }
     },
 
@@ -261,26 +273,32 @@ const SecondaryInfo = new Lang.Class({
     },
 
     updateInfo: function(state) {
-      this._artistLabel.text = state.trackArtist;
-      if (this._artistLabel.text == "") {
-        this._artistLabel.hide();
+      if (this._artistLabel.text != state.trackArtist) {
+        this._artistLabel.text = state.trackArtist;
+        if (this._artistLabel.text == "") {
+          this._artistLabel.hide();
+        }
+        else {
+          this._artistLabel.show();
+        }
       }
-      else {
-        this._artistLabel.show();
-      }        
-      this._titleLabel.text = state.trackTitle;
-      if (this._titleLabel.text == "") {
-        this._titleLabel.hide();
+      if (this._titleLabel.text != state.trackTitle) {        
+        this._titleLabel.text = state.trackTitle;
+        if (this._titleLabel.text == "") {
+          this._titleLabel.hide();
+        }
+        else {
+          this._titleLabel.show();
+        }
       }
-      else {
-        this._titleLabel.show();
-      }
-      this._albumLabel.text = state.trackAlbum;
-      if (this._albumLabel.text == "") {
-        this._albumLabel.hide();
-      }
-      else {
-        this._albumLabel.show();
+      if (this._albumLabel.text != state.trackAlbum) {
+        this._albumLabel.text = state.trackAlbum;
+        if (this._albumLabel.text == "") {
+          this._albumLabel.hide();
+        }
+        else {
+          this._albumLabel.show();
+        }
       }
     },
 
@@ -396,8 +414,9 @@ const TrackRating = new Lang.Class({
                 starred = true;
             }
             // Create star icons
-            let starIcon = new St.Icon({style_class: 'popup-menu-icon star-icon',
-                                             icon_name: icon_name
+            let starIcon = new St.Icon({style_class: 'star-icon',
+                                             icon_name: icon_name,
+                                             icon_size: 16
                                              });
             // Create the button with starred icon
             this._starButton[i] = new St.Button({x_align: St.Align.MIDDLE,
@@ -417,8 +436,11 @@ const TrackRating = new Lang.Class({
     },
 
     _buildPithosRatings: function() {
-        this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon star-icon', icon_size: 12});
-        this._unRateButton = new St.Button({child: this._ratingsIcon});
+        this._ratingsIcon = new St.Icon({icon_size: 12});
+        this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
+                                            y_align: St.Align.MIDDLE,
+                                            child: this._ratingsIcon
+                                           })
         this.box.add(this._unRateButton);
         this._loveButton = new St.Button();
         this.box.add(this._loveButton);
@@ -489,7 +511,7 @@ const TrackRating = new Lang.Class({
              this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
              this._unRateButton.show();
              // Translators: The spaces are important. They act as padding.
-             this._loveButton.label = _(" UnLove ");
+             this._loveButton.label = _("  UnLove ");
              this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
                  this._player._pithosRatings.UnRateSongRemote(this._player.state.trackObj);
              }));
@@ -806,10 +828,10 @@ const ListSubMenuItem = new Lang.Class({
 
     _init: function () {
         this.parent();
-        // We have to replace the _ornamentLabel so that it's vertically centered.
-        this.actor.remove_actor(this._ornamentLabel);
-        this._ornamentLabel = new St.Label({style_class: 'popup-menu-ornament'});
-        this.actor.add(this._ornamentLabel, {y_expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+        // We want the _ornamentLabel vertically centered.
+        this.actor.child_set_property(this._ornamentLabel, "y-fill", false);
+        this.actor.child_set_property(this._ornamentLabel, "y-expand", true);
+        this.actor.child_set_property(this._ornamentLabel, "y-align", St.Align.MIDDLE);
     }
 
 });
@@ -856,10 +878,10 @@ const TracklistItem = new Lang.Class({
         this._ratingBox = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this._ratingBox.hide();
         this._box = new St.BoxLayout({vertical: true});
-        this._box.add(this._artistLabel);
-        this._box.add(this._titleLabel);
-        this._box.add(this._albumLabel);
-        this._box.add(this._ratingBox);
+        this._box.add(this._artistLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+        this._box.add(this._titleLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+        this._box.add(this._albumLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
+        this._box.add(this._ratingBox, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._coverIcon, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
         if (this._player._pithosRatings) {
@@ -921,8 +943,9 @@ const TracklistItem = new Lang.Class({
             icon_name = 'starred-symbolic';
         }
         // Create star icons
-        this._starIcon[i] = new St.Icon({style_class: 'popup-menu-icon star-icon',
-                                    icon_name: icon_name
+        this._starIcon[i] = new St.Icon({style_class: 'star-icon',
+                                    icon_name: icon_name,
+                                    icon_size: 16
                                     });
         this._ratingBox.add(this._starIcon[i]);
       }
@@ -930,15 +953,18 @@ const TracklistItem = new Lang.Class({
     },
 
     _buildPithosRatings: function(rating) {
-      this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon star-icon', icon_size: 12});
-      this._unRateButton = new St.Button({child: this._ratingsIcon});
-      this._ratingBox.add(this._unRateButton);
+      this._ratingsIcon = new St.Icon({icon_size: 12});
+      this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
+                                          y_align: St.Align.MIDDLE,
+                                          child: this._ratingsIcon
+                                         })
+      this._ratingBox.add(this._unRateButton, {y_align: St.Align.MIDDLE});
       this._loveButton = new St.Button();
-      this._ratingBox.add(this._loveButton);
+      this._ratingBox.add(this._loveButton, {y_align: St.Align.MIDDLE});
       this._banButton = new St.Button();
-      this._ratingBox.add(this._banButton);
+      this._ratingBox.add(this._banButton, {y_align: St.Align.MIDDLE});
       this._tiredButton = new St.Button();
-      this._ratingBox.add(this._tiredButton);
+      this._ratingBox.add(this._tiredButton, {y_align: St.Align.MIDDLE});
       this._unrateCallbackId = this._unRateButton.connect('clicked', Lang.bind(this, function() {
         this._player._pithosRatings.UnRateSongRemote(this.obj);
       }));
@@ -982,7 +1008,7 @@ const TracklistItem = new Lang.Class({
         this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
         this._unRateButton.show();
         // Translators: The spaces are important. They act as padding.
-        this._loveButton.label = _(" UnLove ");
+        this._loveButton.label = _("  UnLove ");
         this._banButton.label = _(" Ban ");
         this._tiredButton.label = _(" Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
@@ -999,7 +1025,7 @@ const TracklistItem = new Lang.Class({
         this._ratingsIcon.icon_name = 'dialog-error-symbolic'
         this._unRateButton.show();
         // Translators: The spaces are important. They act as padding.
-        this._loveButton.label = _(" Love ");
+        this._loveButton.label = _("  Love ");
         this._banButton.label = _(" UnBan ");
         this._tiredButton.label = _(" Tired");
         this._loveCallbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
@@ -1021,7 +1047,7 @@ const TracklistItem = new Lang.Class({
         this._ratingsIcon.icon_name = 'go-jump-symbolic';
         this._unRateButton.show();
         // Translators: The spaces are important. They act as padding.
-        this._loveButton.label = _(" Tired… (Can't be Changed)");
+        this._loveButton.label = _("  Tired… (Can't be Changed)");
         this._loveButton.reactive = false;
         this._unRateButton.reactive = false;
         this._banButton.hide();
