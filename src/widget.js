@@ -870,8 +870,8 @@ const TracklistItem = new Lang.Class({
         this._box.add(this._titleLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
         this._box.add(this._albumLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
         this._box.add(this._ratingBox, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
-        this.actor.add(this._coverIcon, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
-        this.actor.add(this._box, {y_expand: false, y_fill: false, y_align: St.Align.MIDDLE});
+        this.actor.add(this._coverIcon, {y_fill: false, y_align: St.Align.MIDDLE});
+        this.actor.add(this._box, {y_fill: false, y_align: St.Align.MIDDLE});
         if (this._player._pithosRatings) {
           this._buildPithosRatings(metadata.pithosRating);
         }
