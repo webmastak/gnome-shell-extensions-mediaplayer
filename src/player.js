@@ -78,8 +78,6 @@ const PlayerState = new Lang.Class({
   showRating: null,
   showVolume: null,
   showPosition: null,
-  largeCoverSize: null,
-  smallCoverSize: null,
   hideStockMpris: null,
 
   showTracklistRating: null,
@@ -204,18 +202,6 @@ const MPRISPlayer = new Lang.Class({
             }))
           );
         }
-        // largeCoverSize setting
-        this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({largeCoverSize: this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY)}));
-          }))
-        );
-        // smallCoverSize setting
-        this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({smallCoverSize: this._settings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY)}));
-          }))
-        );
         // showVolume setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
@@ -436,7 +422,6 @@ const MPRISPlayer = new Lang.Class({
         showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
         showTracklist: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY),
         showTracklistRating: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY),
-        largeCoverSize: this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY),
         volume: this._mediaServerPlayer.Volume || 0.0,
         status: this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP,
         orderings: this._checkOrderings(this._mediaServerPlaylists.Orderings),

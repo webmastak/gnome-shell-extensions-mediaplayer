@@ -65,24 +65,6 @@ function init() {
             step: 5,
             default: 300
         },
-        large_cover: {
-            type: "i",
-            label: _("Large cover size"),
-            help: _("The size of the cover when zoomed. Default is 128px."),
-            min: 128,
-            max: 256,
-            step: 1,
-            default: 128
-        },
-        small_cover: {
-            type: "i",
-            label: _("Small cover size"),
-            help: _("The size of the cover when not zoomed. Default is 48px."),
-            min: 32,
-            max: 96,
-            step: 1,
-            default: 48
-        },
         start_zoomed: {
             type: "b",
             label: _("Start with the cover zoomed"),

@@ -89,13 +89,11 @@ function disable() {
   manager = null;
   if (indicator instanceof Panel.PanelIndicator) {
     indicator.destroy();
-    indicator = null;
   }
   else {
     indicator.indicators.destroy();
-    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-    indicator = null;
   }
+  indicator = null;
   if (Settings.MINOR_VERSION > 19) {
     //Revert Monkey patch
     _stockMpris._shouldShow = _stockMprisOldShouldShow;

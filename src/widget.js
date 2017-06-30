@@ -191,7 +191,7 @@ const TrackBox = new Lang.Class({
       if (!this._artistLabel.text && !this._titleLabel.text && !this._albumLabel.text) {
         this.infos.hide();
       }
-      else if (this._cover.child.icon_size == Settings.gsettings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY)){
+      else if (this._cover.child.icon_size == 48){
         this.infos.show();
       }
     },
@@ -436,7 +436,7 @@ const TrackRating = new Lang.Class({
     },
 
     _buildPithosRatings: function() {
-        this._ratingsIcon = new St.Icon({icon_size: 12});
+        this._ratingsIcon = new St.Icon({icon_size: 16});
         this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
                                             y_align: St.Align.MIDDLE,
                                             child: this._ratingsIcon
@@ -941,7 +941,7 @@ const TracklistItem = new Lang.Class({
     },
 
     _buildPithosRatings: function(rating) {
-      this._ratingsIcon = new St.Icon({icon_size: 12});
+      this._ratingsIcon = new St.Icon({icon_size: 16});
       this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
                                           y_align: St.Align.MIDDLE,
                                           child: this._ratingsIcon

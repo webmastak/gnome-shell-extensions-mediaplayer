@@ -106,9 +106,6 @@ const IndicatorMixin = {
 
   _connectSignals: function() {
     this.panelChangeId = this.panelState.connect('changed', Lang.bind(this, this._updatePanel));
-    this.themeChangeId = this.themeContext.connect('changed', Lang.bind(this, function() {
-      this._setMenuWidth(this._settings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY));
-    }));
     this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TYPE_KEY,
       Lang.bind(this, function() {
         this.useCoverInPanel =
@@ -124,10 +121,6 @@ const IndicatorMixin = {
   },
 
   _disconnectSignals: function() {
-    if (this.themeChangeId != 0) {
-      this.themeContext.disconnect(this.themeChangeId);
-      this.themeChangeId = 0;
-    }
     if (this.panelChangeId != 0) {
       this.panelState.disconnect(this.panelChangeId);
       this.panelChangeId = 0;
@@ -140,9 +133,6 @@ const IndicatorMixin = {
 
   // method binded to classes below
   _commonOnActivePlayerUpdate: function(manager, state) {
-    if (state.largeCoverSize !== null) {
-      this._setMenuWidth(state.largeCoverSize);
-    } 
     this.panelState.update(state);
     this._onActivePlayerUpdate(state);
   },
@@ -174,9 +164,7 @@ const IndicatorMixin = {
       if (this._thirdIndicator.clutter_text.text != stateText) {
         this._thirdIndicator.clutter_text.set_markup(stateText);
       }
-      if (this._thirdIndicator.clutter_text.text) {
-        this._thirdIndicator.clutter_text.set_width(-1);
-      }
+      this._thirdIndicator.clutter_text.set_width(-1);
       let prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
       let desiredwidth = Math.min(prefWidth, statusTextWidth);
@@ -220,7 +208,6 @@ const PanelIndicator = new Lang.Class({
     this.parent(0.0, "mediaplayer");
 
     this._manager = null;
-    this.themeChangeId = 0;
     this.panelChangeId = 0;
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.actor.add_style_class_name('panel-status-button');
@@ -269,14 +256,6 @@ const PanelIndicator = new Lang.Class({
 
   _onActivePlayerRemove: function() {
     this.actor.hide();
-  },
-
-  _setMenuWidth: function(largeCoverSize) {
-    // Not sure how scale factor plays into this?
-    let menu = this.menu;
-    let menuWidth = menu.actor.get_theme_node().get_min_width();
-    let minMenuWidth = largeCoverSize + 96;
-    menu.actor.width = Math.max(menuWidth, minMenuWidth);
   }
 });
 Lib._extends(PanelIndicator, IndicatorMixin);
@@ -289,7 +268,6 @@ const AggregateMenuIndicator = new Lang.Class({
     this.parent();
 
     this._manager = null;
-    this.themeChangeId = 0;
     this.panelChangeId = 0;
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.compileTemplate = Lib.compileTemplate;
@@ -339,14 +317,6 @@ const AggregateMenuIndicator = new Lang.Class({
   _onActivePlayerRemove: function() {
     this.indicators.hide();
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
-  },
-
-  _setMenuWidth: function(largeCoverSize) {
-    // Not sure how scale factor plays into this?
-    let menu = Main.panel.statusArea.aggregateMenu.menu
-    let menuWidth = menu.actor.get_theme_node().get_min_width();
-    let minMenuWidth = largeCoverSize + 96;
-    menu.actor.width = Math.max(menuWidth, minMenuWidth);
   }
 });
 Lib._extends(AggregateMenuIndicator, IndicatorMixin);

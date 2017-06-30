@@ -61,16 +61,6 @@
         <_summary>Status text size</_summary>
         <_description>The the maximum width before the title gets an ellipsis. Default is 300px.</_description>
     </key>
-    <key name="small-cover" type="i">
-        <default>48</default>
-        <_summary>Small cover size</_summary>
-        <_description>The size of the cover when not zoomed. Default is 48px.</_description>
-    </key>
-    <key name="large-cover" type="i">
-        <default>128</default>
-        <_summary>Large cover size</_summary>
-        <_description>The size of the cover when zoomed. Default is 128px.</_description>
-    </key>
     <key name="volumemenu" type="b">
         <default>true</default>
         <_summary>Show the media player in the volume menu</_summary>

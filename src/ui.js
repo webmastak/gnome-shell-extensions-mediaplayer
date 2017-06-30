@@ -109,8 +109,6 @@ const PlayerUI = new Lang.Class({
     //Broken Players never get anything beyond the most basic functionality
     //because they don't know how to behave properly.
     this.playerIsBroken = Settings.BROKEN_PLAYERS.indexOf(this.player.info.identity) != -1;
-    this.largeCoverSize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_LARGE_COVER_SIZE_KEY);
-    this.smallCoverSize = Settings.gsettings.get_int(Settings.MEDIAPLAYER_SMALL_COVER_SIZE_KEY);
 
     this.trackCover = new St.Button({child: new St.Icon({icon_name: "media-optical-cd-audio-symbolic"})});
     if (Settings.MINOR_VERSION > 19) {
@@ -218,9 +216,15 @@ const PlayerUI = new Lang.Class({
       this.trackBox.infos.hide();      
     }
     else {
-      this.trackCover.child.icon_size = this.smallCoverSize;
+      this.trackCover.child.icon_size = 48;
       this.secondaryInfo.hide();
-    } 
+    }
+    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
+    this.themeChangeId = this.themeContext.connect('changed', Lang.bind(this, function() {
+      if (this.trackCover.child.icon_size != 48) {
+        this.trackCover.child.icon_size = this.largeCoverSize;
+      }
+    })); 
   },
 
   update: function(player, newState) {
@@ -237,20 +241,6 @@ const PlayerUI = new Lang.Class({
           }
         }
       }
-    }
-
-    if (newState.largeCoverSize !== null) {
-      this.largeCoverSize = newState.largeCoverSize;
-      if (this.trackCover.child.icon_size !== this.smallCoverSize) {
-        this.trackCover.child.icon_size = this.largeCoverSize;
-      }              
-    }
-
-    if (newState.smallCoverSize !== null) {
-      this.smallCoverSize = newState.smallCoverSize;
-      if (this.trackCover.child.icon_size !== this.largeCoverSize) {
-        this.trackCover.child.icon_size = this.smallCoverSize;
-      }              
     }
 
     if (newState.showRating !== null && this.trackRatings !== null) {
@@ -411,7 +401,7 @@ const PlayerUI = new Lang.Class({
       }
       else {
         this.trackBox.showAnimate();
-        if (this.trackCover.child.icon_size == this.largeCoverSize) {
+        if (this.trackCover.child.icon_size != 48) {
           this.secondaryInfo.showAnimate();
         }
         if (!this.playerIsBroken) {
@@ -487,11 +477,17 @@ const PlayerUI = new Lang.Class({
     }
   },
 
+  get largeCoverSize() {
+    let menu = Main.panel.statusArea.aggregateMenu.menu;
+    let menuWidth = menu.actor.get_theme_node().get_min_width();
+    return menuWidth - 96;
+  },
+
   _toggleCover: function() {
     let targetSize, transition;
-    if (this.trackCover.child.icon_size == this.smallCoverSize) {
-      let adjustment = this.largeCoverSize - this.smallCoverSize;
+    if (this.trackCover.child.icon_size == 48) {
       targetSize = this.largeCoverSize;
+      let adjustment = targetSize - 48;
       transition = 'easeOutQuad';
       this.trackBox.infos.hide();
       this.secondaryInfo.showAnimate();
@@ -501,7 +497,7 @@ const PlayerUI = new Lang.Class({
       }     
     }
     else {
-      targetSize = this.smallCoverSize;
+      targetSize = 48;
       transition = 'easeInQuad';
       this.secondaryInfo.hideAnimate();
     }
@@ -510,7 +506,7 @@ const PlayerUI = new Lang.Class({
                                              time: Settings.FADE_ANIMATION_TIME,
                                              transition: transition,
                                              onComplete: Lang.bind(this, function() {
-                                               if (targetSize == this.smallCoverSize) { 
+                                               if (targetSize == 48) { 
                                                  this.trackBox.infos.show();
                                                  if (!this.playerIsBroken) {
                                                    this.tracklist.updateScrollbarPolicy();
@@ -567,6 +563,7 @@ const PlayerUI = new Lang.Class({
     if (this._updateId) {
       this.player.disconnect(this._updateId);
       this.player.disconnect(this._updateInfoId);
+      this.themeContext.disconnect(this.themeChangeId);
     }
     this.parent();
   }
