@@ -55,10 +55,10 @@ function _reset() {
 }
 
 function enable() {
-  let position = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY),
+  let position = Settings.gsettings.get_string(Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY),
       menu, desiredMenuPosition;
 
-  if (position == Settings.IndicatorPosition.VOLUMEMENU) {
+  if (position == 'volume-menu') {
     indicator = new Panel.AggregateMenuIndicator();
     menu = Main.panel.statusArea.aggregateMenu.menu;
     desiredMenuPosition = Main.panel.statusArea.aggregateMenu.menu._getMenuItems().indexOf(Main.panel.statusArea.aggregateMenu._rfkill.menu);
@@ -71,10 +71,10 @@ function enable() {
 
   manager = new Manager.PlayerManager(menu, desiredMenuPosition);
 
-  if (position == Settings.IndicatorPosition.RIGHT) {
+  if (position == 'right') {
     Main.panel.addToStatusArea('mediaplayer', indicator);
   }
-  else if (position == Settings.IndicatorPosition.CENTER) {
+  else if (position == 'center') {
     Main.panel.addToStatusArea('mediaplayer', indicator, 999, 'center');
   }
   else {
