@@ -19,6 +19,7 @@
 'use strict';
 const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
+const Gio = imports.gi.Gio;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
@@ -38,17 +39,17 @@ function init() {
             type: "e",
             label: _("Indicator position"),
             list: [
-                { nick: "center", name: _("Center"), id: 0 },
-                { nick: "right", name: _("Right"), id: 1 },
-                { nick: "volume-menu", name: _("System menu"), id: 2 }
+                { name: _("Center"), id: 0 },
+                { name: _("Right"), id: 1 },
+                { name: _("System menu"), id: 2 }
             ]
         },
         status_type: {
             type: "e",
             label: _("Indicator appearance"),
             list: [
-                { nick: "icon", name: _("Symbolic icon"), id: 0 },
-                { nick: "cover", name: _("Current album cover"), id: 1 }
+                { name: _("Symbolic icon"), id: 0 },
+                { name: _("Current album cover"), id: 1 }
             ]
         },
         status_text: {
@@ -165,8 +166,6 @@ function buildHbox(settings, setting) {
         hbox = createIntSetting(settings, setting);
     if (settings[setting].type == "b")
         hbox = createBoolSetting(settings, setting);
-    if (settings[setting].type == "r")
-        hbox = createRangeSetting(settings, setting);
     if (settings[setting].type == "e")
         hbox = createEnumSetting(settings, setting);
 
@@ -229,9 +228,7 @@ function createStringSetting(settings, setting) {
 
     let setting_string = new Gtk.Entry({text: gsettings.get_string(setting.replace('_', '-'))});
     setting_string.set_width_chars(30);
-    setting_string.connect('notify::text', function(entry) {
-        gsettings.set_string(setting.replace('_', '-'), entry.text);
-    });
+    gsettings.bind(setting.replace('_', '-') , setting_string, 'text', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
@@ -259,10 +256,7 @@ function createIntSetting(settings, setting) {
                                           climb_rate: 1.0,
                                           digits: 0,
                                           snap_to_ticks: true});
-    setting_int.set_value(gsettings.get_int(setting.replace('_', '-')));
-    setting_int.connect('value-changed', function(entry) {
-        gsettings.set_int(setting.replace('_', '-'), entry.value);
-    });
+    gsettings.bind(setting.replace('_', '-') , setting_int, 'value', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
@@ -284,9 +278,7 @@ function createBoolSetting(settings, setting) {
                                        xalign: 0 });
 
     let setting_switch = new Gtk.Switch({active: gsettings.get_boolean(setting.replace('_', '-'))});
-    setting_switch.connect('notify::active', function(button) {
-        gsettings.set_boolean(setting.replace('_', '-'), button.active);
-    });
+    gsettings.bind(setting.replace('_', '-') , setting_switch, 'active', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
@@ -295,36 +287,6 @@ function createBoolSetting(settings, setting) {
 
     hbox.pack_start(setting_label, true, true, 0);
     hbox.add(setting_switch);
-
-    return hbox;
-}
-
-function createRangeSetting(settings, setting) {
-
-    let hbox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
-
-    let setting_label = new Gtk.Label({ label: settings[setting].label,
-                                        xalign: 0 });
-
-    let setting_range = Gtk.HScale.new_with_range(settings[setting].min,
-                                                  settings[setting].max,
-                                                  settings[setting].step);
-    setting_range.set_value(gsettings.get_int(setting.replace('_', '-')));
-    setting_range.set_draw_value(false);
-    setting_range.add_mark(settings[setting].default,
-                           Gtk.PositionType.BOTTOM, null);
-    setting_range.set_size_request(200, -1);
-    setting_range.connect('value-changed', function(slider) {
-        gsettings.set_int(setting.replace('_', '-'), slider.get_value());
-    });
-
-    if (settings[setting].help) {
-        setting_label.set_tooltip_text(settings[setting].help);
-        setting_range.set_tooltip_text(settings[setting].help);
-    }
-
-    hbox.pack_start(setting_label, true, true, 0);
-    hbox.add(setting_range);
 
     return hbox;
 }
