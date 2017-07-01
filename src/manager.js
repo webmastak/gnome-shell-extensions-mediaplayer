@@ -45,9 +45,8 @@ const PlayerManager = new Lang.Class({
             this.showActivePlayer();
           }
         }));
-        this._settings.connect("changed::" + Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY, Lang.bind(this, function() {
-          let keepActiveOpen = this._settings.get_boolean(Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY);
-          if (keepActiveOpen) {
+        this._settingChangeId = this._settings.connect("changed::" + Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY, Lang.bind(this, function(settings, key) {
+          if (settings.get_boolean(key)) {
             this.showActivePlayer();
           }
           else {
@@ -320,6 +319,7 @@ const PlayerManager = new Lang.Class({
 
     destroy: function() {
         this._disabling = true;
+        this._settings.disconnect(this._settingChangeId);
         if (this._ownerChangedId)
             this._dbus.disconnectSignal(this._ownerChangedId);
         for (let owner in this._players)

@@ -197,48 +197,49 @@ const MPRISPlayer = new Lang.Class({
         // Versions before 3.20 don't have Mpris built-in.
         // hideStockMpris setting
           this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY, Lang.bind(this, function() {
-              this.emit('player-update', new PlayerState({hideStockMpris: this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY)}));
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY, Lang.bind(this, function(settings, key) {
+              this.emit('player-update', new PlayerState({hideStockMpris: settings.get_boolean(key)}));
             }))
           );
         }
         // showVolume setting
         this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY)}));
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_VOLUME_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showVolume: settings.get_boolean(key)}));
           }))
         );
         // showPosition setting
         this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY)}));
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_POSITION_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showPosition: settings.get_boolean(key)}));
           }))
         );
         // showRating setting
         this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY)}));
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showRating: settings.get_boolean(key)}));
           }))
         );
         // showTracklistRating setting
         this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showTracklistRating: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY)}));
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showTracklistRating: settings.get_boolean(key)}));
           }))
         );
         // showPlaylists setting
         this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function() {
-            this.emit('player-update', new PlayerState({showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)}));
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showPlaylist: settings.get_boolean(key)}));
           }))
         );
         // showTracklist setting
           this._signalsId.push(
-            this._settings.connect("changed::" + Settings.MEDIAPLAYER_TRACKLIST_KEY, Lang.bind(this, function() {
-              if (this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY) && this.state.hasTrackList) {
+            this._settings.connect("changed::" + Settings.MEDIAPLAYER_TRACKLIST_KEY, Lang.bind(this, function(settings, key) {
+              let showTracklist = settings.get_boolean(key);
+              if (showTracklist && this.state.hasTrackList) {
                 this._getTracklist();
               }
-              this.emit('player-update', new PlayerState({showTracklist: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY)}));
+              this.emit('player-update', new PlayerState({showTracklist: showTracklist}));
             }))
           );
 
