@@ -106,17 +106,20 @@ const IndicatorMixin = {
 
   _connectSignals: function() {
     this.panelChangeId = this.panelState.connect('changed', Lang.bind(this, this._updatePanel));
-    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TYPE_KEY,
-      Lang.bind(this, function() {
-        this.useCoverInPanel =
-          this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_COVER_STATUS_KEY,
+      Lang.bind(this, function(settings, key) {
+        this._useCoverInPanel = settings.get_boolean(key);
         this._updatePanel();
     })));
-    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TEXT_KEY, Lang.bind(this, function() {
-      this._updatePanel();
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_TEXT_KEY,
+      Lang.bind(this, function(settings, key) {
+        this._stateTemplate = settings.get_string(key);
+        this._updatePanel();
     })));
-    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_SIZE_KEY, Lang.bind(this, function() {
-      this._updatePanel();
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_STATUS_SIZE_KEY,
+      Lang.bind(this, function(settings, key) {
+          this._prefWidth = settings.get_int(key);
+          this._updatePanel();
     })));
   },
 
@@ -154,20 +157,18 @@ const IndicatorMixin = {
       this.indicators.show();
     }
 
-    let stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
-    if(stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
+    if(this._stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
       this._thirdIndicator.hide();      
     }
     else if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
       this._thirdIndicator.show();
-      let stateText = this.compileTemplate(stateTemplate, state);
+      let stateText = this.compileTemplate(this._stateTemplate, state);
       if (this._thirdIndicator.clutter_text.text != stateText) {
         this._thirdIndicator.clutter_text.set_markup(stateText);
       }
       this._thirdIndicator.clutter_text.set_width(-1);
-      let prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
-      let desiredwidth = Math.min(prefWidth, statusTextWidth);
+      let desiredwidth = Math.min(this._prefWidth, statusTextWidth);
       if (statusTextWidth != desiredwidth) {
         this._thirdIndicator.clutter_text.set_width(desiredwidth);
       }
@@ -175,7 +176,7 @@ const IndicatorMixin = {
 
     if (state.trackCoverUrl || state.desktopEntry) {
       let fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry);
-      if (state.trackCoverUrl && this.useCoverInPanel) {
+      if (state.trackCoverUrl && this._useCoverInPanel) {
           this.setCoverIconAsync(this._primaryIndicator, state.trackCoverUrl, fallbackIcon);
       }
       else {
@@ -218,7 +219,9 @@ const PanelIndicator = new Lang.Class({
     this.panelState = new PanelState();
 
     this._settings = Settings.gsettings;
-    this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+    this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
+    this._stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
+    this._prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
     this._signalsId = [];
 
     this.indicators = new St.BoxLayout({vertical: false, style_class: 'system-status-icon'});
@@ -275,7 +278,9 @@ const AggregateMenuIndicator = new Lang.Class({
     this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
     this._settings = Settings.gsettings;
     this.panelState = new PanelState();
-    this.useCoverInPanel = this._settings.get_enum(Settings.MEDIAPLAYER_STATUS_TYPE_KEY) == Settings.IndicatorStatusType.COVER;
+    this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
+    this._stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
+    this._prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
     this._signalsId = [];
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';

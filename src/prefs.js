@@ -44,14 +44,6 @@ function init() {
                 { name: _("System menu"), id: 2 }
             ]
         },
-        status_type: {
-            type: "e",
-            label: _("Indicator appearance"),
-            list: [
-                { name: _("Symbolic icon"), id: 0 },
-                { name: _("Current album cover"), id: 1 }
-            ]
-        },
         status_text: {
             type: "s",
             label: _("Indicator status text"),
@@ -66,6 +58,11 @@ function init() {
             step: 5,
             default: 300
         },
+        cover_status: {
+            type: "b",
+            label: _("Show the current Song's cover in the Panel."),
+            help: _("If no cover is available the Player's symbolic icon is shown or a generic audio mime type icon.")
+        },
         start_zoomed: {
             type: "b",
             label: _("Start with the cover zoomed"),
@@ -78,36 +75,34 @@ function init() {
         },
         hide_aggindicator: {
             type: "b",
-            label: _("Always hide the indicator in the system menu"),
+            label: _("Always hide the Indicator in the system menu"),
             help: _("Whether to always hide the panel indicator when the extension is in the system menu.")
         },
         volume: {
             type: "b",
-            label: _("Show the media player volume slider")
+            label: _("Show the Media Player's volume slider")
         },
         position: {
             type: "b",
-            label: _("Show the media player position slider")
+            label: _("Show the Media Player's position slider")
         },
         playlists: {
             type: "b",
-            label: _("Show the media player playlists"),
+            label: _("Show the Media Player's playlists"),
             help: _("Few players currently support the Mpris Playlist Interface.")
         },
         tracklist: {
             type: "b",
-            label: _("Show the media player tracklist"),
+            label: _("Show the Media Player's tracklist"),
             help: _("Very few players currently support the Mpris Tracklist Interface.")
         },
         rating: {
             type: "b",
-            label: _("Display the current song's rating"),
-            help: _("Display the currently playing song's rating on a 0 to 5 scale")
+            label: _("Display the current Song's rating"),
         },
         tracklist_rating: {
             type: "b",
             label: _("Display song ratings in the tracklist"),
-            help: _("Display the ratings of the songs in tracklist on a 0 to 5 scale")
         },
         enable_scroll: {
             type: "b",
@@ -116,7 +111,7 @@ function init() {
         },
         active_open: {
             type: "b",
-            label: _("Always keep the active player open"),
+            label: _("Always keep the active Player open"),
             help: _("Always keep the active player open when you open the indicator or system menu.")
         }
     };

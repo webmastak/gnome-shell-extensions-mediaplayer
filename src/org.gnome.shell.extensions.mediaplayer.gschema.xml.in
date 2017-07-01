@@ -4,10 +4,6 @@
     <value nick='right' value='1'/>
     <value nick='volume-menu' value='2'/>
   </enum>
-  <enum id='org.gnome.shell.extensions.mediaplayer.status-type'>
-    <value nick='icon' value='0'/>
-    <value nick='cover' value='1'/>
-  </enum>
   <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
     <key name="indicator-position" enum="org.gnome.shell.extensions.mediaplayer.positions">
         <default>'volume-menu'</default>
@@ -17,6 +13,11 @@
         <default>false</default>
         <_summary>Always hide the indicator in the system menu</_summary>
         <_description>Whether to always hide the indicator in the system menu.</_description>
+    </key>
+    <key name="cover-status" type="b">
+        <default>false</default>
+        <_summary>Show the current tracks cover in the panel</_summary>
+        <_description>Show the current tracks cover in the panel instead of an icon.</_description>
     </key>
     <key name="volume" type="b">
         <default>false</default>
@@ -47,10 +48,6 @@
     	<default>false</default>
     	<_summary>Display song ratings in the tracklist</_summary>
 	    <_description>Display the ratings of the songs in tracklist on a 0 to 5 scale</_description>
-    </key>
-    <key name="status-type" enum="org.gnome.shell.extensions.mediaplayer.status-type">
-    	<default>'icon'</default>
-    	<_summary>Indicator appearance</_summary>
     </key>
     <key type="s" name="status-text">
     	<default>''</default>

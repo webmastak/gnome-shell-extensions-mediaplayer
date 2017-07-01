@@ -28,7 +28,7 @@ const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
 
 const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
-const MEDIAPLAYER_STATUS_TYPE_KEY = 'status-type';
+const MEDIAPLAYER_COVER_STATUS_KEY = 'cover-status';
 const MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
 const MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
 const MEDIAPLAYER_VOLUME_KEY = 'volume';
@@ -89,11 +89,6 @@ const PLAYERS_THAT_CANT_STOP = [
 const BROKEN_PLAYERS = [
     "Spotify"
 ];
-
-const IndicatorStatusType = {
-    ICON: 0,
-    COVER: 1
-};
 
 let gsettings;
 
