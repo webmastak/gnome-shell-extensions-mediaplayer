@@ -109,6 +109,12 @@ const PlayerUI = new Lang.Class({
     //Broken Players never get anything beyond the most basic functionality
     //because they don't know how to behave properly.
     this.playerIsBroken = Settings.BROKEN_PLAYERS.indexOf(this.player.info.identity) != -1;
+    if (!this.playerIsBroken) {
+      this.playlistTitle = new Widget.PlaylistTitle();
+      this.playlistTitle.connect('activate', Lang.bind(this.player, this.player.raise));
+      this.addMenuItem(this.playlistTitle);
+      this.playlistTitle.hide();
+    }
 
     this.trackCover = new St.Button({child: new St.Icon({icon_name: "media-optical-cd-audio-symbolic"})});
     if (Settings.MINOR_VERSION > 19) {
@@ -261,6 +267,19 @@ const PlayerUI = new Lang.Class({
       else {
         this.volume.actor.hide();
       }
+    }
+
+    if (newState.showPlaylistTitle !== null && this.playlistTitle !== null) {
+      if (newState.showPlaylistTitle) {
+        this.playlistTitle.show();
+      }
+      else {
+        this.playlistTitle.hide();
+      }
+    }
+
+    if (newState.playlistTitle !== null && this.playlistTitle !== null) {
+      this.playlistTitle.update(newState.playlistTitle);
     }
 
     if (newState.trackLength !== null) {

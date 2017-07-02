@@ -66,6 +66,45 @@ const PlayerButtons = new Lang.Class({
     }
 });
 
+const PlaylistTitle = new Lang.Class({
+    Name: 'PlaylistTitle',
+    Extends: BaseContainer,
+
+    _init: function () {
+        this.parent({hover: false, style_class: 'no-padding-bottom'});
+        this._label = new St.Label({style_class: 'track-info-artist'});
+        this.actor.add(this._label, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+        this._hidden = false;
+    },
+
+    update: function(name) {
+      if (!name) {
+        this._label.text = '';
+        this.actor.hide();
+      }
+      else {
+        if (!this._hidden) {
+          this.actor.show();
+        }
+        if (this._label.text != name) {
+          this._label.text = name;
+        }
+      }
+    },
+
+    hide: function() {
+      this._hidden = true;
+      this.actor.hide();
+    },
+
+    show: function() {
+      this._hidden = false;
+      if (this._label.text) {
+        this.actor.show();
+      }
+    }
+});
+
 const PlayerButton = new Lang.Class({
     Name: "PlayerButton",
 

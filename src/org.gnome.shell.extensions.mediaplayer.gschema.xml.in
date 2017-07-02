@@ -34,6 +34,11 @@
         <_summary>Show media player playlists</_summary>
         <_description>Whether to show the playlists of the mediaplayers.</_description>
     </key>
+    <key name="playlist-title" type="b">
+        <default>false</default>
+        <_summary>Show the current Playlist Title in the main trackbox</_summary>
+        <_description>Whether to show the current Playlist Title in the main trackbox.</_description>
+    </key>
     <key name="tracklist" type="b">
         <default>false</default>
         <_summary>Show media player tracklist</_summary>

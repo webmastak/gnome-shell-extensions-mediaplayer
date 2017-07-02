@@ -91,6 +91,11 @@ function init() {
             label: _("Show the Media Player's playlists"),
             help: _("Few players currently support the Mpris Playlist Interface.")
         },
+        playlist_title: {
+            type: "b",
+            label: _("Show the current Playlist Title in the main trackbox"),
+            help: _("Few players currently support the Mpris Playlist Interface.")
+        },
         tracklist: {
             type: "b",
             label: _("Show the Media Player's tracklist"),

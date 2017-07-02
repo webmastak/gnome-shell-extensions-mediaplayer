@@ -91,6 +91,8 @@ const PlayerState = new Lang.Class({
 
   volume: null,
   pithosRating: null,
+  showPlaylistTitle: null,
+  playlistTitle: null,
 });
 
 
@@ -232,6 +234,12 @@ const MPRISPlayer = new Lang.Class({
             this.emit('player-update', new PlayerState({showPlaylist: settings.get_boolean(key)}));
           }))
         );
+        // showPlaylistTitle setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLIST_TITLE_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showPlaylistTitle: settings.get_boolean(key)}));
+          }))
+        );
         // showTracklist setting
           this._signalsId.push(
             this._settings.connect("changed::" + Settings.MEDIAPLAYER_TRACKLIST_KEY, Lang.bind(this, function(settings, key) {
@@ -325,9 +333,13 @@ const MPRISPlayer = new Lang.Class({
           }
 
           if (props.ActivePlaylist) {
-            let playlist = props.ActivePlaylist.deep_unpack()[1][0];
+            let [playlist, playlistTitle] = props.ActivePlaylist.deep_unpack()[1];
+            
             if (this.state.playlist !== playlist) {
               newState.playlist = playlist;
+            }
+            if (this.state.playlistTitle !== playlistTitle) {
+              newState.playlistTitle = playlistTitle;
             }
           }
 
@@ -421,6 +433,7 @@ const MPRISPlayer = new Lang.Class({
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
         showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
         showPlaylist: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY),
+        showPlaylistTitle: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLIST_TITLE_KEY),
         showTracklist: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY),
         showTracklistRating: this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY),
         volume: this._mediaServerPlayer.Volume || 0.0,
@@ -433,7 +446,7 @@ const MPRISPlayer = new Lang.Class({
         newState.volume = Math.pow(newState.volume, 1 / 3);
       }
       if (this._mediaServerPlaylists.ActivePlaylist) {
-        newState.playlist = this._mediaServerPlaylists.ActivePlaylist[1][0];
+        [newState.playlist, newState.playlistTitle] = this._mediaServerPlaylists.ActivePlaylist[1];
       }
 
       this.parseMetadata(this._mediaServerPlayer.Metadata, newState);
@@ -618,10 +631,14 @@ const MPRISPlayer = new Lang.Class({
       this._prop.GetRemote('org.mpris.MediaPlayer2.Playlists', 'ActivePlaylist',
                            Lang.bind(this, function(value, err) {
                              if (!err) {
-                               let playlist = value[0].deep_unpack()[1][0];
+                               let [playlist, playlistTitle] = value[0].deep_unpack()[1];
                                if (this.state.playlist != playlist) {
                                  this.emit('player-update', 
                                            new PlayerState({playlist: playlist}));
+                               }
+                               if (this.state.playlistTitle != playlistTitle) {
+                                 this.emit('player-update', 
+                                           new PlayerState({playlistTitle: playlistTitle}));
                                }
                              }
                            })
