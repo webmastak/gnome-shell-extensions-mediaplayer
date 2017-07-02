@@ -453,7 +453,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.playlists !== null) {
+    if (newState.playlists !== null && this.playlists !== null) {
       this.playlists.loadPlaylists(newState.playlists);
     }
 
@@ -471,6 +471,10 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.updatedPlaylist !== null && this.playlists !== null) {
+      let [playlist, playlistTitle] = newState.updatedPlaylist;
+      if (playlist == this.playlists.activeObject) {
+        this.playlistTitle.update(playlistTitle);
+      }
       this.playlists.updatePlaylist(newState.updatedPlaylist);
     }
 
