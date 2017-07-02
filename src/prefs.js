@@ -39,9 +39,9 @@ function init() {
             type: "e",
             label: _("Indicator position"),
             list: [
-                { name: _("Center"), id: 0 },
-                { name: _("Right"), id: 1 },
-                { name: _("System menu"), id: 2 }
+                { nick: 'center', name: _("Center"), id: 0 },
+                { nick: 'right', name: _("Right"), id: 1 },
+                { nick: 'volume-menu', name: _("System menu"), id: 2 }
             ]
         },
         status_text: {
@@ -175,31 +175,17 @@ function createEnumSetting(settings, setting) {
     let setting_label = new Gtk.Label({label: settings[setting].label,
                                        xalign: 0 });
 
-    let model = new Gtk.ListStore();
-    model.set_column_types([GObject.TYPE_INT, GObject.TYPE_STRING]);
-    let setting_enum = new Gtk.ComboBox({model: model});
+    let setting_enum = new Gtk.ComboBoxText();
     setting_enum.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
-    let renderer = new Gtk.CellRendererText();
-    setting_enum.pack_start(renderer, true);
-    setting_enum.add_attribute(renderer, 'text', 1);
 
-    for (let i=0; i<settings[setting].list.length; i++) {
-        let item = settings[setting].list[i];
-        let iter = model.append();
-        model.set(iter, [0, 1], [item.id, item.name]);
-        if (item.id == gsettings.get_enum(setting.replace('_', '-'))) {
-            setting_enum.set_active(item.id);
-        }
-    }
-
-    setting_enum.connect('changed', function(entry) {
-        let [success, iter] = setting_enum.get_active_iter();
-        if (!success)
-            return;
-
-        let id = model.get_value(iter, 0);
-        gsettings.set_enum(setting.replace('_', '-'), id);
+    settings[setting].list.forEach(function(item) {
+      setting_enum.append(item.nick, item.name);
+      if (item.id == gsettings.get_enum(setting.replace('_', '-'))) {
+        setting_enum.set_active(item.id);
+      }
     });
+
+    gsettings.bind(setting.replace('_', '-'), setting_enum, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
