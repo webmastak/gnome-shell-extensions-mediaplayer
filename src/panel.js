@@ -158,20 +158,17 @@ const IndicatorMixin = {
     }
 
     if(this._stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
-      this._thirdIndicator.hide();      
+      this._thirdIndicator.hide();
+      this._clearStateText();      
     }
     else if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
-      this._thirdIndicator.show();
       let stateText = this.compileTemplate(this._stateTemplate, state);
-      if (this._thirdIndicator.clutter_text.text != stateText) {
-        this._thirdIndicator.clutter_text.set_markup(stateText);
-      }
+      this._thirdIndicator.clutter_text.set_markup(stateText);
       this._thirdIndicator.clutter_text.set_width(-1);
       let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
       let desiredwidth = Math.min(this._prefWidth, statusTextWidth);
-      if (statusTextWidth != desiredwidth) {
-        this._thirdIndicator.clutter_text.set_width(desiredwidth);
-      }
+      this._thirdIndicator.clutter_text.set_width(desiredwidth);
+      this._thirdIndicator.show();
     }
 
     if (state.trackCoverUrl || state.desktopEntry) {
