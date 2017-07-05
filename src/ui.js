@@ -155,15 +155,6 @@ const PlayerUI = new Lang.Class({
     this.playButton = new Widget.PlayerButton('media-playback-start-symbolic',
                                               Lang.bind(this.player, this.player.playPause));
     this.trackControls.addButton(this.playButton);
-
-    this.stopButton = null;
-
-    if (Settings.PLAYERS_THAT_CANT_STOP.indexOf(this.player.info.identity) == -1) {
-      this.stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
-                                                Lang.bind(this.player, this.player.stop));
-      this.stopButton.hide();
-      this.trackControls.addButton(this.stopButton)
-    }
     
     this.nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
                                               Lang.bind(this.player, this.player.next));
@@ -187,7 +178,9 @@ const PlayerUI = new Lang.Class({
       this.volume = new Widget.SliderItem("audio-volume-high-symbolic", 0);
       this.volume.connect('activate', Lang.bind(this.player, this.player.raise))
       this.volume.sliderConnect('value-changed', Lang.bind(this, function(item) {
-        this.player.setVolume(item._value);
+        if (this.player.volume != item._value) {
+          this.player.volume = item._value;
+        }
       }));
       this.addMenuItem(this.volume);
 
@@ -249,7 +242,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.showRating !== null && this.trackRatings !== null) {
+    if (newState.showRating !== null && !this.playerIsBroken) {
       this.showRating = newState.showRating;
       if (this.showRating) {
         this.trackRatings.actor.show();
@@ -259,7 +252,7 @@ const PlayerUI = new Lang.Class({
       }              
     }
 
-    if (newState.showVolume !== null && this.volume !== null) {
+    if (newState.showVolume !== null && !this.playerIsBroken) {
       this.showVolume = newState.showVolume;
       if (this.showVolume) {
         this.volume.actor.show();
@@ -269,7 +262,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.showPlaylistTitle !== null && this.playlistTitle !== null) {
+    if (newState.showPlaylistTitle !== null && !this.playerIsBroken) {
       if (newState.showPlaylistTitle) {
         this.playlistTitle.show();
       }
@@ -278,7 +271,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.playlistTitle !== null && this.playlistTitle !== null) {
+    if (newState.playlistTitle !== null && !this.playerIsBroken) {
       this.playlistTitle.update(newState.playlistTitle);
     }
 
@@ -286,7 +279,7 @@ const PlayerUI = new Lang.Class({
       this.trackLength = newState.trackLength;
     }
 
-    if (newState.showPosition !== null && this.position !== null) {
+    if (newState.showPosition !== null && !this.playerIsBroken) {
       this.showPosition = newState.showPosition;
       if (this.showPosition && this.trackLength !== 0) {
         this.position.actor.show();
@@ -296,7 +289,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.showPlaylist !== null && this.playlists !== null) {
+    if (newState.showPlaylist !== null && !this.playerIsBroken) {
       this.showPlaylist = newState.showPlaylist;
       if (this.showPlaylist) {
         this.playlists.show();
@@ -306,7 +299,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.showTracklist !== null && this.tracklist !== null) {
+    if (newState.showTracklist !== null && !this.playerIsBroken) {
       this.showTracklist = newState.showTracklist;
       if (this.hasTrackList && this.showTracklist) {
         this.tracklist.show();
@@ -316,7 +309,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.hasTrackList !== null && this.tracklist !== null) {
+    if (newState.hasTrackList !== null && !this.playerIsBroken) {
       this.hasTrackList = newState.hasTrackList;
       if (this.hasTrackList && this.showTracklist) {
         this.tracklist.show();
@@ -326,7 +319,7 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.trackRating !== null && this.trackRatings !== null && !this.player._pithosRatings) {
+    if (newState.trackRating !== null && !this.playerIsBroken && !this.player._pithosRatings) {
       this.trackRatings.rate(newState.trackRating);
     }
 
@@ -339,7 +332,7 @@ const PlayerUI = new Lang.Class({
       this.secondaryInfo.updateInfo(newState);
     }
 
-    if (newState.volume !== null && this.volume !== null) {
+    if (newState.volume !== null && !this.playerIsBroken) {
       // Adapted from https://github.com/GNOME/gnome-shell/blob/master/js/ui/status/volume.js
       // So that our icon changes match the system volume icon changes.
       let value = newState.volume, volumeIcon;
@@ -362,15 +355,6 @@ const PlayerUI = new Lang.Class({
       this.volume.setValue(value);
     }
 
-    if (newState.canPause !== null) {
-      if (newState.canPause) {
-        this.playButton.setCallback(Lang.bind(this.player, this.player.playPause));
-      }
-      else {
-        this.playButton.setCallback(Lang.bind(this.player, this.player.play));
-      }
-    }
-
     if (newState.canGoNext !== null) {
       if (newState.canGoNext) {
         this.nextButton.enable();
@@ -389,11 +373,11 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.canSeek !== null && this.position !== null) {
+    if (newState.canSeek !== null && !this.playerIsBroken) {
       this.position.setReactive(newState.canSeek)
     }
 
-    if (newState.trackTime !== null && this.position !== null) {
+    if (newState.trackTime !== null && !this.playerIsBroken) {
       if (this.trackLength === 0) {
         this.position.actor.hide();
       }
@@ -405,10 +389,6 @@ const PlayerUI = new Lang.Class({
     if (newState.status !== null) {
 
       if (newState.status === Settings.Status.STOP) {
-        if (this.stopButton) {
-          this.stopButton.hide();
-        }
-        this.playButton.show();
         this.playButton.setIcon('media-playback-start-symbolic');
         this.trackBox.hideAnimate();
         this.secondaryInfo.hideAnimate();
@@ -437,40 +417,31 @@ const PlayerUI = new Lang.Class({
       }
 
       if (newState.status === Settings.Status.PLAY) {
-        if (this.stopButton) {
-          this.stopButton.show();
-        }
-        if (player.state.canPause) {
-          this.playButton.setIcon('media-playback-pause-symbolic');
-          this.playButton.show();
-        }
-        else {
-          this.playButton.hide();
-        }
+        this.playButton.setIcon('media-playback-pause-symbolic');
       }
       if (newState.status === Settings.Status.PAUSE) {
         this.playButton.setIcon('media-playback-start-symbolic');
       }
     }
 
-    if (newState.playlists !== null && this.playlists !== null) {
+    if (newState.playlists !== null && !this.playerIsBroken) {
       this.playlists.loadPlaylists(newState.playlists);
     }
 
-    if (newState.trackListMetaData !== null && this.tracklist !== null) {
+    if (newState.trackListMetaData !== null && !this.playerIsBroken) {
       this.tracklist.loadTracklist(newState.trackListMetaData, this.showTracklistRating);
     }
 
-    if (newState.showTracklistRating !== null && this.tracklist !== null) {
+    if (newState.showTracklistRating !== null && !this.playerIsBroken) {
       this.showTracklistRating = newState.showTracklistRating;
       this.tracklist.showRatings(newState.showTracklistRating);
     }
 
-    if (newState.playlist !== null && this.playlists !== null) {
+    if (newState.playlist !== null && !this.playerIsBroken) {
       this.playlists.setObjectActive(newState.playlist);
     }
 
-    if (newState.updatedPlaylist !== null && this.playlists !== null) {
+    if (newState.updatedPlaylist !== null && !this.playerIsBroken) {
       let [playlist, playlistTitle] = newState.updatedPlaylist;
       if (playlist == this.playlists.activeObject) {
         this.playlistTitle.update(playlistTitle);
@@ -482,11 +453,11 @@ const PlayerUI = new Lang.Class({
       this.changeCover(newState);
     }
 
-    if (newState.trackObj !== null && this.tracklist !== null) {
+    if (newState.trackObj !== null && !this.playerIsBroken) {
       this.tracklist.setObjectActive(newState.trackObj);
     }
 
-    if (newState.updatedMetadata !== null && this.tracklist !== null) {
+    if (newState.updatedMetadata !== null && !this.playerIsBroken) {
       this.tracklist.updateMetadata(newState.updatedMetadata);
     }
   },

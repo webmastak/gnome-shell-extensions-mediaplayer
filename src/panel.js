@@ -158,16 +158,23 @@ const IndicatorMixin = {
     }
 
     if(this._stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
-      this._thirdIndicator.hide();
-      this._clearStateText();      
+      this._thirdIndicator.clutter_text.set_markup('');
+      this._statusTextWidth = 0;
+      this._stateText = '';
+      this._thirdIndicator.hide();      
     }
     else if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
       let stateText = this.compileTemplate(this._stateTemplate, state);
-      this._thirdIndicator.clutter_text.set_markup(stateText);
-      this._thirdIndicator.clutter_text.set_width(-1);
-      let statusTextWidth = this._thirdIndicator.clutter_text.get_width();
-      let desiredwidth = Math.min(this._prefWidth, statusTextWidth);
-      this._thirdIndicator.clutter_text.set_width(desiredwidth);
+      if (this._stateText != stateText) {
+        this._thirdIndicator.clutter_text.set_markup(stateText);
+        this._thirdIndicator.set_width(-1);
+        this._statusTextWidth = this._thirdIndicator.get_width();
+      }
+      let desiredwidth = Math.min(this._prefWidth, this._statusTextWidth);
+      let currentWidth = this._thirdIndicator.get_width();
+      if (currentWidth != desiredwidth) {
+        this._thirdIndicator.set_width(desiredwidth);
+      }
       this._thirdIndicator.show();
     }
 
@@ -184,17 +191,12 @@ const IndicatorMixin = {
 
   _commonOnActivePlayerRemove: function(manager) {
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';    
-    this._clearStateText();
+    this._thirdIndicator.clutter_text.set_markup('');
     this._thirdIndicator.set_width(0);
     this._secondaryIndicator.set_width(0);
     this._thirdIndicator.hide();
     this._secondaryIndicator.hide();
     this._onActivePlayerRemove();
-  },
-
-  _clearStateText: function() {
-    this._thirdIndicator.text = "";
-    this._thirdIndicator.clutter_text.set_width(0);
   }
 };
 
@@ -219,6 +221,8 @@ const PanelIndicator = new Lang.Class({
     this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
     this._stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     this._prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+    this._statusTextWidth = 0;
+    this._stateText = '';
     this._signalsId = [];
 
     this.indicators = new St.BoxLayout({vertical: false, style_class: 'system-status-icon'});
@@ -278,6 +282,8 @@ const AggregateMenuIndicator = new Lang.Class({
     this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
     this._stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     this._prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+    this._statusTextWidth = 0;
+    this._stateText = '';
     this._signalsId = [];
     this._primaryIndicator = this._addIndicator();
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';

@@ -61,6 +61,12 @@ const Status = {
     PAUSE: "Paused"
 };
 
+const ValidPlaybackStatuses = [
+    'Stopped',
+    'Playing',
+    'Paused'
+];
+
 const SEND_STOP_ON_CHANGE = [
     "org.mpris.MediaPlayer2.banshee",
     "org.mpris.MediaPlayer2.vlc",
@@ -77,14 +83,6 @@ const ALTERNATIVE_PLAYLIST_TITLES = [
 
 const ALTERNATIVE_TRACKLIST_TITLES = [
     {"Pithos": _("Current Playlist")}
-];
-
-const PLAYERS_THAT_CANT_STOP = [
-    "Pithos",
-    "Spotify",
-    "Quodlibet",
-    "Lollypop",
-    "GnomeMusic"
 ];
 
 const BROKEN_PLAYERS = [

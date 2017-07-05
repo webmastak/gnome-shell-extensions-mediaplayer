@@ -433,7 +433,7 @@ const TrackRating = new Lang.Class({
                 "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
             };
             if (supported[this._player.busName]) {
-              this._rhythmbox3Proxy = new DBusIface.RhythmboxRatings();
+              this._rhythmbox3Proxy = new DBusIface.RhythmboxRatings(this._player.busName);
               this._applyFunc = supported[this._player.busName];
             }
           }
@@ -899,6 +899,7 @@ const TracklistItem = new Lang.Class({
         if (Settings.MINOR_VERSION > 19) {
           this._coverIcon.add_style_class_name('media-message-cover-icon fallback no-padding');
         }
+        this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
         this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'track-info-artist'});
         this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-title'});
         this._albumLabel = new St.Label({text: metadata.trackAlbum, style_class: 'track-info-album'});
@@ -918,7 +919,6 @@ const TracklistItem = new Lang.Class({
           this._buildStars(metadata.trackRating);
         }
         this.showRatings(metadata.showRatings);
-        this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
     },
 
     updateMetadata: function(metadata) {
