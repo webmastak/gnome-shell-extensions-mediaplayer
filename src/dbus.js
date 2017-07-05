@@ -108,7 +108,6 @@ const MediaServer2PlaylistsIface = '<node>\
             <arg type="b" direction="in" />\
             <arg type="a(oss)" direction="out" />\
         </method>\
-        <property name="PlaylistCount" type="u" access="read" />\
         <property name="Orderings" type="as" access="read" />\
         <property name="ActivePlaylist" type="(b(oss))" access="read" />\
         <signal name="PlaylistChanged">\
@@ -127,7 +126,6 @@ const MediaServer2TracklistIface = '<node>\
         <method name="GoTo">\
             <arg type="o" direction="in" />\
         </method>\
-        <property name="Tracks" type="ao" access="read" />\
         <signal name="TrackListReplaced">\
             <arg type="ao" direction="out" />\
             <arg type="o" direction="out" />\
