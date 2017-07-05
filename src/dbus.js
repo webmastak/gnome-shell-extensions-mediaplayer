@@ -83,14 +83,12 @@ const MediaServer2PlayerIface = '<node>\
             <arg type="d" direction="in" />\
         </method>\
         <property name="NuvolaCanRate" type="b" access="read" />\
-        <property name="CanPause" type="b" access="read" />\
         <property name="CanSeek" type="b" access="read" />\
         <property name="CanGoNext" type="b" access="read" />\
         <property name="CanGoPrevious" type="b" access="read" />\
         <property name="Metadata" type="a{sv}" access="read" />\
         <property name="Volume" type="d" access="readwrite" />\
         <property name="PlaybackStatus" type="s" access="read" />\
-        <property name="Position" type="x" access="read" />\
         <signal name="Seeked">\
             <arg type="x" direction="out" />\
         </signal>\
