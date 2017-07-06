@@ -128,6 +128,7 @@ const MPRISPlayer = new Lang.Class({
 
         this._settings = Settings.gsettings;
         this.parseMetadata = Lib.parseMetadata;
+        this._isTypeOf = Lib.isTypeOf;
         this._signalsId = [];
         this._tracklistSignalsId = [];
         this._trackIds = [];
@@ -396,7 +397,7 @@ const MPRISPlayer = new Lang.Class({
         }));
 
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
-          value = volume.constructor === Number ? value : 0;
+          value = this._isTypeOf(value, Number) ? value : 0;
           if (value > 0) {
             this.trackTime = value / 1000000;
             this._wantedSeekValue = 0;
@@ -489,9 +490,9 @@ const MPRISPlayer = new Lang.Class({
     // TODO: Meaningful error/log messages when things aren't as expected.
 
     _checkActivePlaylist: function(activePlaylist) {
-      if (activePlaylist && activePlaylist[1]) {
+      if (activePlaylist && activePlaylist[1] && Array.isArray(activePlaylist[1])) {
         let [playlist, playlistTitle] = activePlaylist[1];
-        if (playlist.constructor === String && playlistTitle.constructor === String) {
+        if (this._isTypeOf(playlist, String) && this._isTypeOf(playlistTitle, String)) {
           return [playlist, playlistTitle];
         }
       }
@@ -513,7 +514,7 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _checkVolume: function(volume) {
-      if (!volume || volume.constructor !== Number) {
+      if (!this._isTypeOf(volume, Number)) {
         volume = 0.0;
       }
       if (this.hasWrongVolumeScaling) {
@@ -523,11 +524,11 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _checkBoolProp: function(boolProp, defaultValue) {
-      return boolProp.constructor === Boolean ? boolProp : defaultValue;
+      return this._isTypeOf(boolProp, Boolean) ? boolProp : defaultValue;
     },
 
     _checkPlaybackStatus: function(playbackStatus) {
-      if (!playbackStatus || playbackStatus.constructor !== String || Settings.ValidPlaybackStatuses.indexOf(playbackStatus) == -1) {
+      if (!playbackStatus || !this._isTypeOf(playbackStatus, String) || Settings.ValidPlaybackStatuses.indexOf(playbackStatus) == -1) {
         playbackStatus = Settings.Status.STOP;
       }
       return playbackStatus;
@@ -626,7 +627,7 @@ const MPRISPlayer = new Lang.Class({
     get identity() {
       try {
         let identity = this._mediaServer.Identity;
-        return identity.constructor === String ? identity : '';
+        return this._isTypeOf(identity, String) ? identity : '';
       }
       catch(err) {
         return '';
@@ -636,7 +637,7 @@ const MPRISPlayer = new Lang.Class({
     get desktopEntry() {
       try {
         let desktopEntry = this._mediaServer.DesktopEntry
-        return desktopEntry.constructor === String ? desktopEntry : '';
+        return this._isTypeOf(desktopEntry, String) ? desktopEntry : '';
       }
       catch(err) {
         return '';
@@ -876,7 +877,7 @@ const MPRISPlayer = new Lang.Class({
             this.emit('player-update', new PlayerState({showPosition: true}));
           }
           let position = value[0].unpack();
-          this.trackTime = position.constructor === Number ? position / 1000000 : 0;
+          this.trackTime = this._isTypeOf(position, Number) ? position / 1000000 : 0;
         }
       }));
     },

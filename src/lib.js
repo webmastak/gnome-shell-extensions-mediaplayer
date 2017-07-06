@@ -44,6 +44,10 @@ function getSettings(extension) {
     }
 }
 
+function isTypeOf(obj, type) {
+  return Object.getPrototypeOf(obj).constructor === type;
+}
+
 function initTranslations(extension) {
     let localeDir = extension.dir.get_child('locale').get_path();
 
@@ -104,16 +108,16 @@ function parseMetadata(metadata, state) {
     metadata[prop] = metadata[prop].deep_unpack();
   }
 
-  state.trackUrl = metadata["xesam:url"] && metadata["xesam:url"].constructor === String ? metadata["xesam:url"] : "";
+  state.trackUrl = metadata["xesam:url"] && isTypeOf(metadata["xesam:url"], String) ? metadata["xesam:url"] : "";
   state.trackArtist = metadata["xesam:artist"] && Array.isArray(metadata["xesam:artist"]) ? metadata["xesam:artist"].join(', ') : "";
-  state.trackAlbum = metadata["xesam:album"] && metadata["xesam:album"].constructor === String ? metadata["xesam:album"] : "";
-  state.trackTitle = metadata["xesam:title"] && metadata["xesam:title"].constructor === String ? metadata["xesam:title"] : "";
-  state.trackLength = metadata["mpris:length"] && metadata["mpris:length"].constructor === Number ? metadata["mpris:length"] / 1000000 : 0;
-  state.trackObj = metadata["mpris:trackid"] && metadata["mpris:trackid"].constructor === String ? metadata["mpris:trackid"] : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
-  state.trackCoverUrl = metadata["mpris:artUrl"] && metadata["mpris:artUrl"].constructor === String ? metadata["mpris:artUrl"] : "";
-  state.pithosRating = metadata["pithos:rating"] && metadata["pithos:rating"].constructor === String ? metadata["pithos:rating"] : "";
-  state.trackRating = metadata["xesam:userRating"] && metadata["xesam:userRating"].constructor === Number ? parseInt(metadata["xesam:userRating"] * 5) : 0;
-  state.trackRating = metadata.rating && metadata.rating.constructor === Number ? parseInt(metadata.rating) : state.trackRating;
+  state.trackAlbum = metadata["xesam:album"] && isTypeOf(metadata["xesam:album"], String) ? metadata["xesam:album"] : "";
+  state.trackTitle = metadata["xesam:title"] && isTypeOf(metadata["xesam:title"], String) ? metadata["xesam:title"] : "";
+  state.trackLength = metadata["mpris:length"] && isTypeOf(metadata["mpris:length"], Number) ? metadata["mpris:length"] / 1000000 : 0;
+  state.trackObj = metadata["mpris:trackid"] && isTypeOf(metadata["mpris:trackid"], String) ? metadata["mpris:trackid"] : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
+  state.trackCoverUrl = metadata["mpris:artUrl"] && isTypeOf(metadata["mpris:artUrl"], String) ? metadata["mpris:artUrl"] : "";
+  state.pithosRating = metadata["pithos:rating"] && isTypeOf(metadata["pithos:rating"], String) ? metadata["pithos:rating"] : "";
+  state.trackRating = metadata["xesam:userRating"] && isTypeOf(metadata["xesam:userRating"], Number) ? parseInt(metadata["xesam:userRating"] * 5) : 0;
+  state.trackRating = metadata.rating && isTypeOf(metadata.rating, Number) ? parseInt(metadata.rating) : state.trackRating;
 };
 
 let compileTemplate = function(template, playerState) {
