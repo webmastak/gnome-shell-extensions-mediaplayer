@@ -253,7 +253,7 @@ const MPRISPlayer = new Lang.Class({
 
         this._tracklistSignalsId.push(
           this._mediaServerTracklist.connectSignal('TrackListReplaced', Lang.bind(this, function(proxy, sender, [trackIds, currentTrackId]) {
-            this._trackIds = trackIds;
+            this._trackIds = this._checkTrackIds(trackIds);
             this._getTracklist();
           }))
         );
@@ -396,6 +396,7 @@ const MPRISPlayer = new Lang.Class({
         }));
 
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
+          value = volume.constructor === Number ? value : 0;
           if (value > 0) {
             this.trackTime = value / 1000000;
             this._wantedSeekValue = 0;
@@ -463,8 +464,7 @@ const MPRISPlayer = new Lang.Class({
       // for right after the player is created after that we rely on
       // the TrackListReplaced, TrackAdded, and TrackRemoved signals
       // to keep our trackIds current as per spec.
-      let maybeTrackIds = this._mediaServerTracklist.Tracks;
-      this._trackIds = Array.isArray(maybeTrackIds) ? maybeTrackIds : [];
+      this._trackIds = this._checkTrackIds(this._mediaServerTracklist.Tracks);
 
       if (newState.hasTrackList) {
         this._tracklistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
@@ -482,6 +482,11 @@ const MPRISPlayer = new Lang.Class({
     // Evil Type Checking...
     // We check to make sure things are what they are suppose to be.
     // And if they are not we return a default value.
+    //
+    // The MPRIS spec is poorly implemented more often than not.
+    // Players can and do send all sorts of wackadoo types and values for things...
+    //
+    // TODO: Meaningful error/log messages when things aren't as expected.
 
     _checkActivePlaylist: function(activePlaylist) {
       if (activePlaylist && activePlaylist[1]) {
@@ -819,7 +824,7 @@ const MPRISPlayer = new Lang.Class({
       if (orderings.indexOf(ordering) === -1)
         ordering = orderings[0];
       this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, ordering, false, Lang.bind(this, function(playlists) {
-        if (playlists && playlists[0]) {
+        if (playlists && playlists[0] && Array.isArray(playlists[0])) {
           if (this.state.showPlaylist == false &&
               this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY)) {
             //Reenable showPlaylist after error
@@ -845,7 +850,7 @@ const MPRISPlayer = new Lang.Class({
       }
       else {
         this._mediaServerTracklist.GetTracksMetadataRemote(this._trackIds, Lang.bind(this, function(trackListMetaData) {
-          if (trackListMetaData && trackListMetaData[0]) {
+          if (trackListMetaData && trackListMetaData[0] && Array.isArray(trackListMetaData[0])) {
             if (this.state.showTracklist == false && this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY)) {
               //Reenable showTracklist after error
               this.emit('player-update', new PlayerState({showTracklist: true}));
@@ -870,8 +875,8 @@ const MPRISPlayer = new Lang.Class({
             // Reenable showPosition after error
             this.emit('player-update', new PlayerState({showPosition: true}));
           }
-          let position = value[0].unpack() / 1000000;
-          this.trackTime = position;
+          let position = value[0].unpack();
+          this.trackTime = position.constructor === Number ? position / 1000000 : 0;
         }
       }));
     },

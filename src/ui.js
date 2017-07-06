@@ -450,7 +450,7 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackCoverUrl !== null) {
-      this.changeCover(newState);
+      this.setCoverIconAsync(this.trackCover.child, newState.trackCoverUrl);
     }
 
     if (newState.trackObj !== null && !this.playerIsBroken) {
@@ -459,15 +459,6 @@ const PlayerUI = new Lang.Class({
 
     if (newState.updatedMetadata !== null && !this.playerIsBroken) {
       this.tracklist.updateMetadata(newState.updatedMetadata);
-    }
-  },
-
-  changeCover: function(state) {
-    if (state.trackCoverUrl) {
-      this.setCoverIconAsync(this.trackCover.child, state.trackCoverUrl, state.fallbackIcon);
-    }
-    else {
-      this.trackCover.child.icon_name = state.fallbackIcon;
     }
   },
 

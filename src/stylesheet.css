@@ -1,9 +1,7 @@
 /* em's don't scale? */
 .player-button {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 
 /* for the panel indicator will be overridden by the large cover size setting */

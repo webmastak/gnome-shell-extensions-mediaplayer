@@ -58,16 +58,24 @@ function initTranslations(extension) {
 }
 
 function setCoverIconAsync(icon, coverUrl, fallback_icon_name) {
-  let file = Gio.File.new_for_uri(coverUrl);
-  file.load_contents_async(null, function(source, result) {
-    try {
-      let bytes = source.load_contents_finish(result)[1];
-      icon.gicon = Gio.BytesIcon.new(bytes);
-    }
-    catch(err) {
-      icon.icon_name = fallback_icon_name;
-    }
-  });
+  fallback_icon_name = fallback_icon_name || 'audio-x-generic-symbolic'
+  if (coverUrl) {
+    let file = Gio.File.new_for_uri(coverUrl);
+    file.load_contents_async(null, function(source, result) {
+      try {
+        let bytes = source.load_contents_finish(result)[1];
+        icon.gicon = Gio.BytesIcon.new(bytes);
+      }
+      catch(err) {
+        if (icon.icon_name != fallback_icon_name) {
+          icon.icon_name = fallback_icon_name;
+        }
+      }
+    });
+  }
+  else if (icon.icon_name != fallback_icon_name) {
+    icon.icon_name = fallback_icon_name;
+  }
 }
 
 function getPlayerSymbolicIcon(desktopEntry) {
@@ -92,34 +100,20 @@ function parseMetadata(metadata, state) {
   if (!metadata || Object.keys(metadata).length < 2) {
     metadata = {};
   }
-  state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
-  state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack().join(', ') : "";
-  state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
-  state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
-  state.trackLength = metadata["mpris:length"] ? metadata["mpris:length"].unpack() / 1000000 : 0;
-  state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
-  state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
-  state.pithosRating = metadata["pithos:rating"] ? metadata["pithos:rating"].unpack() : "";
-  state.fallbackIcon = 'media-optical-cd-audio-symbolic';
-  if (metadata["xesam:genre"]) {
-    let genres = metadata["xesam:genre"].deep_unpack();
-    for (let i in genres) {
-      if (genres[i].toLowerCase().indexOf("radio") > -1) {
-        state.fallbackIcon = 'application-rss+xml-symbolic';
-        break;
-      }
-    }
+  for (let prop in metadata) {
+    metadata[prop] = metadata[prop].deep_unpack();
   }
 
-  let rating = 0;
-  if (metadata["xesam:userRating"]) {
-    rating = (metadata["xesam:userRating"].deep_unpack() * 5);
-  }
-  // Clementine
-  if (metadata.rating) {
-    rating = metadata.rating.deep_unpack();
-  }
-  state.trackRating = parseInt(rating);
+  state.trackUrl = metadata["xesam:url"] && metadata["xesam:url"].constructor === String ? metadata["xesam:url"] : "";
+  state.trackArtist = metadata["xesam:artist"] && Array.isArray(metadata["xesam:artist"]) ? metadata["xesam:artist"].join(', ') : "";
+  state.trackAlbum = metadata["xesam:album"] && metadata["xesam:album"].constructor === String ? metadata["xesam:album"] : "";
+  state.trackTitle = metadata["xesam:title"] && metadata["xesam:title"].constructor === String ? metadata["xesam:title"] : "";
+  state.trackLength = metadata["mpris:length"] && metadata["mpris:length"].constructor === Number ? metadata["mpris:length"] / 1000000 : 0;
+  state.trackObj = metadata["mpris:trackid"] && metadata["mpris:trackid"].constructor === String ? metadata["mpris:trackid"] : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
+  state.trackCoverUrl = metadata["mpris:artUrl"] && metadata["mpris:artUrl"].constructor === String ? metadata["mpris:artUrl"] : "";
+  state.pithosRating = metadata["pithos:rating"] && metadata["pithos:rating"].constructor === String ? metadata["pithos:rating"] : "";
+  state.trackRating = metadata["xesam:userRating"] && metadata["xesam:userRating"].constructor === Number ? parseInt(metadata["xesam:userRating"] * 5) : 0;
+  state.trackRating = metadata.rating && metadata.rating.constructor === Number ? parseInt(metadata.rating) : state.trackRating;
 };
 
 let compileTemplate = function(template, playerState) {

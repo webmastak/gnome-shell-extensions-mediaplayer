@@ -58,7 +58,7 @@ const PlayerButtons = new Lang.Class({
 
     _init: function() {
         this.parent({hover: false});
-        this.box = new St.BoxLayout();
+        this.box = new St.BoxLayout({style_class: 'no-padding-bottom'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
     addButton: function(button) {
@@ -183,7 +183,7 @@ const TrackBox = new Lang.Class({
     Extends: BaseContainer,
 
     _init: function(cover) {
-      this.parent({hover: false});
+      this.parent({hover: false, style_class: 'no-padding-bottom'});
       this._hidden = false;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
@@ -406,7 +406,7 @@ const TrackRating = new Lang.Class({
 
     _init: function(player, value) {
         this._player = player;
-        this.parent({style_class: "track-rating", hover: false});
+        this.parent({style_class: 'no-padding-bottom', hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this._applyFunc = null;
@@ -895,11 +895,11 @@ const TracklistItem = new Lang.Class({
         this.obj = metadata.trackObj;
         this._setCoverIconAsync = Lib.setCoverIconAsync;
         this._rating = null;
-        this._coverIcon = new St.Icon({icon_name: metadata.fallbackIcon, icon_size: 48});
+        this._coverIcon = new St.Icon({icon_size: 48});
         if (Settings.MINOR_VERSION > 19) {
           this._coverIcon.add_style_class_name('media-message-cover-icon fallback no-padding');
         }
-        this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
+        this._setCoverIconAsync(this._coverIcon, metadata.trackCoverUrl);
         this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'track-info-artist'});
         this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-title'});
         this._albumLabel = new St.Label({text: metadata.trackAlbum, style_class: 'track-info-album'});
@@ -922,7 +922,7 @@ const TracklistItem = new Lang.Class({
     },
 
     updateMetadata: function(metadata) {
-      this._setCoverIcon(metadata.trackCoverUrl, metadata.fallbackIcon);
+      this._setCoverIconAsync(this._coverIcon, metadata.trackCoverUrl);
       this._setArtist(metadata.trackArtist);
       this._setTitle(metadata.trackTitle);
       this._setAlbum(metadata.trackAlbum);
@@ -949,15 +949,6 @@ const TracklistItem = new Lang.Class({
     _setAlbum: function(album) {
       if (this._albumLabel.text != album) {
         this._albumLabel.text = album;
-      }
-    },
-
-    _setCoverIcon: function(coverUrl, fallbackIcon) {
-      if (coverUrl) {
-        this._setCoverIconAsync(this._coverIcon, coverUrl, fallbackIcon);
-      }
-      else {
-        this._coverIcon.icon_name = fallbackIcon;
       }
     },
 

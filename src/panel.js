@@ -180,10 +180,10 @@ const IndicatorMixin = {
 
     if (state.trackCoverUrl || state.desktopEntry) {
       let fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry);
-      if (state.trackCoverUrl && this._useCoverInPanel) {
+      if (this._useCoverInPanel) {
           this.setCoverIconAsync(this._primaryIndicator, state.trackCoverUrl, fallbackIcon);
       }
-      else {
+      else if (this._primaryIndicator.icon_name != fallbackIcon) {
         this._primaryIndicator.icon_name = fallbackIcon;
       }
     }
