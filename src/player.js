@@ -130,6 +130,7 @@ const MPRISPlayer = new Lang.Class({
         this.parseMetadata = Lib.parseMetadata;
         this._signalsId = [];
         this._tracklistSignalsId = [];
+        this._trackIds = [];
 
         this.parent(this._identity, true);
         this._mediaServer = null;
@@ -251,20 +252,42 @@ const MPRISPlayer = new Lang.Class({
           );
 
         this._tracklistSignalsId.push(
-          this._mediaServerTracklist.connectSignal('TrackListReplaced', Lang.bind(this, function(proxy, sender, [iface, props]) {
+          this._mediaServerTracklist.connectSignal('TrackListReplaced', Lang.bind(this, function(proxy, sender, [trackIds, currentTrackId]) {
+            this._trackIds = trackIds;
             this._getTracklist();
           }))
         );
 
         this._tracklistSignalsId.push(
-          this._mediaServerTracklist.connectSignal('TrackAdded', Lang.bind(this, function(proxy, sender, [iface, props]) {
-            this._getTracklist();
+          this._mediaServerTracklist.connectSignal('TrackAdded', Lang.bind(this, function(proxy, sender, [trackMetadata, afterTrackId]) {
+            let insertIndex = -1;
+            if (afterTrackId === 'org/mpris/MediaPlayer2/TrackList/NoTrack') {
+              insertIndex = 0;
+            }
+            else {
+              let afterTrackIdIndex = this._trackIds.indexOf(afterTrackId);
+              if (afterTrackIdIndex !== -1) {
+                insertIndex = afterTrackIdIndex + 1;
+              } 
+            }
+            if (insertIndex !== -1) {
+              let metadata = {};
+              this.parseMetadata(trackMetadata, metadata);
+              if (metadata.trackObj !== 'org/mpris/MediaPlayer2/TrackList/NoTrack') {
+                this._trackIds.splice(insertIndex, 0, metadata.trackObj);
+                this._getTracklist();
+              }
+            }
           }))
         );
 
         this._tracklistSignalsId.push(
-          this._mediaServerTracklist.connectSignal('TrackRemoved', Lang.bind(this, function(proxy, sender, [iface, props]) {
-             this._getTracklist();
+          this._mediaServerTracklist.connectSignal('TrackRemoved', Lang.bind(this, function(proxy, sender, [trackId]) {
+             let removedTrackIndex = this._trackIds.indexOf(trackId);
+             if (removedTrackIndex !== -1) {
+               this._trackIds.splice(removedTrackIndex, 1);
+               this._getTracklist();
+             }
           }))
         );
 
@@ -427,6 +450,7 @@ const MPRISPlayer = new Lang.Class({
       this.parseMetadata(this._mediaServerPlayer.Metadata, newState);
 
       this.emit('player-update', newState);
+
       
       //Delay calls 1 sec because some players make the interface available without data available in the beginning
       this._playlistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
@@ -434,6 +458,13 @@ const MPRISPlayer = new Lang.Class({
         this._getPlaylists();
         return false;
       }));
+
+      // The Tracks prop value is never updated so it's value is only good
+      // for right after the player is created after that we rely on
+      // the TrackListReplaced, TrackAdded, and TrackRemoved signals
+      // to keep our trackIds current as per spec.
+      let maybeTrackIds = this._mediaServerTracklist.Tracks;
+      this._trackIds = Array.isArray(maybeTrackIds) ? maybeTrackIds : [];
 
       if (newState.hasTrackList) {
         this._tracklistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
@@ -462,9 +493,17 @@ const MPRISPlayer = new Lang.Class({
       return [null, null];
     },
 
+    _checkTrackIds: function(trackIds) {
+      if (!trackIds || !Array.isArray(trackIds)) {
+        trackIds = [];
+      }
+      return trackIds;
+    },
+
     _checkOrderings: function(orderings) {
-      if (!orderings || !Array.isArray(orderings) || orderings.length < 1)
+      if (!orderings || !Array.isArray(orderings) || orderings.length < 1) {
         orderings = ['Alphabetical'];
+      }
       return orderings;
     },
 
@@ -801,32 +840,23 @@ const MPRISPlayer = new Lang.Class({
         Mainloop.source_remove(this._tracklistTimeOutId);
         this._tracklistTimeOutId = 0;
       }
-      this._prop.GetRemote('org.mpris.MediaPlayer2.TrackList', 'Tracks', Lang.bind(this, function(value, err) {
-        if (err) {
-          this.emit('player-update', new PlayerState({showTracklist: false}));
-        }
-        else {
-          let trackIds = value[0].deep_unpack();
-          if (trackIds.length == 0) {
-            this.emit('player-update', new PlayerState({showTracklist: false}));
+      if (this._trackIds.length === 0) {
+        this.emit('player-update', new PlayerState({showTracklist: false}));
+      }
+      else {
+        this._mediaServerTracklist.GetTracksMetadataRemote(this._trackIds, Lang.bind(this, function(trackListMetaData) {
+          if (trackListMetaData && trackListMetaData[0]) {
+            if (this.state.showTracklist == false && this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY)) {
+              //Reenable showTracklist after error
+              this.emit('player-update', new PlayerState({showTracklist: true}));
+            }
+            this.emit('player-update', new PlayerState({trackListMetaData: trackListMetaData[0]}));
           }
           else {
-            this._mediaServerTracklist.GetTracksMetadataRemote(trackIds, Lang.bind(this, function(trackListMetaData) {
-              if (trackListMetaData && trackListMetaData[0]) {
-                if (this.state.showTracklist == false &&
-                  this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY)) {
-                  //Reenable showTracklist after error
-                  this.emit('player-update', new PlayerState({showTracklist: true}));
-                }
-                this.emit('player-update', new PlayerState({trackListMetaData: trackListMetaData[0]}));
-              }
-              else {
-                this.emit('player-update', new PlayerState({showTracklist: false}));
-              }
-            }));
+            this.emit('player-update', new PlayerState({showTracklist: false}));
           }
-        }
-      }));
+        }));
+      }
     },
 
     _getPosition: function() {

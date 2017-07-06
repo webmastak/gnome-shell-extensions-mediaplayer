@@ -126,6 +126,7 @@ const MediaServer2TracklistIface = '<node>\
         <method name="GoTo">\
             <arg type="o" direction="in" />\
         </method>\
+        <property name="Tracks" type="ao" access="read" />\
         <signal name="TrackListReplaced">\
             <arg type="ao" direction="out" />\
             <arg type="o" direction="out" />\
