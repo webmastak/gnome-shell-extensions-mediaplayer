@@ -437,13 +437,13 @@ const PlayerUI = new Lang.Class({
       this.tracklist.showRatings(newState.showTracklistRating);
     }
 
-    if (newState.playlist !== null && !this.playerIsBroken) {
-      this.playlists.setObjectActive(newState.playlist);
+    if (newState.playlistObj !== null && !this.playerIsBroken) {
+      this.playlists.setObjectActive(newState.playlistObj);
     }
 
     if (newState.updatedPlaylist !== null && !this.playerIsBroken) {
-      let [playlist, playlistTitle] = newState.updatedPlaylist;
-      if (playlist == this.playlists.activeObject) {
+      let [playlistObj, playlistTitle] = newState.updatedPlaylist;
+      if (playlistObj == this.playlists.activeObject) {
         this.playlistTitle.update(playlistTitle);
       }
       this.playlists.updatePlaylist(newState.updatedPlaylist);
