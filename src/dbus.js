@@ -44,6 +44,10 @@ const PropertiesIface = '<node>\
             <arg type="s" direction="in" />\
             <arg type="v" direction="out" />\
         </method>\
+        <method name="GetAll"> \
+            <arg direction="in" type="s"/> \
+            <arg direction="out" type="a{sv}"/> \
+        </method> \
         <signal name="PropertiesChanged">\
             <arg type="s" direction="out" />\
             <arg type="a{sv}" direction="out" />\
