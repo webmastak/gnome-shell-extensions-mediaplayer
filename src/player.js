@@ -715,82 +715,61 @@ const MPRISPlayer = new Lang.Class({
       // Many players have a habit of changing properties without emitting
       // a PropertiesChanged signal as they should. This is basically CYA.
       // In a perfect world this would be redundant and unnecessary.
-      this._prop.GetAllRemote('org.mpris.MediaPlayer2.Player',
-                              Lang.bind(this, function([props], err) {                              
-                               if (!err) {                             
-                                 if (newState.canGoNext === null && props.CanGoNext) {
-                                   let canGoNext = this._checkBoolProp(props.CanGoNext.unpack(), true);
-                                   if (this.state.canGoNext !== canGoNext) {
-                                     newState.canGoNext = canGoNext;
-                                   }
-                                 }
-                                 if (newState.canGoPrevious === null && props.CanGoPrevious) {
-                                   let canGoPrevious = this._checkBoolProp(props.CanGoPrevious.unpack(), true);
-                                   if (this.state.canGoPrevious !== canGoPrevious) {
-                                     newState.canGoPrevious = canGoPrevious;
-                                   }
-                                 }
-                                 if (newState.canSeek === null && props.CanSeek) {
-                                   let canSeek = this._checkBoolProp(props.CanSeek.unpack(), false);
-                                   if (this.state.canSeek !== canSeek) {
-                                     newState.canSeek = canSeek;
-                                    }
-                                 }
-                                 if (newState.volume === null && props.Volume) {
-                                   let volume = this._checkVolume(props.Volume.unpack());
-                                   if (this.state.volume !== volume) {
-                                     newState.volume = volume;
-                                   }
-                                 }
-                                 if (props.Position) {
-                                   let position = this._checkPosition(props.Position.unpack());
-                                   if (this.trackTime !== position) {
-                                     this._trackTime = position;
-                                     newState.trackTime = position;
-                                   }
-                                 }
-                               }
-                               if (newState.hasTrackList === null || newState.orderings === null) {
-                                 this.__refreshHasTrackListProperty(newState);
-                               }
-                               else {
-                                 this.emit('player-update', newState);
-                               }
-                              })
-                             );
-    },
-
-    __refreshHasTrackListProperty: function(newState) {
-      this._prop.GetRemote('org.mpris.MediaPlayer2', 'HasTrackList',
-                           Lang.bind(this, function([value], err) {
-                             if (!err && newState.hasTrackList === null) {
-                               let hasTrackList = this._checkBoolProp(value.unpack(), false);
-                               if (this.state.hasTrackList != hasTrackList) {
-                                 newState.hasTrackList = hasTrackList;
-                               }
-                             }
-                             if (newState.orderings === null) {
-                               this.__refreshOrderingsProperty(newState);
-                             }
-                             else {
-                               this.emit('player-update', newState);
-                             }
-                           })
-                          );
-    },
-
-    __refreshOrderingsProperty: function(newState) {
       this._prop.GetRemote('org.mpris.MediaPlayer2.Playlists', 'Orderings',
-                           Lang.bind(this, function([value], err) {
-                             if (!err && newState.orderings === null) {
-                               let orderings = this._checkOrderings(value.deep_unpack());
-                               if (this.state.orderings != orderings) {
-                                 newState.orderings = orderings;
-                               }
-                             }
-                             this.emit('player-update', newState);
-                           })
-                          );
+        Lang.bind(this, function([orderings], err) {
+          if (!err && newState.orderings === null) {
+            orderings = this._checkOrderings(orderings.deep_unpack());
+            if (this.state.orderings != orderings) {
+              newState.orderings = orderings;
+            }
+          }
+          this._prop.GetRemote('org.mpris.MediaPlayer2', 'HasTrackList',
+            Lang.bind(this, function([hasTrackList], err) {
+              if (!err && newState.hasTrackList === null) {
+                hasTrackList = this._checkBoolProp(hasTrackList.unpack(), false);
+                if (this.state.hasTrackList != hasTrackList) {
+                  newState.hasTrackList = hasTrackList;
+                }
+              }
+              this._prop.GetAllRemote('org.mpris.MediaPlayer2.Player',
+                Lang.bind(this, function([props], err) {
+                  if (!err) {                             
+                    if (newState.canGoNext === null && props.CanGoNext) {
+                    let canGoNext = this._checkBoolProp(props.CanGoNext.unpack(), true);
+                      if (this.state.canGoNext !== canGoNext) {
+                        newState.canGoNext = canGoNext;
+                      }
+                    }
+                    if (newState.canGoPrevious === null && props.CanGoPrevious) {
+                      let canGoPrevious = this._checkBoolProp(props.CanGoPrevious.unpack(), true);
+                        if (this.state.canGoPrevious !== canGoPrevious) {
+                          newState.canGoPrevious = canGoPrevious;
+                        }
+                    }
+                    if (newState.canSeek === null && props.CanSeek) {
+                      let canSeek = this._checkBoolProp(props.CanSeek.unpack(), false);
+                      if (this.state.canSeek !== canSeek) {
+                        newState.canSeek = canSeek;
+                      }
+                    }
+                    if (newState.volume === null && props.Volume) {
+                      let volume = this._checkVolume(props.Volume.unpack());
+                      if (this.state.volume !== volume) {
+                        newState.volume = volume;
+                      }
+                    }
+                    if (props.Position) {
+                      let position = this._checkPosition(props.Position.unpack());
+                      if (this.trackTime !== position) {
+                        this._trackTime = position;
+                          newState.trackTime = position;
+                      }
+                    }
+                  }
+                  this.emit('player-update', newState);
+              }));
+          }));
+      }));
     },
 
     _getActivePlaylist: function() {
