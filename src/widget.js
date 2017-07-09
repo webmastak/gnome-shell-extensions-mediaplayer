@@ -44,175 +44,12 @@ const BaseContainer = new Lang.Class({
 
     _init: function(parms) {
       this.parent(parms);
+      this._hidden = false;
       //We don't want our BaseContainers to be highlighted when clicked,
       //they're not really menu items in the traditional sense.
       //We want to maintain the illusion that they are normal UI containers,
       //and that our main track UI area is one big container.
       this.actor.add_style_pseudo_class = function() {return null;}
-    }
-});
-
-const PlayerButtons = new Lang.Class({
-    Name: 'PlayerButtons',
-    Extends: BaseContainer,
-
-    _init: function() {
-        this.parent({hover: false});
-        this.box = new St.BoxLayout({style_class: 'no-padding-bottom'});
-        this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-    },
-    addButton: function(button) {
-        this.box.add_actor(button.actor);
-    }
-});
-
-const PlaylistTitle = new Lang.Class({
-    Name: 'PlaylistTitle',
-    Extends: BaseContainer,
-
-    _init: function () {
-        this.parent({hover: false, style_class: 'no-padding-bottom'});
-        this._label = new St.Label({style_class: 'track-info-artist'});
-        this.actor.add(this._label, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-        this._hidden = false;
-    },
-
-    update: function(name) {
-      if (name && this._label.text != name) {
-        this._label.text = name;
-      }
-    },
-
-    get hidden() {
-      return this._hidden;
-    },
-
-    set hidden(value) {
-      this._hidden = value;
-    },
-
-    hide: function() {
-      this.actor.hide();
-      this.actor.opacity = 0;
-      this.actor.set_height(0);
-      this.hidden = true;
-    },
-
-    show: function() {
-      this.actor.show();
-      this.actor.opacity = 255;
-      this.actor.set_height(-1);
-      this.hidden = false;
-    },
-
-    showAnimate: function() {
-      if (!this.actor.get_stage() || !this._hidden)
-        return;
-
-      this.actor.set_height(-1);
-      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
-      this.actor.set_height(0);
-      this.actor.show();
-      Tweener.addTween(this.actor, {
-        opacity: 255,
-        height: naturalHeight,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.show();
-        },
-        onCompleteScope: this
-      });
-    },
-
-    hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden)
-        return;
-
-      Tweener.addTween(this.actor, {
-        opacity: 0,
-        height: 0,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.hide();
-        },
-        onCompleteScope: this
-      });
-    }
-});
-
-const PlayerButton = new Lang.Class({
-    Name: "PlayerButton",
-
-    _init: function(icon, callback) {
-        let style_class;
-        if (Settings.MINOR_VERSION > 19) {
-          style_class = 'message-media-control player-button';
-        }
-        else {
-          style_class = 'system-menu-action popup-inactive-menu-item';
-        }
-        this.icon = new St.Icon({icon_name: icon, icon_size: 16});
-        this.actor = new St.Button({style_class: style_class, child: this.icon});
-        this.actor._delegate = this;
-        this._callback_id = this.actor.connect('clicked', callback);
-    },
-
-    setCallback: function(callback) {
-        this.actor.disconnect(this._callback_id);
-        this._callback_id = this.actor.connect('clicked', callback);
-    },
-
-    setIcon: function(icon) {
-        this.icon.icon_name = icon;
-    },
-
-    enable: function() {
-        this.actor.reactive = true;
-    },
-
-    disable: function() {
-        this.actor.reactive = false;
-    },
-
-    show: function() {
-        this.actor.show();
-    },
-
-    hide: function() {
-        this.actor.hide();
-    }
-});
-
-const SliderItem = new Lang.Class({
-    Name: "SliderItem",
-    Extends: BaseContainer,
-
-    _init: function(icon, value) {
-        this.parent({hover: false});
-        this._hidden = false;
-        this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
-        this._slider = new Slider.Slider(value);
-
-        this.actor.add(this._icon);
-        this.actor.add(this._slider.actor, {expand: true});
-    },
-
-    setReactive: function(reactive) {
-        this._slider.actor.reactive = reactive;
-    },
-
-    setValue: function(value) {
-        this._slider.setValue(value);
-    },
-
-    setIcon: function(icon) {
-        this._icon.icon_name = icon;
-    },
-
-    sliderConnect: function(signal, callback) {
-        this._slider.connect(signal, callback);
     },
 
     get hidden() {
@@ -274,13 +111,108 @@ const SliderItem = new Lang.Class({
     }
 });
 
+const PlayerButtons = new Lang.Class({
+    Name: 'PlayerButtons',
+    Extends: BaseContainer,
+
+    _init: function() {
+        this.parent({hover: false});
+        this.box = new St.BoxLayout({style_class: 'no-padding-bottom'});
+        this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+    },
+    addButton: function(button) {
+        this.box.add_actor(button.actor);
+    }
+});
+
+const PlaylistTitle = new Lang.Class({
+    Name: 'PlaylistTitle',
+    Extends: BaseContainer,
+
+    _init: function () {
+        this.parent({hover: false, style_class: 'no-padding-bottom'});
+        this._label = new St.Label({style_class: 'track-info-artist'});
+        this.actor.add(this._label, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+    },
+
+    update: function(name) {
+      if (name && this._label.text != name) {
+        this._label.text = name;
+      }
+    }
+});
+
+const PlayerButton = new Lang.Class({
+    Name: "PlayerButton",
+
+    _init: function(icon, callback) {
+        let style_class;
+        if (Settings.MINOR_VERSION > 19) {
+          style_class = 'message-media-control player-button';
+        }
+        else {
+          style_class = 'system-menu-action popup-inactive-menu-item';
+        }
+        this.icon = new St.Icon({icon_name: icon, icon_size: 16});
+        this.actor = new St.Button({style_class: style_class, child: this.icon});
+        this.actor._delegate = this;
+        this._callback_id = this.actor.connect('clicked', callback);
+    },
+
+    setCallback: function(callback) {
+        this.actor.disconnect(this._callback_id);
+        this._callback_id = this.actor.connect('clicked', callback);
+    },
+
+    setIcon: function(icon) {
+        this.icon.icon_name = icon;
+    },
+
+    enable: function() {
+        this.actor.reactive = true;
+    },
+
+    disable: function() {
+        this.actor.reactive = false;
+    }
+});
+
+const SliderItem = new Lang.Class({
+    Name: "SliderItem",
+    Extends: BaseContainer,
+
+    _init: function(icon, value) {
+        this.parent({hover: false});
+        this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
+        this._slider = new Slider.Slider(value);
+
+        this.actor.add(this._icon);
+        this.actor.add(this._slider.actor, {expand: true});
+    },
+
+    setReactive: function(reactive) {
+        this._slider.actor.reactive = reactive;
+    },
+
+    setValue: function(value) {
+        this._slider.setValue(value);
+    },
+
+    setIcon: function(icon) {
+        this._icon.icon_name = icon;
+    },
+
+    sliderConnect: function(signal, callback) {
+        this._slider.connect(signal, callback);
+    }
+});
+
 const TrackBox = new Lang.Class({
     Name: "TrackBox",
     Extends: BaseContainer,
 
     _init: function(cover) {
       this.parent({hover: false, style_class: 'no-padding-bottom'});
-      this._hidden = false;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
       this._artistLabel = new St.Label({style_class: 'track-info-artist'});
@@ -329,64 +261,6 @@ const TrackBox = new Lang.Class({
       else if (this._cover.child.icon_size == 48){
         this.infos.show();
       }
-    },
-
-    get hidden() {
-      return this._hidden;
-    },
-
-    set hidden(value) {
-      this._hidden = value;
-    },
-
-    hide: function() {
-      this.actor.hide();
-      this.actor.opacity = 0;
-      this.actor.set_height(0);
-      this.hidden = true;
-    },
-
-    show: function() {
-      this.actor.show();
-      this.actor.opacity = 255;
-      this.actor.set_height(-1);
-      this.hidden = false;
-    },
-
-    showAnimate: function() {
-      if (!this.actor.get_stage() || !this._hidden)
-        return;
-
-      this.actor.set_height(-1);
-      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
-      this.actor.set_height(0);
-      this.actor.show();
-      Tweener.addTween(this.actor, {
-        opacity: 255,
-        height: naturalHeight,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.show();
-        },
-        onCompleteScope: this
-      });
-    },
-
-    hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden)
-        return;
-
-      Tweener.addTween(this.actor, {
-        opacity: 0,
-        height: 0,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.hide();
-        },
-        onCompleteScope: this
-      });
     }
 });
 
@@ -435,64 +309,6 @@ const SecondaryInfo = new Lang.Class({
           this._albumLabel.show();
         }
       }
-    },
-
-    get hidden() {
-      return this._hidden;
-    },
-
-    set hidden(value) {
-      this._hidden = value;
-    },
-
-    hide: function() {
-      this.actor.hide();
-      this.actor.opacity = 0;
-      this.actor.set_height(0);
-      this.hidden = true;
-    },
-
-    show: function() {
-      this.actor.show();
-      this.actor.opacity = 255;
-      this.actor.set_height(-1);
-      this.hidden = false;
-    },
-
-    showAnimate: function() {
-      if (!this.actor.get_stage() || !this._hidden)
-        return;
-
-      this.actor.set_height(-1);
-      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
-      this.actor.set_height(0);
-      this.actor.show();
-      Tweener.addTween(this.actor, {
-        opacity: 255,
-        height: naturalHeight,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.show();
-        },
-        onCompleteScope: this
-      });
-    },
-
-    hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden)
-        return;
-
-      Tweener.addTween(this.actor, {
-        opacity: 0,
-        height: 0,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeInQuad',
-        onComplete: function() {
-          this.hide();
-        },
-        onCompleteScope: this
-      });
     }
 });
 
@@ -724,64 +540,6 @@ const TrackRating = new Lang.Class({
             return true;
         }
         return false;
-    },
-
-    get hidden() {
-      return this._hidden;
-    },
-
-    set hidden(value) {
-      this._hidden = value;
-    },
-
-    hide: function() {
-      this.actor.hide();
-      this.actor.opacity = 0;
-      this.actor.set_height(0);
-      this.hidden = true;
-    },
-
-    show: function() {
-      this.actor.show();
-      this.actor.opacity = 255;
-      this.actor.set_height(-1);
-      this.hidden = false;
-    },
-
-    showAnimate: function() {
-      if (!this.actor.get_stage() || !this._hidden)
-        return;
-
-      this.actor.set_height(-1);
-      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
-      this.actor.set_height(0);
-      this.actor.show();
-      Tweener.addTween(this.actor, {
-        opacity: 255,
-        height: naturalHeight,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.show();
-        },
-        onCompleteScope: this
-      });
-    },
-
-    hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden)
-        return;
-
-      Tweener.addTween(this.actor, {
-        opacity: 0,
-        height: 0,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeInQuad',
-        onComplete: function() {
-          this.hide();
-        },
-        onCompleteScope: this
-      });
     }
 });
 
@@ -824,65 +582,65 @@ const ListSubMenu = new Lang.Class({
     this.menu._arrow.rotation_angle_z = this.menu.actor.text_direction == Clutter.TextDirection.RTL ? -90 : 90;   
   },
 
-    get hidden() {
-      return this._hidden;
-    },
+  get hidden() {
+    return this._hidden;
+  },
 
-    set hidden(value) {
-      this._hidden = value;
-    },
+  set hidden(value) {
+    this._hidden = value;
+  },
 
-    hide: function() {
-      this.actor.hide();
-      this.close();
-      this.actor.opacity = 0;
-      this.actor.set_height(0);
-      this.hidden = true;
-    },
+  hide: function() {
+    this.actor.hide();
+    this.close();
+    this.actor.opacity = 0;
+    this.actor.set_height(0);
+    this.hidden = true;
+  },
 
-    show: function() {
-      this.actor.show();
-      this.actor.opacity = 255;
-      this.actor.set_height(-1);
-      this.hidden = false;
-    },
+  show: function() {
+    this.actor.show();
+    this.actor.opacity = 255;
+    this.actor.set_height(-1);
+    this.hidden = false;
+  },
 
-    showAnimate: function() {
-      if (!this.actor.get_stage() || !this._hidden)
-        return;
+  showAnimate: function() {
+    if (!this.actor.get_stage() || !this._hidden)
+      return;
 
-      this.actor.set_height(-1);
-      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
-      this.actor.set_height(0);
-      this.actor.show();
-      Tweener.addTween(this.actor, {
-        opacity: 255,
-        height: naturalHeight,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.show();
-        },
-        onCompleteScope: this
-      });
-    },
+    this.actor.set_height(-1);
+    let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+    this.actor.set_height(0);
+    this.actor.show();
+    Tweener.addTween(this.actor, {
+      opacity: 255,
+      height: naturalHeight,
+      time: Settings.FADE_ANIMATION_TIME,
+      transition: 'easeOutQuad',
+      onComplete: function() {
+        this.show();
+      },
+      onCompleteScope: this
+    });
+  },
 
-    hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden)
-        return;
+  hideAnimate: function() {
+    if (!this.actor.get_stage() || this._hidden)
+      return;
 
-      Tweener.addTween(this.actor, {
-        opacity: 0,
-        height: 0,
-        time: Settings.FADE_ANIMATION_TIME,
-        transition: 'easeOutQuad',
-        onComplete: function() {
-          this.hide();
-          this.close();
-        },
-        onCompleteScope: this
-      });
-    },
+    Tweener.addTween(this.actor, {
+      opacity: 0,
+      height: 0,
+      time: Settings.FADE_ANIMATION_TIME,
+      transition: 'easeOutQuad',
+      onComplete: function() {
+        this.hide();
+        this.close();
+      },
+      onCompleteScope: this
+    });
+  },
 
   setScrollbarPolicyAllways: function() {
     this.menu.actor.vscrollbar_policy = Gtk.PolicyType.ALWAYS;
