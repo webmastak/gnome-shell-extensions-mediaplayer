@@ -101,7 +101,7 @@ function parseMetadata(metadata, state) {
     metadata = {};
   }
   state.trackUrl = metadata["xesam:url"] ? metadata["xesam:url"].unpack() : "";
-  state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack().join(', ') : "";
+  state.trackArtist = metadata["xesam:artist"] ? metadata["xesam:artist"].deep_unpack().join('/') : "";
   state.trackAlbum = metadata["xesam:album"] ? metadata["xesam:album"].unpack() : "";
   state.trackTitle = metadata["xesam:title"] ? metadata["xesam:title"].unpack() : "";
   state.trackLength = metadata["mpris:length"] ? Math.round(metadata["mpris:length"].unpack() / 1000000) : 0;

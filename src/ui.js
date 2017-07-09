@@ -104,6 +104,7 @@ const PlayerUI = new Lang.Class({
     this.showTracklistRating = false;
     this.hasTrackList = false;
     this.trackLength = 0;
+    this.playlistCount = 0;
 
     this.oldShouldShow = null;
     //Broken Players never get anything beyond the most basic functionality
@@ -289,9 +290,19 @@ const PlayerUI = new Lang.Class({
       }
     }
 
+    if (newState.playlistCount !== null && !this.playerIsBroken) {
+      this.playlistCount = newState.playlistCount;
+      if (this.showPlaylist && this.playlistCount > 0) {
+        this.playlists.show();
+      }
+      else {
+        this.playlists.hide();
+      }
+    }
+
     if (newState.showPlaylist !== null && !this.playerIsBroken) {
       this.showPlaylist = newState.showPlaylist;
-      if (this.showPlaylist) {
+      if (this.showPlaylist && this.playlistCount > 0) {
         this.playlists.show();
       }
       else {
