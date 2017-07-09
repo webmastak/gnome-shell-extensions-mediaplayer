@@ -528,30 +528,37 @@ const MPRISPlayer = new Lang.Class({
 
       this.parseMetadata(this._mediaServerPlayer.Metadata, newState);
 
-      this.emit('player-update', newState);
-
       
       //Delay calls 1 sec because some players make the interface available without data available in the beginning
 
-      if (newState.playlistCount > 0) {
+      if (newState.playlistCount > 0 && newState.playlistTitle) {
         this._playlistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
           this._playlistTimeOutId = 0;
           this._getPlaylists(this.state.orderings);
           return false;
         }));
       }
+      else {
+        newState.showPlaylist = false;
+      }
 
-      if (newState.hasTrackList) {
+      let isDummyTracklist = this._trackIds.length == 1 && this._trackIds[0] == '/org/mpris/MediaPlayer2/TrackList/NoTrack';
+      if (newState.hasTrackList && !isDummyTracklist) {
         this._tracklistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
           this._tracklistTimeOutId = 0;
           this._getTracklist();
           return false;
         }));
       }
+      else {
+        newState.showTracklist = false;
+      }
 
       this._getPlayerInfo();
 
       this.emit('player-update-info', this.info);
+
+      this.emit('player-update', newState);
     },
 
     _checkTrackIds: function(trackIds) {

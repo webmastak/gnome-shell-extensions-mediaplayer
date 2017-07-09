@@ -105,6 +105,8 @@ const PlayerUI = new Lang.Class({
     this.hasTrackList = false;
     this.trackLength = 0;
     this.playlistCount = 0;
+    this.showPlaylistTitle = false;
+    this._playlistTitle = null;
 
     this.oldShouldShow = null;
     //Broken Players never get anything beyond the most basic functionality
@@ -140,6 +142,7 @@ const PlayerUI = new Lang.Class({
       this.trackRatings = new Widget.TrackRating(this.player, 0);
       this.trackRatings.connect('activate', Lang.bind(this.player, this.player.raise));
       this.addMenuItem(this.trackRatings);
+      this.trackRatings.hide();
     }
 
     this.secondaryInfo = new Widget.SecondaryInfo();
@@ -175,6 +178,7 @@ const PlayerUI = new Lang.Class({
         this.player.seek(item._value);
       }));
       this.addMenuItem(this.position);
+      this.position.hide();
 
       this.volume = new Widget.SliderItem("audio-volume-high-symbolic", 0);
       this.volume.connect('activate', Lang.bind(this.player, this.player.raise))
@@ -184,12 +188,15 @@ const PlayerUI = new Lang.Class({
         }
       }));
       this.addMenuItem(this.volume);
+      this.volume.hide();
 
       this.tracklist = this._createTracklistWidget();
       this.addMenuItem(this.tracklist);
+      this.tracklist.hide();
  
       this.playlists = this._createPlaylistWidget();
       this.addMenuItem(this.playlists);
+      this.playlists.hide();
 
       this.connect('player-menu-opened', Lang.bind(this, function() {
         this.tracklist.updateScrollbarPolicy();
@@ -246,34 +253,42 @@ const PlayerUI = new Lang.Class({
     if (newState.showRating !== null && !this.playerIsBroken) {
       this.showRating = newState.showRating;
       if (this.showRating) {
-        this.trackRatings.actor.show();
+        this.trackRatings.showAnimate()
       }
       else {
-        this.trackRatings.actor.hide();
+        this.trackRatings.hideAnimate();
       }              
     }
 
     if (newState.showVolume !== null && !this.playerIsBroken) {
       this.showVolume = newState.showVolume;
       if (this.showVolume) {
-        this.volume.actor.show();
+        this.volume.showAnimate();
       }
       else {
-        this.volume.actor.hide();
+        this.volume.hideAnimate();
       }
     }
 
     if (newState.showPlaylistTitle !== null && !this.playerIsBroken) {
-      if (newState.showPlaylistTitle) {
-        this.playlistTitle.show();
+      this.showPlaylistTitle = newState.showPlaylistTitle;
+      if (this.showPlaylistTitle && this._playlistTitle) {
+        this.playlistTitle.showAnimate();
       }
       else {
-        this.playlistTitle.hide();
+        this.playlistTitle.hideAnimate();
       }
     }
 
     if (newState.playlistTitle !== null && !this.playerIsBroken) {
-      this.playlistTitle.update(newState.playlistTitle);
+      this._playlistTitle = newState.playlistTitle;
+      if (this.showPlaylistTitle && this._playlistTitle) {
+        this.playlistTitle.update(newState.playlistTitle);
+        this.playlistTitle.showAnimate();
+      }
+      else {
+        this.playlistTitle.hideAnimate();
+      }
     }
 
     if (newState.trackLength !== null) {
@@ -283,50 +298,50 @@ const PlayerUI = new Lang.Class({
     if (newState.showPosition !== null && !this.playerIsBroken) {
       this.showPosition = newState.showPosition;
       if (this.showPosition && this.trackLength !== 0) {
-        this.position.actor.show();
+        this.position.showAnimate();
       }
       else {
-        this.position.actor.hide();
+        this.position.hideAnimate();
       }
     }
 
     if (newState.playlistCount !== null && !this.playerIsBroken) {
       this.playlistCount = newState.playlistCount;
       if (this.showPlaylist && this.playlistCount > 0) {
-        this.playlists.show();
+        this.playlists.showAnimate();
       }
       else {
-        this.playlists.hide();
+        this.playlists.hideAnimate();
       }
     }
 
     if (newState.showPlaylist !== null && !this.playerIsBroken) {
       this.showPlaylist = newState.showPlaylist;
       if (this.showPlaylist && this.playlistCount > 0) {
-        this.playlists.show();
+        this.playlists.showAnimate();
       }
       else {
-        this.playlists.hide();
+        this.playlists.hideAnimate();
       }
     }
 
     if (newState.showTracklist !== null && !this.playerIsBroken) {
       this.showTracklist = newState.showTracklist;
       if (this.hasTrackList && this.showTracklist) {
-        this.tracklist.show();
+        this.tracklist.showAnimate();
       }
       else {
-        this.tracklist.hide();
+        this.tracklist.hideAnimate();
       }
     }
 
     if (newState.hasTrackList !== null && !this.playerIsBroken) {
       this.hasTrackList = newState.hasTrackList;
       if (this.hasTrackList && this.showTracklist) {
-        this.tracklist.show();
+        this.tracklist.showAnimate();
       }
       else {
-        this.tracklist.hide();
+        this.tracklist.hideAnimate();
       }
     }
 
@@ -390,7 +405,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.trackTime !== null && !this.playerIsBroken) {
       if (this.trackLength === 0) {
-        this.position.actor.hide();
+        this.position.hideAnimate();
       }
       else {
         this.position.setValue(newState.trackTime / this.trackLength);
@@ -404,9 +419,8 @@ const PlayerUI = new Lang.Class({
         this.trackBox.hideAnimate();
         this.secondaryInfo.hideAnimate();
         if (!this.playerIsBroken) {
-          this.trackRatings.actor.hide();
-          this.volume.actor.hide();
-          this.position.actor.hide();
+          this.trackRatings.hideAnimate();
+          this.position.hideAnimate();
         }
       }
       else {
@@ -416,13 +430,10 @@ const PlayerUI = new Lang.Class({
         }
         if (!this.playerIsBroken) {
           if (this.showRating) {
-            this.trackRatings.actor.show();
-          }
-          if (this.showVolume) {
-            this.volume.actor.show();
+            this.trackRatings.showAnimate();
           }
           if (this.showPosition) {
-            this.position.actor.show();
+            this.position.showAnimate();
           }
         }
       }

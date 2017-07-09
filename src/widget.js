@@ -78,30 +78,67 @@ const PlaylistTitle = new Lang.Class({
     },
 
     update: function(name) {
-      if (!name) {
-        this._label.text = '';
-        this.actor.hide();
+      if (name && this._label.text != name) {
+        this._label.text = name;
       }
-      else {
-        if (!this._hidden) {
-          this.actor.show();
-        }
-        if (this._label.text != name) {
-          this._label.text = name;
-        }
-      }
+    },
+
+    get hidden() {
+      return this._hidden;
+    },
+
+    set hidden(value) {
+      this._hidden = value;
     },
 
     hide: function() {
-      this._hidden = true;
       this.actor.hide();
+      this.actor.opacity = 0;
+      this.actor.set_height(0);
+      this.hidden = true;
     },
 
     show: function() {
-      this._hidden = false;
-      if (this._label.text) {
-        this.actor.show();
-      }
+      this.actor.show();
+      this.actor.opacity = 255;
+      this.actor.set_height(-1);
+      this.hidden = false;
+    },
+
+    showAnimate: function() {
+      if (!this.actor.get_stage() || !this._hidden)
+        return;
+
+      this.actor.set_height(-1);
+      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      this.actor.set_height(0);
+      this.actor.show();
+      Tweener.addTween(this.actor, {
+        opacity: 255,
+        height: naturalHeight,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.show();
+        },
+        onCompleteScope: this
+      });
+    },
+
+    hideAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden)
+        return;
+
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        height: 0,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.hide();
+        },
+        onCompleteScope: this
+      });
     }
 });
 
@@ -154,6 +191,7 @@ const SliderItem = new Lang.Class({
 
     _init: function(icon, value) {
         this.parent({hover: false});
+        this._hidden = false;
         this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(value);
 
@@ -175,6 +213,64 @@ const SliderItem = new Lang.Class({
 
     sliderConnect: function(signal, callback) {
         this._slider.connect(signal, callback);
+    },
+
+    get hidden() {
+      return this._hidden;
+    },
+
+    set hidden(value) {
+      this._hidden = value;
+    },
+
+    hide: function() {
+      this.actor.hide();
+      this.actor.opacity = 0;
+      this.actor.set_height(0);
+      this.hidden = true;
+    },
+
+    show: function() {
+      this.actor.show();
+      this.actor.opacity = 255;
+      this.actor.set_height(-1);
+      this.hidden = false;
+    },
+
+    showAnimate: function() {
+      if (!this.actor.get_stage() || !this._hidden)
+        return;
+
+      this.actor.set_height(-1);
+      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      this.actor.set_height(0);
+      this.actor.show();
+      Tweener.addTween(this.actor, {
+        opacity: 255,
+        height: naturalHeight,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.show();
+        },
+        onCompleteScope: this
+      });
+    },
+
+    hideAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden)
+        return;
+
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        height: 0,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeInQuad',
+        onComplete: function() {
+          this.hide();
+        },
+        onCompleteScope: this
+      });
     }
 });
 
@@ -405,6 +501,7 @@ const TrackRating = new Lang.Class({
     Extends: BaseContainer,
 
     _init: function(player, value) {
+        this._hidden = false;
         this._player = player;
         this.parent({style_class: 'no-padding-bottom', hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding track-info-album'});
@@ -628,6 +725,64 @@ const TrackRating = new Lang.Class({
         }
         return false;
     },
+
+    get hidden() {
+      return this._hidden;
+    },
+
+    set hidden(value) {
+      this._hidden = value;
+    },
+
+    hide: function() {
+      this.actor.hide();
+      this.actor.opacity = 0;
+      this.actor.set_height(0);
+      this.hidden = true;
+    },
+
+    show: function() {
+      this.actor.show();
+      this.actor.opacity = 255;
+      this.actor.set_height(-1);
+      this.hidden = false;
+    },
+
+    showAnimate: function() {
+      if (!this.actor.get_stage() || !this._hidden)
+        return;
+
+      this.actor.set_height(-1);
+      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      this.actor.set_height(0);
+      this.actor.show();
+      Tweener.addTween(this.actor, {
+        opacity: 255,
+        height: naturalHeight,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.show();
+        },
+        onCompleteScope: this
+      });
+    },
+
+    hideAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden)
+        return;
+
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        height: 0,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeInQuad',
+        onComplete: function() {
+          this.hide();
+        },
+        onCompleteScope: this
+      });
+    }
 });
 
 const ListSubMenu = new Lang.Class({
@@ -669,16 +824,65 @@ const ListSubMenu = new Lang.Class({
     this.menu._arrow.rotation_angle_z = this.menu.actor.text_direction == Clutter.TextDirection.RTL ? -90 : 90;   
   },
 
-  show: function() {
-    this._hidden = false;
-    this.actor.show();
-  },
+    get hidden() {
+      return this._hidden;
+    },
 
-  hide: function() {
-    this._hidden = true;
-    this.close();
-    this.actor.hide();
-  },
+    set hidden(value) {
+      this._hidden = value;
+    },
+
+    hide: function() {
+      this.actor.hide();
+      this.close();
+      this.actor.opacity = 0;
+      this.actor.set_height(0);
+      this.hidden = true;
+    },
+
+    show: function() {
+      this.actor.show();
+      this.actor.opacity = 255;
+      this.actor.set_height(-1);
+      this.hidden = false;
+    },
+
+    showAnimate: function() {
+      if (!this.actor.get_stage() || !this._hidden)
+        return;
+
+      this.actor.set_height(-1);
+      let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
+      this.actor.set_height(0);
+      this.actor.show();
+      Tweener.addTween(this.actor, {
+        opacity: 255,
+        height: naturalHeight,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.show();
+        },
+        onCompleteScope: this
+      });
+    },
+
+    hideAnimate: function() {
+      if (!this.actor.get_stage() || this._hidden)
+        return;
+
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        height: 0,
+        time: Settings.FADE_ANIMATION_TIME,
+        transition: 'easeOutQuad',
+        onComplete: function() {
+          this.hide();
+          this.close();
+        },
+        onCompleteScope: this
+      });
+    },
 
   setScrollbarPolicyAllways: function() {
     this.menu.actor.vscrollbar_policy = Gtk.PolicyType.ALWAYS;
