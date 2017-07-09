@@ -58,7 +58,6 @@ const PlayerState = new Lang.Class({
 
   playlistObj: null,
   playlists: null,
-  orderings: null,
 
   trackListMetaData: null,
 
@@ -133,6 +132,7 @@ const MPRISPlayer = new Lang.Class({
         this._signalsId = [];
         this._tracklistSignalsId = [];
         this._trackIds = [];
+        this._orderings = ['Alphabetical'];
 
         this.parent(this._identity, true);
         this._mediaServer = null;
@@ -402,9 +402,8 @@ const MPRISPlayer = new Lang.Class({
 
           if (props.Orderings) {
             let orderings = this._checkOrderings(props.Orderings.deep_unpack());
-            if (this.state.orderings != orderings) {
-              newState.orderings = orderings;
-              this.emit('player-update', newState);
+            if (this._orderings != orderings) {
+              this._orderings = orderings;
               this._getPlaylists();
             }
           }
@@ -447,7 +446,7 @@ const MPRISPlayer = new Lang.Class({
 
         this._seekedId = this._mediaServerPlayer.connectSignal('Seeked', Lang.bind(this, function(proxy, sender, [value]) {
           if (value > 0) {
-            this.trackTime = value / 1000000;
+            this.trackTime = Math.round(value / 1000000);
             this._wantedSeekValue = 0;
           }
           // Banshee is buggy and always emits Seeked(0). See #34, #183,
@@ -472,6 +471,13 @@ const MPRISPlayer = new Lang.Class({
     },
 
     populate: function() {
+      // The Tracks prop value is never updated so it's value is only good
+      // for right after the player is created after that we rely on
+      // the TrackListReplaced, TrackAdded, and TrackRemoved signals
+      // to keep our trackIds current as per spec.
+      this._trackIds = this._checkTrackIds(this._mediaServerTracklist.Tracks);
+      this._orderings = this._checkOrderings(this._mediaServerPlaylists.Orderings);
+
       let newState = new PlayerState({
         canGoNext: this.canGoNext,
         canGoPrevious: this.canGoPrevious,
@@ -481,7 +487,6 @@ const MPRISPlayer = new Lang.Class({
         status: this.playbackStatus,
         playerName: this.identity,
         desktopEntry: this.desktopEntry,
-        orderings: this.orderings,
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
         showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
@@ -508,12 +513,6 @@ const MPRISPlayer = new Lang.Class({
         this._getPlaylists();
         return false;
       }));
-
-      // The Tracks prop value is never updated so it's value is only good
-      // for right after the player is created after that we rely on
-      // the TrackListReplaced, TrackAdded, and TrackRemoved signals
-      // to keep our trackIds current as per spec.
-      this._trackIds = this._checkTrackIds(this._mediaServerTracklist.Tracks);
 
       if (newState.hasTrackList) {
         this._tracklistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
@@ -544,11 +543,7 @@ const MPRISPlayer = new Lang.Class({
 
     set trackTime(value) {
       this._trackTime = value;
-      let newState = new PlayerState({
-        trackTime: this._trackTime,
-        trackLength: this.state.trackLength || 0
-      });
-      this.emit('player-update', newState);
+      this.emit('player-update', new PlayerState({trackTime: this._trackTime}));
     },
 
     get trackTime() {
@@ -599,10 +594,6 @@ const MPRISPlayer = new Lang.Class({
 
     get playbackStatus() {
       return this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP;
-    },
-
-    get orderings() {
-      return this._checkOrderings(this._mediaServerPlaylists.Orderings);
     },
 
     get identity() {
@@ -681,10 +672,11 @@ const MPRISPlayer = new Lang.Class({
       // In a perfect world this would be redundant and unnecessary.
       this._prop.GetRemote('org.mpris.MediaPlayer2.Playlists', 'Orderings',
         Lang.bind(this, function([orderings], err) {
-          if (!err && newState.orderings === null) {
+          if (!err) {
             orderings = orderings.deep_unpack();
-            if (this.state.orderings != orderings) {
-              newState.orderings = orderings;
+            if (this._orderings != orderings) {
+              this._orderings = orderings;
+              this._getPlaylists();
             }
           }
           this._prop.GetRemote('org.mpris.MediaPlayer2', 'HasTrackList',
@@ -752,7 +744,7 @@ const MPRISPlayer = new Lang.Class({
                       newState.showVolume = false;
                     }
                     if (props.Position) {
-                      let position = props.Position.unpack() / 1000000;
+                      let position = Math.round(props.Position.unpack() / 1000000);
                       if (this.trackTime !== position) {
                         this._trackTime = position;
                         newState.trackTime = position;
@@ -818,7 +810,7 @@ const MPRISPlayer = new Lang.Class({
       // unless Alphabetical is not in the Orderings,
       // in that case use the 1st available ordering in the array.
       let ordering = "Alphabetical";
-      let orderings = this.state.orderings;
+      let orderings = this._orderings;
       if (orderings.indexOf(ordering) === -1)
         ordering = orderings[0];
       this._mediaServerPlaylists.GetPlaylistsRemote(0, 100, ordering, false, Lang.bind(this, function([playlists]) {
@@ -875,7 +867,7 @@ const MPRISPlayer = new Lang.Class({
             newState.showPosition = true;
             newState.emitSignal = true;
           }
-          let position = value.unpack() / 1000000;
+          let position = Math.round(value.unpack() / 1000000);
           if (this.trackTime !== position) {
             this._trackTime = position;
             newState.trackTime = position;
