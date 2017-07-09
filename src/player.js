@@ -536,7 +536,7 @@ const MPRISPlayer = new Lang.Class({
       if (newState.playlistCount > 0) {
         this._playlistTimeOutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
           this._playlistTimeOutId = 0;
-          this._getPlaylists(this.orderings);
+          this._getPlaylists(this.state.orderings);
           return false;
         }));
       }
