@@ -35,7 +35,7 @@ const _ = Gettext.gettext;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
-const Lib = Me.imports.lib;
+const Util = Me.imports.util;
 const DBusIface = Me.imports.dbus;
 
 const BaseContainer = new Lang.Class({
@@ -722,7 +722,7 @@ const TrackList = new Lang.Class({
   _init: function(label, player) {
     this.parent(label);
     this.player = player;
-    this.parseMetadata = Lib.parseMetadata;
+    this.parseMetadata = Util.parseMetadata;
   },
 
   showRatings: function(value) {
@@ -850,8 +850,7 @@ const TracklistItem = new Lang.Class({
         this._banCallbackId = 0;
         this._tiredCallbackId = 0;
         this.obj = metadata.trackObj;
-        this._setCoverIconAsync = Lib.setCoverIconAsync;
-        this._animateChange = Lib.animateChange;
+        this._setCoverIconAsync = Util.setCoverIconAsync;
         this._rating = null;
         this._coverIcon = new St.Icon({icon_name: 'audio-x-generic-symbolic', icon_size: 48});
         if (Settings.MINOR_VERSION > 19) {

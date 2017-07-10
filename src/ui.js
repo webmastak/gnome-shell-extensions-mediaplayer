@@ -40,7 +40,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Widget = Me.imports.widget;
 const Settings = Me.imports.settings;
 const Player = Me.imports.player;
-const Lib = Me.imports.lib;
+const Util = Me.imports.util;
 
 
 const PlayerMenu = new Lang.Class({
@@ -92,7 +92,7 @@ const PlayerUI = new Lang.Class({
     this.parent(player.info.identity, true);
     this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;
-    this.setCoverIconAsync = Lib.setCoverIconAsync;
+    this.setCoverIconAsync = Util.setCoverIconAsync;
     this._updateId = player.connect("player-update", Lang.bind(this, this.update));
     this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
 
@@ -558,7 +558,7 @@ const PlayerUI = new Lang.Class({
 
   updateInfo: function(player, playerInfo) {
     this.label.text = playerInfo.identity;
-    this.icon.icon_name = Lib.getPlayerSymbolicIcon(playerInfo.desktopEntry);
+    this.icon.icon_name = Util.getPlayerSymbolicIcon(playerInfo.desktopEntry);
   },
 
   toString: function() {

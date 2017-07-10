@@ -1,6 +1,6 @@
 include ../include.mk
 
-dist_extension_DATA = extension.js player.js manager.js panel.js \
+dist_extension_DATA = extension.js player.js manager.js panel.js util.js\
 					  settings.js widget.js dbus.js lib.js prefs.js ui.js \
 					  stylesheet.css
 nodist_extension_DATA = metadata.json

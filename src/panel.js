@@ -31,7 +31,7 @@ const Signals = imports.signals;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
-const Lib = Me.imports.lib;
+const Util = Me.imports.util;
 
 const PanelState = new Lang.Class({
   Name: 'PanelState',
@@ -212,9 +212,9 @@ const PanelIndicator = new Lang.Class({
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.actor.add_style_class_name('panel-status-button');
     this.menu.actor.add_style_class_name('aggregate-menu dummy-style-class');
-    this.compileTemplate = Lib.compileTemplate;
-    this.setCoverIconAsync = Lib.setCoverIconAsync;
-    this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
+    this.compileTemplate = Util.compileTemplate;
+    this.setCoverIconAsync = Util.setCoverIconAsync;
+    this.getPlayerSymbolicIcon = Util.getPlayerSymbolicIcon;
     this.panelState = new PanelState();
 
     this._settings = Settings.gsettings;
@@ -262,7 +262,7 @@ const PanelIndicator = new Lang.Class({
     this.actor.hide();
   }
 });
-Lib._extends(PanelIndicator, IndicatorMixin);
+Util._extends(PanelIndicator, IndicatorMixin);
 
 const AggregateMenuIndicator = new Lang.Class({
   Name: 'AggregateMenuIndicator',
@@ -274,9 +274,9 @@ const AggregateMenuIndicator = new Lang.Class({
     this._manager = null;
     this.panelChangeId = 0;
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
-    this.compileTemplate = Lib.compileTemplate;
-    this.setCoverIconAsync = Lib.setCoverIconAsync;
-    this.getPlayerSymbolicIcon = Lib.getPlayerSymbolicIcon;
+    this.compileTemplate = Util.compileTemplate;
+    this.setCoverIconAsync = Util.setCoverIconAsync;
+    this.getPlayerSymbolicIcon = Util.getPlayerSymbolicIcon;
     this._settings = Settings.gsettings;
     this.panelState = new PanelState();
     this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
@@ -327,4 +327,4 @@ const AggregateMenuIndicator = new Lang.Class({
     Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
   }
 });
-Lib._extends(AggregateMenuIndicator, IndicatorMixin);
+Util._extends(AggregateMenuIndicator, IndicatorMixin);

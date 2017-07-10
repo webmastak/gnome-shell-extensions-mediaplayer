@@ -35,7 +35,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Widget = Me.imports.widget;
 const DBusIface = Me.imports.dbus;
 const Settings = Me.imports.settings;
-const Lib = Me.imports.lib;
+const Util = Me.imports.util;
 
 
 const PlayerState = new Lang.Class({
@@ -132,7 +132,7 @@ const MPRISPlayer = new Lang.Class({
         this._tracklistTimeOutId = 0;
 
         this._settings = Settings.gsettings;
-        this.parseMetadata = Lib.parseMetadata;
+        this.parseMetadata = Util.parseMetadata;
         this._signalsId = [];
         this._tracklistSignalsId = [];
         this._trackIds = [];
