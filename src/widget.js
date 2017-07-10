@@ -949,7 +949,7 @@ const TracklistItem = new Lang.Class({
       this._setPithosRating(rating);
     },
 
-    _setPithosRating(rating) {
+    _setPithosRating: function(rating) {
       if (this._rating == rating) {
         return;
       }
