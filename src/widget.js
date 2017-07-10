@@ -159,11 +159,6 @@ const PlayerButton = new Lang.Class({
         this._callback_id = this.actor.connect('clicked', callback);
     },
 
-    setCallback: function(callback) {
-        this.actor.disconnect(this._callback_id);
-        this._callback_id = this.actor.connect('clicked', callback);
-    },
-
     setIcon: function(icon) {
         this.icon.icon_name = icon;
     },
@@ -856,15 +851,15 @@ const TracklistItem = new Lang.Class({
         this._tiredCallbackId = 0;
         this.obj = metadata.trackObj;
         this._setCoverIconAsync = Lib.setCoverIconAsync;
+        this._animateChange = Lib.animateChange;
         this._rating = null;
-        this._coverIcon = new St.Icon({icon_size: 48});
+        this._coverIcon = new St.Icon({icon_name: 'audio-x-generic-symbolic', icon_size: 48});
         if (Settings.MINOR_VERSION > 19) {
           this._coverIcon.add_style_class_name('media-message-cover-icon fallback no-padding');
         }
-        this._setCoverIconAsync(this._coverIcon, metadata.trackCoverUrl);
-        this._artistLabel = new St.Label({text: metadata.trackArtist, style_class: 'track-info-artist'});
-        this._titleLabel = new St.Label({text: metadata.trackTitle, style_class: 'track-info-title'});
-        this._albumLabel = new St.Label({text: metadata.trackAlbum, style_class: 'track-info-album'});
+        this._artistLabel = new St.Label({style_class: 'track-info-artist'});
+        this._titleLabel = new St.Label({style_class: 'track-info-title'});
+        this._albumLabel = new St.Label({style_class: 'track-info-album'});
         this._ratingBox = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this._ratingBox.hide();
         this._box = new St.BoxLayout({vertical: true});
@@ -881,6 +876,7 @@ const TracklistItem = new Lang.Class({
           this._buildStars(metadata.trackRating);
         }
         this.showRatings(metadata.showRatings);
+        this.updateMetadata(metadata);
     },
 
     updateMetadata: function(metadata) {

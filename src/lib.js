@@ -57,25 +57,60 @@ function initTranslations(extension) {
     }
 }
 
-function setCoverIconAsync(icon, coverUrl, fallback_icon_name) {
+function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate) {
   fallback_icon_name = fallback_icon_name || 'audio-x-generic-symbolic'
   if (coverUrl) {
     let file = Gio.File.new_for_uri(coverUrl);
     file.load_contents_async(null, function(source, result) {
       try {
         let bytes = source.load_contents_finish(result)[1];
-        icon.gicon = Gio.BytesIcon.new(bytes);
+        let newIcon = Gio.BytesIcon.new(bytes);
+        if (!newIcon.equal(icon.gicon)) {
+          if (dontAnimate) {
+            icon.gicon = newIcon;
+          }
+          else {
+            animateChange(icon, 'gicon', newIcon);
+          }
+        }
       }
       catch(err) {
         if (icon.icon_name != fallback_icon_name) {
-          icon.icon_name = fallback_icon_name;
+          if (dontAnimate) {
+            icon.icon_name = fallback_icon_name;
+          }
+          else {
+            animateChange(icon, 'icon_name', fallback_icon_name);
+          }
         }
       }
     });
   }
   else if (icon.icon_name != fallback_icon_name) {
-    icon.icon_name = fallback_icon_name;
+    if (dontAnimate) {
+      icon.icon_name = fallback_icon_name;
+    }
+    else {
+      animateChange(icon, 'icon_name', fallback_icon_name);
+    }
   }
+}
+
+function animateChange(actor, prop, value) {
+  const Tweener = imports.ui.tweener;
+  Tweener.addTween(actor, {
+    opacity: 0,
+    time: 0.125,
+    transition: 'easeOutCubic',
+    onComplete: function() {
+      actor[prop] = value;
+      Tweener.addTween(actor, {
+        opacity: 255,
+        time: 0.125,
+        transition: 'easeInCubic',
+      });
+    }
+  });
 }
 
 function getPlayerSymbolicIcon(desktopEntry) {
