@@ -591,8 +591,8 @@ const ListSubMenu = new Lang.Class({
   },
 
   hide: function() {
-    this.actor.hide();
     this.close();
+    this.actor.hide();
     this.actor.opacity = 0;
     this.actor.set_height(0);
     this.hidden = true;
@@ -629,6 +629,7 @@ const ListSubMenu = new Lang.Class({
     if (!this.actor.get_stage() || this._hidden)
       return;
 
+    this.close();
     Tweener.addTween(this.actor, {
       opacity: 0,
       height: 0,
@@ -636,7 +637,6 @@ const ListSubMenu = new Lang.Class({
       transition: 'easeOutQuad',
       onComplete: function() {
         this.hide();
-        this.close();
       },
       onCompleteScope: this
     });
