@@ -107,6 +107,7 @@ const PlayerUI = new Lang.Class({
     this.playlistCount = 0;
     this.showPlaylistTitle = false;
     this._playlistTitle = null;
+    this.ratings = null;
 
     this.oldShouldShow = null;
     //Broken Players never get anything beyond the most basic functionality
@@ -252,7 +253,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showRating !== null && !this.playerIsBroken) {
       this.showRating = newState.showRating;
-      if (this.showRating) {
+      if (this.showRating && this.ratings) {
         this.trackRatings.showAnimate()
       }
       else {
@@ -346,11 +347,19 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackRating !== null && !this.playerIsBroken && !this.player._pithosRatings) {
+      this.ratings = newState.trackRating;
       this.trackRatings.rate(newState.trackRating);
+      if (this.showRating) {
+        this.trackRatings.showAnimate()
+      }
     }
 
     if (newState.pithosRating !== null && this.player._pithosRatings) {
+      this.ratings = newState.pithosRating;
       this.trackRatings.rate(newState.pithosRating);
+      if (this.showRating) {
+        this.trackRatings.showAnimate()
+      }
     }
 
     if (newState.trackArtist !== null) {
@@ -413,28 +422,25 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.status !== null) {
-
       if (newState.status === Settings.Status.STOP) {
         this.playButton.setIcon('media-playback-start-symbolic');
-        this.trackBox.hideAnimate();
-        this.secondaryInfo.hideAnimate();
         if (!this.playerIsBroken) {
-          this.trackRatings.hideAnimate();
           this.position.hideAnimate();
+          this.trackRatings.hideAnimate();
         }
+        this.secondaryInfo.hideAnimate();
+        this.trackBox.hideAnimate();
       }
       else {
         this.trackBox.showAnimate();
+        if (!this.playerIsBroken && this.showRating) {
+          this.trackRatings.showAnimate();
+        }
         if (this.trackCover.child.icon_size != 48) {
           this.secondaryInfo.showAnimate();
         }
-        if (!this.playerIsBroken) {
-          if (this.showRating) {
-            this.trackRatings.showAnimate();
-          }
-          if (this.showPosition) {
-            this.position.showAnimate();
-          }
+        if (!this.playerIsBroken && this.showPosition) {
+          this.position.showAnimate();
         }
       }
 
@@ -444,6 +450,11 @@ const PlayerUI = new Lang.Class({
       if (newState.status === Settings.Status.PAUSE) {
         this.playButton.setIcon('media-playback-start-symbolic');
       }
+    }
+
+    if (newState.trackCoverUrl !== null) {
+      let dontAnimate = this.trackBox.animating;
+      this.setCoverIconAsync(this.trackCover.child, newState.trackCoverUrl, '', dontAnimate);
     }
 
     if (newState.playlists !== null && !this.playerIsBroken) {
@@ -469,10 +480,6 @@ const PlayerUI = new Lang.Class({
         this.playlistTitle.update(playlistTitle);
       }
       this.playlists.updatePlaylist(newState.updatedPlaylist);
-    }
-
-    if (newState.trackCoverUrl !== null) {
-      this.setCoverIconAsync(this.trackCover.child, newState.trackCoverUrl);
     }
 
     if (newState.trackObj !== null && !this.playerIsBroken) {

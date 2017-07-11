@@ -45,6 +45,7 @@ const BaseContainer = new Lang.Class({
     _init: function(parms) {
       this.parent(parms);
       this._hidden = false;
+      this._animating = false;
       //We don't want our BaseContainers to be highlighted when clicked,
       //they're not really menu items in the traditional sense.
       //We want to maintain the illusion that they are normal UI containers,
@@ -58,6 +59,14 @@ const BaseContainer = new Lang.Class({
 
     set hidden(value) {
       this._hidden = value;
+    },
+
+    get animating() {
+      return this._animating;
+    },
+
+    set animating(value) {
+      this._animating = value;
     },
 
     hide: function() {
@@ -75,9 +84,10 @@ const BaseContainer = new Lang.Class({
     },
 
     showAnimate: function() {
-      if (!this.actor.get_stage() || !this._hidden)
+      if (!this.actor.get_stage() || !this._hidden || this.animating) {
         return;
-
+      }
+      this.animating = true;
       this.actor.set_height(-1);
       let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
       this.actor.set_height(0);
@@ -89,15 +99,17 @@ const BaseContainer = new Lang.Class({
         transition: 'easeOutQuad',
         onComplete: function() {
           this.show();
+          this.animating = false;
         },
         onCompleteScope: this
       });
     },
 
     hideAnimate: function() {
-      if (!this.actor.get_stage() || this._hidden)
+      if (!this.actor.get_stage() || this._hidden || this.animating) {
         return;
-
+      }
+      this.animating = true;
       Tweener.addTween(this.actor, {
         opacity: 0,
         height: 0,
@@ -105,6 +117,7 @@ const BaseContainer = new Lang.Class({
         transition: 'easeInQuad',
         onComplete: function() {
           this.hide();
+          this.animating = false;
         },
         onCompleteScope: this
       });

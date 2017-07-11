@@ -108,7 +108,7 @@ function parseMetadata(metadata, state) {
   state.trackLength = metadata["mpris:length"] ? Math.round(metadata["mpris:length"].unpack() / 1000000) : 0;
   state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
   state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
-  state.pithosRating = metadata["pithos:rating"] ? metadata["pithos:rating"].unpack() : "";
+  state.pithosRating = metadata["pithos:rating"] ? metadata["pithos:rating"].unpack() : null;
   state.trackRating = metadata["xesam:userRating"] ? parseInt(metadata["xesam:userRating"].unpack() * 5) : 0;
   state.trackRating = metadata.rating ? parseInt(metadata.rating.unpack()) : state.trackRating;
 };
