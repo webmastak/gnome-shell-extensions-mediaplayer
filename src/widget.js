@@ -87,6 +87,8 @@ const BaseContainer = new Lang.Class({
       if (!this.actor.get_stage() || !this._hidden || this.animating) {
         return;
       }
+      let factor = St.get_slow_down_factor();
+      let time = (factor / 4) / factor;
       this.animating = true;
       this.actor.set_height(-1);
       let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
@@ -95,7 +97,7 @@ const BaseContainer = new Lang.Class({
       Tweener.addTween(this.actor, {
         opacity: 255,
         height: naturalHeight,
-        time: Settings.FADE_ANIMATION_TIME,
+        time: time,
         transition: 'easeOutQuad',
         onComplete: function() {
           this.show();
@@ -109,11 +111,13 @@ const BaseContainer = new Lang.Class({
       if (!this.actor.get_stage() || this._hidden || this.animating) {
         return;
       }
+      let factor = St.get_slow_down_factor();
+      let time = (factor / 4) / factor;
       this.animating = true;
       Tweener.addTween(this.actor, {
         opacity: 0,
         height: 0,
-        time: Settings.FADE_ANIMATION_TIME,
+        time: time,
         transition: 'easeInQuad',
         onComplete: function() {
           this.hide();
@@ -616,7 +620,8 @@ const ListSubMenu = new Lang.Class({
   showAnimate: function() {
     if (!this.actor.get_stage() || !this._hidden)
       return;
-
+    let factor = St.get_slow_down_factor();
+    let time = (factor / 4) / factor;
     this.actor.set_height(-1);
     let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
     this.actor.set_height(0);
@@ -624,7 +629,7 @@ const ListSubMenu = new Lang.Class({
     Tweener.addTween(this.actor, {
       opacity: 255,
       height: naturalHeight,
-      time: Settings.FADE_ANIMATION_TIME,
+      time: time,
       transition: 'easeOutQuad',
       onComplete: function() {
         this.show();
@@ -636,12 +641,13 @@ const ListSubMenu = new Lang.Class({
   hideAnimate: function() {
     if (!this.actor.get_stage() || this._hidden)
       return;
-
+    let factor = St.get_slow_down_factor();
+    let time = (factor / 4) / factor;
     this.close();
     Tweener.addTween(this.actor, {
       opacity: 0,
       height: 0,
-      time: Settings.FADE_ANIMATION_TIME,
+      time: time,
       transition: 'easeOutQuad',
       onComplete: function() {
         this.hide();

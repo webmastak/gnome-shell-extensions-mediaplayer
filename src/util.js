@@ -22,6 +22,7 @@ const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Pango = imports.gi.Pango;
 const Tweener = imports.ui.tweener;
+const St = imports.gi.St;
 
 
 function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate) {
@@ -64,15 +65,17 @@ function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate) {
 };
 
 function animateChange(actor, prop, value) {
+  let factor = St.get_slow_down_factor();
+  let time = (factor / 8) / factor;
   Tweener.addTween(actor, {
     opacity: 0,
-    time: 0.125,
+    time: time,
     transition: 'easeOutCubic',
     onComplete: function() {
       actor[prop] = value;
       Tweener.addTween(actor, {
         opacity: 255,
-        time: 0.125,
+        time: time,
         transition: 'easeInCubic',
       });
     }
