@@ -107,7 +107,7 @@ const PlayerUI = new Lang.Class({
     this.playlistCount = 0;
     this.showPlaylistTitle = false;
     this._playlistTitle = null;
-    this.ratings = null;
+    this.ratings = 'no rating';
 
     this.oldShouldShow = null;
     //Broken Players never get anything beyond the most basic functionality
@@ -253,7 +253,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showRating !== null && !this.playerIsBroken) {
       this.showRating = newState.showRating;
-      if (this.showRating && this.ratings) {
+      if (this.showRating && this.ratings !== 'no rating') {
         this.trackRatings.showAnimate()
       }
       else {
@@ -348,17 +348,27 @@ const PlayerUI = new Lang.Class({
 
     if (newState.trackRating !== null && !this.playerIsBroken && !this.player._pithosRatings) {
       this.ratings = newState.trackRating;
-      this.trackRatings.rate(newState.trackRating);
-      if (this.showRating) {
-        this.trackRatings.showAnimate()
+      if (this.ratings !== 'no rating') {
+        this.trackRatings.rate(this.ratings);
+        if (this.showRating) {
+          this.trackRatings.showAnimate();
+        }
+      }
+      else {
+        this.trackRatings.hideAnimate();
       }
     }
 
     if (newState.pithosRating !== null && this.player._pithosRatings) {
       this.ratings = newState.pithosRating;
-      this.trackRatings.rate(newState.pithosRating);
-      if (this.showRating) {
-        this.trackRatings.showAnimate()
+      if (this.ratings !== 'no rating') {
+        this.trackRatings.rate(this.ratings);
+        if (this.showRating) {
+          this.trackRatings.showAnimate();
+        }
+      }
+      else {
+        this.trackRatings.hideAnimate();
       }
     }
 
@@ -516,8 +526,11 @@ const PlayerUI = new Lang.Class({
       this.secondaryInfo.hideAnimate();
     }
 
+    let factor = St.get_slow_down_factor();
+    let time = (factor / 4) / factor;
+
     Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
-                                             time: Settings.FADE_ANIMATION_TIME,
+                                             time: time,
                                              transition: transition,
                                              onComplete: Lang.bind(this, function() {
                                                if (targetSize == 48) { 

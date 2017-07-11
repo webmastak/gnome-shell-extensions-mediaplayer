@@ -98,7 +98,6 @@ const BaseContainer = new Lang.Class({
         opacity: 255,
         height: naturalHeight,
         time: time,
-        transition: 'easeOutQuad',
         onComplete: function() {
           this.show();
           this.animating = false;
@@ -118,7 +117,6 @@ const BaseContainer = new Lang.Class({
         opacity: 0,
         height: 0,
         time: time,
-        transition: 'easeInQuad',
         onComplete: function() {
           this.hide();
           this.animating = false;
@@ -630,7 +628,6 @@ const ListSubMenu = new Lang.Class({
       opacity: 255,
       height: naturalHeight,
       time: time,
-      transition: 'easeOutQuad',
       onComplete: function() {
         this.show();
       },
@@ -648,7 +645,6 @@ const ListSubMenu = new Lang.Class({
       opacity: 0,
       height: 0,
       time: time,
-      transition: 'easeOutQuad',
       onComplete: function() {
         this.hide();
       },
