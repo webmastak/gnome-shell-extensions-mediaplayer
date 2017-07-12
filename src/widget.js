@@ -87,8 +87,6 @@ const BaseContainer = new Lang.Class({
       if (!this.actor.get_stage() || !this._hidden || this.animating) {
         return;
       }
-      let factor = St.get_slow_down_factor();
-      let time = (factor / 4) / factor;
       this.animating = true;
       this.actor.set_height(-1);
       let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
@@ -97,7 +95,7 @@ const BaseContainer = new Lang.Class({
       Tweener.addTween(this.actor, {
         opacity: 255,
         height: naturalHeight,
-        time: time,
+        time: 0.25,
         onComplete: function() {
           this.show();
           this.animating = false;
@@ -110,13 +108,11 @@ const BaseContainer = new Lang.Class({
       if (!this.actor.get_stage() || this._hidden || this.animating) {
         return;
       }
-      let factor = St.get_slow_down_factor();
-      let time = (factor / 4) / factor;
       this.animating = true;
       Tweener.addTween(this.actor, {
         opacity: 0,
         height: 0,
-        time: time,
+        time: 0.25,
         onComplete: function() {
           this.hide();
           this.animating = false;
@@ -271,6 +267,23 @@ const TrackBox = new Lang.Class({
       else if (this._cover.child.icon_size == 48){
         this.infos.show();
       }
+    },
+
+    hideInfo: function() {
+      this.infos.hide();
+      this.infos.opacity = 0;
+    },
+
+    showInfo: function() {
+      this.infos.show();
+      Tweener.addTween(this.infos, {
+        opacity: 255,
+        time: 0.25,
+        onComplete: function() {
+          this.infos.show();
+        },
+        onCompleteScope: this
+      });
     }
 });
 
@@ -618,8 +631,6 @@ const ListSubMenu = new Lang.Class({
   showAnimate: function() {
     if (!this.actor.get_stage() || !this._hidden)
       return;
-    let factor = St.get_slow_down_factor();
-    let time = (factor / 4) / factor;
     this.actor.set_height(-1);
     let [minHeight, naturalHeight] = this.actor.get_preferred_height(-1);
     this.actor.set_height(0);
@@ -627,7 +638,7 @@ const ListSubMenu = new Lang.Class({
     Tweener.addTween(this.actor, {
       opacity: 255,
       height: naturalHeight,
-      time: time,
+      time: 0.25,
       onComplete: function() {
         this.show();
       },
@@ -638,13 +649,11 @@ const ListSubMenu = new Lang.Class({
   hideAnimate: function() {
     if (!this.actor.get_stage() || this._hidden)
       return;
-    let factor = St.get_slow_down_factor();
-    let time = (factor / 4) / factor;
     this.close();
     Tweener.addTween(this.actor, {
       opacity: 0,
       height: 0,
-      time: time,
+      time: 0.25,
       onComplete: function() {
         this.hide();
       },

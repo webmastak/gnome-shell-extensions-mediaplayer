@@ -221,7 +221,7 @@ const PlayerUI = new Lang.Class({
 
     if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_START_ZOOMED_KEY)) {
       this.trackCover.child.icon_size = this.largeCoverSize;
-      this.trackBox.infos.hide();      
+      this.trackBox.hideInfo();      
     }
     else {
       this.trackCover.child.icon_size = 48;
@@ -508,12 +508,11 @@ const PlayerUI = new Lang.Class({
   },
 
   _toggleCover: function() {
-    let targetSize, transition;
+    let targetSize;
     if (this.trackCover.child.icon_size == 48) {
       targetSize = this.largeCoverSize;
       let adjustment = targetSize - 48;
-      transition = 'easeOutQuad';
-      this.trackBox.infos.hide();
+      this.trackBox.hideInfo();
       this.secondaryInfo.showAnimate();
       if (!this.playerIsBroken) { 
         this.tracklist.updateScrollbarPolicy(adjustment);
@@ -522,23 +521,16 @@ const PlayerUI = new Lang.Class({
     }
     else {
       targetSize = 48;
-      transition = 'easeInQuad';
+      this.trackBox.showInfo();
       this.secondaryInfo.hideAnimate();
     }
 
-    let factor = St.get_slow_down_factor();
-    let time = (factor / 4) / factor;
-
     Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
-                                             time: time,
-                                             transition: transition,
+                                             time: 0.25,
                                              onComplete: Lang.bind(this, function() {
-                                               if (targetSize == 48) { 
-                                                 this.trackBox.infos.show();
-                                                 if (!this.playerIsBroken) {
-                                                   this.tracklist.updateScrollbarPolicy();
-                                                   this.playlists.updateScrollbarPolicy();
-                                                 }
+                                               if (targetSize == 48 && !this.playerIsBroken) {
+                                                 this.tracklist.updateScrollbarPolicy();
+                                                 this.playlists.updateScrollbarPolicy();
                                                }
                                              }
                                            )}
