@@ -20,6 +20,7 @@
 
 'use strict';
 
+const Mainloop = imports.mainloop;
 const St = imports.gi.St;
 const PopupMenu = imports.ui.popupMenu;
 const Slider = imports.ui.slider;
@@ -219,6 +220,7 @@ const TrackBox = new Lang.Class({
 
     _init: function(cover) {
       this.parent({hover: false, style_class: 'no-padding-bottom'});
+      this._animateChange = Util.animateChange;
       this._cover = cover;      
       this.infos = new St.BoxLayout({vertical: true});
       this._artistLabel = new St.Label({style_class: 'track-info-artist'});
@@ -234,39 +236,9 @@ const TrackBox = new Lang.Class({
     },
 
     updateInfo: function(state) {
-      if (this._artistLabel.text != state.trackArtist) {
-        this._artistLabel.text = state.trackArtist;
-        if (this._artistLabel.text == "") {
-          this._artistLabel.hide();
-        }
-        else {
-          this._artistLabel.show();
-        }
-      }
-      if (this._titleLabel.text != state.trackTitle) {        
-        this._titleLabel.text = state.trackTitle;
-        if (this._titleLabel.text == "") {
-          this._titleLabel.hide();
-        }
-        else {
-          this._titleLabel.show();
-        }
-      }
-      if (this._albumLabel.text != state.trackAlbum) {
-        this._albumLabel.text = state.trackAlbum;
-        if (this._albumLabel.text == "") {
-          this._albumLabel.hide();
-        }
-        else {
-          this._albumLabel.show();
-        }
-      }
-      if (!this._artistLabel.text && !this._titleLabel.text && !this._albumLabel.text) {
-        this.infos.hide();
-      }
-      else if (this._cover.child.icon_size == 48){
-        this.infos.show();
-      }
+      this._setInfoText(this._artistLabel, state.trackArtist);
+      this._setInfoText(this._titleLabel, state.trackTitle);
+      this._setInfoText(this._albumLabel, state.trackAlbum);
     },
 
     hideInfo: function() {
@@ -284,6 +256,77 @@ const TrackBox = new Lang.Class({
         },
         onCompleteScope: this
       });
+    },
+
+    _setInfoText: function(actor, text) {
+      if (actor.text != text) {
+        if (text === '') {
+          this._hideAnimateInfoItem(actor, text);
+        }
+        else {
+          this._showAnimateInfoItem(actor, text);
+        }
+      }
+    },
+
+    _hideInfoItem: function(actor) {
+      actor.hide();
+      actor.opacity = 0;
+      actor.set_height(0);
+    },
+
+    _showInfoItem: function(actor) {
+      actor.show();
+      actor.opacity = 255;
+      actor.set_height(-1);
+    },
+
+    _showAnimateInfoItem: function(actor, text) {
+      if (actor.visible && !this.animating) {
+        this._animateChange(actor, 'text', text);
+      }
+      else if (this.animating) {
+        actor.text = text;
+        this._showInfoItem(actor);
+      }
+      else {
+        actor.text = text;
+        actor.set_height(-1);
+        let [minHeight, naturalHeight] = actor.get_preferred_height(-1);
+        actor.set_height(0);
+        actor.show();
+        Tweener.addTween(actor, {
+          height: naturalHeight,
+          time: 0.25,
+          opacity: 255,
+          onComplete: function() {
+            this._showInfoItem(actor);
+          },
+          onCompleteScope: this
+        });
+      }
+    },
+
+    _hideAnimateInfoItem: function(actor, text) {
+      if (!actor.visible && !this.animating) {
+        actor.text = text;
+      }
+      else if (this.animating) {
+        this._hideInfoItem(actor);
+        actor.text = text;
+      }
+      else {
+        Tweener.addTween(actor, {
+          height: 0,
+          time: 0.25,
+          opacity: 0,
+          onComplete: function() {
+            this._hideInfoItem(actor);
+            actor.text = text;
+          },
+          onCompleteScope: this
+        });
+      }
     }
 });
 
@@ -293,7 +336,7 @@ const SecondaryInfo = new Lang.Class({
 
     _init: function() {
       this.parent({hover: false, style_class: 'no-padding-bottom'});
-      this._hidden = false;     
+      this._animateChange = Util.animateChange;     
       this.infos = new St.BoxLayout({vertical: true});
       this._artistLabel = new St.Label({style_class: 'track-info-artist'});
       this._titleLabel = new St.Label({style_class: 'track-info-title'});
@@ -305,32 +348,79 @@ const SecondaryInfo = new Lang.Class({
     },
 
     updateInfo: function(state) {
-      if (this._artistLabel.text != state.trackArtist) {
-        this._artistLabel.text = state.trackArtist;
-        if (this._artistLabel.text == "") {
-          this._artistLabel.hide();
+      this._setInfoText(this._artistLabel, state.trackArtist);
+      this._setInfoText(this._titleLabel, state.trackTitle);
+      this._setInfoText(this._albumLabel, state.trackAlbum);
+    },
+
+    _setInfoText: function(actor, text) {
+      if (actor.text != text) {
+        if (text === '') {
+          this._hideAnimateInfoItem(actor, text);
         }
         else {
-          this._artistLabel.show();
+          this._showAnimateInfoItem(actor, text);
         }
       }
-      if (this._titleLabel.text != state.trackTitle) {        
-        this._titleLabel.text = state.trackTitle;
-        if (this._titleLabel.text == "") {
-          this._titleLabel.hide();
-        }
-        else {
-          this._titleLabel.show();
-        }
+    },
+
+    _hideInfoItem: function(actor) {
+      actor.hide();
+      actor.opacity = 0;
+      actor.set_height(0);
+    },
+
+    _showInfoItem: function(actor) {
+      actor.show();
+      actor.opacity = 255;
+      actor.set_height(-1);
+    },
+
+    _showAnimateInfoItem: function(actor, text) {
+      if (actor.visible && !this.animating) {
+        this._animateChange(actor, 'text', text);
       }
-      if (this._albumLabel.text != state.trackAlbum) {
-        this._albumLabel.text = state.trackAlbum;
-        if (this._albumLabel.text == "") {
-          this._albumLabel.hide();
-        }
-        else {
-          this._albumLabel.show();
-        }
+      else if (this.animating) {
+        actor.text = text;
+        this._showInfoItem(actor);
+      }
+      else {
+        actor.text = text;
+        actor.set_height(-1);
+        let [minHeight, naturalHeight] = actor.get_preferred_height(-1);
+        actor.set_height(0);
+        actor.show();
+        Tweener.addTween(actor, {
+          height: naturalHeight,
+          time: 0.25,
+          opacity: 255,
+          onComplete: function() {
+            this._showInfoItem(actor);
+          },
+          onCompleteScope: this
+        });
+      }
+    },
+
+    _hideAnimateInfoItem: function(actor, text) {
+      if (!actor.visible && !this.animating) {
+        actor.text = text;
+      }
+      else if (this.animating) {
+        this._hideInfoItem(actor);
+        actor.text = text;
+      }
+      else {
+        Tweener.addTween(actor, {
+          height: 0,
+          time: 0.25,
+          opacity: 0,
+          onComplete: function() {
+            this._hideInfoItem(actor);
+            actor.text = text;
+          },
+          onCompleteScope: this
+        });
       }
     }
 });
@@ -342,12 +432,13 @@ const TrackRating = new Lang.Class({
     _init: function(player, value) {
         this._hidden = false;
         this._player = player;
+        this._animateChange = Util.animateChange;
         this.parent({style_class: 'no-padding-bottom', hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this._applyFunc = null;
+        this._value = null;
         if (this._player._pithosRatings) {
-          this._value = null;
           this._isNuvolaPlayer = false;
           this._rhythmbox3Proxy = false;
           this.rate = this._ratePithos;
@@ -374,23 +465,16 @@ const TrackRating = new Lang.Class({
             }
           }
           this.rate = this._rate;
-          this._buildStars(value);
+          this._buildStars();
         }
     },
 
-    _buildStars: function(value) {
-        this._value = Math.min(Math.max(0, value), 5);
+    _buildStars: function() {
         this._starButton = [];
         for(let i=0; i < 5; i++) {
-            let icon_name = 'non-starred-symbolic';
-            let starred = false;
-            if (i < this._value) {
-                icon_name = 'starred-symbolic';
-                starred = true;
-            }
             // Create star icons
             let starIcon = new St.Icon({style_class: 'star-icon',
-                                             icon_name: icon_name,
+                                             icon_name: 'non-starred-symbolic',
                                              icon_size: 16
                                              });
             // Create the button with starred icon
@@ -400,7 +484,6 @@ const TrackRating = new Lang.Class({
                                                  child: starIcon
                                                 });
             this._starButton[i]._rateValue = i + 1;
-            this._starButton[i]._starred = starred;
             if (this._applyFunc) {
                 this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
                 this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
@@ -443,12 +526,8 @@ const TrackRating = new Lang.Class({
 
     newRating: function(button) {
         if (!this._isNuvolaPlayer || this.player._mediaServerPlayer.NuvolaCanRate) {
-            if (button.hover) {
-                this.hoverRating(button._rateValue);
-            }
-            else {
-                this.rate(this._value);
-            }
+          let hoverRating = button.hover ? button._rateValue : this._value;
+          this.hoverRating(hoverRating);
         }
     },
 
@@ -495,66 +574,57 @@ const TrackRating = new Lang.Class({
          this.box.set_width(-1);      
     },
 
-    _rate: function(value) {
+    _rate: function(value) {        
         value = Math.min(Math.max(0, value), 5);
+        if (this._value == value) {
+          return;
+        }
+        this._value = value;       
         for (let i = 0; i < 5; i++) {
             let icon_name = 'non-starred-symbolic';
-            let starred = false;
-            if (i < value) {
+            if (i < this._value) {
                 icon_name = 'starred-symbolic';
-                starred = true;
             }
-            this._starButton[i].child.icon_name = icon_name;
-            this._starButton[i]._starred = starred;
+            if (this.animating) {
+              this._starButton[i].child.icon_name = icon_name;
+            }
+            else {
+              let starChild = this._starButton[i].child;
+              Mainloop.timeout_add(50 * i, Lang.bind(this, function() {
+                this._animateChange(starChild, 'icon_name', icon_name);
+                return false;
+              }));
+            }
         }
-        this._value = value;
     },
 
     applyRating: function(button) {
-        let rateValue;
-        // Click on a already starred icon, unrates
-        if (button._starred && button._rateValue == this._value) {
-            rateValue = 0;
-        }
-        else {
-            rateValue = button._rateValue;
-        }
-        // Apply the rating in the player
-        let applied = this._applyFunc(rateValue);
-        if (applied) {
-            this.rate(rateValue);
-        }
+        let rateValue = button._rateValue == this._value ? 0 : button._rateValue;
+        this._applyFunc(rateValue);
     },
 
     applyBansheeRating: function(value) {
         GLib.spawn_command_line_async("banshee --set-rating=%s".format(value));
-        return true;
     },
 
     applyGuayadequeRating: function(value) {
         GLib.spawn_command_line_async("guayadeque --set-rating=%s".format(value));
-        return true;
     },
 
     applyQuodLibetRating: function(value) {
         // Quod Libet works on 0.0 to 1.0 scores
         GLib.spawn_command_line_async("quodlibet --set-rating=%f".format(value / 5.0));
-        return true;
     },
 
     applyLollypopRating: function(value) {
         GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
-        return true;
     },
 
     applyRhythmbox3Rating: function(value) {
-        if (this._rhythmbox3Proxy && this._player.state.trackUrl) {
+        if (this._player.state.trackUrl) {
             this._rhythmbox3Proxy.SetEntryPropertiesRemote(this._player.state.trackUrl,
                                                            {rating: GLib.Variant.new_double(value)});
-            return true;
         }
-
-        return false;
     },
     
     applyNuvolaRating: function(value) {

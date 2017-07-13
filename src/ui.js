@@ -140,7 +140,7 @@ const PlayerUI = new Lang.Class({
     this.addMenuItem(this.trackBox);
     this.trackRatings = null;
     if (!this.playerIsBroken) {
-      this.trackRatings = new Widget.TrackRating(this.player, 0);
+      this.trackRatings = new Widget.TrackRating(this.player);
       this.trackRatings.connect('activate', Lang.bind(this.player, this.player.raise));
       this.addMenuItem(this.trackRatings);
       this.trackRatings.hide();
