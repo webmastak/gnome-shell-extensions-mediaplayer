@@ -485,8 +485,18 @@ const TrackRating = new Lang.Class({
                                                 });
             this._starButton[i]._rateValue = i + 1;
             if (this._applyFunc) {
-                this._starButton[i].connect('notify::hover', Lang.bind(this, this.newRating));
-                this._starButton[i].connect('clicked', Lang.bind(this, this.applyRating));
+                this._starButton[i].connect('notify::hover', Lang.bind(this, function(button) {
+                  if (!this._isNuvolaPlayer || this.player._mediaServerPlayer.NuvolaCanRate) {
+                    let value = button.hover ? button._rateValue : this._value;
+                    for (let i = 0; i < 5; i++) {
+                      this._starButton[i].child.icon_name = i < value ? 'starred-symbolic' : 'non-starred-symbolic';
+                    }
+                  }
+                }));
+                this._starButton[i].connect('clicked', Lang.bind(this, function(button) {
+                  let rateValue = button._rateValue == this._value ? 0 : button._rateValue;
+                  this._applyFunc(rateValue);
+                }));
             }
             // Put the button in the box
             this.box.add(this._starButton[i]);
@@ -522,23 +532,6 @@ const TrackRating = new Lang.Class({
         }));
         this._unRateButton.hide();
         this.box.set_width(-1);
-    },
-
-    newRating: function(button) {
-        if (!this._isNuvolaPlayer || this.player._mediaServerPlayer.NuvolaCanRate) {
-          let hoverRating = button.hover ? button._rateValue : this._value;
-          this.hoverRating(hoverRating);
-        }
-    },
-
-    hoverRating: function(value) {
-        for (let i = 0; i < 5; i++) {
-            let icon_name = 'non-starred-symbolic';
-            if (i < value) {
-                icon_name = 'starred-symbolic';
-            }
-            this._starButton[i].child.icon_name = icon_name;
-        }
     },
 
     _ratePithos: function(rating) {
@@ -581,10 +574,7 @@ const TrackRating = new Lang.Class({
         }
         this._value = value;       
         for (let i = 0; i < 5; i++) {
-            let icon_name = 'non-starred-symbolic';
-            if (i < this._value) {
-                icon_name = 'starred-symbolic';
-            }
+            let icon_name = i < this._value ? 'starred-symbolic' : 'non-starred-symbolic';
             if (this.animating) {
               this._starButton[i].child.icon_name = icon_name;
             }
@@ -596,11 +586,6 @@ const TrackRating = new Lang.Class({
               }));
             }
         }
-    },
-
-    applyRating: function(button) {
-        let rateValue = button._rateValue == this._value ? 0 : button._rateValue;
-        this._applyFunc(rateValue);
     },
 
     applyBansheeRating: function(value) {
@@ -630,9 +615,7 @@ const TrackRating = new Lang.Class({
     applyNuvolaRating: function(value) {
         if (this.player._mediaServerPlayer.NuvolaCanRate) {
             this.player._mediaServerPlayer.NuvolaSetRatingRemote(value / 5.0);
-            return true;
         }
-        return false;
     }
 });
 
@@ -945,6 +928,7 @@ const TracklistItem = new Lang.Class({
         this._tiredCallbackId = 0;
         this.obj = metadata.trackObj;
         this._setCoverIconAsync = Util.setCoverIconAsync;
+        this._animateChange = Util.animateChange;
         this._rating = null;
         this._coverIcon = new St.Icon({icon_name: 'audio-x-generic-symbolic', icon_size: 48});
         if (Settings.MINOR_VERSION > 19) {
@@ -963,12 +947,27 @@ const TracklistItem = new Lang.Class({
         this.actor.add(this._coverIcon, {y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_fill: false, y_align: St.Align.MIDDLE});
         if (this._player._pithosRatings) {
-          this._buildPithosRatings(metadata.pithosRating);
+          this._validRatings = metadata.pithosRating != 'no rating';
+          if (this._validRatings) {
+            this._buildPithosRatings(metadata.pithosRating);
+            this.showRatings(metadata.showRatings);
+          }
+          else {
+            this._buildPithosRatings('');
+            this.showRatings(false);
+          }
         }
         else {
-          this._buildStars(metadata.trackRating);
+          this._validRatings = metadata.trackRating != 'no rating';
+          if (this._validRatings) {
+            this._buildStars(metadata.trackRating);
+            this.showRatings(metadata.showRatings);
+          }
+          else {
+            this._buildStars(0);
+            this.showRatings(false);
+          }
         }
-        this.showRatings(metadata.showRatings);
         this.updateMetadata(metadata);
     },
 
@@ -978,28 +977,40 @@ const TracklistItem = new Lang.Class({
       this._setTitle(metadata.trackTitle);
       this._setAlbum(metadata.trackAlbum);
       if (this._player._pithosRatings) {
-        this._setPithosRating(metadata.pithosRating);
+        this._validRatings = metadata.pithosRating != 'no rating';
+        if (this._validRatings) {
+          this._setPithosRating(metadata.pithosRating);
+        }
+        else {
+          this.showRatings(false);
+        }
       }
       else {
-        this._setRating(metadata.trackRating);
+        this._validRatings = metadata.trackRating != 'no rating';
+        if (this._validRatings) {
+          this._setRating(metadata.trackRating);
+        }
+        else {
+          this.showRatings(false);
+        }
       }
     },
 
     _setArtist: function(artist) {
       if (this._artistLabel.text != artist) {
-        this._artistLabel.text = artist;
+        this._animateChange(this._artistLabel, 'text', artist);
       }
     },
 
     _setTitle: function(title) {
       if (this._titleLabel.text != title) {
-        this._titleLabel.text = title;
+        this._animateChange(this._titleLabel, 'text', title);
       }
     },
 
     _setAlbum: function(album) {
       if (this._albumLabel.text != album) {
-        this._albumLabel.text = album;
+        this._animateChange(this._albumLabel, 'text', album);
       }
     },
 
@@ -1007,16 +1018,17 @@ const TracklistItem = new Lang.Class({
       value = Math.min(Math.max(0, value), 5);
       this._starIcon = [];
       for(let i=0; i < 5; i++) {
-        let icon_name = 'non-starred-symbolic';
-        if (i < value) {
-            icon_name = 'starred-symbolic';
-        }
-        // Create star icons
+        let icon_name = i < value ? 'starred-symbolic' : 'non-starred-symbolic';
         this._starIcon[i] = new St.Icon({style_class: 'star-icon',
-                                    icon_name: icon_name,
                                     icon_size: 16
                                     });
         this._ratingBox.add(this._starIcon[i]);
+        let starIcon = this._starIcon[i];
+        Mainloop.timeout_add(50 * i, Lang.bind(this, function() {
+          this._animateChange(starIcon, 'icon_name', icon_name);
+          return false;
+        }));
+        
       }
       this._rating = value;
     },
@@ -1135,17 +1147,18 @@ const TracklistItem = new Lang.Class({
     if (this._rating != value) {
       this._rating = value;
       for (let i = 0; i < 5; i++) {
-        let icon_name = 'non-starred-symbolic';
-        if (i < value) {
-            icon_name = 'starred-symbolic';
-        }
-        this._starIcon[i].icon_name = icon_name;
+        let icon_name = i < value ? 'starred-symbolic' : 'non-starred-symbolic';
+        let starIcon = this._starIcon[i];
+        Mainloop.timeout_add(50 * i, Lang.bind(this, function() {
+          this._animateChange(starIcon, 'icon_name', icon_name);
+          return false;
+        }));
       }
     }
   },
 
   showRatings: function(value) {
-    if (value) {
+    if (value && this._validRatings) {
       this._albumLabel.hide();
       this._ratingBox.show();
     }
