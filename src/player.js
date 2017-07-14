@@ -791,35 +791,7 @@ const MPRISPlayer = new Lang.Class({
                   newState.showPosition = false;
                 }
               }
-              this._prop.GetAllRemote('org.mpris.MediaPlayer2.Playlists',
-              Lang.bind(this, function([props], err) {
-                if (!err) {
-                  if (newState.orderings === null && props.Orderings) {
-                    let orderings = this._checkOrderings(props.Orderings.deep_unpack());
-                    if (JSON.stringify(orderings) != JSON.stringify(this.state.orderings)) {
-                      newState.orderings = orderings;
-                      newState.getPlaylists = true;
-                    }
-                  }
-                  if (newState.playlistCount === null && props.PlaylistCount) {
-                    let playlistCount = props.PlaylistCount.unpack();
-                    if (this.state.playlistCount !== playlistCount) {
-                      newState.playlistCount = playlistCount;
-                    }
-                    if (playlistCount > 0) {
-                      newState.getPlaylists = true;
-                    }
-                    else {
-                      newState.getPlaylists = null;                      
-                    }
-                  }
-                }
-                this.emit('player-update', newState);
-                if (newState.getPlaylists) {
-                  let _orderings = newState.orderings || this.state.orderings;
-                  this._getPlaylists(_orderings);
-                }
-              }));
+              this.emit('player-update', newState);
           }));
       }));
     },
