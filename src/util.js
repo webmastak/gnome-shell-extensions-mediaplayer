@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
+const Mainloop = imports.mainloop;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
@@ -24,7 +25,7 @@ const Pango = imports.gi.Pango;
 const Tweener = imports.ui.tweener;
 
 
-function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate) {
+function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate, delay) {
   fallback_icon_name = fallback_icon_name || 'audio-x-generic-symbolic'
   if (coverUrl) {
     let file = Gio.File.new_for_uri(coverUrl);
@@ -36,6 +37,12 @@ function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate) {
           if (dontAnimate) {
             icon.gicon = newIcon;
           }
+          else if (delay) {
+            Mainloop.timeout_add(250, function() {
+              animateChange(icon, 'gicon', newIcon);
+              return false;
+            });
+          }
           else {
             animateChange(icon, 'gicon', newIcon);
           }
@@ -45,6 +52,12 @@ function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate) {
         if (icon.icon_name != fallback_icon_name) {
           if (dontAnimate) {
             icon.icon_name = fallback_icon_name;
+          }
+          else if (delay) {
+            Mainloop.timeout_add(250, function() {
+              animateChange(icon, 'icon_name', fallback_icon_name);
+              return false;
+            });
           }
           else {
             animateChange(icon, 'icon_name', fallback_icon_name);

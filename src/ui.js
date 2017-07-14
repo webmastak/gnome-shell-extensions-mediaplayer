@@ -20,7 +20,6 @@
 
 'use strict';
 
-const Mainloop = imports.mainloop;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
@@ -463,8 +462,7 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackCoverUrl !== null) {
-      let dontAnimate = this.trackBox.animating;
-      this.setCoverIconAsync(this.trackCover.child, newState.trackCoverUrl, '', dontAnimate);
+      this.setCoverIconAsync(this.trackCover.child, newState.trackCoverUrl, '', false, this.trackBox.animating);
     }
 
     if (newState.playlists !== null && !this.playerIsBroken) {
