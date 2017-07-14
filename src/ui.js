@@ -105,6 +105,7 @@ const PlayerUI = new Lang.Class({
     this.trackLength = 0;
     this.playlistCount = 0;
     this.showPlaylistTitle = false;
+    this.isRhythmboxStream = false;
     this._playlistTitle = null;
     this.ratings = 'no rating';
 
@@ -250,9 +251,17 @@ const PlayerUI = new Lang.Class({
       }
     }
 
+    if (newState.isRhythmboxStream !== null && !this.playerIsBroken) {
+      this.isRhythmboxStream = newState.isRhythmboxStream;
+      if (this.isRhythmboxStream) {
+        this.trackRatings.hideAnimate();
+        this.position.hideAnimate();
+      }             
+    }
+
     if (newState.showRating !== null && !this.playerIsBroken) {
       this.showRating = newState.showRating;
-      if (this.showRating && this.ratings !== 'no rating') {
+      if (this.showRating && this.ratings !== 'no rating' && !this.isRhythmboxStream) {
         this.trackRatings.showAnimate()
       }
       else {
@@ -292,12 +301,13 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackLength !== null) {
+      global.log('trackLength', newState.trackLength);
       this.trackLength = newState.trackLength;
     }
 
     if (newState.showPosition !== null && !this.playerIsBroken) {
       this.showPosition = newState.showPosition;
-      if (this.showPosition && this.trackLength !== 0) {
+      if (this.showPosition && this.trackLength !== 0 && !this.isRhythmboxStream) {
         this.position.showAnimate();
       }
       else {
@@ -345,24 +355,11 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.trackRating !== null && !this.playerIsBroken && !this.player._pithosRatings) {
+    if (newState.trackRating !== null && !this.playerIsBroken) {
       this.ratings = newState.trackRating;
       if (this.ratings !== 'no rating') {
         this.trackRatings.rate(this.ratings);
-        if (this.showRating) {
-          this.trackRatings.showAnimate();
-        }
-      }
-      else {
-        this.trackRatings.hideAnimate();
-      }
-    }
-
-    if (newState.pithosRating !== null && this.player._pithosRatings) {
-      this.ratings = newState.pithosRating;
-      if (this.ratings !== 'no rating') {
-        this.trackRatings.rate(this.ratings);
-        if (this.showRating) {
+        if (this.showRating && !this.isRhythmboxStream) {
           this.trackRatings.showAnimate();
         }
       }
@@ -442,13 +439,13 @@ const PlayerUI = new Lang.Class({
       }
       else {
         this.trackBox.showAnimate();
-        if (!this.playerIsBroken && this.showRating) {
+        if (!this.playerIsBroken && this.showRating && !this.isRhythmboxStream) {
           this.trackRatings.showAnimate();
         }
         if (this.trackCover.child.icon_size != 48) {
           this.secondaryInfo.showAnimate();
         }
-        if (!this.playerIsBroken && this.showPosition) {
+        if (!this.playerIsBroken && this.showPosition && !this.isRhythmboxStream) {
           this.position.showAnimate();
         }
       }

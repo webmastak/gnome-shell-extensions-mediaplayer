@@ -90,11 +90,12 @@ const PlayerState = new Lang.Class({
   canGoPrevious: null,
 
   volume: null,
-  pithosRating: null,
   showPlaylistTitle: null,
   playlistTitle: null,
 
   getPlaylists: null,
+
+  isRhythmboxStream: null,
 
   emitSignal: null,
 });
@@ -890,7 +891,7 @@ const MPRISPlayer = new Lang.Class({
         if (err && this.state.showPosition) {
           this.emit('player-update', new PlayerState({showPosition: false}));
         }
-        else {
+        else if (value) {
           let newState = new PlayerState();
           showPosition = showPosition || this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY);
           if (this.state.showPosition == false && showPosition) {

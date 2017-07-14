@@ -259,13 +259,13 @@ const TrackBox = new Lang.Class({
     },
 
     _setInfoText: function(actor, text) {
-      if (actor.text != text) {
-        if (text === '') {
-          this._hideAnimateInfoItem(actor, text);
-        }
-        else {
+      if (text) {
+        if (actor.text != text) {
           this._showAnimateInfoItem(actor, text);
         }
+      }
+      else {
+        this._hideAnimateInfoItem(actor, text);
       }
     },
 
@@ -354,13 +354,13 @@ const SecondaryInfo = new Lang.Class({
     },
 
     _setInfoText: function(actor, text) {
-      if (actor.text != text) {
-        if (text === '') {
-          this._hideAnimateInfoItem(actor, text);
-        }
-        else {
+      if (text) {
+        if (actor.text != text) {
           this._showAnimateInfoItem(actor, text);
         }
+      }
+      else {
+        this._hideAnimateInfoItem(actor, text);
       }
     },
 
@@ -946,10 +946,11 @@ const TracklistItem = new Lang.Class({
         this._box.add(this._ratingBox, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._coverIcon, {y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_fill: false, y_align: St.Align.MIDDLE});
+        this._validRatings = metadata.trackRating != 'no rating';
         if (this._player._pithosRatings) {
-          this._validRatings = metadata.pithosRating != 'no rating';
+          this._rate = this._setPithosRating;
           if (this._validRatings) {
-            this._buildPithosRatings(metadata.pithosRating);
+            this._buildPithosRatings(metadata.trackRating);
             this.showRatings(metadata.showRatings);
           }
           else {
@@ -958,7 +959,7 @@ const TracklistItem = new Lang.Class({
           }
         }
         else {
-          this._validRatings = metadata.trackRating != 'no rating';
+          this._rate = this._setStarRating;
           if (this._validRatings) {
             this._buildStars(metadata.trackRating);
             this.showRatings(metadata.showRatings);
@@ -976,23 +977,12 @@ const TracklistItem = new Lang.Class({
       this._setArtist(metadata.trackArtist);
       this._setTitle(metadata.trackTitle);
       this._setAlbum(metadata.trackAlbum);
-      if (this._player._pithosRatings) {
-        this._validRatings = metadata.pithosRating != 'no rating';
-        if (this._validRatings) {
-          this._setPithosRating(metadata.pithosRating);
-        }
-        else {
-          this.showRatings(false);
-        }
+      this._validRatings = metadata.trackRating != 'no rating';
+      if (this._validRatings) {
+        this._rate(metadata.trackRating);
       }
       else {
-        this._validRatings = metadata.trackRating != 'no rating';
-        if (this._validRatings) {
-          this._setRating(metadata.trackRating);
-        }
-        else {
-          this.showRatings(false);
-        }
+        this.showRatings(false);
       }
     },
 
@@ -1142,7 +1132,7 @@ const TracklistItem = new Lang.Class({
       this._rating = rating;
     },
 
-  _setRating: function(value) {
+  _setStarRating: function(value) {
     value = Math.min(Math.max(0, value), 5);
     if (this._rating != value) {
       this._rating = value;
