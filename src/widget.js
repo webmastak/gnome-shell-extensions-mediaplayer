@@ -567,8 +567,17 @@ const TrackRating = new Lang.Class({
          this.box.set_width(-1);      
     },
 
-    _rate: function(value) {        
-        value = Math.min(Math.max(0, value), 5);
+    _rate: function(value) {
+        // For Pithos versions without ratings support.
+        if (value === '' || 'ban' || 'tired') {
+          value = 0;
+        }
+        else if (value === 'love') {
+          value = 5;
+        }
+        else {
+          value = Math.min(Math.max(0, value), 5);
+        }
         if (this._value == value) {
           return;
         }
@@ -1133,7 +1142,16 @@ const TracklistItem = new Lang.Class({
     },
 
   _setStarRating: function(value) {
-    value = Math.min(Math.max(0, value), 5);
+    // For Pithos versions without ratings support.
+    if (value === '' || 'ban' || 'tired') {
+      value = 0;
+    }
+    else if (value === 'love') {
+      value = 5;
+    }
+    else {
+      value = Math.min(Math.max(0, value), 5);
+    }
     if (this._rating != value) {
       this._rating = value;
       for (let i = 0; i < 5; i++) {
