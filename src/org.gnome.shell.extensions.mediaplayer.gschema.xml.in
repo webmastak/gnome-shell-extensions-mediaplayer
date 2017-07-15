@@ -93,5 +93,10 @@
         <_summary>Always keep the active player menu open</_summary>
         <_description>Always keep the active player menu open.</_description>
     </key>
+    <key name="stop-button" type="b">
+        <default>false</default>
+        <_summary>Show a Stop Button in the Player controls</_summary>
+        <_description>Show a Stop Button in the Player controls.</_description>
+    </key>
   </schema>
 </schemalist>

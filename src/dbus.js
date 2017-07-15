@@ -79,6 +79,7 @@ const MediaServer2PlayerIface = '<node>\
         <method name="PlayPause" />\
         <method name="Next" />\
         <method name="Previous" />\
+        <method name="Stop" />\
         <method name="SetPosition">\
             <arg type="o" direction="in" />\
             <arg type="x" direction="in" />\

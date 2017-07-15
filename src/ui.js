@@ -100,6 +100,7 @@ const PlayerUI = new Lang.Class({
     this.showPosition = false;
     this.showPlaylist = false;
     this.showTracklist = false;
+    this.showStopButton = false;
     this.showTracklistRating = false;
     this.hasTrackList = false;
     this.trackLength = 0;
@@ -160,6 +161,10 @@ const PlayerUI = new Lang.Class({
     this.playButton = new Widget.PlayerButton('media-playback-start-symbolic',
                                               Lang.bind(this.player, this.player.playPause));
     this.trackControls.addButton(this.playButton);
+
+    this.stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
+                                              Lang.bind(this.player, this.player.stop));
+    this.trackControls.addButton(this.stopButton);
     
     this.nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
                                               Lang.bind(this.player, this.player.next));
@@ -276,6 +281,16 @@ const PlayerUI = new Lang.Class({
       }
       else {
         this.volume.hideAnimate();
+      }
+    }
+
+    if (newState.showStopButton !== null) {
+      this.showStopButton = newState.showStopButton;
+      if (newState.showStopButton) {
+        this.stopButton.show();
+      }
+      else {
+        this.stopButton.hide();
       }
     }
 
@@ -430,6 +445,7 @@ const PlayerUI = new Lang.Class({
     if (newState.status !== null) {
       if (newState.status === Settings.Status.STOP) {
         this.playButton.setIcon('media-playback-start-symbolic');
+        this.stopButton.hide();
         if (!this.playerIsBroken) {
           this.position.hideAnimate();
           this.trackRatings.hideAnimate();
@@ -438,6 +454,9 @@ const PlayerUI = new Lang.Class({
         this.trackBox.hideAnimate();
       }
       else {
+        if (this.showStopButton) {
+          this.stopButton.show();
+        }
         this.trackBox.showAnimate();
         if (!this.playerIsBroken && this.showRating && !this.isRhythmboxStream) {
           this.trackRatings.showAnimate();

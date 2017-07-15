@@ -118,6 +118,10 @@ function init() {
             type: "b",
             label: _("Always keep the active Player open"),
             help: _("Always keep the active player open when you open the indicator or system menu.")
+        },
+        stop_button: {
+            type: "b",
+            label: _("Show a Stop Button in the Player Controls")
         }
     };
 

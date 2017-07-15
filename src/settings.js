@@ -35,6 +35,7 @@ const MEDIAPLAYER_VOLUME_KEY = 'volume';
 const MEDIAPLAYER_HIDE_AGGINDICATOR_KEY = 'hide-aggindicator';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
+const MEDIAPLAYER_STOP_BUTTON_KEY = 'stop-button';
 const MEDIAPLAYER_PLAYLIST_TITLE_KEY = 'playlist-title';
 const MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
 const MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';

@@ -80,6 +80,7 @@ const PlayerState = new Lang.Class({
   showVolume: null,
   showPosition: null,
   hideStockMpris: null,
+  showStopButton: null,
 
   showTracklistRating: null,
   updatedMetadata: null,
@@ -258,6 +259,12 @@ const MPRISPlayer = new Lang.Class({
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY, Lang.bind(this, function(settings, key) {
             this.emit('player-update', new PlayerState({showTracklistRating: settings.get_boolean(key)}));
+          }))
+        );
+        // showStopButton setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_STOP_BUTTON_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showStopButton: settings.get_boolean(key)}));
           }))
         );
         // showPlaylists setting
@@ -512,6 +519,7 @@ const MPRISPlayer = new Lang.Class({
         desktopEntry: this.desktopEntry,
         playlistCount: this.playlistCount,
         orderings: this.orderings,
+        showStopButton: this._settings.get_boolean(Settings.MEDIAPLAYER_STOP_BUTTON_KEY),
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
         showRating: this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY),
@@ -668,6 +676,10 @@ const MPRISPlayer = new Lang.Class({
 
     playPause: function() {
       this._mediaServerPlayer.PlayPauseRemote();
+    },
+
+    stop: function() {
+      this._mediaServerPlayer.StopRemote();
     },
 
     seek: function(value) {

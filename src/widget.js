@@ -181,6 +181,14 @@ const PlayerButton = new Lang.Class({
 
     disable: function() {
         this.actor.reactive = false;
+    },
+
+    hide: function() {
+      this.actor.hide();
+    },
+
+    show: function() {
+      this.actor.show();
     }
 });
 
