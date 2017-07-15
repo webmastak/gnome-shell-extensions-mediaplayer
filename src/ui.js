@@ -121,7 +121,7 @@ const PlayerUI = new Lang.Class({
       this.playlistTitle.hide();
     }
 
-    this.trackCover = new St.Button({child: new St.Icon({icon_name: "media-optical-cd-audio-symbolic"})});
+    this.trackCover = new St.Button({child: new St.Icon({icon_name: "audio-x-generic-symbolic"})});
     if (Settings.MINOR_VERSION > 19) {
       this.trackCover.child.add_style_class_name('media-message-cover-icon fallback no-padding');
     }
