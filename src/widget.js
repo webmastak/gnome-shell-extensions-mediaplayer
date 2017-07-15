@@ -583,7 +583,6 @@ const TrackRating = new Lang.Class({
         else {
           value = Math.min(Math.max(0, value), 5);
         }
-        global.log('My Value', value);
         if (this._value == value) {
           return;
         }
