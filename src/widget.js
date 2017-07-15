@@ -577,15 +577,13 @@ const TrackRating = new Lang.Class({
 
     _rate: function(value) {
         // For Pithos versions without ratings support.
-        if (value === '' || 'ban' || 'tired') {
-          value = 0;
-        }
-        else if (value === 'love') {
-          value = 5;
+        if (value.constructor === String) {
+          value = value == 'love' ? 5 : 0;
         }
         else {
           value = Math.min(Math.max(0, value), 5);
         }
+        global.log('My Value', value);
         if (this._value == value) {
           return;
         }
@@ -1022,7 +1020,13 @@ const TracklistItem = new Lang.Class({
     },
 
     _buildStars: function(value) {
-      value = Math.min(Math.max(0, value), 5);
+      // For Pithos versions without ratings support.
+      if (value.constructor === String) {
+        value = value == 'love' ? 5 : 0;
+      }
+      else {
+        value = Math.min(Math.max(0, value), 5);
+      }
       this._starIcon = [];
       for(let i=0; i < 5; i++) {
         let icon_name = i < value ? 'starred-symbolic' : 'non-starred-symbolic';
@@ -1151,11 +1155,8 @@ const TracklistItem = new Lang.Class({
 
   _setStarRating: function(value) {
     // For Pithos versions without ratings support.
-    if (value === '' || 'ban' || 'tired') {
-      value = 0;
-    }
-    else if (value === 'love') {
-      value = 5;
+    if (value.constructor === String) {
+      value = value == 'love' ? 5 : 0;
     }
     else {
       value = Math.min(Math.max(0, value), 5);
