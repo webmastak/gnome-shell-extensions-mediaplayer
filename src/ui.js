@@ -115,6 +115,7 @@ const PlayerUI = new Lang.Class({
     //Broken Players never get anything beyond the most basic functionality
     //because they don't know how to behave properly.
     this.playerIsBroken = Settings.BROKEN_PLAYERS.indexOf(this.player.info.identity) != -1;
+    this.noLoopStatusSupport = Settings.NO_LOOP_STATUS_SUPPORT.indexOf(this.player.info.identity) != -1;
     if (!this.playerIsBroken) {
       this.playlistTitle = new Widget.PlaylistTitle();
       this.playlistTitle.connect('activate', Lang.bind(this.player, this.player.raise));
@@ -179,9 +180,11 @@ const PlayerUI = new Lang.Class({
     this.playlists = null;
     this.shuffleLoopStatus = false;
     if (!this.playerIsBroken) {
-      this.shuffleLoopStatus = new Widget.ShuffleLoopStatus(this.player);
-      this.addMenuItem(this.shuffleLoopStatus);
-      this.shuffleLoopStatus.hide();
+      if (!this.noLoopStatusSupport) {
+        this.shuffleLoopStatus = new Widget.ShuffleLoopStatus(this.player);
+        this.addMenuItem(this.shuffleLoopStatus);
+        this.shuffleLoopStatus.hide();
+      }
 
       this.position = new Widget.SliderItem("document-open-recent-symbolic", 0);
       this.position.connect('activate', Lang.bind(this.player, this.player.raise))
@@ -266,7 +269,9 @@ const PlayerUI = new Lang.Class({
       if (this.isRhythmboxStream) {
         this.trackRatings.hideAnimate();
         this.position.hideAnimate();
-        this.shuffleLoopStatus.hideAnimate();
+        if (!this.noLoopStatusSupport) {
+          this.shuffleLoopStatus.hideAnimate();
+        }
       }             
     }
 
@@ -300,15 +305,15 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.shuffle !== null) {
+    if (newState.shuffle !== null && !this.playerIsBroken && !this.noLoopStatusSupport) {
       this.shuffleLoopStatus.setShuffle(newState.shuffle);
     }
 
-    if (newState.loopStatus !== null) {
+    if (newState.loopStatus !== null && !this.playerIsBroken && !this.noLoopStatusSupport) {
       this.shuffleLoopStatus.setLoopStaus(newState.loopStatus);
     }
 
-    if (newState.showLoopStatus !== null && !this.playerIsBroken) {
+    if (newState.showLoopStatus !== null && !this.playerIsBroken && !this.noLoopStatusSupport) {
       this.showLoopStatus = newState.showLoopStatus;
       if (this.showLoopStatus && !this.isRhythmboxStream) {
         this.shuffleLoopStatus.showAnimate();
@@ -340,7 +345,6 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackLength !== null) {
-      global.log('trackLength', newState.trackLength);
       this.trackLength = newState.trackLength;
     }
 
@@ -472,7 +476,9 @@ const PlayerUI = new Lang.Class({
         this.stopButton.hide();
         if (!this.playerIsBroken) {
           this.position.hideAnimate();
-          this.shuffleLoopStatus.hideAnimate();
+          if (!this.noLoopStatusSupport) {
+            this.shuffleLoopStatus.hideAnimate();
+          }
           this.trackRatings.hideAnimate();
         }
         this.secondaryInfo.hideAnimate();
@@ -489,7 +495,7 @@ const PlayerUI = new Lang.Class({
         if (this.trackCover.child.icon_size != 48) {
           this.secondaryInfo.showAnimate();
         }
-        if (!this.playerIsBroken && this.showLoopStatus && !this.isRhythmboxStream) {
+        if (!this.playerIsBroken && this.showLoopStatus && !this.isRhythmboxStream && !this.noLoopStatusSupport) {
           this.shuffleLoopStatus.showAnimate();
         }
         if (!this.playerIsBroken && this.showPosition && !this.isRhythmboxStream) {

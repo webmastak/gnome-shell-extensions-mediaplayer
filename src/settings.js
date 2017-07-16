@@ -89,6 +89,10 @@ const BROKEN_PLAYERS = [
     "Spotify"
 ];
 
+const NO_LOOP_STATUS_SUPPORT = [
+    "Pithos"
+];
+
 let gsettings;
 
 function init() {
