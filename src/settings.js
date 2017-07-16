@@ -39,6 +39,7 @@ const MEDIAPLAYER_STOP_BUTTON_KEY = 'stop-button';
 const MEDIAPLAYER_PLAYLIST_TITLE_KEY = 'playlist-title';
 const MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
 const MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';
+const MEDIAPLAYER_LOOP_STATUS_KEY = 'loop-status';
 const MEDIAPLAYER_RATING_KEY = 'rating';
 const MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY = 'enable-scroll';
 const MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';

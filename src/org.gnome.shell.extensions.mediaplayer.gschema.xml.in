@@ -98,5 +98,10 @@
         <_summary>Show a Stop Button in the Player controls</_summary>
         <_description>Show a Stop Button in the Player controls.</_description>
     </key>
+    <key name="loop-status" type="b">
+        <default>false</default>
+        <_summary>Show shuffle and repeat buttons</_summary>
+        <_description>Show shuffle and repeat buttons.</_description>
+    </key>
   </schema>
 </schemalist>

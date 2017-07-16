@@ -93,6 +93,8 @@ const MediaServer2PlayerIface = '<node>\
         <property name="CanGoPrevious" type="b" access="read" />\
         <property name="Metadata" type="a{sv}" access="read" />\
         <property name="Volume" type="d" access="readwrite" />\
+        <property name="LoopStatus" type="s" access="readwrite" />\
+        <property name="Shuffle" type="b" access="readwrite" />\
         <property name="PlaybackStatus" type="s" access="read" />\
         <signal name="Seeked">\
             <arg type="x" direction="out" />\

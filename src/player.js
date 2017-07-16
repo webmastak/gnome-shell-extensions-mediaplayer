@@ -81,6 +81,7 @@ const PlayerState = new Lang.Class({
   showPosition: null,
   hideStockMpris: null,
   showStopButton: null,
+  showLoopStatus: null,
 
   showTracklistRating: null,
   updatedMetadata: null,
@@ -97,6 +98,9 @@ const PlayerState = new Lang.Class({
   getPlaylists: null,
 
   isRhythmboxStream: null,
+
+  shuffle: null,
+  loopStatus: null,
 
   emitSignal: null,
 });
@@ -267,6 +271,13 @@ const MPRISPlayer = new Lang.Class({
             this.emit('player-update', new PlayerState({showStopButton: settings.get_boolean(key)}));
           }))
         );
+        // showLoopStatus setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_LOOP_STATUS_KEY, Lang.bind(this, function(settings, key) {
+            let showLoopStatus = settings.get_boolean(key) && this.shouldShowLoopStatus;
+            this.emit('player-update', new PlayerState({showLoopStatus: showLoopStatus}));
+          }))
+        );
         // showPlaylists setting
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAYLISTS_KEY, Lang.bind(this, function(settings, key) {
@@ -360,6 +371,22 @@ const MPRISPlayer = new Lang.Class({
             }
             if (this.state.volume !== volume) {
               newState.volume = volume;
+              newState.emitSignal = true;
+            }
+          }
+
+          if (props.Shuffle) {
+            let shuffle = props.Shuffle.unpack();
+            if (this.state.shuffle !== shuffle) {
+              newState.shuffle = shuffle;
+              newState.emitSignal = true;
+            }
+          }
+
+          if (props.LoopStatus) {
+            let loopStatus = props.LoopStatus.unpack();
+            if (this.state.loopStatus !== loopStatus) {
+              newState.loopStatus = loopStatus;
               newState.emitSignal = true;
             }
           }
@@ -519,6 +546,9 @@ const MPRISPlayer = new Lang.Class({
         desktopEntry: this.desktopEntry,
         playlistCount: this.playlistCount,
         orderings: this.orderings,
+        loopStatus: this.loopStatus,
+        shuffle: this.shuffle,
+        showLoopStatus: this._settings.get_boolean(Settings.MEDIAPLAYER_LOOP_STATUS_KEY) && this.shouldShowLoopStatus,
         showStopButton: this._settings.get_boolean(Settings.MEDIAPLAYER_STOP_BUTTON_KEY),
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),
         showPosition: this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY),
@@ -633,6 +663,30 @@ const MPRISPlayer = new Lang.Class({
         volume = Math.pow(volume, 3);
       }
       this._mediaServerPlayer.Volume = volume;
+    },
+
+    get shuffle() {
+      return this._mediaServerPlayer.Shuffle || false;
+    },
+
+    set shuffle(shuffle) {
+      if (this._mediaServerPlayer.Shuffle !== null) {
+        this._mediaServerPlayer.Shuffle = shuffle;
+      }
+    },
+
+    get loopStatus() {
+      return this._mediaServerPlayer.LoopStatus || 'None';
+    },
+
+    set loopStatus(loopStatus) {
+      if (this._mediaServerPlayer.LoopStatus !== null) {
+        this._mediaServerPlayer.LoopStatus = loopStatus;
+      }
+    },
+
+    get shouldShowLoopStatus() {
+      return this._mediaServerPlayer.LoopStatus !== null && this._mediaServerPlayer.Shuffle !== null;
     },
 
     get playbackStatus() {
@@ -752,6 +806,18 @@ const MPRISPlayer = new Lang.Class({
                   let canSeek = props.CanSeek.unpack();
                   if (this.state.canSeek !== canSeek) {
                     newState.canSeek = canSeek;
+                  }
+                }
+                if (newState.shuffle === null && props.Shuffle) {
+                  let shuffle = props.Shuffle.unpack();
+                  if (this.state.shuffle !== shuffle) {
+                    newState.shuffle = shuffle;
+                  }
+                }
+                if (newState.loopStatus === null && props.LoopStatus) {
+                  let loopStatus = props.LoopStatus.unpack();
+                  if (this.state.loopStatus !== loopStatus) {
+                    newState.loopStatus = loopStatus;
                   }
                 }
                 if (newState.status === null && props.PlaybackStatus) {

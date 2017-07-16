@@ -13,6 +13,10 @@
     padding: 0px;
 }
 
+.no-padding-top {
+    padding-top: 0px;
+}
+
 .no-padding-bottom {
     padding-bottom: 0px;
 }

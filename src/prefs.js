@@ -122,6 +122,11 @@ function init() {
         stop_button: {
             type: "b",
             label: _("Show a Stop Button in the Player Controls")
+        },
+        loop_status: {
+            type: "b",
+            label: _("Show Shuffle and Repeat Buttons in the Player Controls"),
+            help: _("Very few player implement this correctly, if at all.")
         }
     };
 

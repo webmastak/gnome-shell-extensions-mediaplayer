@@ -137,6 +137,80 @@ const PlayerButtons = new Lang.Class({
     }
 });
 
+const ShuffleLoopStatus = new Lang.Class({
+    Name: 'PlayerButtons',
+    Extends: BaseContainer,
+
+    _init: function(player) {
+        this.parent({hover: false, style_class: 'no-padding-bottom no-padding-top'});
+        this._player = player;
+        this.box = new St.BoxLayout({style_class: 'no-padding-bottom no-padding-top'});
+        this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
+        let style_class;
+        if (Settings.MINOR_VERSION > 19) {
+          style_class = 'message-media-control player-button';
+        }
+        else {
+          style_class = 'system-menu-action popup-inactive-menu-item';
+        }
+        let shuffleIcon = new St.Icon({icon_name: 'media-playlist-shuffle-symbolic', style_class: 'star-icon', icon_size: 16});
+        this._shuffleButton = new St.Button({style_class: style_class, child: shuffleIcon});
+        this._setButtonActive(this._shuffleButton, false);
+        this._shuffleButton.connect('notify::hover', Lang.bind(this, this._onButtonHover));
+        this._shuffleButton.connect('clicked', Lang.bind(this, function() {
+          this._player.shuffle = this._player.state.shuffle ? false : true;
+        }));
+        this.box.add(this._shuffleButton);
+        let repeatIcon = new St.Icon({icon_name: 'media-playlist-repeat-song-symbolic', style_class: 'star-icon', icon_size: 16});
+        this._repeatButton = new St.Button({style_class: style_class, child: repeatIcon});
+        this._setButtonActive(this._repeatButton, false);
+        this._repeatButton.connect('notify::hover', Lang.bind(this, this._onButtonHover));
+        this._repeatButton.connect('clicked', Lang.bind(this, function() {
+          this._player.loopStatus = this._player.state.loopStatus == 'Track' ? 'None' : 'Track';
+        }));
+        this.box.add(this._repeatButton);
+        let repeatAllIcon = new St.Icon({icon_name: 'media-playlist-repeat-symbolic', style_class: 'star-icon', icon_size: 16});
+        this._repeatAllButton = new St.Button({style_class: style_class, child: repeatAllIcon});
+        this._setButtonActive(this._repeatAllButton, false);
+        this._repeatAllButton.connect('notify::hover', Lang.bind(this, this._onButtonHover));
+        this._repeatAllButton.connect('clicked', Lang.bind(this, function() {
+          this._player.loopStatus = this._player.state.loopStatus == 'Playlist' ? 'None' : 'Playlist';
+        }));
+        this.box.add(this._repeatAllButton);
+    },
+
+    setLoopStaus: function (loopStatus) {
+      if (loopStatus == 'None') {
+        this._setButtonActive(this._repeatButton, false);
+        this._setButtonActive(this._repeatAllButton, false);
+      }
+      else if (loopStatus == 'Track') {
+        this._setButtonActive(this._repeatButton, true);
+        this._setButtonActive(this._repeatAllButton, false);
+      }
+      else if (loopStatus == 'Playlist') {
+        this._setButtonActive(this._repeatButton, false);
+        this._setButtonActive(this._repeatAllButton, true);
+      }
+    },
+
+    setShuffle: function (shuffle) {
+      this._setButtonActive(this._shuffleButton, shuffle);
+    },
+
+    _setButtonActive: function (button, active) {
+      button._isActive = active;
+      button.hover = active;
+    },
+
+    _onButtonHover: function (button) {
+      let abuseTheHoverProp = button._isActive || button.hover;
+      if (button.hover != abuseTheHoverProp) { 
+        button.hover = abuseTheHoverProp;
+      }
+    }
+});
+
 const PlaylistTitle = new Lang.Class({
     Name: 'PlaylistTitle',
     Extends: BaseContainer,

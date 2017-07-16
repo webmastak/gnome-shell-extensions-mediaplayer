@@ -101,6 +101,7 @@ const PlayerUI = new Lang.Class({
     this.showPlaylist = false;
     this.showTracklist = false;
     this.showStopButton = false;
+    this.showLoopStatus = false;
     this.showTracklistRating = false;
     this.hasTrackList = false;
     this.trackLength = 0;
@@ -172,12 +173,16 @@ const PlayerUI = new Lang.Class({
 
     this.addMenuItem(this.trackControls);
 
-
     this.position = null;
     this.volume = null;
     this.tracklist = null;
     this.playlists = null;
+    this.shuffleLoopStatus = false;
     if (!this.playerIsBroken) {
+      this.shuffleLoopStatus = new Widget.ShuffleLoopStatus(this.player);
+      this.addMenuItem(this.shuffleLoopStatus);
+      this.shuffleLoopStatus.hide();
+
       this.position = new Widget.SliderItem("document-open-recent-symbolic", 0);
       this.position.connect('activate', Lang.bind(this.player, this.player.raise))
       this.position.sliderConnect('value-changed', Lang.bind(this, function(item) {
@@ -261,6 +266,7 @@ const PlayerUI = new Lang.Class({
       if (this.isRhythmboxStream) {
         this.trackRatings.hideAnimate();
         this.position.hideAnimate();
+        this.shuffleLoopStatus.hideAnimate();
       }             
     }
 
@@ -291,6 +297,24 @@ const PlayerUI = new Lang.Class({
       }
       else {
         this.stopButton.hide();
+      }
+    }
+
+    if (newState.shuffle !== null) {
+      this.shuffleLoopStatus.setShuffle(newState.shuffle);
+    }
+
+    if (newState.loopStatus !== null) {
+      this.shuffleLoopStatus.setLoopStaus(newState.loopStatus);
+    }
+
+    if (newState.showLoopStatus !== null && !this.playerIsBroken) {
+      this.showLoopStatus = newState.showLoopStatus;
+      if (this.showLoopStatus && !this.isRhythmboxStream) {
+        this.shuffleLoopStatus.showAnimate();
+      }
+      else {
+        this.shuffleLoopStatus.hideAnimate();
       }
     }
 
@@ -448,6 +472,7 @@ const PlayerUI = new Lang.Class({
         this.stopButton.hide();
         if (!this.playerIsBroken) {
           this.position.hideAnimate();
+          this.shuffleLoopStatus.hideAnimate();
           this.trackRatings.hideAnimate();
         }
         this.secondaryInfo.hideAnimate();
@@ -463,6 +488,9 @@ const PlayerUI = new Lang.Class({
         }
         if (this.trackCover.child.icon_size != 48) {
           this.secondaryInfo.showAnimate();
+        }
+        if (!this.playerIsBroken && this.showLoopStatus && !this.isRhythmboxStream) {
+          this.shuffleLoopStatus.showAnimate();
         }
         if (!this.playerIsBroken && this.showPosition && !this.isRhythmboxStream) {
           this.position.showAnimate();
