@@ -67,12 +67,6 @@ const ValidPlaybackStatuses = [
     'Paused'
 ];
 
-const SEND_STOP_ON_CHANGE = [
-    "org.mpris.MediaPlayer2.banshee",
-    "org.mpris.MediaPlayer2.vlc",
-    "org.mpris.MediaPlayer2.pragha"
-];
-
 const WRONG_VOLUME_SCALING = [
     "org.mpris.MediaPlayer2.quodlibet"
 ];
