@@ -219,7 +219,8 @@ const MPRISPlayer = new Lang.Class({
             let showVolume = settings.get_boolean(key);
             if (this.state.showVolume !== showVolume) {
               if (showVolume) {
-                this._refreshProperties();
+                let newState = new PlayerState();
+                this._refreshProperties(newState);
               }
               else {
                 this.emit('player-update', new PlayerState({showVolume: false}));
@@ -460,6 +461,7 @@ const MPRISPlayer = new Lang.Class({
 
           if (props.Metadata) {
             this.parseMetadata(props.Metadata.deep_unpack(), newState);
+            newState.emitSignal = true;
             if (newState.trackUrl !== this.state.trackUrl || newState.trackObj !== this.state.trackObj) {
               this._refreshProperties(newState);
             }
@@ -498,7 +500,8 @@ const MPRISPlayer = new Lang.Class({
             // If the seek was initiated by the player itself, query it
             // for the new position.
             else {
-              this._refreshProperties();
+              let newState = new PlayerState();
+              this._refreshProperties(newState)
             }
           }
         }));
@@ -544,7 +547,6 @@ const MPRISPlayer = new Lang.Class({
       }
 
       this.parseMetadata(this._mediaServerPlayer.Metadata, newState);
-
       
       //Delay calls 1 sec because some players make the interface available without data available in the beginning
 
@@ -756,7 +758,6 @@ const MPRISPlayer = new Lang.Class({
       // Many players have a habit of changing properties without emitting
       // a PropertiesChanged signal as they should. This is basically CYA.
       // In a perfect world this would be redundant and unnecessary.
-      newState = newState || new PlayerState();
       this._prop.GetAllRemote('org.mpris.MediaPlayer2',
         Lang.bind(this, function([props], err) {
           if (!err) {
@@ -913,7 +914,8 @@ const MPRISPlayer = new Lang.Class({
 
     _onStatusChange: function() {
       // sync track time
-      this._refreshProperties();
+      let newState = new PlayerState();
+      this._refreshProperties(newState)
       let status = this.state.status;
       if (status == Settings.Status.PLAY) {
         this._startTimer();
