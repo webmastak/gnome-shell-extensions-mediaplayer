@@ -595,6 +595,12 @@ const MPRISPlayer = new Lang.Class({
     },
 
     set trackTime(value) {
+      // Assume that if our trackTime is equal to or greater than
+      // the trackLength the song must have started over.
+      let trackLength = this.state.trackLength || 0;
+      if (this._trackTime >= trackLength) {
+        value = 0;
+      }
       this._trackTime = value;
       this.emit('player-update', new PlayerState({trackTime: this._trackTime}));
     },

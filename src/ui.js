@@ -407,6 +407,8 @@ const PlayerUI = new Lang.Class({
         }
       }
       else {
+        let dummyRating = this.player._pithosRatings ? '' : 0;
+        this.trackRatings.rate(dummyRating);
         this.trackRatings.hideAnimate();
       }
     }
