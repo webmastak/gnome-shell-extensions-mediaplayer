@@ -674,8 +674,11 @@ const TrackRating = new Lang.Class({
     applyLollypopRating: function(value) {
         if (value !== 0) {
           GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
+          // Lollypop doesn't emit a prop change signal when we rate the song but it will more
+          // than likely stick so we just fake it...
           // You also can't set the rating to zero for some reason so you can't "unrate" a song.
           // https://github.com/gnumdk/lollypop/issues/930
+          this.rate(value);
         }
     },
 
