@@ -409,14 +409,14 @@ const PlayerUI = new Lang.Class({
           this.stopButton.show();
         }
         this.trackCover.showAnimate();
-        if (!this.playerIsBroken && this.showRating && !this.isRhythmboxStream) {
+        if (!this.playerIsBroken && this.showRating && !this.isRhythmboxStream && this.ratings !== 'no rating') {
           this.trackRatings.showAnimate();
         }
         this.info.showAnimate();
         if (!this.playerIsBroken && this.showLoopStatus && !this.isRhythmboxStream && !this.noLoopStatusSupport) {
           this.shuffleLoopStatus.showAnimate();
         }
-        if (!this.playerIsBroken && this.showPosition && !this.isRhythmboxStream) {
+        if (!this.playerIsBroken && this.showPosition && this.trackLength !== 0 && !this.isRhythmboxStream) {
           this.position.showAnimate();
         }
       }
