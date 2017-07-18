@@ -40,7 +40,7 @@ const PlayerUI = new Lang.Class({
   Extends: Widget.PlayerMenu,
 
   _init: function(player) {
-    this.parent(player, player.info.identity, true);
+    this.parent(player.info.identity, true);
     this.hidePlayStatusIcon();
     this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;

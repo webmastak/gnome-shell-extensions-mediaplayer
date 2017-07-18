@@ -124,9 +124,8 @@ const PlayerMenu = new Lang.Class({
   Name: 'PlayerMenu',
   Extends: PopupMenu.PopupSubMenuMenuItem,
 
-  _init: function(player, label, wantIcon) {
+  _init: function(label, wantIcon) {
     this.parent(label, wantIcon);
-    this._player = player;
     this._playStatusIcon = new St.Icon({style_class: 'popup-menu-icon'});
     this.actor.insert_child_at_index(this._playStatusIcon, 3);
     this.menu = new SubMenu(this.actor, this._triangle, true);
