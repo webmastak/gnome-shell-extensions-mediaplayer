@@ -124,14 +124,29 @@ const PlayerMenu = new Lang.Class({
   Name: 'PlayerMenu',
   Extends: PopupMenu.PopupSubMenuMenuItem,
 
-  _init: function(label, wantIcon) {
+  _init: function(player, label, wantIcon) {
     this.parent(label, wantIcon);
+    this._player = player;
+    this._playStatusIcon = new St.Icon({style_class: 'popup-menu-icon'});
+    this.actor.insert_child_at_index(this._playStatusIcon, 3);
     this.menu = new SubMenu(this.actor, this._triangle, true);
     this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
   },
 
   addMenuItem: function(item) {
     this.menu.addMenuItem(item);
+  },
+
+  setPlayStatusIcon: function(icon) {
+    this._playStatusIcon.icon_name = icon;
+  },
+
+  hidePlayStatusIcon: function() {
+    this._playStatusIcon.hide();
+  },
+
+  showPlayStatusIcon: function() {
+    this._playStatusIcon.show();
   }
 });
 
@@ -660,11 +675,8 @@ const TrackRating = new Lang.Class({
     applyLollypopRating: function(value) {
         if (value !== 0) {
           GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
-          // Lollypop doesn't emit a prop change signal when we rate the song but it will more
-          // than likely stick so we just fake it...
           // You also can't set the rating to zero for some reason so you can't "unrate" a song.
           // https://github.com/gnumdk/lollypop/issues/930
-          this.rate(value);
         }
     },
 

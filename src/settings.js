@@ -44,6 +44,7 @@ const MEDIAPLAYER_RATING_KEY = 'rating';
 const MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY = 'enable-scroll';
 const MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';
 const MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY = 'active-open';
+const MEDIAPLAYER_PLAY_STATUS_ICON_KEY = 'playstatus';
 
 const MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
 

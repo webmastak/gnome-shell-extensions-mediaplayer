@@ -40,7 +40,8 @@ const PlayerUI = new Lang.Class({
   Extends: Widget.PlayerMenu,
 
   _init: function(player) {
-    this.parent(player.info.identity, true);
+    this.parent(player, player.info.identity, true);
+    this.hidePlayStatusIcon();
     this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;
     this.setCoverIconAsync = Util.setCoverIconAsync;
@@ -192,6 +193,15 @@ const PlayerUI = new Lang.Class({
           this.shuffleLoopStatus.hideAnimate();
         }
       }             
+    }
+
+    if (newState.showPlayStatusIcon !== null) {
+      if (newState.showPlayStatusIcon) {
+        this.showPlayStatusIcon();
+      }
+      else {
+        this.hidePlayStatusIcon();
+      }              
     }
 
     if (newState.showRating !== null && !this.playerIsBroken) {
@@ -392,6 +402,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.status !== null) {
       if (newState.status === Settings.Status.STOP) {
+        this.setPlayStatusIcon('media-playback-stop-symbolic');
         this.playButton.setIcon('media-playback-start-symbolic');
         this.stopButton.hide();
         if (!this.playerIsBroken) {
@@ -422,9 +433,11 @@ const PlayerUI = new Lang.Class({
       }
 
       if (newState.status === Settings.Status.PLAY) {
+        this.setPlayStatusIcon('media-playback-start-symbolic');
         this.playButton.setIcon('media-playback-pause-symbolic');
       }
       if (newState.status === Settings.Status.PAUSE) {
+        this.setPlayStatusIcon('media-playback-pause-symbolic');
         this.playButton.setIcon('media-playback-start-symbolic');
       }
     }

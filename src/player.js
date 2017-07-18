@@ -79,6 +79,7 @@ const PlayerState = new Lang.Class({
   hideStockMpris: null,
   showStopButton: null,
   showLoopStatus: null,
+  showPlayStatusIcon: null,
 
   showTracklistRating: null,
   updatedMetadata: null,
@@ -246,6 +247,12 @@ const MPRISPlayer = new Lang.Class({
         this._signalsId.push(
           this._settings.connect("changed::" + Settings.MEDIAPLAYER_RATING_KEY, Lang.bind(this, function(settings, key) {
             this.emit('player-update', new PlayerState({showRating: settings.get_boolean(key)}));
+          }))
+        );
+        // showPlayStatusIcon setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAY_STATUS_ICON_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('player-update', new PlayerState({showPlayStatusIcon: settings.get_boolean(key)}));
           }))
         );
         // showTracklistRating setting
@@ -526,6 +533,7 @@ const MPRISPlayer = new Lang.Class({
         orderings: this.orderings,
         loopStatus: this.loopStatus,
         shuffle: this.shuffle,
+        showPlayStatusIcon: this._settings.get_boolean(Settings.MEDIAPLAYER_PLAY_STATUS_ICON_KEY),
         showLoopStatus: this._settings.get_boolean(Settings.MEDIAPLAYER_LOOP_STATUS_KEY) && this.shouldShowLoopStatus,
         showStopButton: this._settings.get_boolean(Settings.MEDIAPLAYER_STOP_BUTTON_KEY),
         showVolume: this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY),

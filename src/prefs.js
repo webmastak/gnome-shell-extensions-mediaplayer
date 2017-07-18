@@ -63,6 +63,10 @@ function init() {
             label: _("Show the current Song's cover in the Panel."),
             help: _("If no cover is available the Player's symbolic icon is shown or a generic audio mime type icon.")
         },
+        playstatus: {
+            type: "b",
+            label: _("Show a Play Status Icon for each Player.")
+        },
         hide_aggindicator: {
             type: "b",
             label: _("Always hide the Indicator in the system menu"),

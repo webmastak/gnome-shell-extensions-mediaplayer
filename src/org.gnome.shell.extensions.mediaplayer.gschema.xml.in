@@ -93,5 +93,10 @@
         <_summary>Show shuffle and repeat buttons</_summary>
         <_description>Show shuffle and repeat buttons.</_description>
     </key>
+    <key name="playstatus" type="b">
+        <default>false</default>
+        <_summary>Show a Play Status Icon for each Player</_summary>
+        <_description>Show a Play Status Icon for each Player.</_description>
+    </key>
   </schema>
 </schemalist>
