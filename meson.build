@@ -4,10 +4,9 @@ project('gnome-shell-extensions-mediaplayer',
 )
 UUID = 'mediaplayer@patapon.info'
 URL  = 'https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/'
-EXTENSION_DIR = join_paths(get_option('prefix'), get_option('datadir'), '/gnome-shell/extensions/', UUID)
-LOCALE_DIR = join_paths(get_option('prefix'), get_option('localedir'), UUID)
-
-i18n = import('i18n')
+EXTENSION_DIR = join_paths(get_option('prefix'), get_option('datadir'), 'gnome-shell/extensions/', UUID)
+LOCALE_DIR = join_paths(EXTENSION_DIR, 'locale')
+SCHEMA_DIR = join_paths(EXTENSION_DIR, 'schemas')
 
 subdir('po')
 subdir('src')
