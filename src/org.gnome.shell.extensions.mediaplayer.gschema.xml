@@ -1,0 +1,102 @@
+<schemalist gettext-domain="gnome-shell-extensions-mediaplayer">
+  <enum id='org.gnome.shell.extensions.mediaplayer.positions'>
+    <value nick='center' value='0'/>
+    <value nick='right' value='1'/>
+    <value nick='volume-menu' value='2'/>
+  </enum>
+  <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
+    <key name="indicator-position" enum="org.gnome.shell.extensions.mediaplayer.positions">
+        <default>'volume-menu'</default>
+        <summary>Where to display the indicator (center, right, volume menu)</summary>
+    </key>
+    <key name="hide-aggindicator" type="b">
+        <default>false</default>
+        <summary>Always hide the indicator in the system menu</summary>
+        <description>Whether to always hide the indicator in the system menu.</description>
+    </key>
+    <key name="cover-status" type="b">
+        <default>false</default>
+        <summary>Show the current tracks cover in the panel</summary>
+        <description>Show the current tracks cover in the panel instead of an icon.</description>
+    </key>
+    <key name="volume" type="b">
+        <default>false</default>
+        <summary>Show the media player volume slider</summary>
+        <description>Whether to show the volume control of the mediaplayers.</description>
+    </key>
+    <key name="position" type="b">
+        <default>true</default>
+        <summary>Show the media player position slider</summary>
+        <description>Whether to show the position slider of the mediaplayers.</description>
+    </key>
+    <key name="playlists" type="b">
+        <default>false</default>
+        <summary>Show media player playlists</summary>
+        <description>Whether to show the playlists of the mediaplayers.</description>
+    </key>
+    <key name="playlist-title" type="b">
+        <default>false</default>
+        <summary>Show the current Playlist Title in the main trackbox</summary>
+        <description>Whether to show the current Playlist Title in the main trackbox.</description>
+    </key>
+    <key name="tracklist" type="b">
+        <default>false</default>
+        <summary>Show media player tracklist</summary>
+        <description>Whether to show the tracklist of the mediaplayers.</description>
+    </key>
+    <key type="b" name="rating">
+    	<default>false</default>
+    	<summary>Display song rating</summary>
+	    <description>Display the currently playing song's rating on a 0 to 5 scale</description>
+    </key>
+    <key type="b" name="tracklist-rating">
+    	<default>false</default>
+    	<summary>Display song ratings in the tracklist</summary>
+	    <description>Display the ratings of the songs in tracklist on a 0 to 5 scale</description>
+    </key>
+    <key type="s" name="status-text">
+    	<default>''</default>
+    	<summary>The indicator status text</summary>
+    </key>
+    <key name="status-size" type="i">
+        <default>300</default>
+        <summary>Status text size</summary>
+        <description>The the maximum width before the title gets an ellipsis. Default is 300px.</description>
+    </key>
+    <key name="volumemenu" type="b">
+        <default>true</default>
+        <summary>Show the media player in the volume menu</summary>
+        <description>Whether to show the mediaplayer controls in the volume menu.</description>
+    </key>
+    <key name="enable-scroll" type="b">
+        <default>true</default>
+        <summary>Enable Indicator scroll events</summary>
+        <description>Enables track changes on scrolling the Indicator.</description>
+    </key>
+    <key name="hide-stockmpris" type="b">
+        <default>false</default>
+        <summary>Hide the built-in Mpris applet</summary>
+        <description>Whether to hide the built-in Mpris applet.</description>
+    </key>
+    <key name="active-open" type="b">
+        <default>true</default>
+        <summary>Always keep the active player menu open</summary>
+        <description>Always keep the active player menu open.</description>
+    </key>
+    <key name="stop-button" type="b">
+        <default>false</default>
+        <summary>Show a Stop Button in the Player controls</summary>
+        <description>Show a Stop Button in the Player controls.</description>
+    </key>
+    <key name="loop-status" type="b">
+        <default>false</default>
+        <summary>Show shuffle and repeat buttons</summary>
+        <description>Show shuffle and repeat buttons.</description>
+    </key>
+    <key name="playstatus" type="b">
+        <default>false</default>
+        <summary>Show a Play Status Icon for each Player</summary>
+        <description>Show a Play Status Icon for each Player.</description>
+    </key>
+  </schema>
+</schemalist>

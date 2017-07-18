@@ -18,7 +18,6 @@ config/
 *~
 *.gmo
 metadata.json
-*.gschema.xml
 *.gschema.valid
 gschemas.compiled
 _build
