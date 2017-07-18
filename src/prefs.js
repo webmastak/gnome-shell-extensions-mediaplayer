@@ -63,16 +63,6 @@ function init() {
             label: _("Show the current Song's cover in the Panel."),
             help: _("If no cover is available the Player's symbolic icon is shown or a generic audio mime type icon.")
         },
-        start_zoomed: {
-            type: "b",
-            label: _("Start with the cover zoomed"),
-            help: _("Always start with the cover zoomed out (Large).")
-        },
-        raise_click: {
-            type: "b",
-            label: _("Raise the Player when the cover is clicked"),
-            help: _("Raise the Player when the cover is clicked instead of zooming in or out.")
-        },
         hide_aggindicator: {
             type: "b",
             label: _("Always hide the Indicator in the system menu"),

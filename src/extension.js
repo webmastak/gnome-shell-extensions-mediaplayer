@@ -18,11 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
-const Mainloop = imports.mainloop;
 const Main = imports.ui.main;
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Lib = Me.imports.lib;
 const Manager = Me.imports.manager;
@@ -32,7 +29,6 @@ const Settings = Me.imports.settings;
 /* global values */
 let manager;
 let indicator;
-let _fileMonitor;
 let _stockMpris;
 let _stockMprisOldShouldShow;
 

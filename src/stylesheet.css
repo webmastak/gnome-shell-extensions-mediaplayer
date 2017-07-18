@@ -1,12 +1,19 @@
-/* em's don't scale? */
 .player-button {
     padding-left: 6px;
     padding-right: 6px;
 }
 
-/* for the panel indicator will be overridden by the large cover size setting */
-.dummy-style-class {
-  width: 128px;
+.panel-media-indicator {
+  min-width: 288px;
+  max-width: 288px;
+}
+
+.large-cover-icon {
+  icon-size: 128px !important;
+}
+
+.small-cover-icon {
+  icon-size: 48px !important;
 }
 
 .no-padding {
@@ -21,6 +28,10 @@
     padding-bottom: 0px;
 }
 
+.pithos-rating-box {
+    spacing: 6px;
+}
+
 .track-info-artist {
   font-weight: bold;
 }
@@ -31,11 +42,6 @@
 
 .track-info-album {
   font-size: x-small;
-}
-
-.track-rating {
-    padding-top: 0px;
-    padding-bottom: 0px;
 }
 
 .star-icon {

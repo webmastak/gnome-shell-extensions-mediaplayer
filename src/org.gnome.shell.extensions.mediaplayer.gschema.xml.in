@@ -78,16 +78,6 @@
         <_summary>Hide the built-in Mpris applet</_summary>
         <_description>Whether to hide the built-in Mpris applet.</_description>
     </key>
-    <key name="raise-click" type="b">
-        <default>false</default>
-        <_summary>Raise the Player when the cover is clicked</_summary>
-        <_description>Raise the Player when the cover is clicked instead of zooming in or out.</_description>
-    </key>
-    <key name="start-zoomed" type="b">
-        <default>false</default>
-        <_summary>Start with the cover zoomed</_summary>
-        <_description>Start with the cover zoomed.</_description>
-    </key>
     <key name="active-open" type="b">
         <default>true</default>
         <_summary>Always keep the active player menu open</_summary>

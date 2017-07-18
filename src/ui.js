@@ -23,14 +23,8 @@
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
-const Clutter = imports.gi.Clutter;
-const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Main = imports.ui.main;
-const PopupMenu = imports.ui.popupMenu;
-const GLib = imports.gi.GLib;
-const Tweener = imports.ui.tweener;
-const BoxPointer = imports.ui.boxpointer;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
@@ -38,62 +32,20 @@ const _ = Gettext.gettext;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Widget = Me.imports.widget;
 const Settings = Me.imports.settings;
-const Player = Me.imports.player;
 const Util = Me.imports.util;
 
 
-const PlayerMenu = new Lang.Class({
-  Name: 'PlayerMenu',
-  Extends: PopupMenu.PopupSubMenuMenuItem,
-
-  _init: function(label, wantIcon) {
-    this.parent(label, wantIcon);
-    //We never want to reserve space for a scrollbar in the players.
-    this.menu.actor.vscrollbar_policy = Gtk.PolicyType.NEVER;
-    this.menu._needsScrollbar = Lang.bind(this, function() {return false;});
-    this.menu._close = this.menu.close;
-    this.menu._open = this.menu.open;
-    this.menu.close = Lang.bind(this, this.close);
-    this.menu.open = Lang.bind(this, this.open);
-  },
-
-  addMenuItem: function(item) {
-    this.menu.addMenuItem(item);
-  },
-
-  close: function(animate) {
-    if (!this.menu.isOpen) {
-      return;
-    }
-    //If we animate the close GNOME Shell gets confused
-    //sometimes and adds space for a scrollbar in other menus in
-    //the system menu on close.
-    this.menu._close(BoxPointer.PopupAnimation.NONE);
-  },
-
-  open: function(animate) {
-    if (this.menu.isOpen) {
-      return;
-    }
-    //If we animate the open GNOME Shell gets confused
-    //and our menus can overflow off screen.
-    this.menu._open(BoxPointer.PopupAnimation.NONE);
-    this.emit('player-menu-opened');
-  }
-
-});
-
 const PlayerUI = new Lang.Class({
   Name: 'PlayerUI',
-  Extends: PlayerMenu,
+  Extends: Widget.PlayerMenu,
 
   _init: function(player) {
     this.parent(player.info.identity, true);
     this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;
     this.setCoverIconAsync = Util.setCoverIconAsync;
-    this._updateId = player.connect("player-update", Lang.bind(this, this.update));
-    this._updateInfoId = player.connect("player-update-info", Lang.bind(this, this.updateInfo));
+    this._updateId = player.connect('player-update', Lang.bind(this, this.update));
+    this._updateInfoId = player.connect('player-update-info', Lang.bind(this, this.updateInfo));
 
     this.showRating = false;
     this.showVolume = false;
@@ -123,24 +75,10 @@ const PlayerUI = new Lang.Class({
       this.playlistTitle.hide();
     }
 
-    this.trackCover = new St.Button({child: new St.Icon({icon_name: "audio-x-generic-symbolic"})});
-    if (Settings.MINOR_VERSION > 19) {
-      this.trackCover.child.add_style_class_name('media-message-cover-icon fallback no-padding');
-    }
-
-    this.trackCover.connect('clicked', Lang.bind(this, function(actor, button) {
-      if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_RAISE_ON_CLICK_KEY)) {
-        this.player.raise();
-        this.menu._getTopMenu().close();
-      }
-      else {
-        this._toggleCover();
-      }
-    }));
-
-    this.trackBox = new Widget.TrackBox(this.trackCover);
-    this.trackBox.connect('activate', Lang.bind(this.player, this.player.raise));
-    this.addMenuItem(this.trackBox);
+    this.trackCover = new Widget.TrackCover(new St.Icon({icon_name: 'audio-x-generic-symbolic', style_class: 'large-cover-icon'}));
+    this.trackCover.connect('activate', Lang.bind(this.player, this.player.raise));
+    this.addMenuItem(this.trackCover);
+    this.trackCover.hide();
     this.trackRatings = null;
     if (!this.playerIsBroken) {
       this.trackRatings = new Widget.TrackRating(this.player);
@@ -149,9 +87,9 @@ const PlayerUI = new Lang.Class({
       this.trackRatings.hide();
     }
 
-    this.secondaryInfo = new Widget.SecondaryInfo();
-    this.secondaryInfo.connect('activate', Lang.bind(this.player, this.player.raise));
-    this.addMenuItem(this.secondaryInfo);
+    this.info = new Widget.Info();
+    this.info.connect('activate', Lang.bind(this.player, this.player.raise));
+    this.addMenuItem(this.info);
         
     this.trackControls = new Widget.PlayerButtons();
     this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise))
@@ -174,19 +112,15 @@ const PlayerUI = new Lang.Class({
 
     this.addMenuItem(this.trackControls);
 
-    this.position = null;
-    this.volume = null;
-    this.tracklist = null;
-    this.playlists = null;
-    this.shuffleLoopStatus = false;
     if (!this.playerIsBroken) {
       if (!this.noLoopStatusSupport) {
         this.shuffleLoopStatus = new Widget.ShuffleLoopStatus(this.player);
+        this.shuffleLoopStatus.connect('activate', Lang.bind(this.player, this.player.raise));
         this.addMenuItem(this.shuffleLoopStatus);
         this.shuffleLoopStatus.hide();
       }
 
-      this.position = new Widget.SliderItem("document-open-recent-symbolic", 0);
+      this.position = new Widget.SliderItem('document-open-recent-symbolic');
       this.position.connect('activate', Lang.bind(this.player, this.player.raise))
       this.position.sliderConnect('value-changed', Lang.bind(this, function(item) {
         this.player.seek(item._value);
@@ -194,7 +128,7 @@ const PlayerUI = new Lang.Class({
       this.addMenuItem(this.position);
       this.position.hide();
 
-      this.volume = new Widget.SliderItem("audio-volume-high-symbolic", 0);
+      this.volume = new Widget.SliderItem('audio-volume-high-symbolic');
       this.volume.connect('activate', Lang.bind(this.player, this.player.raise))
       this.volume.sliderConnect('value-changed', Lang.bind(this, function(item) {
         if (this.player.volume != item._value) {
@@ -212,17 +146,17 @@ const PlayerUI = new Lang.Class({
       this.addMenuItem(this.playlists);
       this.playlists.hide();
 
-      this.connect('player-menu-opened', Lang.bind(this, function() {
-        this.tracklist.updateScrollbarPolicy();
-        this.playlists.updateScrollbarPolicy();
+      this.tracklist.menu.connect('open-state-changed', Lang.bind(this, function(menu, open) {
+        if (open) {
+          this.playlists.menu.close();
+        }
+      }));
+      this.playlists.menu.connect('open-state-changed', Lang.bind(this, function(menu, open) {
+        if (open) {
+          this.tracklist.menu.close();
+        }
       }));
 
-      this.tracklist.connect('ListSubMenu-opened', Lang.bind(this, function() {
-        this.playlists.close();
-      }));
-      this.playlists.connect('ListSubMenu-opened', Lang.bind(this, function() {
-        this.tracklist.close();
-      }));
     }
 
     if (Settings.MINOR_VERSION > 19) {
@@ -230,22 +164,7 @@ const PlayerUI = new Lang.Class({
       //Monkey patch
       this.stockMprisOldShouldShow = this.stockMpris._shouldShow;
       
-    }
-
-    if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_START_ZOOMED_KEY)) {
-      this.trackCover.child.icon_size = this.largeCoverSize;
-      this.trackBox.hideInfo();      
-    }
-    else {
-      this.trackCover.child.icon_size = 48;
-      this.secondaryInfo.hide();
-    }
-    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
-    this.themeChangeId = this.themeContext.connect('changed', Lang.bind(this, function() {
-      if (this.trackCover.child.icon_size != 48) {
-        this.trackCover.child.icon_size = this.largeCoverSize;
-      }
-    })); 
+    } 
   },
 
   update: function(player, newState) {
@@ -414,8 +333,7 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackArtist !== null) {
-      this.trackBox.updateInfo(newState);
-      this.secondaryInfo.updateInfo(newState);
+      this.info.update(newState);
     }
 
     if (newState.volume !== null && !this.playerIsBroken) {
@@ -423,18 +341,18 @@ const PlayerUI = new Lang.Class({
       // So that our icon changes match the system volume icon changes.
       let value = newState.volume, volumeIcon;
       if (value === 0) {
-        volumeIcon = "audio-volume-muted-symbolic";
+        volumeIcon = 'audio-volume-muted-symbolic';
       }
       else {
         let n = Math.floor(3 * value) + 1;
         if (n < 2) {
-          volumeIcon = "audio-volume-low-symbolic";
+          volumeIcon = 'audio-volume-low-symbolic';
         }
         else if (n >= 3) {
-          volumeIcon = "audio-volume-high-symbolic";          
+          volumeIcon = 'audio-volume-high-symbolic';          
         }
         else {
-          volumeIcon = "audio-volume-medium-symbolic";
+          volumeIcon = 'audio-volume-medium-symbolic';
         }
       }
       this.volume.setIcon(volumeIcon);
@@ -483,20 +401,18 @@ const PlayerUI = new Lang.Class({
           }
           this.trackRatings.hideAnimate();
         }
-        this.secondaryInfo.hideAnimate();
-        this.trackBox.hideAnimate();
+        this.info.hideAnimate();
+        this.trackCover.hideAnimate();
       }
       else {
         if (this.showStopButton) {
           this.stopButton.show();
         }
-        this.trackBox.showAnimate();
+        this.trackCover.showAnimate();
         if (!this.playerIsBroken && this.showRating && !this.isRhythmboxStream) {
           this.trackRatings.showAnimate();
         }
-        if (this.trackCover.child.icon_size != 48) {
-          this.secondaryInfo.showAnimate();
-        }
+        this.info.showAnimate();
         if (!this.playerIsBroken && this.showLoopStatus && !this.isRhythmboxStream && !this.noLoopStatusSupport) {
           this.shuffleLoopStatus.showAnimate();
         }
@@ -514,7 +430,7 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.trackCoverUrl !== null) {
-      this.setCoverIconAsync(this.trackCover.child, newState.trackCoverUrl, '', false, this.trackBox.animating);
+      this.setCoverIconAsync(this.trackCover.icon, newState.trackCoverUrl, '', false, this.trackCover.animating);
     }
 
     if (newState.playlists !== null && !this.playerIsBroken) {
@@ -549,42 +465,6 @@ const PlayerUI = new Lang.Class({
     if (newState.updatedMetadata !== null && !this.playerIsBroken) {
       this.tracklist.updateMetadata(newState.updatedMetadata);
     }
-  },
-
-  get largeCoverSize() {
-    let menu = Main.panel.statusArea.aggregateMenu.menu;
-    let menuWidth = menu.actor.get_theme_node().get_min_width();
-    return menuWidth - 96;
-  },
-
-  _toggleCover: function() {
-    let targetSize;
-    if (this.trackCover.child.icon_size == 48) {
-      targetSize = this.largeCoverSize;
-      let adjustment = targetSize - 48;
-      this.trackBox.hideInfo();
-      this.secondaryInfo.showAnimate();
-      if (!this.playerIsBroken) { 
-        this.tracklist.updateScrollbarPolicy(adjustment);
-        this.playlists.updateScrollbarPolicy(adjustment);
-      }     
-    }
-    else {
-      targetSize = 48;
-      this.trackBox.showInfo();
-      this.secondaryInfo.hideAnimate();
-    }
-
-    Tweener.addTween(this.trackCover.child, {icon_size: targetSize,
-                                             time: 0.25,
-                                             onComplete: Lang.bind(this, function() {
-                                               if (targetSize == 48 && !this.playerIsBroken) {
-                                                 this.tracklist.updateScrollbarPolicy();
-                                                 this.playlists.updateScrollbarPolicy();
-                                               }
-                                             }
-                                           )}
-    );
   },
 
   _createPlaylistWidget: function() {
@@ -624,7 +504,7 @@ const PlayerUI = new Lang.Class({
   },
 
   toString: function() {
-      return "[object PlayerUI(%s)]".format(this.player.info.identity);
+      return '[object PlayerUI(%s)]'.format(this.player.info.identity);
   },
 
 
@@ -632,7 +512,6 @@ const PlayerUI = new Lang.Class({
     if (this._updateId) {
       this.player.disconnect(this._updateId);
       this.player.disconnect(this._updateInfoId);
-      this.themeContext.disconnect(this.themeChangeId);
     }
     this.parent();
   }

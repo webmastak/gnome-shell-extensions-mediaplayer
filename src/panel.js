@@ -20,13 +20,10 @@
 'use strict';
 
 const Lang = imports.lang;
-const Gio = imports.gi.Gio;
 const Clutter = imports.gi.Clutter;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const PanelMenu = imports.ui.panelMenu;
-const Main = imports.ui.main;
-const GLib = imports.gi.GLib;
 const Signals = imports.signals;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -211,7 +208,7 @@ const PanelIndicator = new Lang.Class({
     this.panelChangeId = 0;
     this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.actor.add_style_class_name('panel-status-button');
-    this.menu.actor.add_style_class_name('aggregate-menu dummy-style-class');
+    this.menu.actor.add_style_class_name('aggregate-menu panel-media-indicator');
     this.compileTemplate = Util.compileTemplate;
     this.setCoverIconAsync = Util.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Util.getPlayerSymbolicIcon;
@@ -324,7 +321,6 @@ const AggregateMenuIndicator = new Lang.Class({
 
   _onActivePlayerRemove: function() {
     this.indicators.hide();
-    Main.panel.statusArea.aggregateMenu.menu.actor.set_width(-1);
   }
 });
 Util._extends(AggregateMenuIndicator, IndicatorMixin);

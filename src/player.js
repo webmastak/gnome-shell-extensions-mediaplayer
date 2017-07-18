@@ -24,15 +24,12 @@ const Mainloop = imports.mainloop;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
-const PopupMenu = imports.ui.popupMenu;
-const GLib = imports.gi.GLib;
 const Signals = imports.signals;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Widget = Me.imports.widget;
 const DBusIface = Me.imports.dbus;
 const Settings = Me.imports.settings;
 const Util = Me.imports.util;

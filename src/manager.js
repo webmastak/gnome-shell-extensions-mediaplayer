@@ -39,9 +39,9 @@ const PlayerManager = new Lang.Class({
         this.menu = menu;
         this._settings = Settings.gsettings;
         this.desiredMenuPosition = desiredMenuPosition;
-        this.menu.connect('open-state-changed', Lang.bind(this, function(menu, active) {
+        this.menu.connect('open-state-changed', Lang.bind(this, function(menu, open) {
           let keepActiveOpen = this._settings.get_boolean(Settings.MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY);
-          if (active == true && keepActiveOpen) {
+          if (open && keepActiveOpen) {
             this.showActivePlayer();
           }
         }));
