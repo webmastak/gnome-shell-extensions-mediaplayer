@@ -12,7 +12,6 @@
 
 BUILD_DIR="builddir"
 LOCAL_PREFIX="$HOME/.local"
-GLOBAL_PREFIX="/usr"
 UUID="mediaplayer@patapon.info"
 TMP_DIR="/tmp/share/gnome-shell/extensions/$UUID"
 
@@ -38,14 +37,10 @@ fi
 
 
 case $build_type in
-  "--install-local"*)
+  "--install"*)
       meson $BUILD_DIR --prefix=$LOCAL_PREFIX
       ninja -C $BUILD_DIR install
-    ;;
-  "--install-system-wide"*)
-      meson $BUILD_DIR --prefix=$GLOBAL_PREFIX
-      sudo ninja -C $BUILD_DIR install
-    ;;
+  ;;
   "--zip-file"*)
       meson $BUILD_DIR --prefix=/tmp
       ninja -C $BUILD_DIR install
@@ -53,7 +48,7 @@ case $build_type in
       cd $TMP_DIR
       zip -rq $dest/$UUID.zip .
       rm -rf $TMP_DIR
-    ;;
+  ;;
 esac
 rm -rf $dest/$BUILD_DIR
 echo "Done"
