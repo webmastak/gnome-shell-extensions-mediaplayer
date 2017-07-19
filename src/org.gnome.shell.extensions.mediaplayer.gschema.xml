@@ -85,8 +85,8 @@
     </key>
     <key name="stop-button" type="b">
         <default>false</default>
-        <summary>Show a Stop Button in the Player controls</summary>
-        <description>Show a Stop Button in the Player controls.</description>
+        <summary>Always show a Stop Button in the Player controls</summary>
+        <description>Always show a Stop Button in the Player controls.</description>
     </key>
     <key name="loop-status" type="b">
         <default>false</default>

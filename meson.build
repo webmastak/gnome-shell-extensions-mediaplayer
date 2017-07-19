@@ -1,5 +1,5 @@
 project('gnome-shell-extensions-mediaplayer',
-  version: '2.7.4',
+  version: '2.8',
   meson_version: '>= 0.40.0',
   default_options: [
     'localedir=share/gnome-shell/extensions/mediaplayer@patapon.info/locale'
