@@ -63,6 +63,11 @@ const PlayerUI = new Lang.Class({
     this.isRhythmboxStream = false;
     this._playlistTitle = null;
     this.ratings = 'no rating';
+    this.status = Settings.Status.STOP;
+    this.canPlay = true;
+    this.canPause = true;
+    this.canGoNext = true;
+    this.canGoPrevious = true;
 
     this.oldShouldShow = null;
     //Broken Players never get anything beyond the most basic functionality
@@ -187,6 +192,7 @@ const PlayerUI = new Lang.Class({
     if (newState.isRhythmboxStream !== null && !this.playerIsBroken) {
       this.isRhythmboxStream = newState.isRhythmboxStream;
       if (this.isRhythmboxStream) {
+        this.trackCover.hideAnimate();
         this.trackRatings.hideAnimate();
         this.position.hideAnimate();
         if (!this.noLoopStatusSupport) {
@@ -206,7 +212,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showRating !== null && !this.playerIsBroken) {
       this.showRating = newState.showRating;
-      if (this.showRating && this.ratings !== 'no rating' && !this.isRhythmboxStream) {
+      if (this.showRating && this.ratings !== 'no rating' && !this.isRhythmboxStream && this.status !== Settings.Status.STOP) {
         this.trackRatings.showAnimate()
       }
       else {
@@ -224,16 +230,6 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.showStopButton !== null) {
-      this.showStopButton = newState.showStopButton;
-      if (newState.showStopButton) {
-        this.stopButton.show();
-      }
-      else {
-        this.stopButton.hide();
-      }
-    }
-
     if (newState.shuffle !== null && !this.playerIsBroken && !this.noLoopStatusSupport) {
       this.shuffleLoopStatus.setShuffle(newState.shuffle);
     }
@@ -244,10 +240,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showLoopStatus !== null && !this.playerIsBroken && !this.noLoopStatusSupport) {
       this.showLoopStatus = newState.showLoopStatus;
-      if (this.showLoopStatus && !this.isRhythmboxStream) {
-        this.shuffleLoopStatus.showAnimate();
-      }
-      else {
+      if (!this.showLoopStatus) {
         this.shuffleLoopStatus.hideAnimate();
       }
     }
@@ -279,7 +272,7 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showPosition !== null && !this.playerIsBroken) {
       this.showPosition = newState.showPosition;
-      if (this.showPosition && this.trackLength !== 0 && !this.isRhythmboxStream) {
+      if (this.showPosition && this.trackLength !== 0 && this.status !== Settings.Status.STOP && !this.isRhythmboxStream) {
         this.position.showAnimate();
       }
       else {
@@ -331,7 +324,7 @@ const PlayerUI = new Lang.Class({
       this.ratings = newState.trackRating;
       if (this.ratings !== 'no rating') {
         this.trackRatings.rate(this.ratings);
-        if (this.showRating && !this.isRhythmboxStream) {
+        if (this.showRating && !this.isRhythmboxStream && this.status !== Settings.Status.STOP) {
           this.trackRatings.showAnimate();
         }
       }
@@ -370,20 +363,34 @@ const PlayerUI = new Lang.Class({
     }
 
     if (newState.canGoNext !== null) {
-      if (newState.canGoNext) {
+      this.canGoNext = newState.canGoNext;
+      if (this.canGoNext) {
         this.nextButton.enable();
       }
       else {
         this.nextButton.disable();
       }
+      if (!this.canGoNext && !this.canGoPrevious && !this.canPlay && !this.canPause) {
+        this.stopButton.disable();
+      }
+      else {
+        this.stopButton.enable();
+      }
     }
 
     if (newState.canGoPrevious !== null) {
-      if (newState.canGoPrevious) {
+      this.canGoPrevious = newState.canGoPrevious;
+      if (this.canGoPrevious) {
         this.prevButton.enable();
       }
       else {
         this.prevButton.disable();
+      }
+      if (!this.canGoNext && !this.canGoPrevious && !this.canPlay && !this.canPause) {
+        this.stopButton.disable();
+      }
+      else {
+        this.stopButton.enable();
       }
     }
 
@@ -391,19 +398,87 @@ const PlayerUI = new Lang.Class({
       this.position.setReactive(newState.canSeek)
     }
 
+    if (newState.canPlay !== null) {
+      this.canPlay = newState.canPlay;
+      if (this.status !== Settings.Status.PLAY) {
+        if (this.canPlay) {
+           this.playButton.enable();
+        }
+        else {
+           this.playButton.disable();
+        }
+      }
+      if (!this.canGoNext && !this.canGoPrevious && !this.canPlay && !this.canPause) {
+        this.stopButton.disable();
+      }
+      else {
+        this.stopButton.enable();
+      }
+    }
+
+    if (newState.canPause !== null) {
+      this.canPause = newState.canPause;
+      if (this.status === Settings.Status.PLAY) {
+        if (this.canPause) {
+          this.playButton.enable();
+          if (!this.showStopButton) {
+            this.stopButton.hide();
+          }
+        }
+        else {
+           // If we're playing and we can't pause
+           // we should show the stop button no matter what.
+           this.stopButton.show();
+           this.playButton.disable();
+        }
+      }
+      if (!this.canGoNext && !this.canGoPrevious && !this.canPlay && !this.canPause) {
+        this.stopButton.disable();
+      }
+      else {
+        this.stopButton.enable();
+      }
+    }
+
     if (newState.trackTime !== null && !this.playerIsBroken) {
       if (this.trackLength === 0) {
         this.position.hideAnimate();
       }
-      else {
+      else if (this.status !== Settings.Status.STOP && this.showPosition && !this.isRhythmboxStream) {
         this.position.setValue(newState.trackTime / this.trackLength);
+        this.position.showAnimate();
       }
     }
 
     if (newState.status !== null) {
-      if (newState.status === Settings.Status.STOP) {
-        this.setPlayStatusIcon('media-playback-stop-symbolic');
+      this.status = newState.status;
+      if (this.status === Settings.Status.PLAY) {
+        this.setPlayStatusIcon('media-playback-start-symbolic');
+        this.playButton.setIcon('media-playback-pause-symbolic');
+        if (this.canPause) {
+          this.playButton.enable();
+          if (!this.showStopButton) {
+            this.stopButton.hide();
+          }
+        }
+        else {
+           // If we're playing and we can't pause
+           // we should show the stop button no matter what.
+           this.stopButton.show();
+           this.playButton.disable();
+        }
+      }
+      else {
         this.playButton.setIcon('media-playback-start-symbolic');
+        if (this.canPlay) {
+           this.playButton.enable();
+        }
+        else {
+           this.playButton.disable();
+        }                 
+      }      
+      if (this.status === Settings.Status.STOP) {
+        this.setPlayStatusIcon('media-playback-stop-symbolic');
         this.stopButton.hide();
         if (!this.playerIsBroken) {
           this.position.hideAnimate();
@@ -419,30 +494,37 @@ const PlayerUI = new Lang.Class({
         if (this.showStopButton) {
           this.stopButton.show();
         }
-        this.trackCover.showAnimate();
-        if (!this.playerIsBroken && this.showRating && !this.isRhythmboxStream && this.ratings !== 'no rating') {
+        if (!this.isRhythmboxStream) {
+          this.trackCover.showAnimate();
+        }
+        if (this.showRating && !this.isRhythmboxStream && this.ratings !== 'no rating') {
           this.trackRatings.showAnimate();
         }
         this.info.showAnimate();
-        if (!this.playerIsBroken && this.showLoopStatus && !this.isRhythmboxStream && !this.noLoopStatusSupport) {
-          this.shuffleLoopStatus.showAnimate();
-        }
-        if (!this.playerIsBroken && this.showPosition && this.trackLength !== 0 && !this.isRhythmboxStream) {
+        if (this.showPosition && this.trackLength !== 0 && !this.isRhythmboxStream) {
           this.position.showAnimate();
         }
       }
 
-      if (newState.status === Settings.Status.PLAY) {
-        this.setPlayStatusIcon('media-playback-start-symbolic');
-        this.playButton.setIcon('media-playback-pause-symbolic');
-      }
-      if (newState.status === Settings.Status.PAUSE) {
+      if (this.status === Settings.Status.PAUSE) {
         this.setPlayStatusIcon('media-playback-pause-symbolic');
-        this.playButton.setIcon('media-playback-start-symbolic');
+      }
+    }
+
+    if (newState.showStopButton !== null) {
+      this.showStopButton = newState.showStopButton;
+      if (this.showStopButton && this.status !== Settings.Status.STOP) {
+        this.stopButton.show();
+      }       
+      else if (this.status === Settings.Status.PLAY && this.canPause) {
+        this.stopButton.hide();
       }
     }
 
     if (newState.trackCoverUrl !== null) {
+      if (!this.isRhythmboxStream && this.status !== Settings.Status.STOP) {
+        this.trackCover.showAnimate();
+      }
       this.setCoverIconAsync(this.trackCover.icon, newState.trackCoverUrl, '', false, this.trackCover.animating);
     }
 
@@ -477,6 +559,12 @@ const PlayerUI = new Lang.Class({
 
     if (newState.updatedMetadata !== null && !this.playerIsBroken) {
       this.tracklist.updateMetadata(newState.updatedMetadata);
+    }
+    // Little bit of the chicken and the egg going on so this has to be naked
+    // and on the bottom otherwise it doesn't show when it's suppose to.
+    // Making sure things intellihide amd show correctly is a PITA.
+    if (this.showLoopStatus && !this.isRhythmboxStream && this.status !== Settings.Status.STOP) {
+      this.shuffleLoopStatus.showAnimate();
     }
   },
 

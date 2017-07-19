@@ -115,7 +115,8 @@ function init() {
         },
         stop_button: {
             type: "b",
-            label: _("Show a Stop Button in the Player Controls")
+            label: _("Always show a Stop Button in the Player Controls"),
+            help: _("Otherwise a Stop Button is only shown if the Player is Playing but can't be Paused.")
         },
         loop_status: {
             type: "b",

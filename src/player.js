@@ -85,6 +85,8 @@ const PlayerState = new Lang.Class({
   updatedMetadata: null,
   updatedPlaylist: null,
   hasTrackList: null,
+  canPlay: null,
+  canPause: null,
   canSeek: null,
   canGoNext: null,
   canGoPrevious: null,
@@ -387,6 +389,22 @@ const MPRISPlayer = new Lang.Class({
             }
           }
 
+          if (props.CanPlay) {
+            let canPlay = props.CanPlay.unpack();
+            if (this.state.canPlay !== canPlay) {
+              newState.canPlay = canPlay;
+              newState.emitSignal = true;
+            }
+          }
+
+          if (props.CanPause) {
+            let canPause = props.CanPause.unpack();
+            if (this.state.canPause !== canPause) {
+              newState.canPause = canPause;
+              newState.emitSignal = true;
+            }
+          }
+
           if (props.CanGoNext) {
             let canGoNext = props.CanGoNext.unpack();
             if (this.state.canGoNext !== canGoNext) {
@@ -523,6 +541,8 @@ const MPRISPlayer = new Lang.Class({
       let newState = new PlayerState({
         canGoNext: this.canGoNext,
         canGoPrevious: this.canGoPrevious,
+        canPlay: this.canPlay,
+        canPause: this.canPause,
         canSeek: this.canSeek,
         hasTrackList: this.hasTrackList,
         volume: this.volume,
@@ -628,6 +648,22 @@ const MPRISPlayer = new Lang.Class({
         canGoPrevious = true;
       }
       return canGoPrevious;
+    },
+
+    get canPlay() {
+      let canPlay = this._mediaServerPlayer.CanPlay;
+      if (canPlay === null) {
+        canPlay = true;
+      }
+      return canPlay;
+    },
+
+    get canPause() {
+      let canPause = this._mediaServerPlayer.CanPause;
+      if (canPause === null) {
+        canPause = true;
+      }
+      return canPause;
     },
 
     get canSeek() {
@@ -782,7 +818,21 @@ const MPRISPlayer = new Lang.Class({
           }
           this._prop.GetAllRemote('org.mpris.MediaPlayer2.Player',
             Lang.bind(this, function([props], err) {
-              if (!err) {                             
+              if (!err) {
+                if (newState.canPlay === null && props.CanPlay) {
+                  let canPlay = props.CanPlay.unpack();
+                  if (this.state.canPlay !== canPlay) {
+                    newState.canPlay = canPlay;
+                    newState.emitSignal = true;
+                  }
+                }
+                if (newState.canPause === null && props.CanPause) {
+                  let canPause = props.CanPause.unpack();
+                  if (this.state.canPause !== canPause) {
+                    newState.canPause = canPause;
+                    newState.emitSignal = true;
+                  }
+                }                             
                 if (newState.canGoNext === null && props.CanGoNext) {
                 let canGoNext = props.CanGoNext.unpack();
                   if (this.state.canGoNext !== canGoNext) {
