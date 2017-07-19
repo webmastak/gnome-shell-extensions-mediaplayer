@@ -14,6 +14,7 @@ builddir/
 build/
 .vscode/
 config/
+mediaplayer@patapon.info/
 
 *~
 *.gmo
@@ -22,5 +23,6 @@ metadata.json
 gschemas.compiled
 _build
 zip-files
+*.zip
 
 *.swp

@@ -17,15 +17,15 @@ TMP_DIR="/tmp/share/gnome-shell/extensions/$UUID"
 
 build_type=$1
 if [ -z $build_type ]; then
-  build_type="--install-local"
+  build_type="--install"
 fi
 
-if [ -d "./$BUILD_DIR" ]; then
+if [ -d "$PWD/$BUILD_DIR" ]; then
   echo "A current build directory already exists. Would you like to remove it?"
   select yn in "Yes" "No"; do
       case $yn in
           Yes )
-            rm -rf "./$BUILD_DIR"
+            rm -rf "$PWD/$BUILD_DIR"
             echo "Build directory was removed succesufly"
           break;;
           No )
@@ -35,20 +35,29 @@ if [ -d "./$BUILD_DIR" ]; then
   done
 fi
 
+function build {
+  prefix=$1
+  meson $BUILD_DIR --prefix=$prefix
+  ninja -C $BUILD_DIR install
+}
+
 
 case $build_type in
   "--install"*)
-      meson $BUILD_DIR --prefix=$LOCAL_PREFIX
-      ninja -C $BUILD_DIR install
+    build $LOCAL_PREFIX
   ;;
   "--zip-file"*)
-      meson $BUILD_DIR --prefix=/tmp
-      ninja -C $BUILD_DIR install
+      build "/tmp"
       dest=$PWD
-      cd $TMP_DIR
+      cd $TMP_DIR || exit
       zip -rq $dest/$UUID.zip .
-      rm -rf $TMP_DIR
+      if [ -d $TMP_DIR ]; then
+        rm -rf $TMP_DIR
+      fi
+      cd $dest
   ;;
 esac
-rm -rf $dest/$BUILD_DIR
+if [ -d "$PWD/$BUILD_DIR" ]; then
+  rm -rf $PWD/$BUILD_DIR
+fi
 echo "Done"
