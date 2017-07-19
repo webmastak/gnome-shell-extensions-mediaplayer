@@ -1,14 +1,11 @@
 #!/usr/bin/sh
 
 # Possible arguments
-#./build --install-local
-#To build and install locally and get any error and what not.
-
-#./build --install-system-wide
-#To build and install system wide and get any error and what not. and be prompted for a sudo password when needed.
+#./build --install
+#To build and install locally.
 
 #./build --zip-file
-#To build and the zip file and get any error and what not.
+#To build and the zip file.
 
 BUILD_DIR="builddir"
 LOCAL_PREFIX="$HOME/.local"
