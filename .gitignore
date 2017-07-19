@@ -10,14 +10,19 @@ autom4te.cache/
 po/POTFILES
 po/stamp-it
 po/*.pot
+builddir/
+build/
+.vscode/
+config/
+mediaplayer@patapon.info/
 
 *~
 *.gmo
 metadata.json
-*.gschema.xml
 *.gschema.valid
 gschemas.compiled
 _build
 zip-files
+*.zip
 
 *.swp

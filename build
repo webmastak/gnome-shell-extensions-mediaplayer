@@ -1,0 +1,63 @@
+#!/usr/bin/sh
+
+# Possible arguments
+#./build --install-local
+#To build and install locally and get any error and what not.
+
+#./build --install-system-wide
+#To build and install system wide and get any error and what not. and be prompted for a sudo password when needed.
+
+#./build --zip-file
+#To build and the zip file and get any error and what not.
+
+BUILD_DIR="builddir"
+LOCAL_PREFIX="$HOME/.local"
+UUID="mediaplayer@patapon.info"
+TMP_DIR="/tmp/share/gnome-shell/extensions/$UUID"
+
+build_type=$1
+if [ -z $build_type ]; then
+  build_type="--install"
+fi
+
+if [ -d "$PWD/$BUILD_DIR" ]; then
+  echo "A current build directory already exists. Would you like to remove it?"
+  select yn in "Yes" "No"; do
+      case $yn in
+          Yes )
+            rm -rf "$PWD/$BUILD_DIR"
+            echo "Build directory was removed succesufly"
+          break;;
+          No )
+            echo "The old build directory must be removed first. Exiting"
+          exit;;
+      esac
+  done
+fi
+
+function build {
+  prefix=$1
+  meson $BUILD_DIR --prefix=$prefix
+  ninja -C $BUILD_DIR install
+}
+
+
+case $build_type in
+  "--install"*)
+    build $LOCAL_PREFIX
+  ;;
+  "--zip-file"*)
+      build "/tmp"
+      dest=$PWD
+      cd $TMP_DIR || exit
+      zip -rq $dest/$UUID.zip .
+      if [ -d $TMP_DIR ]; then
+        rm -rf $TMP_DIR
+      fi
+      cd $dest
+  ;;
+esac
+if [ -d "$PWD/$BUILD_DIR" ]; then
+  rm -rf $PWD/$BUILD_DIR
+fi
+echo "Done"
