@@ -83,6 +83,7 @@ const BROKEN_PLAYERS = [
 ];
 
 const NO_LOOP_STATUS_SUPPORT = [
+    "org.mpris.MediaPlayer2.quodlibet",
     "org.mpris.MediaPlayer2.pithos",
     "org.mpris.MediaPlayer2.spotify"
 ];
