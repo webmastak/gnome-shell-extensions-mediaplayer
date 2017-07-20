@@ -399,7 +399,7 @@ const TrackCover = new Lang.Class({
     Extends: BaseContainer,
 
     _init: function(icon) {
-      this.parent({hover: false});
+      this.parent({hover: false, style_class: 'no-padding-bottom'});
       this.icon = icon;
       this.actor.add(this.icon, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     }
@@ -508,7 +508,7 @@ const TrackRating = new Lang.Class({
         this._hidden = false;
         this._player = player;
         this._animateChange = Util.animateChange;
-        this.parent({style_class: 'no-padding-bottom no-padding-top', hover: false});
+        this.parent({style_class: 'no-padding-bottom', hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this._applyFunc = null;
@@ -672,14 +672,11 @@ const TrackRating = new Lang.Class({
     },
 
     applyLollypopRating: function(value) {
-        if (value !== 0) {
-          GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
-          // Lollypop doesn't emit a prop change signal when we rate the song but it will more
-          // than likely stick so we just fake it...
-          // You also can't set the rating to zero for some reason so you can't "unrate" a song.
-          // https://github.com/gnumdk/lollypop/issues/930
-          this.rate(value);
-        }
+        // Lollypop works on 0 to 5 scores.
+        GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
+        // Lollypop doesn't emit a prop change signal when we rate the song but it will more
+        // than likely stick so we just fake it...
+        this.rate(value);
     },
 
     applyRhythmbox3Rating: function(value) {

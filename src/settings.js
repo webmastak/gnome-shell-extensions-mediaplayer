@@ -79,11 +79,12 @@ const ALTERNATIVE_TRACKLIST_TITLES = [
 ];
 
 const BROKEN_PLAYERS = [
-    "Spotify"
+    "org.mpris.MediaPlayer2.spotify"
 ];
 
 const NO_LOOP_STATUS_SUPPORT = [
-    "Pithos"
+    "org.mpris.MediaPlayer2.pithos",
+    "org.mpris.MediaPlayer2.spotify"
 ];
 
 let gsettings;
