@@ -50,6 +50,11 @@ const PlayerUI = new Lang.Class({
 
     this.oldShouldShow = null;
 
+    //Clementine rapid fires metadata updates many without a coverUrl, if we animate
+    //cover changes we end up with no cover just about every other song. As it is
+    //there is still a bit of a noticeable flicker. 
+    this.isClementine = this.player.busName == 'org.mpris.MediaPlayer2.clementine';
+
     this.playlistTitle = new Widget.PlaylistTitle();
     this.playlistTitle.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.playlistTitle);
@@ -511,7 +516,10 @@ const PlayerUI = new Lang.Class({
           && this.state.status !== Settings.Status.STOP) {
         this.trackCover.showAnimate();
       }
-      this.setCoverIconAsync(this.trackCover.icon, this.state.trackCoverUrl, '', false, this.trackCover.animating);
+      this.setCoverIconAsync(this.trackCover.icon,
+                             this.state.trackCoverUrl,
+                             '', this.isClementine || false,
+                             this.trackCover.animating);
     }
 
     if (newState.playlists !== null) {
