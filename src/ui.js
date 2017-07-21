@@ -244,9 +244,9 @@ const PlayerUI = new Lang.Class({
 
     if (newState.showPosition !== null) {
       if (this.state.showPosition
-          && this.player.state.trackLength !== 0
-          && this.player.state.status !== Settings.Status.STOP
-          && !this.player.state.isRhythmboxStream) {
+          && this.state.trackLength !== 0
+          && this.state.status !== Settings.Status.STOP
+          && !this.state.isRhythmboxStream) {
         this.position.showAnimate();
       }
       else {
@@ -401,8 +401,8 @@ const PlayerUI = new Lang.Class({
             this.stopButton.hide();
           }
         }
-        else {
-           // If we're playing and we can't pause
+        else if (!this.player.playerIsBroken) {
+           // If we're playing, we can't pause, and the player isn't broken
            // we should show the stop button no matter what.
            this.stopButton.show();
            this.playButton.disable();
@@ -441,8 +441,8 @@ const PlayerUI = new Lang.Class({
             this.stopButton.hide();
           }
         }
-        else {
-           // If we're playing and we can't pause
+        else if (!this.player.playerIsBroken) {
+           // If we're playing, we can't pause, and the player isn't broken
            // we should show the stop button no matter what.
            this.stopButton.show();
            this.playButton.disable();

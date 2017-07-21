@@ -102,6 +102,8 @@ const PlayerState = new Lang.Class({
   shuffle: null,
   loopStatus: null,
 
+  timeFresh: null,
+
   emitSignal: null,
 });
 
@@ -184,7 +186,7 @@ const MPRISPlayer = new Lang.Class({
           //global.log(JSON.stringify(state));
           this.state.update(state);
           if (state.status)
-            this._onStatusChange();
+            this._onStatusChange(state);
           this.emit('player-update', state);
         }));
 
@@ -950,20 +952,19 @@ const MPRISPlayer = new Lang.Class({
                 }
                 if (props.Position) {
                   let position = Math.round(props.Position.unpack() / 1000000);
+                  newState.timeFresh = true;
                   if (this.trackTime !== position) {
                     this._trackTime = position;
                     newState.trackTime = position;
                     newState.emitSignal = true;
                   }
                   if (this.state.showPosition == false && this.showPosition) {
-                    this._positionError = false;
                     // Reenable showPosition after error
                     newState.showPosition = true;
                     newState.emitSignal = true;
                   }
                 }
                 else if (this.state.showPosition) {
-                  this._positionError = true;
                   newState.showPosition = false;
                   newState.emitSignal = true;
                 }
@@ -1028,18 +1029,27 @@ const MPRISPlayer = new Lang.Class({
       }
     },
 
-    _onStatusChange: function() {
+    _onStatusChange: function(newState) {
+      // If the player is broken (Spotify you suck...) we'll never see the
+      // position slider any way. No need to waste CPU cycles
+      // on a timer...
+      if (this.playerIsBroken) {
+        return;
+      }
       // sync track time
-      let newState = new PlayerState();
-      this._refreshProperties(newState)
-      let status = this.state.status;
-      if (status == Settings.Status.PLAY) {
+      // If the time is fresh we just came from a
+      // properties refresh and don't need to do it again. 
+      if (!newState.timeFresh) {
+        let newState = new PlayerState();
+        this._refreshProperties(newState)
+      }
+      if (this.state.status == Settings.Status.PLAY) {
         this._startTimer();
       }
-      else if (status == Settings.Status.PAUSE) {
+      else if (this.state.status == Settings.Status.PAUSE) {
         this._stopTimer();
       }
-      else if (status == Settings.Status.STOP) {
+      else if (this.state.status == Settings.Status.STOP) {
         this._stopTimer();
         this.trackTime = 0;
       }
