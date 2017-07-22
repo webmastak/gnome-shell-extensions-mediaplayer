@@ -121,7 +121,6 @@ function parseMetadata(metadata, state) {
   state.trackObj = metadata["mpris:trackid"] ? metadata["mpris:trackid"].unpack() : "/org/mpris/MediaPlayer2/TrackList/NoTrack";
   state.trackCoverUrl = metadata["mpris:artUrl"] ? metadata["mpris:artUrl"].unpack() : "";
   state.trackRating = metadata["xesam:userRating"] ? parseInt(metadata["xesam:userRating"].unpack() * 5) : 'no rating';
-  state.trackRating = metadata.rating ? parseInt(metadata.rating.unpack()) : state.trackRating;
   state.trackRating = metadata["pithos:rating"] ? metadata["pithos:rating"].unpack() : state.trackRating;
   state.isRhythmboxStream = metadata["rhythmbox:streamTitle"] ? true : false;
 };

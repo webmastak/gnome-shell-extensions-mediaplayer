@@ -206,6 +206,7 @@ const MPRISPlayer = new Lang.Class({
 
     _init3: function() {
         this.info.canRaise = this._mediaServer.CanRaise;
+        this.isClementine = this.busName == 'org.mpris.MediaPlayer2.clementine';
         this.playerIsBroken = Settings.BROKEN_PLAYERS.indexOf(this.busName) != -1;
         this.noLoopStatusSupport = Settings.NO_LOOP_STATUS_SUPPORT.indexOf(this.busName) != -1;
         this.hasWrongVolumeScaling = Settings.WRONG_VOLUME_SCALING.indexOf(this.busName) != -1;
@@ -784,15 +785,15 @@ const MPRISPlayer = new Lang.Class({
     },
 
     get showPlaylist() {
-      return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY) && !this.playerIsBroken;
+      return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY) && !this.playerIsBroken && !this.isClementine;
     },
 
     get showPlaylistTitle() {
-      return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLIST_TITLE_KEY) && !this.playerIsBroken;
+      return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLIST_TITLE_KEY) && !this.playerIsBroken && !this.isClementine;
     },
 
     get showTracklist() {
-      return this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY) && !this.playerIsBroken;
+      return this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY) && !this.playerIsBroken && !this.isClementine;
     },
 
     get showTracklistRating() {
