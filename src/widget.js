@@ -673,10 +673,9 @@ const TrackRating = new Lang.Class({
 
     applyLollypopRating: function(value) {
         // Lollypop works on 0 to 5 scores.
+        // Lollypop also does the right thing and emits a prop change signal
+        // on ratings changes so we don't have to fake it and set it ourself.
         GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
-        // Lollypop doesn't emit a prop change signal when we rate the song but it will more
-        // than likely stick so we just fake it...
-        this.rate(value);
     },
 
     applyRhythmbox3Rating: function(value) {
@@ -948,7 +947,9 @@ const TracklistItem = new Lang.Class({
         this._setCoverIconAsync = Util.setCoverIconAsync;
         this._animateChange = Util.animateChange;
         this._rating = null;
-        this._coverIcon = new St.Icon({icon_name: 'audio-x-generic-symbolic', style_class: 'small-cover-icon'});
+        this._coverIcon = new St.Icon({style_class: 'small-cover-icon'});
+        let _icon_box = new St.BoxLayout({height: 48, width: 48});
+        _icon_box.add(this._coverIcon, {y_fill: false, y_align: St.Align.MIDDLE});
         this._artistLabel = new St.Label({style_class: 'track-info-artist'});
         this._titleLabel = new St.Label({style_class: 'track-info-title'});
         this._albumLabel = new St.Label({style_class: 'track-info-album'});
@@ -959,7 +960,7 @@ const TracklistItem = new Lang.Class({
         this._box.add(this._titleLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
         this._box.add(this._albumLabel, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
         this._box.add(this._ratingBox, {expand: true, y_fill: false, y_align: St.Align.MIDDLE});
-        this.actor.add(this._coverIcon, {y_fill: false, y_align: St.Align.MIDDLE});
+        this.actor.add(_icon_box, {y_fill: false, y_align: St.Align.MIDDLE});
         this.actor.add(this._box, {y_fill: false, y_align: St.Align.MIDDLE});
         this._validRatings = metadata.trackRating != 'no rating';
         if (this._player._pithosRatings) {
