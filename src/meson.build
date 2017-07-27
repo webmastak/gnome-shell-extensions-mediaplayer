@@ -1,9 +1,3 @@
-conf = configuration_data()
-conf.set('LOCALEDIR', LOCALE_DIR)
-conf.set('URL', URL)
-conf.set('UUID', UUID)
-
-
 install_data([
     'dbus.js',
     'extension.js',
@@ -16,7 +10,8 @@ install_data([
     'stylesheet.css',
     'ui.js',
     'util.js',
-    'widget.js'
+    'widget.js',
+    'metadata.json'
   ],
   install_dir: EXTENSION_DIR
 )
@@ -24,12 +19,4 @@ install_data([
 install_data(
     'org.gnome.shell.extensions.mediaplayer.gschema.xml',
     install_dir : SCHEMA_DIR
-)
-
-configure_file(
-  input: 'metadata.json.in',
-  output: 'metadata.json',
-  configuration: conf,
-  install: true,
-  install_dir: EXTENSION_DIR
 )
