@@ -151,6 +151,7 @@ const MPRISPlayer = new Lang.Class({
         this._mediaServerTracklist = null;
         this._prop = null;
         this._pithosRatings = null;
+        this._ratingsExtension = null;
         new DBusIface.MediaServer2(busName,
                                    Lang.bind(this, function(proxy) {
                                         this._mediaServer = proxy;
@@ -176,6 +177,11 @@ const MPRISPlayer = new Lang.Class({
                                         this._pithosRatings = proxy;
                                         this._init2();
                                     }));
+        new DBusIface.RatingsExtension(busName,
+                                       Lang.bind(this, function(proxy) {
+                                           this._ratingsExtension = proxy;
+                                           this._init2();
+                                       }));
         new DBusIface.Properties(busName,
                                  Lang.bind(this, function(proxy) {
                                     this._prop = proxy;
@@ -198,8 +204,9 @@ const MPRISPlayer = new Lang.Class({
             && this._mediaServerPlayer !== null
             && this._mediaServerPlaylists !== null
             && this._mediaServerTracklist !== null
-            && this._prop !== null
-            && this._pithosRatings !== null) {
+            && this._pithosRatings !== null
+            && this._ratingsExtension !== null
+            && this._prop !== null) {
             this._init3();
         }
     },

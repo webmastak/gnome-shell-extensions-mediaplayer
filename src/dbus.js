@@ -175,6 +175,17 @@ const PithosRatingsIface = '<node>\
 </node>';
 const PithosRatingsProxy = Gio.DBusProxy.makeProxyWrapper(PithosRatingsIface);
 
+const RatingsExtensionIface = '<node>\
+    <interface name="org.mpris.MediaPlayer2.ExtensionSetRatings">\
+        <method name="SetRating">\
+            <arg type="o" direction="in" />\
+            <arg type="d" direction="in" />\
+        </method>\
+        <property name="HasRatingsExtension" type="b" access="read" />\
+    </interface>\
+</node>';
+const RatingsExtensionProxy = Gio.DBusProxy.makeProxyWrapper(RatingsExtensionIface);
+
 const Rhythmbox3Iface = '<node>\
     <interface name="org.gnome.Rhythmbox3.RhythmDB">\
         <method name="SetEntryProperties">\
@@ -234,6 +245,17 @@ function PithosRatings(owner, callback) {
       else {
         callback(false);
       }
+    }
+}
+
+function RatingsExtension(owner, callback) {
+    let proxy = new RatingsExtensionProxy(Gio.DBus.session, owner,
+                                          '/org/mpris/MediaPlayer2');
+    if (proxy.HasRatingsExtension) {
+      callback(proxy);
+    }
+    else {
+      callback(false);
     }
 }
 

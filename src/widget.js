@@ -513,28 +513,32 @@ const TrackRating = new Lang.Class({
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this._applyFunc = null;
         this._value = null;
+        this._isNuvolaPlayer = false;
+        this._rhythmbox3Proxy = false;
         if (this._player._pithosRatings) {
-          this._isNuvolaPlayer = false;
-          this._rhythmbox3Proxy = false;
           this.rate = this._ratePithos;
           this._buildPithosRatings();
         }
         else {
-          this._isNuvolaPlayer = this._player.busName.indexOf("org.mpris.MediaPlayer2.NuvolaApp") != -1;
-          if (this._isNuvolaPlayer) {
-            this._rhythmbox3Proxy = false;
-            this._applyFunc = this.applyNuvolaRating;
+          if (this._player._ratingsExtension) {
+            this._applyFunc = this.applyRatingsExtension;
           }
           else {
-            // Supported players (except for Nuvola Player & Pithos)
-            let supported = {
-                "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
-                "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
-                "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
-            };
-            if (supported[this._player.busName]) {
-              this._rhythmbox3Proxy = new DBusIface.RhythmboxRatings(this._player.busName);
-              this._applyFunc = supported[this._player.busName];
+            this._isNuvolaPlayer = this._player.busName.indexOf("org.mpris.MediaPlayer2.NuvolaApp") != -1;
+            if (this._isNuvolaPlayer) {
+              this._applyFunc = this.applyNuvolaRating;
+            }
+            else {
+              // Supported players (except for Nuvola Player & Pithos)
+              let supported = {
+                  "org.mpris.MediaPlayer2.rhythmbox": this.applyRhythmbox3Rating,
+                  "org.mpris.MediaPlayer2.quodlibet": this.applyQuodLibetRating,
+                  "org.mpris.MediaPlayer2.Lollypop": this.applyLollypopRating
+              };
+              if (supported[this._player.busName]) {
+                this._rhythmbox3Proxy = new DBusIface.RhythmboxRatings(this._player.busName);
+                this._applyFunc = supported[this._player.busName];
+              }
             }
           }
           this.rate = this._rate;
@@ -691,6 +695,12 @@ const TrackRating = new Lang.Class({
     applyNuvolaRating: function(value) {
         if (this.player._mediaServerPlayer.NuvolaCanRate) {
             this.player._mediaServerPlayer.NuvolaSetRatingRemote(value / 5.0);
+        }
+    },
+
+    applyRatingsExtension: function(value) {
+        if (this._player.state.trackObj) {
+            this._player._ratingsExtension.SetRatingRemote(this._player.state.trackObj, value / 5.0);
         }
     }
 });
