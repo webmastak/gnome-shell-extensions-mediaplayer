@@ -114,37 +114,28 @@ const MPRISPlayer = new Lang.Class({
     _init: function(busName, owner) {
         let baseName = busName.split('.')[3];
 
-        this.info = {
-            owner: owner,
-            busName: busName,
-            app: null,
-            appInfo: null,
-            // Guess a name based on the dbus path
-            identity: baseName.charAt(0).toUpperCase() + baseName.slice(1),
-            canRaise: false
-        };
-
         this.state = new PlayerState();
 
         this.owner = owner;
         this.busName = busName;
+        this.isClementine = this.busName == 'org.mpris.MediaPlayer2.clementine';
+        this.playerIsBroken = Settings.BROKEN_PLAYERS.indexOf(this.busName) != -1;
+        this.noLoopStatusSupport = Settings.NO_LOOP_STATUS_SUPPORT.indexOf(this.busName) != -1;
+        this.hasWrongVolumeScaling = Settings.WRONG_VOLUME_SCALING.indexOf(this.busName) != -1;
+        this.app = null;
         // Guess the name based on the dbus path
         // Should be overriden by the Identity property
         this._identity = baseName.charAt(0).toUpperCase() + baseName.slice(1);
         this._trackTime = 0;
         this._wantedSeekValue = 0;
-
         this._timerId = 0;
         this._playlistTimeOutId = 0;
         this._tracklistTimeOutId = 0;
-
         this._settings = Settings.gsettings;
         this.parseMetadata = Util.parseMetadata;
         this._signalsId = [];
         this._tracklistSignalsId = [];
         this._trackIds = [];
-
-        this.parent(this._identity, true);
         this._mediaServer = null;
         this._mediaServerPlayer = null;
         this._mediaServerPlaylists = null;
@@ -212,11 +203,6 @@ const MPRISPlayer = new Lang.Class({
     },
 
     _init3: function() {
-        this.info.canRaise = this._mediaServer.CanRaise;
-        this.isClementine = this.busName == 'org.mpris.MediaPlayer2.clementine';
-        this.playerIsBroken = Settings.BROKEN_PLAYERS.indexOf(this.busName) != -1;
-        this.noLoopStatusSupport = Settings.NO_LOOP_STATUS_SUPPORT.indexOf(this.busName) != -1;
-        this.hasWrongVolumeScaling = Settings.WRONG_VOLUME_SCALING.indexOf(this.busName) != -1;
         if (Settings.MINOR_VERSION > 19) {
         // Versions before 3.20 don't have Mpris built-in.
         // hideStockMpris setting
@@ -547,7 +533,10 @@ const MPRISPlayer = new Lang.Class({
             }
           }
         }));
-
+        if (this.desktopEntry) {
+          let appSys = Shell.AppSystem.get_default();
+          this.app = appSys.lookup_app(this.desktopEntry + ".desktop");
+        }
         this.populate();
     },
 
@@ -617,10 +606,6 @@ const MPRISPlayer = new Lang.Class({
       else {
         newState.showTracklist = false;
       }
-
-      this._getPlayerInfo();
-
-      this.emit('player-update-info', this.info);
 
       this.emit('update-player-state', newState);
     },
@@ -741,7 +726,7 @@ const MPRISPlayer = new Lang.Class({
     },
 
     get identity() {
-      return this._mediaServer.Identity || '';
+      return this._mediaServer.Identity || this._identity;
     },
 
     get desktopEntry() {
@@ -846,22 +831,12 @@ const MPRISPlayer = new Lang.Class({
     },
 
     raise: function() {
-      if (this.info.app)
-        this.info.app.activate_full(-1, 0);
-      else if (this.info.canRaise)
+      if (this.app) {
+        this.app.activate_full(-1, 0);
+      }
+      else if (this._mediaServer.CanRaise) {
         this._mediaServer.RaiseRemote();
-    },
-
-    _getPlayerInfo: function() {
-        if (this._mediaServer.Identity) {
-          this.info.identity = this.identity;
-        }
-        if (this._mediaServer.DesktopEntry) {
-          this.info.desktopEntry = this.desktopEntry;
-          let appSys = Shell.AppSystem.get_default();
-          this.info.app = appSys.lookup_app(this.info.desktopEntry + ".desktop");
-          this.info.appInfo = Gio.DesktopAppInfo.new(this.info.desktopEntry + ".desktop");
-        }
+      }
     },
 
     _refreshProperties: function(newState) {
@@ -1106,8 +1081,9 @@ const MPRISPlayer = new Lang.Class({
           }
         }
 
-        for (let id in this._signalsId)
+        for (let id in this._signalsId) {
             this._settings.disconnect(this._signalsId[id]);
+        }
     },
 
     toString: function() {

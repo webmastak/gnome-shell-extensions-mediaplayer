@@ -40,13 +40,11 @@ const PlayerUI = new Lang.Class({
   Extends: Widget.PlayerMenu,
 
   _init: function(player) {
-    this.parent(player.info.identity, true);
+    this.parent('', true);
     this.hidePlayStatusIcon();
-    this.icon.icon_name = 'audio-x-generic-symbolic';
     this.player = player;
     this.setCoverIconAsync = Util.setCoverIconAsync;
     this._updateId = player.connect('player-update', Lang.bind(this, this.update));
-    this._updateInfoId = player.connect('player-update-info', Lang.bind(this, this.updateInfo));
 
     this.oldShouldShow = null;
 
@@ -145,6 +143,14 @@ const PlayerUI = new Lang.Class({
   },
 
   update: function(player, newState) {
+    if (newState.desktopEntry !== null) {
+      this.icon.icon_name = Util.getPlayerSymbolicIcon(this.state.desktopEntry);
+    }
+
+    if (newState.playerName !== null) {
+      this.label.text = this.state.playerName;
+    }
+
     if (newState.hideStockMpris !== null) {
       if (this.stockMpris) {
         if (newState.hideStockMpris) {
@@ -556,7 +562,7 @@ const PlayerUI = new Lang.Class({
     for (let i = 0; i < altPlaylistTitles.length; i++) {
       let obj = altPlaylistTitles[i];
       for (let key in obj){
-        if (key == this.player.info.identity) {
+        if (key == this.player.busName) {
           playlistTitle = obj[key];
           break;
         }
@@ -571,7 +577,7 @@ const PlayerUI = new Lang.Class({
     for (let i = 0; i < altTracklistTitles.length; i++) {
       let obj = altTracklistTitles[i];
       for (let key in obj){
-        if (key == this.player.info.identity) {
+        if (key == this.player.busName) {
           tracklistTitle = obj[key];
           break;
         }
@@ -580,21 +586,14 @@ const PlayerUI = new Lang.Class({
     return new Widget.TrackList(tracklistTitle, this.player);
   },
 
-
-  updateInfo: function(player, playerInfo) {
-    this.label.text = playerInfo.identity;
-    this.icon.icon_name = Util.getPlayerSymbolicIcon(playerInfo.desktopEntry);
-  },
-
   toString: function() {
-      return '[object PlayerUI(%s)]'.format(this.player.info.identity);
+      return '[object PlayerUI(%s)]'.format(this.player.busName);
   },
 
 
   destroy: function() {
     if (this._updateId) {
       this.player.disconnect(this._updateId);
-      this.player.disconnect(this._updateInfoId);
     }
     this.parent();
   }

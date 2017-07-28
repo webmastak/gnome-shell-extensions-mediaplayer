@@ -71,11 +71,11 @@ const WRONG_VOLUME_SCALING = [
 ];
 
 const ALTERNATIVE_PLAYLIST_TITLES = [
-    {"Pithos": _("Stations")}
+    {"org.mpris.MediaPlayer2.pithos": _("Stations")}
 ];
 
 const ALTERNATIVE_TRACKLIST_TITLES = [
-    {"Pithos": _("Current Playlist")}
+    {"org.mpris.MediaPlayer2.pithos": _("Current Playlist")}
 ];
 
 const BROKEN_PLAYERS = [
