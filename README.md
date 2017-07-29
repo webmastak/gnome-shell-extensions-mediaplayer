@@ -23,7 +23,7 @@ any MPRIS v2.1 capable media player.
 - playlist support (org.mpris.MediaPlayer2.Playlists interface)
 - tracklist support (org.mpris.MediaPlayer2.TrackList interface)
 - Shuffle and Repeat support(not well supported by players. Lollypop has full support)
-- rating support (Not a part of the MPRIS spec, limited support with player specifc code. Currently you can set ratings in Rhythmbox, Lollypop, Nuvola Player, Quod Libet and Pithos.)
+- rating support (Not a part of the MPRIS spec, limited support with player specifc code, see [Ratings Support](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Ratings-Support). Currently you can set ratings in Rhythmbox, Lollypop, Nuvola Player, Quod Libet and Pithos.)
 - and more...
 
 ## Authors
