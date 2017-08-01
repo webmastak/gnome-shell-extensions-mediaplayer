@@ -210,6 +210,13 @@ const PlayerUI = new Lang.Class({
       }
     }
 
+    if (newState.buttonIconSize !== null) {
+      this.prevButton.setIconSize(this.state.buttonIconSize);
+      this.playButton.setIconSize(this.state.buttonIconSize);
+      this.stopButton.setIconSize(this.state.buttonIconSize);
+      this.nextButton.setIconSize(this.state.buttonIconSize);
+    }
+
     if (newState.shuffle !== null) {
       this.shuffleLoopStatus.setShuffle(this.state.shuffle);
     }

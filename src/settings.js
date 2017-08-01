@@ -36,6 +36,7 @@ const MEDIAPLAYER_HIDE_AGGINDICATOR_KEY = 'hide-aggindicator';
 const MEDIAPLAYER_POSITION_KEY = 'position';
 const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
 const MEDIAPLAYER_STOP_BUTTON_KEY = 'stop-button';
+const MEDIAPLAYER_BUTTON_ICON_SIZE_KEY = 'button-icon-size';
 const MEDIAPLAYER_PLAYLIST_TITLE_KEY = 'playlist-title';
 const MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
 const MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';
@@ -52,6 +53,13 @@ const IndicatorPosition = {
     CENTER: 0,
     RIGHT: 1,
     VOLUMEMENU: 2
+};
+
+const ButtonIconSizes = {
+    DEFAULT: 0,
+    LARGE: 1,
+    MEDIUM: 2,
+    SMALL: 3
 };
 
 const Status = {

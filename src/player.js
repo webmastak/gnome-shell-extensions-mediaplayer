@@ -77,6 +77,7 @@ const PlayerState = new Lang.Class({
   showVolume: null,
   showPosition: null,
   hideStockMpris: null,
+  buttonIconSize: null,
   showStopButton: null,
   showLoopStatus: null,
   showPlayStatusIcon: null,
@@ -278,6 +279,12 @@ const MPRISPlayer = new Lang.Class({
             if (this.state.showLoopStatus !== this.showLoopStatus) {
               this.emit('update-player-state', new PlayerState({showLoopStatus: this.showLoopStatus}));
             }
+          }))
+        );
+        // buttonIconSize setting
+        this._signalsId.push(
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('update-player-state', new PlayerState({buttonIconSize: settings.get_enum(key)}));
           }))
         );
         // showPlaylists setting
@@ -762,6 +769,10 @@ const MPRISPlayer = new Lang.Class({
 
     get showStopButton() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_STOP_BUTTON_KEY) && !this.playerIsBroken;
+    },
+
+    get buttonIconSize() {
+      return this._settings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
     },
 
     get showVolume() {
