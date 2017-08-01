@@ -56,10 +56,9 @@ const IndicatorPosition = {
 };
 
 const ButtonIconSizes = {
-    DEFAULT: 0,
-    LARGE: 1,
-    MEDIUM: 2,
-    SMALL: 3
+    SMALL: 0,
+    MEDIUM: 1,
+    LARGE: 2
 };
 
 const Status = {

@@ -1,6 +1,5 @@
 .player-button {
-    padding-left: 6px;
-    padding-right: 6px;
+    padding: 0 4px;
 }
 
 .panel-media-indicator {

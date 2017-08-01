@@ -335,11 +335,9 @@ const PlayerButton = new Lang.Class({
         let button_size = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
         let style_class = 'popup-menu-icon';
         if (button_size == Settings.ButtonIconSizes.LARGE) {
-            style_class = 'shell-mount-operation-icon';
+            style_class = 'shell-mount-operation-icon player-button';
         } else if (button_size == Settings.ButtonIconSizes.MEDIUM) {
-            style_class = 'nm-dialog-header-icon';
-        } else if (button_size == Settings.ButtonIconSizes.SMALL) {
-            style_class = 'nm-dialog-icon';
+            style_class = 'nm-dialog-header-icon player-button';
         }
         this.actor = new St.Button({child: new St.Icon({icon_name: icon, style_class: style_class})});
         this.actor.opacity = 204;
@@ -355,14 +353,12 @@ const PlayerButton = new Lang.Class({
     },
 
     setIconSize: function(size) {
-        if (size == Settings.ButtonIconSizes.DEFAULT)
-            this.actor.child.style_class = 'popup-menu-icon';
-        else if (size == Settings.ButtonIconSizes.LARGE)
-            this.actor.child.style_class = 'shell-mount-operation-icon';
+        if (size == Settings.ButtonIconSizes.LARGE)
+            this.actor.child.style_class = 'shell-mount-operation-icon player-button';
         else if (size == Settings.ButtonIconSizes.MEDIUM)
-            this.actor.child.style_class = 'nm-dialog-header-icon';
+            this.actor.child.style_class = 'nm-dialog-header-icon player-button';
         else if (size == Settings.ButtonIconSizes.SMALL)
-            this.actor.child.style_class = 'nm-dialog-icon';
+            this.actor.child.style_class = 'popup-menu-icon';
     },
 
     enable: function() {

@@ -58,6 +58,15 @@ function init() {
             step: 5,
             default: 300
         },
+        button_icon_size: {
+            type: "e",
+            label: _("Player button size"),
+            list: [
+                { nick: 'small', name: _("Small"), id: 0 },
+                { nick: 'medium', name: _("Medium"), id: 1 },
+                { nick: 'large', name: _("Large"), id: 2 }
+            ]
+        },
         cover_status: {
             type: "b",
             label: _("Show the current Song's cover in the Panel."),
@@ -122,17 +131,7 @@ function init() {
             type: "b",
             label: _("Show Shuffle and Repeat Buttons in the Player Controls"),
             help: _("Very few player implement this correctly, if at all.")
-        },
-        button_icon_size: {
-            type: "e",
-            label: _("Player button size"),
-            list: [
-                { nick: 'default', name: _("Default"), id: 0 },
-                { nick: 'large', name: _("Large"), id: 1 },
-                { nick: 'medium', name: _("Medium"), id: 2 },
-                { nick: 'small', name: _("Small"), id: 3 }
-            ]
-        },
+        }
     };
 
     if (Gtk.get_minor_version() > 19) {
