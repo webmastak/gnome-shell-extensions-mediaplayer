@@ -4,6 +4,12 @@
     <value nick='right' value='1'/>
     <value nick='volume-menu' value='2'/>
   </enum>
+  <enum id='org.gnome.shell.extensions.mediaplayer.button-sizes'>
+    <value nick='default' value='0'/>
+    <value nick='large' value='1'/>
+    <value nick='medium' value='2'/>
+    <value nick='small' value='3'/>
+  </enum>
   <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
     <key name="indicator-position" enum="org.gnome.shell.extensions.mediaplayer.positions">
         <default>'volume-menu'</default>
@@ -18,6 +24,10 @@
         <default>false</default>
         <summary>Show the current tracks cover in the panel</summary>
         <description>Show the current tracks cover in the panel instead of an icon.</description>
+    </key>
+    <key name="button-icon-size" enum="org.gnome.shell.extensions.mediaplayer.button-sizes">
+        <default>'default'</default>
+        <summary>The size of the play control buttons</summary>
     </key>
     <key name="volume" type="b">
         <default>false</default>
