@@ -189,12 +189,12 @@ function createEnumSetting(settings, setting) {
 
     settings[setting].list.forEach(function(item) {
       setting_enum.append(item.nick, item.name);
-      if (item.id == gsettings.get_enum(setting.replace('_', '-'))) {
+      if (item.id == gsettings.get_enum(setting.replace(/_/g, '-'))) {
         setting_enum.set_active(item.id);
       }
     });
 
-    gsettings.bind(setting.replace('_', '-'), setting_enum, 'active-id', Gio.SettingsBindFlags.DEFAULT);
+    gsettings.bind(setting.replace(/_/g, '-'), setting_enum, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
@@ -216,9 +216,9 @@ function createStringSetting(settings, setting) {
     let setting_label = new Gtk.Label({label: settings[setting].label,
                                        xalign: 0 });
 
-    let setting_string = new Gtk.Entry({text: gsettings.get_string(setting.replace('_', '-'))});
+    let setting_string = new Gtk.Entry({text: gsettings.get_string(setting.replace(/_/g, '-'))});
     setting_string.set_width_chars(30);
-    gsettings.bind(setting.replace('_', '-') , setting_string, 'text', Gio.SettingsBindFlags.DEFAULT);
+    gsettings.bind(setting.replace(/_/g, '-') , setting_string, 'text', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
@@ -246,7 +246,7 @@ function createIntSetting(settings, setting) {
                                           climb_rate: 1.0,
                                           digits: 0,
                                           snap_to_ticks: true});
-    gsettings.bind(setting.replace('_', '-') , setting_int, 'value', Gio.SettingsBindFlags.DEFAULT);
+    gsettings.bind(setting.replace(/_/g, '-') , setting_int, 'value', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
@@ -267,8 +267,8 @@ function createBoolSetting(settings, setting) {
     let setting_label = new Gtk.Label({label: settings[setting].label,
                                        xalign: 0 });
 
-    let setting_switch = new Gtk.Switch({active: gsettings.get_boolean(setting.replace('_', '-'))});
-    gsettings.bind(setting.replace('_', '-') , setting_switch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    let setting_switch = new Gtk.Switch({active: gsettings.get_boolean(setting.replace(/_/g, '-'))});
+    gsettings.bind(setting.replace(/_/g, '-') , setting_switch, 'active', Gio.SettingsBindFlags.DEFAULT);
 
     if (settings[setting].help) {
         setting_label.set_tooltip_text(settings[setting].help);
