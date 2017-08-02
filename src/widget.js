@@ -333,7 +333,7 @@ const PlayerButton = new Lang.Class({
 
     _init: function(icon, callback) {
         let button_size = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
-        let style_class = 'popup-menu-icon small-player-button';
+        let style_class = 'popup-menu-icon player-button';
         if (button_size == Settings.ButtonIconSizes.MEDIUM)
             style_class = 'nm-dialog-header-icon medium-player-button';
         else if (button_size == Settings.ButtonIconSizes.LARGE)
@@ -354,7 +354,7 @@ const PlayerButton = new Lang.Class({
 
     setIconSize: function(size) {
         if (size == Settings.ButtonIconSizes.SMALL)
-            this.actor.child.style_class = 'popup-menu-icon small-player-button';
+            this.actor.child.style_class = 'popup-menu-icon player-button';
         else if (size == Settings.ButtonIconSizes.MEDIUM)
             this.actor.child.style_class = 'nm-dialog-header-icon medium-player-button';
         else if (size == Settings.ButtonIconSizes.LARGE)
