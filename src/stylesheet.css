@@ -1,5 +1,8 @@
-.player-button {
-    padding: 0 4px;
+.medium-player-button {
+    padding: 0 6px;
+}
+.large-player-button {
+    padding: 0 8px;
 }
 
 .panel-media-indicator {
