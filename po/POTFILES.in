@@ -1,4 +1,4 @@
 src/ui.js
 src/settings.js
 src/prefs.js
-src/org.gnome.shell.extensions.mediaplayer.gschema.xml.in
+src/org.gnome.shell.extensions.mediaplayer.gschema.xml
