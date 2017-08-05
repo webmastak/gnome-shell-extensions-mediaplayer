@@ -251,7 +251,10 @@ function PithosRatings(owner, callback) {
 function RatingsExtension(owner, callback) {
     let proxy = new RatingsExtensionProxy(Gio.DBus.session, owner,
                                           '/org/mpris/MediaPlayer2');
-    if (proxy.HasRatingsExtension) {
+    if (owner == 'org.mpris.MediaPlayer2.GnomeMusic') {
+      callback(false);
+    }    
+    else if (proxy.HasRatingsExtension) {
       callback(proxy);
     }
     else {
