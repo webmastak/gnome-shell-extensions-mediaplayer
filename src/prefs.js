@@ -71,13 +71,13 @@ const Settings = {
     cover_status: {
         type: "b",
         tab: "i",
-        label: _("Show the current Song's Cover in the Panel"),
+        label: _("Show the Current Song's Cover in the Panel"),
         help: _("If no cover is available the Player's symbolic icon is shown or a generic audio mime type icon.")
     },
     playstatus: {
         type: "b",
         tab: "i",
-        label: _("Show a Play Status Icon for each Player")
+        label: _("Show a Play Status Icon for each Media Player")
     },
     hide_aggindicator: {
         type: "b",
@@ -103,7 +103,7 @@ const Settings = {
     playlist_title: {
         type: "b",
         tab: "v",
-        label: _("Show the current Playlist Title in the main Trackbox"),
+        label: _("Show the Current Playlist Title in the main Trackbox"),
         help: _("Few players currently support the Mpris Playlist Interface.")
     },
     tracklist: {
@@ -115,7 +115,7 @@ const Settings = {
     rating: {
         type: "b",
         tab: "v",
-        label: _("Display the Current Song's Sating"),
+        label: _("Display the Current Song's Rating"),
     },
     tracklist_rating: {
         type: "b",
@@ -131,7 +131,7 @@ const Settings = {
     active_open: {
         type: "b",
         tab: "i",
-        label: _("Always keep the Active Player Open"),
+        label: _("Always keep the Active Media Player Open"),
         help: _("Always keep the active player open when you open the indicator or system menu.")
     },
     stop_button: {
