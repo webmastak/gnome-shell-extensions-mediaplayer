@@ -4,6 +4,7 @@ project('gnome-shell-extensions-mediaplayer',
 
 UUID = 'mediaplayer@patapon.info'
 EXTENSION_DIR = join_paths(get_option('prefix'), get_option('datadir'), 'gnome-shell/extensions/', UUID)
+LOCALE_DIR = join_paths(EXTENSION_DIR, 'locale')
 SCHEMA_DIR = join_paths(EXTENSION_DIR, 'schemas')
 
 subdir('po')
