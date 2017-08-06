@@ -187,6 +187,14 @@ const Notebook = new GObject.Class({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.CENTER
         });
+    },
+
+    append_page: function(notebookPage) {
+        Gtk.Notebook.prototype.append_page.call(
+            this,
+            notebookPage,
+            notebookPage.getTitleLabel()
+        );
     }
 });
 
@@ -202,7 +210,7 @@ const NotebookPage = new GObject.Class({
             hexpand: true,
             vexpand: true
         });
-        this.title = new Gtk.Label({
+        this._title = new Gtk.Label({
             label: "<b>" + title + "</b>",
             use_markup: true,
             valign: Gtk.Align.CENTER,
@@ -210,6 +218,10 @@ const NotebookPage = new GObject.Class({
             margin_start: 12,
             margin_end: 12
         });
+    },
+
+    getTitleLabel: function() {
+        return this._title;
     },
 
     addSettingsBox: function(settingsBox) {
@@ -393,13 +405,13 @@ const PrefsWidget = new GObject.Class({
         this._notebook = new Notebook();
 
         this._indicatorPage = new NotebookPage(_("Indicator"));
-        this._notebook.append_page(this._indicatorPage, this._indicatorPage.title);
+        this._notebook.append_page(this._indicatorPage);
 
         this._playerControlsPage = new NotebookPage(_("Player Controls"));
-        this._notebook.append_page(this._playerControlsPage, this._playerControlsPage.title);
+        this._notebook.append_page(this._playerControlsPage);
 
         this._visibleWidgetsPage = new NotebookPage(_("Visible Widgets"));
-        this._notebook.append_page(this._visibleWidgetsPage, this._visibleWidgetsPage.title);
+        this._notebook.append_page(this._visibleWidgetsPage);
 
         this.pack_start(this._notebook, true, true, 0);
 
