@@ -412,8 +412,6 @@ const CreditBox = new GObject.Class({
             orientation: Gtk.Orientation.VERTICAL,
             margin_top: 6,
             margin_bottom: 6,
-            margin_start: 12,
-            margin_end: 12,
             hexpand: true,
             vexpand: true
         });
