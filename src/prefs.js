@@ -30,6 +30,12 @@ const Lib = Me.imports.lib;
 
 const Gsettings = Lib.getSettings(Me);
 
+const GNU_SOFTWARE = '<span size="small">' +
+    'This program comes with absolutely no warranty.\n' +
+    'See the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.html">' +
+	'GNU General Public License, version 2 or later</a> for details.' +
+	'</span>';
+
 const Settings = {
     indicator_position: {
         type: "e",
@@ -72,7 +78,7 @@ const Settings = {
         type: "b",
         tab: "i",
         label: _("Show the Current Song's Cover in the Panel"),
-        help: _("If no cover is available the Player's symbolic icon is shown or a generic audio mime type icon.")
+        help: _("If no cover is available the Media Player's symbolic icon is shown or a generic audio mime type icon.")
     },
     playstatus: {
         type: "b",
@@ -98,19 +104,19 @@ const Settings = {
         type: "b",
         tab: "v",
         label: _("Show the Media Player's Playlists"),
-        help: _("Few players currently support the Mpris Playlist Interface.")
+        help: _("Few Media Players currently support the MPRIS Playlist Interface.")
     },
     playlist_title: {
         type: "b",
         tab: "v",
         label: _("Show the Current Playlist Title in the main Trackbox"),
-        help: _("Few players currently support the Mpris Playlist Interface.")
+        help: _("Few Media Players currently support the MPRIS Playlist Interface.")
     },
     tracklist: {
         type: "b",
         tab: "v",
         label: _("Show the Media Player's Tracklist"),
-        help: _("Very few players currently support the Mpris Tracklist Interface.")
+        help: _("Very few Media Players currently support the MPRIS Tracklist Interface.")
     },
     rating: {
         type: "b",
@@ -132,24 +138,24 @@ const Settings = {
         type: "b",
         tab: "i",
         label: _("Always keep the Active Media Player Open"),
-        help: _("Always keep the active player open when you open the indicator or system menu.")
+        help: _("Always keep the Active Media Player when you open the indicator or system menu.")
     },
     stop_button: {
         type: "b",
         tab: "p",
         label: _("Always show a Stop Button in the Player Controls"),
-        help: _("Otherwise a Stop Button is only shown if the Player is Playing but can't be Paused.")
+        help: _("Otherwise a Stop Button is only shown if the Media Player is Playing but can't be Paused.")
     },
     loop_status: {
         type: "b",
         tab: "p",
         label: _("Show Shuffle and Repeat Buttons in the Player Controls"),
-        help: _("Very few player implement this correctly, if at all.")
+        help: _("Very few Media players implement this correctly, if at all.")
     },
     hide_stockmpris: {
         type: "b",
         tab: "i",
-        label: _("Hide the built-in GNOME Shell Mpris Controls")
+        label: _("Hide the built-in GNOME Shell MPRIS Controls")
     },
 };
 
@@ -164,7 +170,6 @@ const Frame = new GObject.Class({
             margin_bottom: 6,
             margin_start: 6,
             margin_end: 6,
-            width_request: 600,
             hexpand: true,
             vexpand: true
         });
@@ -183,9 +188,7 @@ const Notebook = new GObject.Class({
             margin_start: 6,
             margin_end: 6,
             hexpand: true,
-            vexpand: true,
-            valign: Gtk.Align.CENTER,
-            halign: Gtk.Align.CENTER
+            vexpand: true
         });
     },
 
@@ -206,17 +209,11 @@ const NotebookPage = new GObject.Class({
     _init: function(title) {
         this.parent({
             orientation: Gtk.Orientation.VERTICAL,
-            homogeneous: false,
-            hexpand: true,
-            vexpand: true
+            homogeneous: false
         });
         this._title = new Gtk.Label({
             label: "<b>" + title + "</b>",
-            use_markup: true,
-            valign: Gtk.Align.CENTER,
-            halign: Gtk.Align.CENTER,
-            margin_start: 12,
-            margin_end: 12
+            use_markup: true
         });
     },
 
@@ -244,9 +241,7 @@ const SettingsLabel = new GObject.Class({
         this.parent({
             label: label,
             valign: Gtk.Align.CENTER,
-            halign: Gtk.Align.START,
-            hexpand: true,
-            vexpand: false
+            halign: Gtk.Align.START
         });
     }
 });
@@ -256,23 +251,35 @@ const SettingsBox = new GObject.Class({
     GTypeName: 'SettingsBox',
     Extends: Gtk.Box,
 
-    _init: function(text, widget, toolTip) {
+    _init: function(setting) {
         this.parent({
             orientation: Gtk.Orientation.HORIZONTAL,
             margin_top: 6,
             margin_bottom: 6,
             margin_start: 12,
-            margin_end: 12,
-            width_request: 600,
-            hexpand: true,
-            vexpand: false
+            margin_end: 12
         });
 
-        if (toolTip) {
-            this.set_tooltip_text(toolTip);
+        let label = new SettingsLabel(Settings[setting].label);
+        
+        let widget;
+
+        if (Settings[setting].type == 's') {
+            widget = new SettingsEntry(setting);
+        }
+        if (Settings[setting].type == "i") {
+            widget = new SettingsSpinButton(setting);
+        }
+        if (Settings[setting].type == "b") {
+            widget = new SettingsSwitch(setting);
+        }
+        if (Settings[setting].type == "e") {
+            widget = new SettingsCombo(setting);
         }
 
-        let label = new SettingsLabel(text);
+        if (Settings[setting].help) {
+            this.set_tooltip_text(Settings[setting].help);
+        }
 
         this.pack_start(label, true, true, 0);
         this.pack_end(widget, true, true, 0);
@@ -290,9 +297,7 @@ const SettingsSwitch = new GObject.Class({
         this.parent({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.END,
-            active: active,
-            hexpand: false,
-            vexpand: false
+            active: active
         });
 
         Gsettings.bind(
@@ -312,9 +317,7 @@ const SettingsCombo = new GObject.Class({
     _init: function(setting) {
         this.parent({
             valign: Gtk.Align.CENTER,
-            halign: Gtk.Align.END,
-            hexpand: false,
-            vexpand: false
+            halign: Gtk.Align.END
         });
 
         Settings[setting].list.forEach(Lang.bind(this, function(item) {
@@ -347,9 +350,7 @@ const SettingsEntry = new GObject.Class({
             halign: Gtk.Align.END,
             width_chars: 30,
             text: text,
-            placeholder_text: placeholder_text,
-            hexpand: false,
-            vexpand: false
+            placeholder_text: placeholder_text
         });
 
         Gsettings.bind(
@@ -381,9 +382,7 @@ const SettingsSpinButton = new GObject.Class({
             climb_rate: 1.0,
             snap_to_ticks: true,
             value: value,
-            adjustment: adjustment,
-            hexpand: false,
-            vexpand: false
+            adjustment: adjustment
         });
 
         Gsettings.bind(
@@ -392,6 +391,55 @@ const SettingsSpinButton = new GObject.Class({
             'value',
             Gio.SettingsBindFlags.DEFAULT
         );
+    }
+});
+
+const AboutPage = new Lang.Class({
+    Name: 'AboutPage',
+    Extends: NotebookPage,
+
+    _init: function(settings) {
+        this.parent(_('About'));
+        let releaseVersion = Me.metadata['version'] || 'bleeding-edge ;-)';
+        let projectDescription = Me.metadata['description'];
+        let projectUrl = Me.metadata['url'];
+
+        let menuLabel = new Gtk.Label({
+            label: '<b><big>' + _('Media Player Indicator') + '</big></b>',
+            use_markup: true,
+            margin_top: 6,
+            margin_start: 12,
+            margin_end: 12
+        });
+        let versionLabel = new Gtk.Label({
+        	label:  _('version: ') + releaseVersion,
+                margin_bottom: 6,
+                margin_start: 12,
+                margin_end: 12
+        });
+        let projectLinkButton = new Gtk.LinkButton({
+            label: _('Website'),
+            uri: projectUrl,
+            margin_top: 6,
+            margin_bottom: 6,
+            margin_start: 12,
+            margin_end: 12
+        });
+
+        let gnuSofwareLabel = new Gtk.Label({
+            label: GNU_SOFTWARE,
+            use_markup: true,
+            justify: Gtk.Justification.CENTER,
+            margin_top: 6,
+            margin_bottom: 6,
+            margin_start: 12,
+            margin_end: 12
+        });
+
+        this.add(menuLabel);
+        this.add(versionLabel);
+        this.add(projectLinkButton);
+        this.add(gnuSofwareLabel);
     }
 });
 
@@ -413,69 +461,29 @@ const PrefsWidget = new GObject.Class({
         this._visibleWidgetsPage = new NotebookPage(_("Visible Widgets"));
         this._notebook.append_page(this._visibleWidgetsPage);
 
+        this._notebook.append_page(new AboutPage());
+
         this.pack_start(this._notebook, true, true, 0);
 
-        let githubHbox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            margin_top: 6,
-            margin_bottom: 6,
-            margin_start: 12,
-            margin_end: 12,
-            width_request: 600,
-            hexpand: false,
-            vexpand: false
-         });
+        let settingsBox;
 
-        let githubButton = new Gtk.LinkButton({
-            label: _("Visit the GitHub page to file a bug report or request a feature."),
-            uri: 'https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Bug-Reports-and-Feature-Requests'
-        });
-
-        githubHbox.pack_start(githubButton, true, true, 0);
-        this.pack_end(githubHbox, true, true, 0);
-
-        this._buildPages();
-    },
-
-    _buildPages: function() {
         for (let setting in Settings) { 
-            this._putInPage(setting);
-        }
-    },
+            settingsBox = new SettingsBox(setting);
 
-    _putInPage: function(setting) {
-        let widget = this._getWidget(setting);
-        let toolTip = Settings[setting].help || null;
-        let settingsBox = new SettingsBox(Settings[setting].label, widget, toolTip);
-        if (Gtk.get_minor_version() < 20 && setting == "hide_stockmpris") {
-            settingsBox.set_sensitive(false);
-        }
+            if (Gtk.get_minor_version() < 20 && setting == "hide_stockmpris") {
+                settingsBox.set_sensitive(false);
+            }
 
-        if (Settings[setting].tab == "i") {
-           this._indicatorPage.addSettingsBox(settingsBox);
+            if (Settings[setting].tab == "i") {
+                this._indicatorPage.addSettingsBox(settingsBox);
+            }
+            if (Settings[setting].tab == "p") {
+                this._playerControlsPage.addSettingsBox(settingsBox);
+            }
+            if (Settings[setting].tab == "v") {
+                this._visibleWidgetsPage.addSettingsBox(settingsBox);
+            }
         }
-        if (Settings[setting].tab == "p") {
-           this._playerControlsPage.addSettingsBox(settingsBox);
-        }
-        if (Settings[setting].tab == "v") {
-           this._visibleWidgetsPage.addSettingsBox(settingsBox);
-        }
-    },
-
-    _getWidget: function(setting) {
-        if (Settings[setting].type == 's') {
-            return new SettingsEntry(setting);
-        }
-        if (Settings[setting].type == "i") {
-            return new SettingsSpinButton(setting);
-        }
-        if (Settings[setting].type == "b") {
-            return new SettingsSwitch(setting);
-        }
-        if (Settings[setting].type == "e") {
-            return new SettingsCombo(setting);
-        }
-
     }
 });    
 
