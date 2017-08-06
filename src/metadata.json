@@ -1,9 +1,8 @@
 {
 "uuid": "mediaplayer@patapon.info",
-"name": "Media player indicator",
-"description": "Control MPRIS version 2 capable media players.",
+"name": "Media Player Indicator",
+"description": "Control MPRIS Version 2 Capable Media Players.",
 "original-author": "eon@patapon.info",
 "shell-version": ["3.18", "3.20", "3.22", "3.24"],
-"locale": "/usr/local/share/locale",
 "url": "https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/"
 }

@@ -36,6 +36,15 @@ const GNU_SOFTWARE = '<span size="small">' +
 	'GNU General Public License, version 2 or later</a> for details.' +
 	'</span>';
 
+const Creators = [
+    _("Created By"),
+    'Jonas Wielicki',
+    'Jean-Philippe Braun',
+    'Mantas Mikulėnas',
+    'Jason Gray',
+    'Bilal Elmoussaoui'
+];
+
 const Settings = {
     indicator_position: {
         type: "e",
@@ -212,8 +221,7 @@ const NotebookPage = new GObject.Class({
             homogeneous: false
         });
         this._title = new Gtk.Label({
-            label: "<b>" + title + "</b>",
-            use_markup: true
+            label: title,
         });
     },
 
@@ -394,34 +402,111 @@ const SettingsSpinButton = new GObject.Class({
     }
 });
 
+const CreditBox = new GObject.Class({
+    Name: 'CreditBox',
+    GTypeName: 'CreditBox',
+    Extends: Gtk.Box,
+
+    _init: function() {
+        this.parent({
+            orientation: Gtk.Orientation.VERTICAL,
+            margin_top: 6,
+            margin_bottom: 6,
+            margin_start: 12,
+            margin_end: 12,
+            hexpand: true,
+            vexpand: true
+        });
+
+        let viewPort = new Gtk.Viewport({
+            shadow_type: Gtk.ShadowType.NONE,
+            margin_start: 12,
+            margin_end: 12,
+            hexpand: true,
+            vexpand: true
+        });
+
+        let scrolledWindow = new Gtk.ScrolledWindow({
+            hscrollbar_policy: Gtk.PolicyType.NEVER,
+            shadow_type: Gtk.ShadowType.IN,
+            margin_start: 12,
+            margin_end: 12,
+            hexpand: true,
+            vexpand: true
+        });
+
+        let creatorText = Creators.join('\n');
+
+        let creatorLabel = new Gtk.Label({
+            label: creatorText,
+            justify: Gtk.Justification.CENTER,
+            hexpand: true,
+            vexpand: true
+        });
+
+        viewPort.add(creatorLabel);
+        scrolledWindow.add(viewPort);
+        this.add(scrolledWindow);
+            
+    }
+});
+
 const AboutPage = new Lang.Class({
     Name: 'AboutPage',
     Extends: NotebookPage,
 
     _init: function(settings) {
         this.parent(_('About'));
-        let releaseVersion = Me.metadata['version'] || 'bleeding-edge ;-)';
+        let releaseVersion = Me.metadata['version'] ? _('Version ') + Me.metadata['version'] : 'git-master';
+        let projectName = Me.metadata['name'];
         let projectDescription = Me.metadata['description'];
         let projectUrl = Me.metadata['url'];
 
-        let menuLabel = new Gtk.Label({
-            label: '<b><big>' + _('Media Player Indicator') + '</big></b>',
-            use_markup: true,
-            margin_top: 6,
+        let icon = new Gtk.Image({
+            icon_name: 'audio-x-generic-symbolic',
+            pixel_size: 48,
+            margin_top: 12,
             margin_start: 12,
-            margin_end: 12
+            margin_end: 12,
+            margin_bottom: 3
+        });
+
+        let nameLabel = new Gtk.Label({
+            label: '<b>' + projectName + '</b>',
+            use_markup: true,
+            margin_top: 3,
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 3
         });
         let versionLabel = new Gtk.Label({
-        	label:  _('version: ') + releaseVersion,
-                margin_bottom: 6,
-                margin_start: 12,
-                margin_end: 12
+            label: releaseVersion,
+            margin_top: 3,
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 3
         });
+
+        let projectDescriptionLabel = new Gtk.Label({
+            label: projectDescription,
+            margin_top: 3,
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 3
+        });
+
         let projectLinkButton = new Gtk.LinkButton({
             label: _('Website'),
             uri: projectUrl,
-            margin_top: 6,
-            margin_bottom: 6,
+            margin_top: 3,
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 6
+        });
+
+        let creditLabel = new Gtk.Label({
+            label: '<small>' + _("Credits") + '</small>',
+            use_markup: true,
             margin_start: 12,
             margin_end: 12
         });
@@ -431,14 +516,18 @@ const AboutPage = new Lang.Class({
             use_markup: true,
             justify: Gtk.Justification.CENTER,
             margin_top: 6,
-            margin_bottom: 6,
             margin_start: 12,
-            margin_end: 12
+            margin_end: 12,
+            margin_bottom: 12
         });
 
-        this.add(menuLabel);
+        this.add(icon);
+        this.add(nameLabel);
         this.add(versionLabel);
+        this.add(projectDescriptionLabel);
         this.add(projectLinkButton);
+        this.add(creditLabel);
+        this.add(new CreditBox());
         this.add(gnuSofwareLabel);
     }
 });
