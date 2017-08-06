@@ -18,20 +18,17 @@
 **/
 
 const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
 const Gettext = imports.gettext;
 
 function getSettings(extension) {
     let schemaName = 'org.gnome.shell.extensions.mediaplayer';
     let schemaDir = extension.dir.get_child('schemas').get_path();
-    if (GLib.file_test(schemaDir + '/gschemas.compiled', GLib.FileTest.EXISTS)) {
-        let schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir,
-                                  Gio.SettingsSchemaSource.get_default(),
-                                  false);
-        let schema = schemaSource.lookup(schemaName, false);
+    let schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir,
+                           Gio.SettingsSchemaSource.get_default(),
+                           false);
+    let schema = schemaSource.lookup(schemaName, false);
 
-        return new Gio.Settings({ settings_schema: schema });
-    }
+    return new Gio.Settings({ settings_schema: schema });
 };
 
 function initTranslations(extension) {
