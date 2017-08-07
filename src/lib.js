@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
+const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
 const Gettext = imports.gettext;
 
@@ -34,4 +35,9 @@ function getSettings(extension) {
 function initTranslations(extension) {
     let localeDir = extension.dir.get_child('locale').get_path();
     Gettext.bindtextdomain('gnome-shell-extensions-mediaplayer', localeDir);
+};
+
+function addIcon(extension) {
+    let iconPath = extension.dir.get_path();
+    Gtk.IconTheme.get_default().append_search_path(iconPath);
 };

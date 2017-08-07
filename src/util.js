@@ -90,7 +90,7 @@ function animateChange(actor, prop, value) {
   });
 };
 
-function getPlayerSymbolicIcon(desktopEntry) {
+function getPlayerSymbolicIcon(desktopEntry, fallback) {
   if (desktopEntry) {
     //The Player's symbolic Icon name *should* be it's
     //Desktop Entry + '-symbolic'.
@@ -104,7 +104,7 @@ function getPlayerSymbolicIcon(desktopEntry) {
       return possibleIconName;
     }
   }
-  return 'audio-x-generic-symbolic';
+  return fallback || 'audio-x-generic-symbolic';
 };
 
 function parseMetadata(metadata, state) {

@@ -176,7 +176,7 @@ const IndicatorMixin = {
     }
 
     if (state.trackCoverUrl || state.desktopEntry) {
-      let fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry);
+      let fallbackIcon = this.getPlayerSymbolicIcon(state.desktopEntry, 'mpi-symbolic');
       if (this._useCoverInPanel) {
           this.setCoverIconAsync(this._primaryIndicator, state.trackCoverUrl, fallbackIcon, true);
       }

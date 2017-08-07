@@ -11,7 +11,8 @@ install_data([
     'ui.js',
     'util.js',
     'widget.js',
-    'metadata.json'
+    'metadata.json',
+    'mpi-symbolic.svg'
   ],
   install_dir: EXTENSION_DIR
 )

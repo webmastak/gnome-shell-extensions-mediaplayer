@@ -34,6 +34,7 @@ let _stockMprisOldShouldShow;
 
 function init() {
   Lib.initTranslations(Me);
+  Lib.addIcon(Me);
   Settings.init();
   if (Settings.MINOR_VERSION > 19) {
     //Monkey patch

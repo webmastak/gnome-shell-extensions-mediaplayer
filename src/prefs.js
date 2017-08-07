@@ -462,8 +462,8 @@ const AboutPage = new Lang.Class({
         let projectUrl = Me.metadata['url'];
 
         let icon = new Gtk.Image({
-            icon_name: 'audio-x-generic-symbolic',
-            pixel_size: 48,
+            icon_name: 'mpi-symbolic',
+            pixel_size: 64,
             margin_top: 12,
             margin_start: 12,
             margin_end: 12,
@@ -576,7 +576,8 @@ const PrefsWidget = new GObject.Class({
 });    
 
 function init() {
-    Lib.initTranslations(Me); 
+    Lib.initTranslations(Me);
+    Lib.addIcon(Me); 
 }
 
 function buildPrefsWidget() {
