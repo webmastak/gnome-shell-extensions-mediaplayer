@@ -42,7 +42,10 @@ const Creators = [
     'Jean-Philippe Braun',
     'Mantas Mikulėnas',
     'Jason Gray',
-    'Bilal Elmoussaoui'
+    'Bilal Elmoussaoui',
+    '',
+    _("Artwork By"),
+    'LinxGem33'    
 ];
 
 const Settings = {
@@ -438,6 +441,7 @@ const CreditBox = new GObject.Class({
 
         let creatorLabel = new Gtk.Label({
             label: creatorText,
+            halign: Gtk.Align.CENTER,
             justify: Gtk.Justification.CENTER,
             hexpand: true,
             vexpand: true
