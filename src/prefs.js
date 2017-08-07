@@ -76,11 +76,12 @@ const Settings = {
     button_icon_size: {
         type: "e",
         tab: "p",
-        label: _("Player Button Size"),
+        label: _("Player Button Style"),
         list: [
-            {nick: 'small', name: _("Small"), id: 0},
-            {nick: 'medium', name: _("Medium"), id: 1},
-            {nick: 'large', name: _("Large"), id: 2}
+            {nick: 'circular', name: _("Circular"), id: 0},
+            {nick: 'small', name: _("Small"), id: 1},
+            {nick: 'medium', name: _("Medium"), id: 2},
+            {nick: 'large', name: _("Large"), id: 3}
         ]
     },
     cover_status: {

@@ -49,9 +49,9 @@ const SubMenu = new Lang.Class({
         this._isPlayerMenu = isPlayerMenu;
         this._arrow = sourceArrow;
 
-        this.actor = new St.ScrollView({ style_class: 'popup-sub-menu',
-                                         hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                         vscrollbar_policy: Gtk.PolicyType.NEVER });
+        this.actor = new St.ScrollView({style_class: 'popup-sub-menu',
+                                        hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                        vscrollbar_policy: Gtk.PolicyType.NEVER});
 
         this.actor.add_actor(this.box);
         this.actor._delegate = this;
@@ -239,11 +239,11 @@ const PlayerButtons = new Lang.Class({
 
     _init: function() {
         this.parent({hover: false});
-        this.box = new St.BoxLayout({style_class: 'no-padding-bottom'});
+        this.box = new St.BoxLayout({style_class: 'no-padding-bottom player-buttons'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     },
     addButton: function(button) {
-        this.box.add_actor(button.actor);
+        this.box.add(button.actor, {expand: false});
     }
 });
 
@@ -332,16 +332,11 @@ const PlayerButton = new Lang.Class({
     Name: "PlayerButton",
 
     _init: function(icon, callback) {
-        let button_size = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
-        let style_class = 'popup-menu-icon';
-        if (button_size == Settings.ButtonIconSizes.MEDIUM)
-            style_class = 'nm-dialog-header-icon medium-player-button';
-        else if (button_size == Settings.ButtonIconSizes.LARGE)
-            style_class = 'shell-mount-operation-icon large-player-button';
-
-        this.actor = new St.Button({child: new St.Icon({icon_name: icon, style_class: style_class})});
+        this.actor = new St.Button({child: new St.Icon({icon_name: icon})});
         this.actor.opacity = 204;
         this.actor._delegate = this;
+        let button_size = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
+        this.setIconSize(button_size);
         this.actor.connect('clicked', callback);
         this.actor.connect('notify::hover', Lang.bind(this, function(button) {
           this.actor.opacity = button.hover ? 255 : 204;
@@ -353,12 +348,18 @@ const PlayerButton = new Lang.Class({
     },
 
     setIconSize: function(size) {
-        if (size == Settings.ButtonIconSizes.SMALL)
-            this.actor.child.style_class = 'popup-menu-icon';
-        else if (size == Settings.ButtonIconSizes.MEDIUM)
-            this.actor.child.style_class = 'nm-dialog-header-icon medium-player-button';
-        else if (size == Settings.ButtonIconSizes.LARGE)
-            this.actor.child.style_class = 'shell-mount-operation-icon large-player-button';
+        if (size == Settings.ButtonIconSizes.CIRCULAR) {
+          this.actor.style_class = 'system-menu-action';
+        }
+        else if (size == Settings.ButtonIconSizes.SMALL) {
+          this.actor.style_class = 'popup-menu-icon';
+        }
+        else if (size == Settings.ButtonIconSizes.MEDIUM) {
+          this.actor.style_class = 'nm-dialog-header-icon medium-player-button';
+        }
+        else if (size == Settings.ButtonIconSizes.LARGE) {
+          this.actor.style_class = 'shell-mount-operation-icon large-player-button';
+        }
     },
 
     enable: function() {

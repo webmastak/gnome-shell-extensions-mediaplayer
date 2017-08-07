@@ -5,9 +5,10 @@
     <value nick='volume-menu' value='2'/>
   </enum>
   <enum id='org.gnome.shell.extensions.mediaplayer.button-sizes'>
-    <value nick='small' value='0'/>
-    <value nick='medium' value='1'/>
-    <value nick='large' value='2'/>
+    <value nick='circular' value='0'/>
+    <value nick='small' value='1'/>
+    <value nick='medium' value='2'/>
+    <value nick='large' value='3'/>
   </enum>
   <schema id="org.gnome.shell.extensions.mediaplayer" path="/org/gnome/shell/extensions/mediaplayer/">
     <key name="indicator-position" enum="org.gnome.shell.extensions.mediaplayer.positions">
