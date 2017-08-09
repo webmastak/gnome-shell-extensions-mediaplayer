@@ -77,7 +77,7 @@ const PlayerState = new Lang.Class({
   showVolume: null,
   showPosition: null,
   hideStockMpris: null,
-  buttonIconSize: null,
+  buttonIconStyle: null,
   showStopButton: null,
   showLoopStatus: null,
   showPlayStatusIcon: null,
@@ -281,10 +281,10 @@ const MPRISPlayer = new Lang.Class({
             }
           }))
         );
-        // buttonIconSize setting
+        // player controls buttonIconStyle setting
         this._signalsId.push(
-          this._settings.connect("changed::" + Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY, Lang.bind(this, function(settings, key) {
-            this.emit('update-player-state', new PlayerState({buttonIconSize: settings.get_enum(key)}));
+          this._settings.connect("changed::" + Settings.MEDIAPLAYER_BUTTON_ICON_STYLE_KEY, Lang.bind(this, function(settings, key) {
+            this.emit('update-player-state', new PlayerState({buttonIconStyle: settings.get_enum(key)}));
           }))
         );
         // showPlaylists setting
@@ -572,6 +572,7 @@ const MPRISPlayer = new Lang.Class({
         showPlayStatusIcon: this.showPlayStatusIcon,
         showLoopStatus: this.showLoopStatus,
         showStopButton: this.showStopButton,
+        buttonIconStyle: this.buttonIconStyle,
         showVolume: this.showVolume,
         showPosition: this.showPosition,
         showRating: this.showRating,
@@ -771,8 +772,8 @@ const MPRISPlayer = new Lang.Class({
       return this._settings.get_boolean(Settings.MEDIAPLAYER_STOP_BUTTON_KEY) && !this.playerIsBroken;
     },
 
-    get buttonIconSize() {
-      return this._settings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
+    get buttonIconStyle() {
+      return this._settings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_STYLE_KEY);
     },
 
     get showVolume() {

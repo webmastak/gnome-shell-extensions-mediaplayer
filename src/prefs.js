@@ -98,7 +98,7 @@ const Settings = {
         step: 5,
         default: 300
     },
-    button_icon_size: {
+    button_icon_style: {
         type: "e",
         tab: "p",
         label: _("Player Button Style"),

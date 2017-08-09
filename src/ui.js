@@ -210,11 +210,11 @@ const PlayerUI = new Lang.Class({
       }
     }
 
-    if (newState.buttonIconSize !== null) {
-      this.prevButton.setIconSize(this.state.buttonIconSize);
-      this.playButton.setIconSize(this.state.buttonIconSize);
-      this.stopButton.setIconSize(this.state.buttonIconSize);
-      this.nextButton.setIconSize(this.state.buttonIconSize);
+    if (newState.buttonIconStyle !== null) {
+      this.prevButton.setIconSize(this.state.buttonIconStyle);
+      this.playButton.setIconSize(this.state.buttonIconStyle);
+      this.stopButton.setIconSize(this.state.buttonIconStyle);
+      this.nextButton.setIconSize(this.state.buttonIconStyle);
     }
 
     if (newState.shuffle !== null) {

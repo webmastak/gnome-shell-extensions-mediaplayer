@@ -335,8 +335,6 @@ const PlayerButton = new Lang.Class({
         this.actor = new St.Button({child: new St.Icon({icon_name: icon})});
         this.actor.opacity = 204;
         this.actor._delegate = this;
-        let button_size = Settings.gsettings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_SIZE_KEY);
-        this.setIconSize(button_size);
         this.actor.connect('clicked', callback);
         this.actor.connect('notify::hover', Lang.bind(this, function(button) {
           this.actor.opacity = button.hover ? 255 : 204;
@@ -347,18 +345,22 @@ const PlayerButton = new Lang.Class({
         this.actor.child.icon_name = icon;
     },
 
-    setIconSize: function(size) {
-        if (size == Settings.ButtonIconSizes.CIRCULAR) {
+    setIconSize: function(style) {
+        if (style == Settings.ButtonIconStyles.CIRCULAR) {
+          this.actor.child.style_class = null;
           this.actor.style_class = 'system-menu-action';
         }
-        else if (size == Settings.ButtonIconSizes.SMALL) {
-          this.actor.style_class = 'popup-menu-icon';
+        else if (style == Settings.ButtonIconStyles.SMALL) {
+          this.actor.style_class = null;
+          this.actor.child.style_class = 'popup-menu-icon';
         }
-        else if (size == Settings.ButtonIconSizes.MEDIUM) {
-          this.actor.style_class = 'nm-dialog-header-icon medium-player-button';
+        else if (style == Settings.ButtonIconStyles.MEDIUM) {
+          this.actor.style_class = null;
+          this.actor.child.style_class = 'nm-dialog-header-icon medium-player-button';
         }
-        else if (size == Settings.ButtonIconSizes.LARGE) {
-          this.actor.style_class = 'shell-mount-operation-icon large-player-button';
+        else if (style == Settings.ButtonIconStyles.LARGE) {
+          this.actor.style_class = null;
+          this.actor.child.style_class = 'shell-mount-operation-icon large-player-button';
         }
     },
 
