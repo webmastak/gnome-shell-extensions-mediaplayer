@@ -71,7 +71,7 @@ const Documenters = [
 
 
 const Settings = {
-    indicator_position: {
+    'indicator-position': {
         type: "e",
         tab: "i",
         label: _("Indicator Position"),
@@ -81,14 +81,14 @@ const Settings = {
             {nick: 'volume-menu', name: _("System menu"), id: 2}
         ]
     },
-    status_text: {
+    'status-text': {
         type: "s",
         tab: "i",
         placeholder_text: "{trackArtist - }{trackTitle}",
         label: _("Indicator Status Text"),
         help: _("{playerName}: Player Name, {trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
     },
-    status_size: {
+    'status-size': {
         type: "i",
         tab: "i",
         label: _("Indicator Status Text Width"),
@@ -98,7 +98,7 @@ const Settings = {
         step: 5,
         default: 300
     },
-    button_icon_style: {
+    'button-icon-style': {
         type: "e",
         tab: "p",
         label: _("Player Button Style"),
@@ -109,85 +109,86 @@ const Settings = {
             {nick: 'large', name: _("Large"), id: 3}
         ]
     },
-    cover_status: {
+    'cover-status': {
         type: "b",
         tab: "i",
         label: _("Show the Current Song's Cover in the Panel"),
         help: _("If no cover is available the Media Player's symbolic icon is shown or a generic audio mime type icon.")
     },
-    playstatus: {
+    'playstatus': {
         type: "b",
         tab: "i",
         label: _("Show a Play Status Icon for each Media Player")
     },
-    hide_aggindicator: {
+    'hide-aggindicator': {
         type: "b",
         tab: "i",
         label: _("Always hide the Indicator in the System Menu")
     },
-    volume: {
+    'volume': {
         type: "b",
         tab: "v",
         label: _("Show the Media Player's Volume Slider")
     },
-    position: {
+    'position': {
         type: "b",
         tab: "v",
         label: _("Show the Media Player's Position Slider")
     },
-    playlists: {
+    'playlists': {
         type: "b",
         tab: "v",
         label: _("Show the Media Player's Playlists"),
         help: _("Few Media Players currently support the MPRIS Playlist Interface.")
     },
-    playlist_title: {
+    'playlist-title': {
         type: "b",
         tab: "v",
         label: _("Show the Current Playlist Title in the main Trackbox"),
         help: _("Few Media Players currently support the MPRIS Playlist Interface.")
     },
-    tracklist: {
+    'tracklist': {
         type: "b",
         tab: "v",
         label: _("Show the Media Player's Tracklist"),
         help: _("Very few Media Players currently support the MPRIS Tracklist Interface.")
     },
-    rating: {
+    'rating': {
         type: "b",
         tab: "v",
         label: _("Display the Current Song's Rating"),
     },
-    tracklist_rating: {
+    'tracklist-rating': {
         type: "b",
         tab: "v",
         label: _("Display Song Ratings in the Tracklist"),
+        help: _("Very few Media Players currently support the MPRIS Tracklist Interface.")
     },
-    enable_scroll: {
+    'enable-scroll': {
         type: "b",
         tab: "i",
         label: _("Enable Indicator Scroll Events"),
         help: _("Enables track changes on scrolling the Indicator.")
     },
-    active_open: {
+    'active-open': {
         type: "b",
         tab: "i",
         label: _("Always keep the Active Media Player Open"),
         help: _("Always keep the Active Media Player when you open the indicator or system menu.")
     },
-    stop_button: {
+    'stop-button': {
         type: "b",
         tab: "p",
         label: _("Always show a Stop Button in the Player Controls"),
         help: _("Otherwise a Stop Button is only shown if the Media Player is Playing but can't be Paused.")
     },
-    loop_status: {
+    'loop-status': {
         type: "b",
         tab: "p",
         label: _("Show Shuffle and Repeat Buttons in the Player Controls"),
         help: _("Very few Media players implement this correctly, if at all.")
     },
-    hide_stockmpris: {
+    'hide-stockmpris': {
         type: "b",
         tab: "i",
         label: _("Hide the built-in GNOME Shell MPRIS Controls")
@@ -295,6 +296,12 @@ const SettingsBox = new GObject.Class({
         });
 
         let label = new SettingsLabel(Settings[setting].label);
+
+        let toolTip = Settings[setting].help;
+
+        if (toolTip) {
+            this.set_tooltip_text(toolTip);
+        }
         
         let widget;
 
@@ -311,10 +318,6 @@ const SettingsBox = new GObject.Class({
             widget = new SettingsCombo(setting);
         }
 
-        if (Settings[setting].help) {
-            this.set_tooltip_text(Settings[setting].help);
-        }
-
         this.pack_start(label, true, true, 0);
         this.pack_end(widget, true, true, 0);
     }
@@ -326,7 +329,7 @@ const SettingsSwitch = new GObject.Class({
     Extends: Gtk.Switch,
 
     _init: function(setting) {
-        let active = Gsettings.get_boolean(setting.replace(/_/g, '-'));
+        let active = Gsettings.get_boolean(setting);
 
         this.parent({
             valign: Gtk.Align.CENTER,
@@ -335,7 +338,7 @@ const SettingsSwitch = new GObject.Class({
         });
 
         Gsettings.bind(
-            setting.replace(/_/g, '-'),
+            setting,
             this,
             'active',
             Gio.SettingsBindFlags.DEFAULT
@@ -356,13 +359,13 @@ const SettingsCombo = new GObject.Class({
 
         Settings[setting].list.forEach(Lang.bind(this, function(item) {
             this.append(item.nick, item.name);
-            if (item.id == Gsettings.get_enum(setting.replace(/_/g, '-'))) {
+            if (item.id == Gsettings.get_enum(setting)) {
                 this.set_active(item.id);
             }
         }));
 
         Gsettings.bind(
-            setting.replace(/_/g, '-'),
+            setting,
             this,
             'active-id',
             Gio.SettingsBindFlags.DEFAULT
@@ -376,19 +379,23 @@ const SettingsEntry = new GObject.Class({
     Extends: Gtk.Entry,
 
     _init: function(setting) {
-        let text = Gsettings.get_string(setting.replace(/_/g, '-'));
-        let placeholder_text = Settings[setting].placeholder_text || "";
+        let text = Gsettings.get_string(setting);
 
         this.parent({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.END,
             width_chars: 30,
-            text: text,
-            placeholder_text: placeholder_text
+            text: text
         });
 
+        let placeholder_text = Settings[setting].placeholder_text;
+
+        if (placeholder_text) {
+            this.set_placeholder_text(placeholder_text);
+        }
+
         Gsettings.bind(
-            setting.replace(/_/g, '-'),
+            setting,
             this,
             'text',
             Gio.SettingsBindFlags.DEFAULT
@@ -408,7 +415,7 @@ const SettingsSpinButton = new GObject.Class({
             step_increment: Settings[setting].step
         });
 
-        let value = Gsettings.get_int(setting.replace(/_/g, '-'));
+        let value = Gsettings.get_int(setting);
 
         this.parent({
             valign: Gtk.Align.CENTER,
@@ -420,7 +427,7 @@ const SettingsSpinButton = new GObject.Class({
         });
 
         Gsettings.bind(
-            setting.replace(/_/g, '-'),
+            setting,
             this,
             'value',
             Gio.SettingsBindFlags.DEFAULT
@@ -687,7 +694,7 @@ const PrefsWidget = new GObject.Class({
         for (let setting in Settings) { 
             settingsBox = new SettingsBox(setting);
 
-            if (Gtk.get_minor_version() < 20 && setting == "hide_stockmpris") {
+            if (Gtk.get_minor_version() < 20 && setting == "hide-stockmpris") {
                 settingsBox.set_sensitive(false);
             }
 
