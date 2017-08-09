@@ -36,17 +36,39 @@ const GNU_SOFTWARE = '<span size="small">' +
 	'GNU General Public License, version 2 or later</a> for details.' +
 	'</span>';
 
+const CC_BY_SA = '<span size="small">' +
+    'All artwork released under the Creative Commons Attribution-ShareAlike 4.0 International license.\n' +
+    'See the <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode">' +
+	'CC BY-SA 4.0</a> for details.' +
+	'</span>';
+
 const Creators = [
-    _("Created By"),
-    'Jonas Wielicki',
-    'Jean-Philippe Braun',
-    'Mantas Mikulėnas',
-    'Jason Gray',
-    'Bilal Elmoussaoui',
-    '',
-    _("Artwork By"),
-    'LinxGem33'    
+    {label: 'Jonas Wielicki',
+     url: 'https://github.com/horazont'},
+    {label: 'Jean-Philippe Braun',
+     url: 'https://github.com/eonpatapon'},
+    {label: 'Mantas Mikulėnas',
+     url: 'https://github.com/grawity'},
+    {label: 'Jason Gray',
+     url: 'https://github.com/JasonLG1979'},
+    {label: 'Bilal Elmoussaoui',
+     url: 'https://github.com/bil-elmoussaoui'}    
 ];
+
+const Artists = [
+    {label: 'LinxGem33',
+     url: 'https://github.com/LinxGem33'},
+    {label: 'Jason Gray',
+     url: 'https://github.com/JasonLG1979'}     
+];
+
+const Documenters = [
+    {label: 'Jean-Philippe Braun',
+     url: 'https://github.com/eonpatapon'},
+    {label: 'Jason Gray',
+     url: 'https://github.com/JasonLG1979'}     
+];
+
 
 const Settings = {
     indicator_position: {
@@ -437,17 +459,109 @@ const CreditBox = new GObject.Class({
             vexpand: true
         });
 
-        let creatorText = Creators.join('\n');
-
-        let creatorLabel = new Gtk.Label({
-            label: creatorText,
+        let innerCreditBox = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
             halign: Gtk.Align.CENTER,
-            justify: Gtk.Justification.CENTER,
+            valign: Gtk.Align.CENTER,
+            margin_top: 0,
+            margin_bottom: 0,
+            margin_start: 0,
+            margin_end: 0,
             hexpand: true,
             vexpand: true
         });
 
-        viewPort.add(creatorLabel);
+        let creatorLabel = new Gtk.Label({
+            label: _("Created By"),
+            halign: Gtk.Align.CENTER,
+            margin_top: 0,
+            margin_bottom: 0,
+            margin_start: 12,
+            margin_end: 12,
+            hexpand: true,
+            vexpand: false
+        });
+
+        innerCreditBox.add(creatorLabel);
+
+        Creators.forEach(function(creator) {
+            let creatorLinkButton = new Gtk.LinkButton({
+                label: creator.label,
+                uri: creator.url,
+                halign: Gtk.Align.CENTER,
+                valign: Gtk.Align.CENTER,
+                margin_top: 0,
+                margin_bottom: 0,
+                margin_start: 12,
+                margin_end: 12,
+                hexpand: true,
+                vexpand: false
+             });
+
+             innerCreditBox.add(creatorLinkButton);
+        });
+
+        let artistLabel = new Gtk.Label({
+            label: _("Artwork By"),
+            halign: Gtk.Align.CENTER,
+            margin_top: 12,
+            margin_bottom: 0,
+            margin_start: 12,
+            margin_end: 12,
+            hexpand: true,
+            vexpand: false
+        });
+
+        innerCreditBox.add(artistLabel);
+
+        Artists.forEach(function(artist) {
+            let artistLinkButton = new Gtk.LinkButton({
+                label: artist.label,
+                uri: artist.url,
+                halign: Gtk.Align.CENTER,
+                valign: Gtk.Align.CENTER,
+                margin_top: 0,
+                margin_bottom: 0,
+                margin_start: 12,
+                margin_end: 12,
+                hexpand: true,
+                vexpand: false
+             });
+
+             innerCreditBox.add(artistLinkButton);
+        });
+
+        let documenterLabel = new Gtk.Label({
+            label: _("Documentation By"),
+            halign: Gtk.Align.CENTER,
+            margin_top: 12,
+            margin_bottom: 0,
+            margin_start: 12,
+            margin_end: 12,
+            hexpand: true,
+            vexpand: false
+        });
+
+        innerCreditBox.add(documenterLabel);
+
+        Documenters.forEach(function(documenter) {
+            let documenterButton = new Gtk.LinkButton({
+                label: documenter.label,
+                uri: documenter.url,
+                halign: Gtk.Align.CENTER,
+                valign: Gtk.Align.CENTER,
+                margin_top: 0,
+                margin_bottom: 0,
+                margin_start: 12,
+                margin_end: 12,
+                hexpand: true,
+                vexpand: false
+             });
+
+             innerCreditBox.add(documenterButton);
+        });
+
+        viewPort.add(innerCreditBox);
         scrolledWindow.add(viewPort);
         this.add(scrolledWindow);
             
@@ -467,7 +581,7 @@ const AboutPage = new Lang.Class({
 
         let icon = new Gtk.Image({
             icon_name: 'mpi-symbolic',
-            pixel_size: 64,
+            pixel_size: 32,
             margin_top: 12,
             margin_start: 12,
             margin_end: 12,
@@ -518,7 +632,17 @@ const AboutPage = new Lang.Class({
             label: GNU_SOFTWARE,
             use_markup: true,
             justify: Gtk.Justification.CENTER,
-            margin_top: 6,
+            margin_top: 0,
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 6
+        });
+
+        let cLabel = new Gtk.Label({
+            label: CC_BY_SA,
+            use_markup: true,
+            justify: Gtk.Justification.CENTER,
+            margin_top: 0,
             margin_start: 12,
             margin_end: 12,
             margin_bottom: 12
@@ -532,6 +656,7 @@ const AboutPage = new Lang.Class({
         this.add(creditLabel);
         this.add(new CreditBox());
         this.add(gnuSofwareLabel);
+        this.add(cLabel);
     }
 });
 
