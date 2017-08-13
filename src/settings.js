@@ -74,6 +74,10 @@ const ValidPlaybackStatuses = [
     'Paused'
 ];
 
+const SUPPORTS_RATINGS_EXTENSION = [
+    "org.mpris.MediaPlayer2.Lollypop"
+];
+
 const WRONG_VOLUME_SCALING = [
     "org.mpris.MediaPlayer2.quodlibet"
 ];

@@ -18,6 +18,8 @@
 
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
+const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Settings = Me.imports.settings;
 
 const DBusIface = '<node>\
     <interface name="org.freedesktop.DBus">\
@@ -249,16 +251,18 @@ function PithosRatings(owner, callback) {
 }
 
 function RatingsExtension(owner, callback) {
-    let proxy = new RatingsExtensionProxy(Gio.DBus.session, owner,
-                                          '/org/mpris/MediaPlayer2');
-    if (owner == 'org.mpris.MediaPlayer2.GnomeMusic') {
+    if (Settings.SUPPORTS_RATINGS_EXTENSION.indexOf(owner) == -1) {
       callback(false);
-    }    
-    else if (proxy.HasRatingsExtension) {
-      callback(proxy);
     }
     else {
-      callback(false);
+      let proxy = new RatingsExtensionProxy(Gio.DBus.session, owner,
+                                            '/org/mpris/MediaPlayer2');   
+      if (proxy.HasRatingsExtension) {
+        callback(proxy);
+      }
+      else {
+        callback(false);
+      }
     }
 }
 
