@@ -35,3 +35,20 @@ any MPRIS v2.1 capable media player.
 Based on the work of horazont (Jonas Wielicki).
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
+## Like this Extension?
+
+Then maybe consider donating to help continue it's development, otherwise known as buying me a RedBull.
+
+You don't have to, but it would be cool if you did.
+
+[![Flattr this git repo](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=JasonLG1979&url=https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer)
+
+And/or consider donating to one of these other projects I believe in.
+
+[GNOME](https://www.gnome.org/support-gnome/donate/)
+
+[The Free Software Foundation](https://www.fsf.org/about/ways-to-donate/)
+
+[The Electronic Frontier Foundation](https://supporters.eff.org/donate/)
+
