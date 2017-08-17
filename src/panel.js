@@ -30,39 +30,6 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Util = Me.imports.util;
 
-const PanelState = new Lang.Class({
-  Name: 'PanelState',
-
-  _init: function() {
-    this.values = {
-      playerName: null,
-      status: null,
-      trackTitle: null,
-      trackAlbum: null,
-      trackArtist: null,
-      trackCoverUrl: null,
-      desktopEntry: null
-    }
-  },
-
-  update: function(state) {
-    let changed = false;
-    for (let key in state) {
-      if (state[key] !== null
-          && state[key].constructor === String
-          && this.values[key] !== undefined
-          && this.values[key] !== state[key]) {
-        this.values[key] = state[key];
-        changed = true;
-      }
-    }
-    if (changed) {
-      this.emit('changed');
-    }
-  }
-});
-Signals.addSignalMethods(PanelState.prototype);
-
 const IndicatorMixin = {
 
   set manager(manager) {
@@ -75,6 +42,13 @@ const IndicatorMixin = {
 
   get manager() {
     return this._manager;
+  },
+
+  get state() {
+    if (this.manager.activePlayer) {
+      return this.manager.activePlayer.state;
+    }
+    return {};
   },
 
   _onScrollEvent: function(actor, event) {
@@ -102,7 +76,6 @@ const IndicatorMixin = {
   },
 
   _connectSignals: function() {
-    this.panelChangeId = this.panelState.connect('changed', Lang.bind(this, this._updatePanel));
     this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_COVER_STATUS_KEY,
       Lang.bind(this, function(settings, key) {
         this._useCoverInPanel = settings.get_boolean(key);
@@ -121,10 +94,6 @@ const IndicatorMixin = {
   },
 
   _disconnectSignals: function() {
-    if (this.panelChangeId != 0) {
-      this.panelState.disconnect(this.panelChangeId);
-      this.panelChangeId = 0;
-    }
     for (let id in this._signalsId) {
       this._settings.disconnect(this._signalsId[id]);
     }
@@ -132,13 +101,13 @@ const IndicatorMixin = {
   },
 
   // method binded to classes below
-  _commonOnActivePlayerUpdate: function(manager, state) {
-    this.panelState.update(state);
-    this._onActivePlayerUpdate(state);
+  _commonOnActivePlayerUpdate: function() {
+    this._updatePanel();
+    this._onActivePlayerUpdate(this.state);
   },
 
   _updatePanel: function() {
-    let state = this.panelState.values;
+    let state = this.state;
     if (state.status) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
@@ -186,7 +155,7 @@ const IndicatorMixin = {
     }
   },
 
-  _commonOnActivePlayerRemove: function(manager) {
+  _commonOnActivePlayerRemove: function() {
     this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';    
     this._thirdIndicator.clutter_text.set_markup('');
     this._thirdIndicator.set_width(0);
@@ -205,14 +174,11 @@ const PanelIndicator = new Lang.Class({
     this.parent(0.0, "mediaplayer");
 
     this._manager = null;
-    this.panelChangeId = 0;
-    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.actor.add_style_class_name('panel-status-button');
     this.menu.actor.add_style_class_name('aggregate-menu panel-media-indicator');
     this.compileTemplate = Util.compileTemplate;
     this.setCoverIconAsync = Util.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Util.getPlayerSymbolicIcon;
-    this.panelState = new PanelState();
 
     this._settings = Settings.gsettings;
     this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
@@ -269,13 +235,10 @@ const AggregateMenuIndicator = new Lang.Class({
     this.parent();
 
     this._manager = null;
-    this.panelChangeId = 0;
-    this.themeContext = St.ThemeContext.get_for_stage(global.stage);
     this.compileTemplate = Util.compileTemplate;
     this.setCoverIconAsync = Util.setCoverIconAsync;
     this.getPlayerSymbolicIcon = Util.getPlayerSymbolicIcon;
     this._settings = Settings.gsettings;
-    this.panelState = new PanelState();
     this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
     this._stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     this._prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
