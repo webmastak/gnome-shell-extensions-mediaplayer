@@ -125,7 +125,7 @@ function parseMetadata(metadata, state) {
   state.isRhythmboxStream = metadata["rhythmbox:streamTitle"] ? true : false;
 };
 
-let compileTemplate = function(template, playerState) {
+var compileTemplate = function(template, playerState) {
   let escapedText = template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {
     let text = "";
     if (playerState[fieldName] && playerState[fieldName].toString() !== "") {
@@ -147,7 +147,7 @@ let compileTemplate = function(template, playerState) {
   return escapedText;
 };
 
-let _extends = function(object1, object2) {
+var _extends = function(object1, object2) {
   Object.getOwnPropertyNames(object2).forEach(function(name, index) {
     let desc = Object.getOwnPropertyDescriptor(object2, name);
     if (! desc.writable)
