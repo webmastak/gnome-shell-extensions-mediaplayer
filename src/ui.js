@@ -35,7 +35,7 @@ const Settings = Me.imports.settings;
 const Util = Me.imports.util;
 
 
-const PlayerUI = new Lang.Class({
+var PlayerUI = new Lang.Class({
   Name: 'PlayerUI',
   Extends: Widget.PlayerMenu,
 
