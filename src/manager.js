@@ -30,7 +30,7 @@ const DBusIface = Me.imports.dbus;
 const UI = Me.imports.ui;
 
 
-const PlayerManager = new Lang.Class({
+var PlayerManager = new Lang.Class({
     Name: 'PlayerManager',
 
     _init: function(menu, desiredMenuPosition) {
