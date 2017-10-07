@@ -218,12 +218,10 @@ var PlayerManager = new Lang.Class({
               };
               if (this.nbPlayers() === 1) {
                 this.emit('connect-signals');
-              } 
-              this._players[owner].signals.push(
-                  this._players[owner].player.connect('player-update',
-                      Lang.bind(this, this._onPlayerUpdate)
-                  )
-              );
+              }
+              let playerItem = this._players[owner];
+              let playerUpdateId = playerItem.player.connect('player-update', Lang.bind(this, this._onPlayerUpdate));
+              playerItem.signals.push(playerUpdateId);
               this._addPlayerToMenu(owner);
           }
           return false;
@@ -241,8 +239,9 @@ var PlayerManager = new Lang.Class({
 
     _addPlayerToMenu: function(owner) {
       let actualPos = this.desiredMenuPosition + this.nbPlayers();  
-      this.menu.addMenuItem(this._players[owner].ui, actualPos);
-      this._refreshActivePlayer(this._players[owner].player);
+      let playerItem = this._players[owner];
+      this.menu.addMenuItem(playerItem.ui, actualPos);
+      this._refreshActivePlayer(playerItem.player);
     },
 
     _getMenuItem: function(position) {
