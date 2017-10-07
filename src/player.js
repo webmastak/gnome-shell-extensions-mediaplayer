@@ -35,7 +35,7 @@ const Settings = Me.imports.settings;
 const Util = Me.imports.util;
 
 
-const PlayerState = new Lang.Class({
+var PlayerState = new Lang.Class({
   Name: 'PlayerState',
 
   _init: function(params) {
@@ -109,7 +109,7 @@ const PlayerState = new Lang.Class({
 });
 
 
-const MPRISPlayer = new Lang.Class({
+var MPRISPlayer = new Lang.Class({
     Name: 'MPRISPlayer',
 
     _init: function(busName, owner) {
