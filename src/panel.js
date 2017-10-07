@@ -166,7 +166,7 @@ const IndicatorMixin = {
   }
 };
 
-const PanelIndicator = new Lang.Class({
+var PanelIndicator = new Lang.Class({
   Name: 'PanelIndicator',
   Extends: PanelMenu.Button,
 
@@ -227,7 +227,7 @@ const PanelIndicator = new Lang.Class({
 });
 Util._extends(PanelIndicator, IndicatorMixin);
 
-const AggregateMenuIndicator = new Lang.Class({
+var AggregateMenuIndicator = new Lang.Class({
   Name: 'AggregateMenuIndicator',
   Extends: PanelMenu.SystemIndicator,
 
