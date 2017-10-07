@@ -40,7 +40,7 @@ const Util = Me.imports.util;
 const DBusIface = Me.imports.dbus;
 
 
-const SubMenu = new Lang.Class({
+var SubMenu = new Lang.Class({
     Name: 'SubMenu',
     Extends: PopupMenu.PopupMenuBase,
 
@@ -120,7 +120,7 @@ const SubMenu = new Lang.Class({
     }
 });
 
-const PlayerMenu = new Lang.Class({
+var PlayerMenu = new Lang.Class({
   Name: 'PlayerMenu',
   Extends: PopupMenu.PopupSubMenuMenuItem,
 
@@ -149,7 +149,7 @@ const PlayerMenu = new Lang.Class({
   }
 });
 
-const BaseContainer = new Lang.Class({
+var BaseContainer = new Lang.Class({
     Name: "BaseContainer",
     Extends: PopupMenu.PopupBaseMenuItem,
 
@@ -233,7 +233,7 @@ const BaseContainer = new Lang.Class({
     }
 });
 
-const PlayerButtons = new Lang.Class({
+var PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
     Extends: BaseContainer,
 
@@ -247,7 +247,7 @@ const PlayerButtons = new Lang.Class({
     }
 });
 
-const ShuffleLoopStatus = new Lang.Class({
+var ShuffleLoopStatus = new Lang.Class({
     Name: 'PlayerButtons',
     Extends: BaseContainer,
 
@@ -311,7 +311,7 @@ const ShuffleLoopStatus = new Lang.Class({
     }
 });
 
-const PlaylistTitle = new Lang.Class({
+var PlaylistTitle = new Lang.Class({
     Name: 'PlaylistTitle',
     Extends: BaseContainer,
 
@@ -328,7 +328,7 @@ const PlaylistTitle = new Lang.Class({
     }
 });
 
-const PlayerButton = new Lang.Class({
+var PlayerButton = new Lang.Class({
     Name: "PlayerButton",
 
     _init: function(icon, callback) {
@@ -383,7 +383,7 @@ const PlayerButton = new Lang.Class({
     }
 });
 
-const SliderItem = new Lang.Class({
+var SliderItem = new Lang.Class({
     Name: "SliderItem",
     Extends: BaseContainer,
 
@@ -413,7 +413,7 @@ const SliderItem = new Lang.Class({
     }
 });
 
-const TrackCover = new Lang.Class({
+var TrackCover = new Lang.Class({
     Name: "TrackBox",
     Extends: BaseContainer,
 
@@ -424,7 +424,7 @@ const TrackCover = new Lang.Class({
     }
 });
 
-const Info = new Lang.Class({
+var Info = new Lang.Class({
     Name: "SecondaryInfo",
     Extends: BaseContainer,
 
@@ -519,7 +519,7 @@ const Info = new Lang.Class({
     }
 });
 
-const TrackRating = new Lang.Class({
+var TrackRating = new Lang.Class({
     Name: "TrackRating",
     Extends: BaseContainer,
 
@@ -724,7 +724,7 @@ const TrackRating = new Lang.Class({
     }
 });
 
-const ListSubMenu = new Lang.Class({
+var ListSubMenu = new Lang.Class({
   Name: 'ListSubMenu',
   Extends: PopupMenu.PopupSubMenuMenuItem,
 
@@ -844,7 +844,7 @@ const ListSubMenu = new Lang.Class({
   }
 });
 
-const TrackList = new Lang.Class({
+var TrackList = new Lang.Class({
     Name: "Tracklist",
     Extends: ListSubMenu,
 
@@ -897,7 +897,7 @@ const TrackList = new Lang.Class({
 
 });
 
-const Playlists = new Lang.Class({
+var Playlists = new Lang.Class({
     Name: "Playlists",
     Extends: ListSubMenu,
 
@@ -941,7 +941,7 @@ const Playlists = new Lang.Class({
 
 });
 
-const PlaylistItem = new Lang.Class({
+var PlaylistItem = new Lang.Class({
     Name: "PlaylistItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 
@@ -960,7 +960,7 @@ const PlaylistItem = new Lang.Class({
 
 });
 
-const TracklistItem = new Lang.Class({
+var TracklistItem = new Lang.Class({
     Name: "TracklistItem",
     Extends: PopupMenu.PopupBaseMenuItem,
 

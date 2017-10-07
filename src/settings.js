@@ -27,80 +27,80 @@ const Config = imports.misc.config;
 const Gettext = imports.gettext.domain('gnome-shell-extensions-mediaplayer');
 const _ = Gettext.gettext;
 
-const MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
-const MEDIAPLAYER_COVER_STATUS_KEY = 'cover-status';
-const MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
-const MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
-const MEDIAPLAYER_VOLUME_KEY = 'volume';
-const MEDIAPLAYER_HIDE_AGGINDICATOR_KEY = 'hide-aggindicator';
-const MEDIAPLAYER_POSITION_KEY = 'position';
-const MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
-const MEDIAPLAYER_STOP_BUTTON_KEY = 'stop-button';
-const MEDIAPLAYER_BUTTON_ICON_STYLE_KEY = 'button-icon-style';
-const MEDIAPLAYER_PLAYLIST_TITLE_KEY = 'playlist-title';
-const MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
-const MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';
-const MEDIAPLAYER_LOOP_STATUS_KEY = 'loop-status';
-const MEDIAPLAYER_RATING_KEY = 'rating';
-const MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY = 'enable-scroll';
-const MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';
-const MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY = 'active-open';
-const MEDIAPLAYER_PLAY_STATUS_ICON_KEY = 'playstatus';
+var MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
+var MEDIAPLAYER_COVER_STATUS_KEY = 'cover-status';
+var MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
+var MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
+var MEDIAPLAYER_VOLUME_KEY = 'volume';
+var MEDIAPLAYER_HIDE_AGGINDICATOR_KEY = 'hide-aggindicator';
+var MEDIAPLAYER_POSITION_KEY = 'position';
+var MEDIAPLAYER_PLAYLISTS_KEY = 'playlists';
+var MEDIAPLAYER_STOP_BUTTON_KEY = 'stop-button';
+var MEDIAPLAYER_BUTTON_ICON_STYLE_KEY = 'button-icon-style';
+var MEDIAPLAYER_PLAYLIST_TITLE_KEY = 'playlist-title';
+var MEDIAPLAYER_TRACKLIST_KEY = 'tracklist';
+var MEDIAPLAYER_TRACKLIST_RATING_KEY = 'tracklist-rating';
+var MEDIAPLAYER_LOOP_STATUS_KEY = 'loop-status';
+var MEDIAPLAYER_RATING_KEY = 'rating';
+var MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY = 'enable-scroll';
+var MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';
+var MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY = 'active-open';
+var MEDIAPLAYER_PLAY_STATUS_ICON_KEY = 'playstatus';
 
-const MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
+var MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
 
-const IndicatorPosition = {
+var IndicatorPosition = {
     CENTER: 0,
     RIGHT: 1,
     VOLUMEMENU: 2
 };
 
-const ButtonIconStyles = {
+var ButtonIconStyles = {
     CIRCULAR: 0,
     SMALL: 1,
     MEDIUM: 2,
     LARGE: 3
 };
 
-const Status = {
+var Status = {
     STOP: "Stopped",
     PLAY: "Playing",
     PAUSE: "Paused"
 };
 
-const ValidPlaybackStatuses = [
+var ValidPlaybackStatuses = [
     'Stopped',
     'Playing',
     'Paused'
 ];
 
-const SUPPORTS_RATINGS_EXTENSION = [
+var SUPPORTS_RATINGS_EXTENSION = [
     "org.mpris.MediaPlayer2.Lollypop"
 ];
 
-const WRONG_VOLUME_SCALING = [
+var WRONG_VOLUME_SCALING = [
     "org.mpris.MediaPlayer2.quodlibet"
 ];
 
-const ALTERNATIVE_PLAYLIST_TITLES = [
+var ALTERNATIVE_PLAYLIST_TITLES = [
     {"org.mpris.MediaPlayer2.pithos": _("Stations")}
 ];
 
-const ALTERNATIVE_TRACKLIST_TITLES = [
+var ALTERNATIVE_TRACKLIST_TITLES = [
     {"org.mpris.MediaPlayer2.pithos": _("Current Playlist")}
 ];
 
-const BROKEN_PLAYERS = [
+var BROKEN_PLAYERS = [
     "org.mpris.MediaPlayer2.spotify"
 ];
 
-const NO_LOOP_STATUS_SUPPORT = [
+var NO_LOOP_STATUS_SUPPORT = [
     "org.mpris.MediaPlayer2.quodlibet",
     "org.mpris.MediaPlayer2.pithos",
     "org.mpris.MediaPlayer2.spotify"
 ];
 
-let gsettings;
+var gsettings;
 
 function init() {
     gsettings = Lib.getSettings(Me);
