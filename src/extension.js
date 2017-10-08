@@ -67,8 +67,10 @@ function enable() {
   }
 
   manager = new Manager.PlayerManager(menu, desiredMenuPosition);
-
-  if (position == Settings.IndicatorPosition.RIGHT) {
+  if (position == Settings.IndicatorPosition.LEFT) {
+    Main.panel.addToStatusArea('mediaplayer', indicator, 999, 'left');
+  }
+  else if (position == Settings.IndicatorPosition.RIGHT) {
     Main.panel.addToStatusArea('mediaplayer', indicator);
   }
   else if (position == Settings.IndicatorPosition.CENTER) {
