@@ -76,6 +76,7 @@ const Settings = {
         tab: "i",
         label: _("Indicator Position"),
         list: [
+            {nick: 'left', name: _("Left"), id: 3},
             {nick: 'center', name: _("Center"), id: 0},
             {nick: 'right', name: _("Right"), id: 1},
             {nick: 'volume-menu', name: _("System menu"), id: 2}

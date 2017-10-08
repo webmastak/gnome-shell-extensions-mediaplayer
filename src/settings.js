@@ -50,6 +50,7 @@ var MEDIAPLAYER_PLAY_STATUS_ICON_KEY = 'playstatus';
 var MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
 
 var IndicatorPosition = {
+    LEFT: 3,
     CENTER: 0,
     RIGHT: 1,
     VOLUMEMENU: 2
