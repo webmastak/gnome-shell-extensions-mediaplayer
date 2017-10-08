@@ -74,6 +74,11 @@
         <summary>Status text size</summary>
         <description>The the maximum width before the title gets an ellipsis. Default is 300px.</description>
     </key>
+    <key name="play-state-icon" type="b">
+        <default>true</default>
+        <summary>Show a play state icon in the indicator</summary>
+        <description>Show a play state icon in the indicator.</description>
+    </key>
     <key name="volumemenu" type="b">
         <default>true</default>
         <summary>Show the media player in the volume menu</summary>

@@ -99,6 +99,11 @@ const Settings = {
         step: 5,
         default: 300
     },
+    'play-state-icon': {
+        type: "b",
+        tab: "i",
+        label: _("Show the Indicator Player State Icon")
+    },
     'button-icon-style': {
         type: "e",
         tab: "p",

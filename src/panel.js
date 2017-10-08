@@ -91,6 +91,11 @@ const IndicatorMixin = {
           this._prefWidth = settings.get_int(key);
           this._updatePanel();
     })));
+    this._signalsId.push(this._settings.connect("changed::" + Settings.MEDIAPLAYER_PLAY_STATE_ICON_KEY,
+      Lang.bind(this, function(settings, key) {
+          this._showPlayStateIcon = settings.get_boolean(key);
+          this._updatePanel();
+    })));
   },
 
   _disconnectSignals: function() {
@@ -108,7 +113,7 @@ const IndicatorMixin = {
 
   _updatePanel: function() {
     let state = this.state;
-    if (state.status) {
+    if (state.status && this._showPlayStateIcon) {
       if (state.status == Settings.Status.PLAY) {
         this._secondaryIndicator.icon_name = "media-playback-start-symbolic";
       }
@@ -121,6 +126,8 @@ const IndicatorMixin = {
       this._secondaryIndicator.show();
       this._secondaryIndicator.set_width(-1);
       this.indicators.show();
+    } else {
+        this._secondaryIndicator.hide();
     }
 
     if(this._stateTemplate.length === 0 || state.status == Settings.Status.STOP) {
@@ -184,6 +191,7 @@ var PanelIndicator = new Lang.Class({
     this._useCoverInPanel = this._settings.get_boolean(Settings.MEDIAPLAYER_COVER_STATUS_KEY);
     this._stateTemplate = this._settings.get_string(Settings.MEDIAPLAYER_STATUS_TEXT_KEY);
     this._prefWidth = this._settings.get_int(Settings.MEDIAPLAYER_STATUS_SIZE_KEY);
+    this._showPlayStateIcon = this._settings.get_boolean(Settings.MEDIAPLAYER_PLAY_STATE_ICON_KEY);
     this._statusTextWidth = 0;
     this._stateText = '';
     this._signalsId = [];
