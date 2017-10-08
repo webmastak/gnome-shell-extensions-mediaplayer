@@ -52,7 +52,9 @@ const Creators = [
     {label: 'Jason Gray',
      url: 'https://github.com/JasonLG1979'},
     {label: 'Bilal Elmoussaoui',
-     url: 'https://github.com/bil-elmoussaoui'}    
+     url: 'https://github.com/bil-elmoussaoui'},
+    {label: 'Alexander Rüedlinger',
+     url: 'https://github.com/lexruee'}    
 ];
 
 const Artists = [
