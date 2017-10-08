@@ -18,7 +18,7 @@ any MPRIS v2.1 capable media player.
 
 ## Features
 
-- 4 positions: letf, center or right in its own menu, or in the system menu
+- 4 positions: left, center or right in its own menu, or in the system menu
 - interactive indicator icon: scroll (next/previous), middle click (play/pause)
 - playlist support (org.mpris.MediaPlayer2.Playlists interface)
 - tracklist support (org.mpris.MediaPlayer2.TrackList interface)
