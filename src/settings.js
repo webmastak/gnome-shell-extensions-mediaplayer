@@ -31,6 +31,7 @@ var MEDIAPLAYER_INDICATOR_POSITION_KEY = 'indicator-position';
 var MEDIAPLAYER_COVER_STATUS_KEY = 'cover-status';
 var MEDIAPLAYER_STATUS_TEXT_KEY = 'status-text';
 var MEDIAPLAYER_STATUS_SIZE_KEY = 'status-size';
+var MEDIAPLAYER_PLAY_STATE_ICON_KEY = 'play-state-icon';
 var MEDIAPLAYER_VOLUME_KEY = 'volume';
 var MEDIAPLAYER_HIDE_AGGINDICATOR_KEY = 'hide-aggindicator';
 var MEDIAPLAYER_POSITION_KEY = 'position';
