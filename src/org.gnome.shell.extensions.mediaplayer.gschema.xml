@@ -1,5 +1,6 @@
 <schemalist gettext-domain="gnome-shell-extensions-mediaplayer">
   <enum id='org.gnome.shell.extensions.mediaplayer.positions'>
+    <value nick='left' value='3'/>
     <value nick='center' value='0'/>
     <value nick='right' value='1'/>
     <value nick='volume-menu' value='2'/>
