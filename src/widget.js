@@ -23,6 +23,7 @@
 const Mainloop = imports.mainloop;
 const St = imports.gi.St;
 const Atk = imports.gi.Atk;
+const BoxPointer = imports.ui.boxpointer;
 const PopupMenu = imports.ui.popupMenu;
 const Slider = imports.ui.slider;
 const GLib = imports.gi.GLib;
