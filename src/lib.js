@@ -30,14 +30,14 @@ function getSettings(extension) {
     let schema = schemaSource.lookup(schemaName, false);
 
     return new Gio.Settings({ settings_schema: schema });
-};
+}
 
 function initTranslations(extension) {
     let localeDir = extension.dir.get_child('locale').get_path();
     Gettext.bindtextdomain('gnome-shell-extensions-mediaplayer', localeDir);
-};
+}
 
 function addIcon(extension) {
     let iconPath = extension.dir.get_path();
     Gtk.IconTheme.get_default().append_search_path(iconPath);
-};
+}

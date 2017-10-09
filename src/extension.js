@@ -41,7 +41,9 @@ function init() {
     _stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
     _stockMprisOldShouldShow = _stockMpris._shouldShow;
   }
-  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {_reset()}); 
+  Settings.gsettings.connect("changed::" + Settings.MEDIAPLAYER_INDICATOR_POSITION_KEY, function() {
+    _reset();
+  });
 }
 
 function _reset() {

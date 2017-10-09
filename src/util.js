@@ -26,7 +26,7 @@ const Tweener = imports.ui.tweener;
 
 
 function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate, delay) {
-  fallback_icon_name = fallback_icon_name || 'audio-x-generic-symbolic'
+  fallback_icon_name = (fallback_icon_name || 'audio-x-generic-symbolic');
   if (coverUrl) {
     let file = Gio.File.new_for_uri(coverUrl);
     file.load_contents_async(null, function(source, result) {
@@ -74,7 +74,7 @@ function setCoverIconAsync(icon, coverUrl, fallback_icon_name, dontAnimate, dela
       animateChange(icon, 'icon_name', fallback_icon_name);
     }
   }
-};
+}
 
 function animateChange(actor, prop, value) {
   Tweener.addTween(actor, {
@@ -88,7 +88,7 @@ function animateChange(actor, prop, value) {
       });
     }
   });
-};
+}
 
 function getPlayerSymbolicIcon(desktopEntry, fallback) {
   if (desktopEntry) {
@@ -105,7 +105,7 @@ function getPlayerSymbolicIcon(desktopEntry, fallback) {
     }
   }
   return fallback || 'audio-x-generic-symbolic';
-};
+}
 
 function parseMetadata(metadata, state) {
   // Pragha sends a metadata dict with one value on stop
@@ -123,7 +123,7 @@ function parseMetadata(metadata, state) {
   state.trackRating = metadata["xesam:userRating"] ? parseInt(metadata["xesam:userRating"].unpack() * 5) : 'no rating';
   state.trackRating = metadata["pithos:rating"] ? metadata["pithos:rating"].unpack() : state.trackRating;
   state.isRhythmboxStream = metadata["rhythmbox:streamTitle"] ? true : false;
-};
+}
 
 var compileTemplate = function(template, playerState) {
   let escapedText = template.replace(/{(\w+)\|?([^}]*)}/g, function(match, fieldName, appendText) {

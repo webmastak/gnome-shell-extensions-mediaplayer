@@ -536,7 +536,7 @@ var MPRISPlayer = new Lang.Class({
             // for the new position.
             else {
               let newState = new PlayerState();
-              this._refreshProperties(newState)
+              this._refreshProperties(newState);
             }
           }
         }));
@@ -738,13 +738,13 @@ var MPRISPlayer = new Lang.Class({
     },
 
     get desktopEntry() {
-      return this._mediaServer.DesktopEntry || ''
+      return (this._mediaServer.DesktopEntry || '');
     },
 
     get activePlaylist() {
       let activePlaylist = this._mediaServerPlaylists.ActivePlaylist;
       if (activePlaylist === null || !activePlaylist || !activePlaylist[1]) {
-        activePlaylist = [null, null]
+        activePlaylist = [null, null];
       }
       else {
         activePlaylist = activePlaylist[1];
@@ -1036,7 +1036,7 @@ var MPRISPlayer = new Lang.Class({
       // properties refresh and don't need to do it again. 
       if (!newState.timeFresh) {
         let newState = new PlayerState();
-        this._refreshProperties(newState)
+        this._refreshProperties(newState);
       }
       if (this.state.status == Settings.Status.PLAY) {
         this._startTimer();

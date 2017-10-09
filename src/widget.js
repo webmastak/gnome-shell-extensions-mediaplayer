@@ -23,6 +23,7 @@
 const Mainloop = imports.mainloop;
 const St = imports.gi.St;
 const Atk = imports.gi.Atk;
+const BoxPointer = imports.ui.boxpointer;
 const PopupMenu = imports.ui.popupMenu;
 const Slider = imports.ui.slider;
 const GLib = imports.gi.GLib;
@@ -161,7 +162,7 @@ var BaseContainer = new Lang.Class({
       //they're not really menu items in the traditional sense.
       //We want to maintain the illusion that they are normal UI containers,
       //and that our main track UI area is one big container.
-      this.actor.add_style_pseudo_class = function() {return null;}
+      this.actor.add_style_pseudo_class = function() {return null;};
     },
 
     get hidden() {
@@ -604,7 +605,7 @@ var TrackRating = new Lang.Class({
         this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
                                             y_align: St.Align.MIDDLE,
                                             child: this._ratingsIcon
-                                           })
+                                           });
         this.box.add(this._unRateButton);
         this._loveButton = new St.Button();
         this.box.add(this._loveButton);
@@ -649,7 +650,7 @@ var TrackRating = new Lang.Class({
              }));
          }
          else if (rating == 'love') {
-             this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
+             this._ratingsIcon.icon_name = 'emblem-favorite-symbolic';
              this._unRateButton.show();
              this._loveButton.label = _("UnLove");
              this._callbackId = this._loveButton.connect('clicked', Lang.bind(this, function() {
@@ -1078,7 +1079,7 @@ var TracklistItem = new Lang.Class({
       this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
                                           y_align: St.Align.MIDDLE,
                                           child: this._ratingsIcon
-                                         })
+                                         });
       this._ratingBox.add(this._unRateButton, {y_align: St.Align.MIDDLE});
       this._loveButton = new St.Button();
       this._ratingBox.add(this._loveButton, {y_align: St.Align.MIDDLE});
@@ -1124,7 +1125,7 @@ var TracklistItem = new Lang.Class({
       }
 
       else if (rating == 'love') {
-        this._ratingsIcon.icon_name = 'emblem-favorite-symbolic'
+        this._ratingsIcon.icon_name = 'emblem-favorite-symbolic';
         this._unRateButton.show();
         this._loveButton.label = _("UnLove");
         this._banButton.label = _("Ban");
@@ -1140,7 +1141,7 @@ var TracklistItem = new Lang.Class({
         }));
       }
       else if (rating == 'ban') {
-        this._ratingsIcon.icon_name = 'dialog-error-symbolic'
+        this._ratingsIcon.icon_name = 'dialog-error-symbolic';
         this._unRateButton.show();
         this._loveButton.label = _("Love");
         this._banButton.label = _("UnBan");
@@ -1168,7 +1169,7 @@ var TracklistItem = new Lang.Class({
         this._unRateButton.reactive = false;
         this._banButton.hide();
         this._tiredButton.hide();
-        this._unrateCallbackId = 0
+        this._unrateCallbackId = 0;
         this._loveCallbackId = 0;
         this._banCallbackId = 0;
         this._tiredCallbackId = 0;

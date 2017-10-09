@@ -48,7 +48,7 @@ var MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY = 'hide-stockmpris';
 var MEDIAPLAYER_KEEP_ACTIVE_OPEN_KEY = 'active-open';
 var MEDIAPLAYER_PLAY_STATUS_ICON_KEY = 'playstatus';
 
-var MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1])
+var MINOR_VERSION = parseInt(Config.PACKAGE_VERSION.split(".")[1]);
 
 var IndicatorPosition = {
     LEFT: 3,
