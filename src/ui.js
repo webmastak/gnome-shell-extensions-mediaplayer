@@ -68,7 +68,7 @@ var PlayerUI = new Lang.Class({
     this.addMenuItem(this.info);
         
     this.trackControls = new Widget.PlayerButtons();
-    this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise))
+    this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise));
 
     this.prevButton = new Widget.PlayerButton('media-skip-backward-symbolic',
                                               Lang.bind(this.player, this.player.previous));
@@ -94,7 +94,7 @@ var PlayerUI = new Lang.Class({
     this.shuffleLoopStatus.hide();
 
     this.position = new Widget.SliderItem('document-open-recent-symbolic');
-    this.position.connect('activate', Lang.bind(this.player, this.player.raise))
+    this.position.connect('activate', Lang.bind(this.player, this.player.raise));
     this.position.sliderConnect('value-changed', Lang.bind(this, function(item) {
       this.player.seek(item._value);
     }));
@@ -102,7 +102,7 @@ var PlayerUI = new Lang.Class({
     this.position.hide();
 
     this.volume = new Widget.SliderItem('audio-volume-high-symbolic');
-    this.volume.connect('activate', Lang.bind(this.player, this.player.raise))
+    this.volume.connect('activate', Lang.bind(this.player, this.player.raise));
     this.volume.sliderConnect('value-changed', Lang.bind(this, function(item) {
       if (this.player.volume != item._value) {
         this.player.volume = item._value;
@@ -194,7 +194,7 @@ var PlayerUI = new Lang.Class({
           && this.state.showRating !== 'no rating'
           && !this.state.isRhythmboxStream
           && this.state.status !== Settings.Status.STOP) {
-        this.trackRatings.showAnimate()
+        this.trackRatings.showAnimate();
       }
       else {
         this.trackRatings.hideAnimate();
@@ -383,7 +383,7 @@ var PlayerUI = new Lang.Class({
     }
 
     if (newState.canSeek !== null) {
-      this.position.setReactive(this.state.canSeek)
+      this.position.setReactive(this.state.canSeek);
     }
 
     if (newState.canPlay !== null) {
