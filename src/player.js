@@ -679,6 +679,10 @@ var MPRISPlayer = new Lang.Class({
       return canPause;
     },
 
+    get canQuit() {
+      return this._mediaServer.CanQuit || false;
+    },
+
     get canSeek() {
       return this._mediaServerPlayer.CanSeek || false;
     },
@@ -848,6 +852,12 @@ var MPRISPlayer = new Lang.Class({
       }
       else if (this._mediaServer.CanRaise) {
         this._mediaServer.RaiseRemote();
+      }
+    },
+
+    quit: function() {
+      if (this.canQuit) {
+        this._mediaServer.QuitRemote();
       }
     },
 
