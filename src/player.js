@@ -185,7 +185,7 @@ var MPRISPlayer = new Lang.Class({
           this.state.update(state);
           if (state.status)
             this._onStatusChange(state);
-          this.emit('player-update', state);
+          this.emit('player-update', this.state);
         }));
 
     },
