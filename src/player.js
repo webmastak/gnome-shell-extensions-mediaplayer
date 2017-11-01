@@ -61,6 +61,8 @@ var PlayerState = new Lang.Class({
   trackListMetaData: null,
 
   trackTime: null,
+  trackDuration: null,
+  trackPosition: null,
   trackTitle: null,
   trackAlbum: null,
   trackArtist: null,
@@ -496,6 +498,7 @@ var MPRISPlayer = new Lang.Class({
 
           if (props.Metadata) {
             this.parseMetadata(props.Metadata.deep_unpack(), newState);
+            newState.trackDuration = this._formatTime(newState.trackLength)
             newState.emitSignal = true;
             if (newState.trackUrl !== this.state.trackUrl || newState.trackObj !== this.state.trackObj) {
               this._refreshProperties(newState);
@@ -639,8 +642,11 @@ var MPRISPlayer = new Lang.Class({
       if (this._trackTime >= trackLength) {
         value = 0;
       }
+      let newState = new PlayerState();
       this._trackTime = value;
-      this.emit('update-player-state', new PlayerState({trackTime: this._trackTime}));
+      newState.trackTime = value;
+      newState.trackPosition = this._formatTime(value);      
+      this.emit('update-player-state', newState);
     },
 
     get trackTime() {
@@ -1073,6 +1079,19 @@ var MPRISPlayer = new Lang.Class({
         Mainloop.source_remove(this._timerId);
         this._timerId = 0;
       }
+    },
+
+    _formatTime: function(s) {
+      if (Number.isNaN(s) || s < 0) {
+        return '0:00'
+      }
+      let h = Math.floor(s / 3600);
+      let m = Math.floor((s % 3600) / 60);
+      s = s % 60;
+      s = s < 10 ? '0' + s : s;
+      m = m < 10 && h > 0 ? '0' + m + ':' : m + ':';
+      h = h > 0 ? h + ':' : '';
+      return h + m + s;
     },
 
     destroy: function() {
