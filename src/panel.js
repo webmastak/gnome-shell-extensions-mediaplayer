@@ -139,7 +139,8 @@ const IndicatorMixin = {
     else if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
       let stateText = this.compileTemplate(this._stateTemplate, state);
       if (this._stateText != stateText) {
-        this._thirdIndicator.clutter_text.set_markup(stateText);
+        this._stateText = stateText;
+        this._thirdIndicator.clutter_text.set_markup(this._stateText);
         this._thirdIndicator.set_width(-1);
         this._statusTextWidth = this._thirdIndicator.get_width();
       }
