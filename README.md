@@ -26,6 +26,12 @@ any MPRIS v2.1 capable media player.
 - rating support (Not a part of the MPRIS spec, limited support with player specifc code, see [Ratings Support](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Ratings-Support). Currently you can set ratings in Rhythmbox, Lollypop, Nuvola Player, Quod Libet and Pithos.)
 - and more...
 
+## Don't care for all the bells and whistles?
+
+If you don't care for all the features and complexity of this extension but still dislike the media controls being in the notification area, you may like this extension's sister extension, [gnome-shell-extensions-mpris-indicator-button](https://github.com/JasonLG1979/gnome-shell-extensions-mpris-indicator-button/)
+
+![Screenshot](https://github.com/JasonLG1979/gnome-shell-extensions-mpris-indicator-button/blob/master/data/Screenshot.png)
+
 ## Authors
 
   * eonpatapon (Jean-Philippe Braun)
