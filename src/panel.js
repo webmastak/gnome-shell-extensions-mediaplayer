@@ -55,10 +55,10 @@ const IndicatorMixin = {
     if (Settings.gsettings.get_boolean(Settings.MEDIAPLAYER_ENABLE_SCROLL_EVENTS_KEY)) {
       switch (event.get_scroll_direction()) {
         case Clutter.ScrollDirection.UP:
-          this.manager.activePlayer.previous();
+          this.manager.activePlayer.next();
         break;
         case Clutter.ScrollDirection.DOWN:
-          this.manager.activePlayer.next();
+          this.manager.activePlayer.previous();
         break;
       }
     }
