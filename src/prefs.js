@@ -87,7 +87,7 @@ const Settings = {
     'status-text': {
         type: "s",
         tab: "i",
-        placeholder_text: "{trackArtist - }{trackTitle}",
+        placeholder_text: "{trackArtist} - {trackTitle}",
         label: _("Indicator Status Text"),
         help: _("{playerName}: Player Name, {trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango markup supported.")
     },
