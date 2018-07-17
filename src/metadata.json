@@ -3,6 +3,6 @@
 "name": "Media Player Indicator",
 "description": "Control MPRIS Version 2 Capable Media Players.",
 "original-author": "eon@patapon.info",
-"shell-version": ["3.18", "3.20", "3.22", "3.24", "3.26"],
+"shell-version": ["3.18", "3.20", "3.22", "3.24", "3.26", "3.28"],
 "url": "https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/"
 }
