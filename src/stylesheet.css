@@ -35,6 +35,10 @@
     spacing: 2px;
 }
 
+.album-details .popup-menu-icon {
+    padding: 0 4px;
+}
+
 .album-details .medium-player-button {
     padding: 0 6px;
 }
