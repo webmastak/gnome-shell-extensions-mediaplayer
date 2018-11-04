@@ -1,28 +1,53 @@
-.panel-media-indicator .popup-sub-menu > * > * > :first-child,
-.panel-media-indicator .popup-sub-menu > * > * > :last-child > :first-child {
-    margin:  0;
-    padding: 0;
+/* Keep the vertical spacing on the Now Playing "row" containers but
+ * remove left/right spacing
+ */
+.album-details {
+  margin-left: 35px;
+  margin-right: 35px;
+  padding-left: 0;
+  padding-right: 0;
+  spacing: 0;
+}
+
+.album-details.slider-row {
+  spacing: 12px;
 }
 
 /*
- * This is ugly, but seems to work - narrow the "spacer"/alignment boxes
+ * Everything within a row defaults to no spacing.
  *
- * The other option would be negative margins, but that
- * breaks things.
+ * Some widgets get overridden later
  */
-.panel-media-indicator .popup-sub-menu > * > * > :first-child {
-    width: 14px;
+.album-details * {
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * Ideally we'd remove the spacer boxes by using a different widget type
+ * but it isn't clear that Gnome Shell supports it.
+ */
+.album-details > :first-child {
+    width: 0px;
 }
 
 .player-buttons {
     spacing: 2px;
 }
 
-.medium-player-button {
+.album-details .medium-player-button {
     padding: 0 6px;
 }
-.large-player-button {
+.album-details .large-player-button {
     padding: 0 8px;
+}
+
+.album-details .system-menu-action {
+  padding: 13px;
+}
+
+.album-details .system-menu-action:hover {
+  padding: 14px;
 }
 
 .panel-media-indicator {
@@ -66,7 +91,7 @@
   font-size: x-small;
 }
 
-.star-icon {
+.album-details .star-icon {
     padding-top: 0px;
     padding-bottom: 0px;
     padding-left: 0.5px;
