@@ -1,8 +1,17 @@
 .panel-media-indicator .popup-sub-menu > * > * > :first-child,
-.panel-media-indicator .popup-sub-menu > * > * > :last-child > :first-child,
-.panel-media-indicator .popup-sub-menu > * > * > :last-child > :first-child > :first-child {
+.panel-media-indicator .popup-sub-menu > * > * > :last-child > :first-child {
     margin:  0;
     padding: 0;
+}
+
+/*
+ * This is ugly, but seems to work - narrow the "spacer"/alignment boxes
+ *
+ * The other option would be negative margins, but that
+ * breaks things.
+ */
+.panel-media-indicator .popup-sub-menu > * > * > :first-child {
+    width: 14px;
 }
 
 .player-buttons {
