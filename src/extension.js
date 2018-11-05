@@ -60,7 +60,6 @@ function enable() {
   if (position == Settings.IndicatorPosition.VOLUMEMENU) {
     indicator = new Panel.AggregateMenuIndicator();
     menu = Main.panel.statusArea.aggregateMenu.menu;
-    menu.actor.add_style_class_name('panel-media-indicator');
     desiredMenuPosition = Main.panel.statusArea.aggregateMenu.menu._getMenuItems().indexOf(Main.panel.statusArea.aggregateMenu._rfkill.menu);
   }
   else {

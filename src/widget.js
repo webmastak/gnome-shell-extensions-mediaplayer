@@ -234,9 +234,19 @@ var BaseContainer = new Lang.Class({
     }
 });
 
+var CenteredBaseContainer = new Lang.Class({
+    Name: "CenteredBaseContainer",
+    Extends: BaseContainer,
+
+    _init: function(parms) {
+      this.parent(parms);
+      this.actor.add_style_class_name('album-details');
+    },
+});
+
 var PlayerButtons = new Lang.Class({
     Name: 'PlayerButtons',
-    Extends: BaseContainer,
+    Extends: CenteredBaseContainer,
 
     _init: function() {
         this.parent({hover: false});
@@ -314,7 +324,7 @@ var ShuffleLoopStatus = new Lang.Class({
 
 var PlaylistTitle = new Lang.Class({
     Name: 'PlaylistTitle',
-    Extends: BaseContainer,
+    Extends: CenteredBaseContainer,
 
     _init: function () {
         this.parent({hover: false, style_class: 'no-padding-bottom'});
@@ -386,13 +396,13 @@ var PlayerButton = new Lang.Class({
 
 var SliderItem = new Lang.Class({
     Name: "SliderItem",
-    Extends: BaseContainer,
+    Extends: CenteredBaseContainer,
 
     _init: function(icon) {
         this.parent({hover: false});
         this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(0);
-
+        this.actor.add_style_class_name('slider-row');
         this.actor.add(this._icon);
         this.actor.add(this._slider.actor, {expand: true});
     },
@@ -416,7 +426,7 @@ var SliderItem = new Lang.Class({
 
 var TrackCover = new Lang.Class({
     Name: "TrackBox",
-    Extends: BaseContainer,
+    Extends: CenteredBaseContainer,
 
     _init: function(icon) {
       this.parent({hover: false, style_class: 'no-padding-bottom'});
@@ -427,7 +437,7 @@ var TrackCover = new Lang.Class({
 
 var Info = new Lang.Class({
     Name: "SecondaryInfo",
-    Extends: BaseContainer,
+    Extends: CenteredBaseContainer,
 
     _init: function() {
       this.parent({hover: false, style_class: 'no-padding-bottom'});
@@ -522,7 +532,7 @@ var Info = new Lang.Class({
 
 var TrackRating = new Lang.Class({
     Name: "TrackRating",
-    Extends: BaseContainer,
+    Extends: CenteredBaseContainer,
 
     _init: function(player, value) {
         this._hidden = false;
