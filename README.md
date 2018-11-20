@@ -3,6 +3,8 @@
 gnome-shell-extensions-mediaplayer is a gnome-shell extension for controlling
 any MPRIS v2.1 capable media player.
 
+[<img src="https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/blob/master/data/get-it-on-ego.svg?sanitize=true" height="100">](https://extensions.gnome.org/extension/55/media-player-indicator/)
+
 ## Please see the Wiki for:
   * [Contributing](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Contributing)
   * [Bug Reports and Feature Requests](https://github.com/JasonLG1979/gnome-shell-extensions-mediaplayer/wiki/Bug-Reports-and-Feature-Requests)
