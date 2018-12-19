@@ -1,0 +1,148 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
+"PO-Revision-Date: 2018-12-19 12:58+0200\n"
+"Last-Translator: Igor Gordiichuk <igor_ck@outlook.com>\n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2\n"
+
+#: ../src/ui.js:165
+msgid "Volume"
+msgstr "Гучнісь"
+
+#: ../src/ui.js:177
+msgid "Playlists"
+msgstr "Списки відтворень"
+
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Зупинено"
+
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Відтвоорюється"
+
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "Пауза"
+
+#: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr "Розташування індикатора"
+
+#: ../src/prefs.js:42
+msgid "Center"
+msgstr "По центру"
+
+#: ../src/prefs.js:43
+msgid "Right"
+msgstr "Праворуч"
+
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr "Меню системи"
+
+#: ../src/prefs.js:49
+msgid "Indicator appearance"
+msgstr "Зовнішній вигляд"
+
+#: ../src/prefs.js:51
+msgid "Symbolic icon"
+msgstr "Піктограма"
+
+#: ../src/prefs.js:52
+msgid "Current album cover"
+msgstr "Обкладинка альбаму"
+
+#: ../src/prefs.js:57
+msgid "Indicator status text"
+msgstr "Текст статуса індикатора"
+
+#: ../src/prefs.js:58
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
+msgstr "%a: виконавець, %b: альбом, %t: назва. Підтримується розмітка Pango."
+
+#: ../src/prefs.js:62
+msgid "Indicator status text width"
+msgstr "Ширина тексту статуса"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+"Максимальна ширина тексту, до його приховування трьома крапками. Типово "
+"300рх."
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Дозволити запуск типового програвача"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Показувати повзунок гучності програвача"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Показувати повзунок часу відтворення"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Показувати список відтворення програвача"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Показувати оцінку пісні"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Показувати оцінку поточної пісні за шкалою від 0 до 5"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Розташування на панелі"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Для застосування цих налаштувань необхідно перезапустити gnome-shell."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "В меню гучності"
+
+#, fuzzy
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr "Запуск плеєра кліком по піктограмі індикатора"
+
+#~ msgid "rating"
+#~ msgstr "оцінка"
+
+#~ msgid "by"
+#~ msgstr "виконавець"
+
+#~ msgid "from"
+#~ msgstr "з альбому"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Невідомий виконавець"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Невідомий альбом"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Невідома назва"
+
+#~ msgid "Album cover size"
+#~ msgstr "Розмір обкладинки альбому"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr "Розмір обкладинки, яку показано в меню. Типовий розмір 80px."
+
+#~ msgid "Show the media player in the volume menu"
+#~ msgstr "Вбудувати плеєр в меню гучності"
