@@ -88,61 +88,61 @@ msgstr "Дозволити запуск типового програвача"
 
 #: ../src/prefs.js:75
 msgid "Show the media player volume slider"
-msgstr "Відображати повзунок гучності програвача"
+msgstr "Показувати повзунок гучності програвача"
 
 #: ../src/prefs.js:79
 msgid "Show the media player position slider"
-msgstr "Відображати повзунок часу відтворення"
+msgstr "Показувати повзунок часу відтворення"
 
 #: ../src/prefs.js:83
 msgid "Show media player playlists"
-msgstr "Відображати список відтворення програвача"
+msgstr "Показувати список відтворення програвача"
 
 #: ../src/prefs.js:87
 msgid "Display song rating"
-msgstr "Відображати оцінку пісні"
+msgstr "Показувати оцінку пісні"
 
 #: ../src/prefs.js:88
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr "Відображати оцінку поточної пісні за шкалою від 0 до 5"
+msgstr "Показувати оцінку поточної пісні за шкалою від 0 до 5"
 
 #~ msgid "Position in the top panel"
-#~ msgstr "Расположение на панели"
+#~ msgstr "Розташування на панелі"
 
 #~ msgid "Restart the shell to apply this setting."
-#~ msgstr "Для этой опции требуется перезапуск gnome-shell."
+#~ msgstr "Для застосування цих налаштувань необхідно перезапустити gnome-shell."
 
 #~ msgid "Volume menu integration"
-#~ msgstr "В индикаторе громкости"
+#~ msgstr "В меню гучності"
 
 #, fuzzy
 #~ msgid ""
 #~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
-#~ msgstr "Запуск плеера кликом по иконке индикатора"
+#~ msgstr "Запуск плеєра кліком по піктограмі індикатора"
 
 #~ msgid "rating"
-#~ msgstr "оценка"
+#~ msgstr "оцінка"
 
 #~ msgid "by"
-#~ msgstr "исполняет"
+#~ msgstr "виконавець"
 
 #~ msgid "from"
-#~ msgstr "из альбома"
+#~ msgstr "з альбому"
 
 #~ msgid "Unknown Artist"
-#~ msgstr "Неизвестный исполнитель"
+#~ msgstr "Невідомий виконавець"
 
 #~ msgid "Unknown Album"
-#~ msgstr "Неизвестный альбом"
+#~ msgstr "Невідомий альбом"
 
 #~ msgid "Unknown Title"
-#~ msgstr "Неизвестное название"
+#~ msgstr "Невідома назва"
 
 #~ msgid "Album cover size"
-#~ msgstr "Размер обложки альбома"
+#~ msgstr "Розмір обкладинки альбому"
 
 #~ msgid "The size of the cover displayed in the menu. Default is 80px width."
-#~ msgstr "Размер обложки, отображаемой в меню. По умолчанию 80 пикселей."
+#~ msgstr "Розмір обкладинки, яку показано в меню. Типовий розмір 80px."
 
 #~ msgid "Show the media player in the volume menu"
-#~ msgstr "Встроить в индикатор громкости"
+#~ msgstr "Вбудувати плеєр в меню гучності"
