@@ -1,0 +1,155 @@
+# Catalan translation for gnome-shell-extension-mediaplayer.
+# Copyright (C) 2019 - gnome-shell-extension-mediaplayer
+# This file is distributed under the same license as the
+# gnome-shell-extension-mediaplayer package.
+# Roig <traduccions@ferranroig.com>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-extension-mediaplayer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-27 18:32+0200\n"
+"PO-Revision-Date: 2019-01-15 16:56+0100\n"
+"Last-Translator: Roig <traduccions@ferranroig.com>\n"
+"Language-Team: català; valencià <>\n"
+"Language: Catalan\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Gtranslator 2.91.7\n"
+
+#: ../src/ui.js:165
+msgid "Volume"
+msgstr "Volum"
+
+#: ../src/ui.js:177
+msgid "Playlists"
+msgstr "Llistes de reproducció"
+
+#: ../src/settings.js:51
+msgid "Stopped"
+msgstr "Aturat"
+
+#: ../src/settings.js:52
+msgid "Playing"
+msgstr "Reproduint"
+
+#: ../src/settings.js:53
+msgid "Paused"
+msgstr "En pausa"
+
+#: ../src/prefs.js:40
+msgid "Indicator position"
+msgstr "Indicador de posició"
+
+#: ../src/prefs.js:42
+msgid "Center"
+msgstr "Centre"
+
+#: ../src/prefs.js:43
+msgid "Right"
+msgstr "Dreta"
+
+#: ../src/prefs.js:44
+msgid "System menu"
+msgstr "Menú de sistema"
+
+#: ../src/prefs.js:49
+msgid "Indicator appearance"
+msgstr "Aparença"
+
+#: ../src/prefs.js:51
+msgid "Symbolic icon"
+msgstr "Icona simbòlica"
+
+#: ../src/prefs.js:52
+msgid "Current album cover"
+msgstr "Portada de l'àlbum actual"
+
+#: ../src/prefs.js:57
+msgid "Indicator status text"
+msgstr "Text d'estat"
+
+#: ../src/prefs.js:58
+msgid ""
+"{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
+"markup supported."
+msgstr "%a: Artista, %b: Àlbum, %t: Títol. Compatible amb sintaxis Pango."
+
+#: ../src/prefs.js:62
+msgid "Indicator status text width"
+msgstr "Amplada del text indicador d'estat"
+
+#: ../src/prefs.js:63
+msgid ""
+"The the maximum width before the status text gets an ellipsis. Default is "
+"300px."
+msgstr ""
+"L'amplada màxima abans del text d'estat provoca una el·lipsis. El valor "
+"predeterminat és 300px."
+
+#: ../src/prefs.js:71
+msgid "Allow to start the default media player"
+msgstr "Permet obrir el reproductor predeterminat"
+
+#: ../src/prefs.js:75
+msgid "Show the media player volume slider"
+msgstr "Mostra el potenciòmetre del volum del reproductor"
+
+#: ../src/prefs.js:79
+msgid "Show the media player position slider"
+msgstr "Mostra el control de posició del reproductor"
+
+#: ../src/prefs.js:83
+msgid "Show media player playlists"
+msgstr "Mostra les llistes de reproducció"
+
+#: ../src/prefs.js:87
+msgid "Display song rating"
+msgstr "Mostra la valoració de la cançó"
+
+#: ../src/prefs.js:88
+msgid "Display the currently playing song's rating on a 0 to 5 scale"
+msgstr "Mostra la valoració de la cançó en una escala del 0 al 5"
+
+#~ msgid "Position in the top panel"
+#~ msgstr "Posició en el panell superior"
+
+#~ msgid "Restart the shell to apply this setting."
+#~ msgstr "Cal reiniciar el shell per fer efectius els canvis."
+
+#~ msgid "Volume menu integration"
+#~ msgstr "Integració amb el menú de volum"
+
+#~ msgid ""
+#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
+#~ msgstr ""
+#~ "Engega el reproductor predeterminat al clicar sobre l'indicador o des del menú"
+
+#~ msgid "rating"
+#~ msgstr "valoració"
+
+#~ msgid "by"
+#~ msgstr "per"
+
+#~ msgid "from"
+#~ msgstr "de"
+
+#~ msgid "Unknown Artist"
+#~ msgstr "Artista desconegut"
+
+#~ msgid "Unknown Album"
+#~ msgstr "Álbum desconocido"
+
+#~ msgid "Unknown Title"
+#~ msgstr "Título desconegut"
+
+#~ msgid "Album cover size"
+#~ msgstr "Mida de la caràtula de l'àlbum"
+
+#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
+#~ msgstr "Mida de la caràtula mostrada en el menú. Valor predeterminat 80px d'ample"
+
+#~ msgid "Schema \"%s\" not found."
+#~ msgstr "Esquema \"%s\" no trobat."
