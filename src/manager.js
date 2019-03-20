@@ -30,10 +30,9 @@ const DBusIface = Me.imports.dbus;
 const UI = Me.imports.ui;
 
 
-var PlayerManager = new Lang.Class({
-    Name: 'PlayerManager',
+var PlayerManager = class PlayerManager {
 
-    _init: function(menu, desiredMenuPosition) {
+    constructor(menu, desiredMenuPosition) {
         this._disabling = false;
         // the menu
         this.menu = menu;
@@ -100,11 +99,11 @@ var PlayerManager = new Lang.Class({
                 }
             }
         ));
-    },
+    }
 
     get activePlayer() {
       return this._activePlayer;
-    },
+    }
 
     set activePlayer(player) {
 
@@ -130,9 +129,9 @@ var PlayerManager = new Lang.Class({
         this.showActivePlayer();
       }
       this.emit('player-active-update', player.state);
-    },
+    }
 
-    showActivePlayer: function() {
+    showActivePlayer() {
       if (!this._activePlayer || !this.menu.actor.visible) {
         return;
       }
@@ -142,21 +141,21 @@ var PlayerManager = new Lang.Class({
           break;
         }
       }
-    },
+    }
 
-    closeAllPlayers: function() {
+    closeAllPlayers() {
       for (let owner in this._players) {
         if (this._players[owner].ui.menu) {
           this._players[owner].ui.menu.close();
         }
       }
-    },
+    }
 
-    nbPlayers: function() {
+    nbPlayers() {
       return Object.keys(this._players).length;
-    },
+    }
 
-    getPlayersByStatus: function(status, preference) {
+    getPlayersByStatus(status, preference) {
       // Return a list of running players by status and preference
       // preference is a player instance, if found in the list
       // it will be put in the first position
@@ -176,25 +175,25 @@ var PlayerManager = new Lang.Class({
           return 1;
         return 0;
       });
-    },
+    }
 
-    _isInstance: function(busName) {
+    _isInstance(busName) {
         // MPRIS instances are in the form
         //   org.mpris.MediaPlayer2.name.instanceXXXX
         // ...except for VLC, which to this day uses
         //   org.mpris.MediaPlayer2.name-XXXX
         return busName.split('.').length > 4 ||
                 /^org\.mpris\.MediaPlayer2\.vlc-\d+$/.test(busName);
-    },
+    }
 
-    _addPlayer: function(busName, owner) {
+    _addPlayer(busName, owner) {
       // Give players 1 sec to populate their interfaces before actually adding them.
       if (this._addPlayerTimeOutIds[busName] && this._addPlayerTimeOutIds[busName] !== 0) {
         Mainloop.source_remove(this._addPlayerTimeOutIds[busName]);
         this._addPlayerTimeOutIds[busName] = 0;
       }
       this._addPlayerTimeOutIds[busName] = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
-          this._addPlayerTimeOutIds[busName] = 0;       
+          this._addPlayerTimeOutIds[busName] = 0;
           if (this._players[owner]) {
               let prevName = this._players[owner].player.busName;
               // HAVE:       ADDING:     ACTION:
@@ -226,25 +225,25 @@ var PlayerManager = new Lang.Class({
           }
           return false;
       }));
-    },
+    }
 
-    _onPlayerUpdate: function(player, newState) {
+    _onPlayerUpdate(player, newState) {
       if (newState.status)
         this._refreshActivePlayer(player);
-    },
+    }
 
-    _onActivePlayerUpdate: function(player, newState) {
+    _onActivePlayerUpdate(player, newState) {
       this.emit('player-active-update', newState);
-    },
+    }
 
-    _addPlayerToMenu: function(owner) {
-      let actualPos = this.desiredMenuPosition + this.nbPlayers();  
+    _addPlayerToMenu(owner) {
+      let actualPos = this.desiredMenuPosition + this.nbPlayers();
       let playerItem = this._players[owner];
       this.menu.addMenuItem(playerItem.ui, actualPos);
       this._refreshActivePlayer(playerItem.player);
-    },
+    }
 
-    _getMenuItem: function(position) {
+    _getMenuItem(position) {
         let items = this.menu.box.get_children().map(function(actor) {
             return actor._delegate;
         });
@@ -252,15 +251,15 @@ var PlayerManager = new Lang.Class({
             return items[position];
         else
             return null;
-    },
+    }
 
-    _removeMenuItem: function(position) {
+    _removeMenuItem(position) {
         let item = this._getMenuItem(position);
         if (item)
             item.destroy();
-    },
+    }
 
-    _getPlayerMenuPosition: function(ui) {
+    _getPlayerMenuPosition(ui) {
         let items = this.menu.box.get_children().map(function(actor) {
             return actor._delegate;
         });
@@ -269,9 +268,9 @@ var PlayerManager = new Lang.Class({
                 return i;
         }
         return null;
-    },
+    }
 
-    _removePlayerFromMenu: function(busName, owner) {
+    _removePlayerFromMenu(busName, owner) {
         if (this._players[owner]) {
             for (let id in this._players[owner].signals)
                 this._players[owner].player.disconnect(this._players[owner].signals[id]);
@@ -287,18 +286,18 @@ var PlayerManager = new Lang.Class({
         if (this.nbPlayers() === 0) {
           this.emit('disconnect-signals');
        }
-    },
+    }
 
-    _changePlayerOwner: function(busName, oldOwner, newOwner) {
+    _changePlayerOwner(busName, oldOwner, newOwner) {
         if (this._players[oldOwner] && busName == this._players[oldOwner].player.busName) {
             this._players[newOwner] = this._players[oldOwner];
             this._players[newOwner].player.owner = newOwner;
             delete this._players[oldOwner];
         }
         this._refreshActivePlayer(this._players[newOwner].player);
-    },
+    }
 
-    _refreshActivePlayer: function(player) {
+    _refreshActivePlayer(player) {
       // Display current status in the top panel
       if (this.nbPlayers() > 0) {
         // Get the first player
@@ -314,9 +313,9 @@ var PlayerManager = new Lang.Class({
       else {
         this.activePlayer = null;
       }
-    },
+    }
 
-    destroy: function() {
+    destroy() {
         this._disabling = true;
         this._settings.disconnect(this._settingChangeId);
         if (this._ownerChangedId)
@@ -331,5 +330,5 @@ var PlayerManager = new Lang.Class({
             }
         }
     }
-});
+};
 Signals.addSignalMethods(PlayerManager.prototype);

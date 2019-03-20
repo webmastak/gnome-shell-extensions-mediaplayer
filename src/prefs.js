@@ -33,14 +33,14 @@ const Gsettings = Lib.getSettings(Me);
 const GNU_SOFTWARE = '<span size="small">' +
     'This program comes with absolutely no warranty.\n' +
     'See the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.html">' +
-	'GNU General Public License, version 2 or later</a> for details.' +
-	'</span>';
+    'GNU General Public License, version 2 or later</a> for details.' +
+    '</span>';
 
 const CC_BY_SA = '<span size="small">' +
     'All artwork released under the Creative Commons Attribution-ShareAlike 4.0 International license.\n' +
     'See the <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode">' +
-	'CC BY-SA 4.0</a> for details.' +
-	'</span>';
+    'CC BY-SA 4.0</a> for details.' +
+    '</span>';
 
 const Creators = [
     {label: 'Jonas Wielicki',
@@ -54,21 +54,21 @@ const Creators = [
     {label: 'Bilal Elmoussaoui',
      url: 'https://github.com/bil-elmoussaoui'},
     {label: 'Alexander Rüedlinger',
-     url: 'https://github.com/lexruee'}    
+     url: 'https://github.com/lexruee'}
 ];
 
 const Artists = [
     {label: 'LinxGem33',
      url: 'https://github.com/LinxGem33'},
     {label: 'Jason Gray',
-     url: 'https://github.com/JasonLG1979'}     
+     url: 'https://github.com/JasonLG1979'}
 ];
 
 const Documenters = [
     {label: 'Jean-Philippe Braun',
      url: 'https://github.com/eonpatapon'},
     {label: 'Jason Gray',
-     url: 'https://github.com/JasonLG1979'}     
+     url: 'https://github.com/JasonLG1979'}
 ];
 
 
@@ -203,13 +203,10 @@ const Settings = {
     },
 };
 
-const Frame = new GObject.Class({
-    Name: 'Frame',
-    GTypeName: 'Frame',
-    Extends: Gtk.Box,
+const Frame = GObject.registerClass(class Frame extends Gtk.Box {
 
-    _init: function(title) {
-        this.parent({
+    _init(title) {
+        super._init({
             orientation: Gtk.Orientation.VERTICAL,
             margin_bottom: 6,
             margin_start: 6,
@@ -220,13 +217,10 @@ const Frame = new GObject.Class({
     }
 });
 
-const Notebook = new GObject.Class({
-    Name: 'Notebook',
-    GTypeName: 'Notebook',
-    Extends: Gtk.Notebook,
+const Notebook = GObject.registerClass(class Notebook extends Gtk.Notebook {
 
-    _init: function() {
-        this.parent({
+    _init() {
+        super._init({
             margin_top: 6,
             margin_bottom: 6,
             margin_start: 6,
@@ -234,9 +228,9 @@ const Notebook = new GObject.Class({
             hexpand: true,
             vexpand: true
         });
-    },
+    }
 
-    append_page: function(notebookPage) {
+    append_page(notebookPage) {
         Gtk.Notebook.prototype.append_page.call(
             this,
             notebookPage,
@@ -245,26 +239,23 @@ const Notebook = new GObject.Class({
     }
 });
 
-const NotebookPage = new GObject.Class({
-    Name: 'NotebookPage',
-    GTypeName: 'NotebookPage',
-    Extends: Gtk.Box,
+const NotebookPage = GObject.registerClass(class NotebookPage extends Gtk.Box {
 
-    _init: function(title) {
-        this.parent({
+    _init(title) {
+        super._init({
             orientation: Gtk.Orientation.VERTICAL,
             homogeneous: false
         });
         this._title = new Gtk.Label({
             label: title,
         });
-    },
+    }
 
-    getTitleLabel: function() {
+    getTitleLabel() {
         return this._title;
-    },
+    }
 
-    addSettingsBox: function(settingsBox) {
+    addSettingsBox(settingsBox) {
         this.pack_start(settingsBox, false, false, 0);
         let sep = new Gtk.Separator({
             orientation: Gtk.Orientation.HORIZONTAL,
@@ -275,13 +266,10 @@ const NotebookPage = new GObject.Class({
     }
 });
 
-const SettingsLabel = new GObject.Class({
-    Name: 'SettingsLabel',
-    GTypeName: 'SettingsLabel',
-    Extends: Gtk.Label,
+const SettingsLabel = GObject.registerClass(class SettingsLabel extends Gtk.Label {
 
-    _init: function(label) {
-        this.parent({
+    _init(label) {
+        super._init({
             label: label,
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.START
@@ -289,13 +277,10 @@ const SettingsLabel = new GObject.Class({
     }
 });
 
-const SettingsBox = new GObject.Class({
-    Name: 'SettingsBox',
-    GTypeName: 'SettingsBox',
-    Extends: Gtk.Box,
+const SettingsBox = GObject.registerClass(class SettingsBox extends Gtk.Box {
 
-    _init: function(setting) {
-        this.parent({
+    _init(setting) {
+        super._init({
             orientation: Gtk.Orientation.HORIZONTAL,
             margin_top: 6,
             margin_bottom: 6,
@@ -310,7 +295,7 @@ const SettingsBox = new GObject.Class({
         if (toolTip) {
             this.set_tooltip_text(toolTip);
         }
-        
+
         let widget;
 
         if (Settings[setting].type == 's') {
@@ -331,15 +316,12 @@ const SettingsBox = new GObject.Class({
     }
 });
 
-const SettingsSwitch = new GObject.Class({
-    Name: 'SettingsSwitch',
-    GTypeName: 'SettingsSwitch',
-    Extends: Gtk.Switch,
+const SettingsSwitch = GObject.registerClass(class SettingsSwitch extends Gtk.Switch {
 
-    _init: function(setting) {
+    _init(setting) {
         let active = Gsettings.get_boolean(setting);
 
-        this.parent({
+        super._init({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.END,
             active: active
@@ -354,13 +336,10 @@ const SettingsSwitch = new GObject.Class({
     }
 });
 
-const SettingsCombo = new GObject.Class({
-    Name: 'SettingsCombo',
-    GTypeName: 'SettingsCombo',
-    Extends: Gtk.ComboBoxText,
+const SettingsCombo = GObject.registerClass(class SettingsCombo extends Gtk.ComboBoxText {
 
-    _init: function(setting) {
-        this.parent({
+    _init(setting) {
+        super._init({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.END
         });
@@ -381,15 +360,12 @@ const SettingsCombo = new GObject.Class({
     }
 });
 
-const SettingsEntry = new GObject.Class({
-    Name: 'SettingsEntry',
-    GTypeName: 'SettingsEntry',
-    Extends: Gtk.Entry,
+const SettingsEntry = GObject.registerClass(class SettingsEntry extends Gtk.Entry {
 
-    _init: function(setting) {
+    _init(setting) {
         let text = Gsettings.get_string(setting);
 
-        this.parent({
+        super._init({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.END,
             width_chars: 30,
@@ -411,12 +387,9 @@ const SettingsEntry = new GObject.Class({
     }
 });
 
-const SettingsSpinButton = new GObject.Class({
-    Name: 'SettingsSpinButton',
-    GTypeName: 'SettingsSpinButton',
-    Extends: Gtk.SpinButton,
+const SettingsSpinButton = GObject.registerClass(class SettingsSpinButton extends Gtk.SpinButton {
 
-    _init: function(setting) {
+    _init(setting) {
         let adjustment = new Gtk.Adjustment({
             lower: Settings[setting].min,
             upper: Settings[setting].max,
@@ -425,7 +398,7 @@ const SettingsSpinButton = new GObject.Class({
 
         let value = Gsettings.get_int(setting);
 
-        this.parent({
+        super._init({
             valign: Gtk.Align.CENTER,
             halign: Gtk.Align.END,
             climb_rate: 1.0,
@@ -443,13 +416,10 @@ const SettingsSpinButton = new GObject.Class({
     }
 });
 
-const CreditBox = new GObject.Class({
-    Name: 'CreditBox',
-    GTypeName: 'CreditBox',
-    Extends: Gtk.Box,
+const CreditBox = GObject.registerClass(class CreditBox extends Gtk.Box {
 
-    _init: function() {
-        this.parent({
+    _init() {
+        super._init({
             orientation: Gtk.Orientation.VERTICAL,
             margin_top: 6,
             margin_bottom: 6,
@@ -579,16 +549,13 @@ const CreditBox = new GObject.Class({
         viewPort.add(innerCreditBox);
         scrolledWindow.add(viewPort);
         this.add(scrolledWindow);
-            
     }
 });
 
-const AboutPage = new Lang.Class({
-    Name: 'AboutPage',
-    Extends: NotebookPage,
+const AboutPage = GObject.registerClass(class AboutPage extends NotebookPage {
 
-    _init: function(settings) {
-        this.parent(_('About'));
+    _init(settings) {
+        super._init(_('About'));
         let releaseVersion = Me.metadata['version'] ? _('Version ') + Me.metadata['version'] : 'git-master';
         let projectName = Me.metadata['name'];
         let projectDescription = Me.metadata['description'];
@@ -675,13 +642,10 @@ const AboutPage = new Lang.Class({
     }
 });
 
-const PrefsWidget = new GObject.Class({
-    Name: 'PrefsWidget',
-    GTypeName: 'PrefsWidget',
-    Extends: Frame,
+const PrefsWidget = GObject.registerClass(class PrefsWidget extends Frame {
 
-    _init: function() {
-        this.parent();
+    _init() {
+        super._init();
         this._notebook = new Notebook();
 
         this._indicatorPage = new NotebookPage(_("Indicator"));
@@ -699,7 +663,7 @@ const PrefsWidget = new GObject.Class({
 
         let settingsBox;
 
-        for (let setting in Settings) { 
+        for (let setting in Settings) {
             settingsBox = new SettingsBox(setting);
 
             if (Gtk.get_minor_version() < 20 && setting == "hide-stockmpris") {
@@ -717,11 +681,11 @@ const PrefsWidget = new GObject.Class({
             }
         }
     }
-});    
+});
 
 function init() {
     Lib.initTranslations(Me);
-    Lib.addIcon(Me); 
+    Lib.addIcon(Me);
 }
 
 function buildPrefsWidget() {

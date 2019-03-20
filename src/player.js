@@ -35,86 +35,85 @@ const Settings = Me.imports.settings;
 const Util = Me.imports.util;
 
 
-var PlayerState = new Lang.Class({
-  Name: 'PlayerState',
+var PlayerState = class PlayerState {
 
-  _init: function(params) {
+  constructor(params) {
+
+    this.playerName = null;
+    this.desktopEntry = null;
+    this.status = null;
+
+    this.playlistObj = null;
+    this.playlists = null;
+    this.playlistCount = null;
+    this.orderings = null;
+
+    this.trackListMetaData = null;
+
+    this.trackTime = null;
+    this.trackDuration = null;
+    this.trackPosition = null;
+    this.trackTitle = null;
+    this.trackAlbum = null;
+    this.trackArtist = null;
+    this.trackUrl = null;
+    this.trackCoverUrl = null;
+    this.trackLength = null;
+    this.trackObj = null;
+    this.trackRating = null;
+    this.fallbackIcon = null;
+
+    this.showPlaylist = null;
+    this.showTracklist = null;
+    this.showRating = null;
+    this.showVolume = null;
+    this.showPosition = null;
+    this.hideStockMpris = null;
+    this.buttonIconStyle = null;
+    this.showStopButton = null;
+    this.showLoopStatus = null;
+    this.showPlayStatusIcon = null;
+
+    this.showTracklistRating = null;
+    this.updatedMetadata = null;
+    this.updatedPlaylist = null;
+    this.hasTrackList = null;
+    this.canPlay = null;
+    this.canPause = null;
+    this.canSeek = null;
+    this.canGoNext = null;
+    this.canGoPrevious = null;
+
+    this.volume = null;
+    this.showPlaylistTitle = null;
+    this.playlistTitle = null;
+
+    this.getPlaylists = null;
+
+    this.isRhythmboxStream = null;
+
+    this.shuffle = null;
+    this.loopStatus = null;
+
+    this.timeFresh = null;
+
+    this.emitSignal = null;
+
     this.update(params || {});
-  },
+  }
 
-  update: function(state) {
+  update(state) {
     for (let key in state) {
       if (state[key] !== null)
         this[key] = state[key];
     }
-  },
-
-  playerName: null,
-  desktopEntry: null,
-  status: null,
-
-  playlistObj: null,
-  playlists: null,
-  playlistCount: null,
-  orderings: null,
-
-  trackListMetaData: null,
-
-  trackTime: null,
-  trackDuration: null,
-  trackPosition: null,
-  trackTitle: null,
-  trackAlbum: null,
-  trackArtist: null,
-  trackUrl: null,
-  trackCoverUrl: null,
-  trackLength: null,
-  trackObj: null,
-  trackRating: null,
-  fallbackIcon: null,
-
-  showPlaylist: null,
-  showTracklist: null,
-  showRating: null,
-  showVolume: null,
-  showPosition: null,
-  hideStockMpris: null,
-  buttonIconStyle: null,
-  showStopButton: null,
-  showLoopStatus: null,
-  showPlayStatusIcon: null,
-
-  showTracklistRating: null,
-  updatedMetadata: null,
-  updatedPlaylist: null,
-  hasTrackList: null,
-  canPlay: null,
-  canPause: null,
-  canSeek: null,
-  canGoNext: null,
-  canGoPrevious: null,
-
-  volume: null,
-  showPlaylistTitle: null,
-  playlistTitle: null,
-
-  getPlaylists: null,
-
-  isRhythmboxStream: null,
-
-  shuffle: null,
-  loopStatus: null,
-
-  timeFresh: null,
-
-  emitSignal: null,
-});
+  }
+};
 
 
-var MPRISPlayer = new Lang.Class({
-    Name: 'MPRISPlayer',
+var MPRISPlayer = class MPRISPlayer {
 
-    _init: function(busName, owner) {
+    constructor(busName, owner) {
         let baseName = busName.split('.')[3];
 
         this.state = new PlayerState();
@@ -189,10 +188,9 @@ var MPRISPlayer = new Lang.Class({
             this._onStatusChange(state);
           this.emit('player-update', state);
         }));
+    }
 
-    },
-
-    _init2: function() {
+    _init2() {
         // Wait for all DBus callbacks to continue
         if (this._mediaServer !== null
             && this._mediaServerPlayer !== null
@@ -203,9 +201,9 @@ var MPRISPlayer = new Lang.Class({
             && this._prop !== null) {
             this._init3();
         }
-    },
+    }
 
-    _init3: function() {
+    _init3() {
         if (Settings.MINOR_VERSION > 19) {
         // Versions before 3.20 don't have Mpris built-in.
         // hideStockMpris setting
@@ -226,7 +224,7 @@ var MPRISPlayer = new Lang.Class({
               else {
                 this.emit('update-player-state', new PlayerState({showVolume: false}));
               }
-            }              
+            }
           }))
         );
         // showPosition setting
@@ -341,7 +339,7 @@ var MPRISPlayer = new Lang.Class({
               let afterTrackIdIndex = this._trackIds.indexOf(afterTrackId);
               if (afterTrackIdIndex !== -1) {
                 insertIndex = afterTrackIdIndex + 1;
-              } 
+              }
             }
             if (insertIndex !== -1) {
               let metadata = {};
@@ -470,14 +468,14 @@ var MPRISPlayer = new Lang.Class({
                 newState.getPlaylists = true;
               }
               else {
-                newState.getPlaylists = null;              
+                newState.getPlaylists = null;
               }
             }
           }
 
           if (props.ActivePlaylist) {
             let [playlistObj, playlistTitle] = props.ActivePlaylist.deep_unpack()[1];
-            
+
             if (this.state.playlistObj !== playlistObj) {
               newState.playlistObj = playlistObj;
               newState.emitSignal = true;
@@ -548,9 +546,9 @@ var MPRISPlayer = new Lang.Class({
           this.app = appSys.lookup_app(this.desktopEntry + ".desktop");
         }
         this.populate();
-    },
+    }
 
-    populate: function() {
+    populate() {
       // The Tracks prop value is never updated so it's value is only good
       // for right after the player is created after that we rely on
       // the TrackListReplaced, TrackAdded, and TrackRemoved signals
@@ -592,7 +590,7 @@ var MPRISPlayer = new Lang.Class({
       }
 
       this.parseMetadata(this._mediaServerPlayer.Metadata, newState);
-      
+
       //Delay calls 1 sec because some players make the interface available without data available in the beginning
 
       if (newState.playlistCount > 0 && newState.playlistTitle) {
@@ -619,21 +617,21 @@ var MPRISPlayer = new Lang.Class({
       }
 
       this.emit('update-player-state', newState);
-    },
+    }
 
-    _checkTrackIds: function(trackIds) {
+    _checkTrackIds(trackIds) {
       if (!trackIds || !Array.isArray(trackIds)) {
         trackIds = [];
       }
       return trackIds;
-    },
+    }
 
-    _checkOrderings: function(orderings) {
+    _checkOrderings(orderings) {
       if (!orderings || !Array.isArray(orderings) || orderings.length < 1) {
         orderings = ['Alphabetical'];
       }
       return orderings;
-    },
+    }
 
     set trackTime(value) {
       // Assume that if our trackTime is equal to or greater than
@@ -645,13 +643,13 @@ var MPRISPlayer = new Lang.Class({
       let newState = new PlayerState();
       this._trackTime = value;
       newState.trackTime = value;
-      newState.trackPosition = this._formatTime(value);      
+      newState.trackPosition = this._formatTime(value);
       this.emit('update-player-state', newState);
-    },
+    }
 
     get trackTime() {
       return this._trackTime;
-    },
+    }
 
     get canGoNext() {
       let canGoNext = this._mediaServerPlayer.CanGoNext;
@@ -659,7 +657,7 @@ var MPRISPlayer = new Lang.Class({
         canGoNext = true;
       }
       return canGoNext;
-    },
+    }
 
     get canGoPrevious() {
       let canGoPrevious = this._mediaServerPlayer.CanGoPrevious;
@@ -667,7 +665,7 @@ var MPRISPlayer = new Lang.Class({
         canGoPrevious = true;
       }
       return canGoPrevious;
-    },
+    }
 
     get canPlay() {
       let canPlay = this._mediaServerPlayer.CanPlay;
@@ -675,7 +673,7 @@ var MPRISPlayer = new Lang.Class({
         canPlay = true;
       }
       return canPlay;
-    },
+    }
 
     get canPause() {
       let canPause = this._mediaServerPlayer.CanPause;
@@ -683,19 +681,19 @@ var MPRISPlayer = new Lang.Class({
         canPause = true;
       }
       return canPause;
-    },
+    }
 
     get canQuit() {
       return this._mediaServer.CanQuit || false;
-    },
+    }
 
     get canSeek() {
       return this._mediaServerPlayer.CanSeek || false;
-    },
+    }
 
     get hasTrackList() {
       return this._mediaServer.HasTrackList || false;
-    },
+    }
 
     get volume() {
       let volume = this._mediaServerPlayer.Volume;
@@ -706,50 +704,50 @@ var MPRISPlayer = new Lang.Class({
         volume = Math.pow(volume, 1 / 3);
       }
       return volume;
-    },
+    }
 
     set volume(volume) {
       if (this.hasWrongVolumeScaling) {
         volume = Math.pow(volume, 3);
       }
       this._mediaServerPlayer.Volume = volume;
-    },
+    }
 
     get shuffle() {
       return this._mediaServerPlayer.Shuffle || false;
-    },
+    }
 
     set shuffle(shuffle) {
       if (this._mediaServerPlayer.Shuffle !== null) {
         this._mediaServerPlayer.Shuffle = shuffle;
       }
-    },
+    }
 
     get loopStatus() {
       return this._mediaServerPlayer.LoopStatus || 'None';
-    },
+    }
 
     set loopStatus(loopStatus) {
       if (this._mediaServerPlayer.LoopStatus !== null) {
         this._mediaServerPlayer.LoopStatus = loopStatus;
       }
-    },
+    }
 
     get shouldShowLoopStatus() {
       return this._mediaServerPlayer.LoopStatus !== null && this._mediaServerPlayer.Shuffle !== null;
-    },
+    }
 
     get playbackStatus() {
       return this._mediaServerPlayer.PlaybackStatus || Settings.Status.STOP;
-    },
+    }
 
     get identity() {
       return this._mediaServer.Identity || this._identity;
-    },
+    }
 
     get desktopEntry() {
       return (this._mediaServer.DesktopEntry || '');
-    },
+    }
 
     get activePlaylist() {
       let activePlaylist = this._mediaServerPlaylists.ActivePlaylist;
@@ -758,116 +756,116 @@ var MPRISPlayer = new Lang.Class({
       }
       else {
         activePlaylist = activePlaylist[1];
-      }      
+      }
       return activePlaylist;
-    },
+    }
 
     get playlistCount() {
       return this._mediaServerPlaylists.PlaylistCount || 0;
-    },
+    }
 
     get orderings() {
       return this._checkOrderings(this._mediaServerPlaylists.Orderings);
-    },
+    }
 
     get showPlayStatusIcon() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAY_STATUS_ICON_KEY);
-    },
+    }
 
     get showLoopStatus() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_LOOP_STATUS_KEY) && this.shouldShowLoopStatus && !this.noLoopStatusSupport;
-    },
+    }
 
     get showStopButton() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_STOP_BUTTON_KEY) && !this.playerIsBroken;
-    },
+    }
 
     get buttonIconStyle() {
       return this._settings.get_enum(Settings.MEDIAPLAYER_BUTTON_ICON_STYLE_KEY);
-    },
+    }
 
     get showVolume() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_VOLUME_KEY) && !this.playerIsBroken;
-    },
+    }
 
     get showPosition() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_POSITION_KEY) && !this.playerIsBroken;
-    },
+    }
 
     get showRating() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_RATING_KEY) && !this.playerIsBroken;
-    },
+    }
 
     get showPlaylist() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLISTS_KEY) && !this.playerIsBroken && !this.isClementine;
-    },
+    }
 
     get showPlaylistTitle() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_PLAYLIST_TITLE_KEY) && !this.playerIsBroken && !this.isClementine;
-    },
+    }
 
     get showTracklist() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_KEY) && !this.playerIsBroken && !this.isClementine;
-    },
+    }
 
     get showTracklistRating() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_TRACKLIST_RATING_KEY) && !this.playerIsBroken;
-    },
+    }
 
     get hideStockMpris() {
       return this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_STOCK_MPRIS_KEY);
-    },
+    }
 
-    next: function() {
+    next() {
       this._mediaServerPlayer.NextRemote();
-    },
+    }
 
-    previous: function() {
+    previous() {
       this._mediaServerPlayer.PreviousRemote();
-    },
+    }
 
-    playPause: function() {
+    playPause() {
       this._mediaServerPlayer.PlayPauseRemote();
-    },
+    }
 
-    stop: function() {
+    stop() {
       this._mediaServerPlayer.StopRemote();
-    },
+    }
 
-    seek: function(value) {
+    seek(value) {
       let time = value * this.state.trackLength;
       this._wantedSeekValue = Math.round(time * 1000000);
       this._mediaServerPlayer.SetPositionRemote(this.state.trackObj, this._wantedSeekValue);
-    },
+    }
 
-    playPlaylist: function(playlistObj) {
+    playPlaylist(playlistObj) {
       this._mediaServerPlaylists.ActivatePlaylistRemote(playlistObj);
-    },
+    }
 
-    playTrack: function(track) {
+    playTrack(track) {
       // GNOME Music crashes if you call the GoTo method.
       //https://bugzilla.gnome.org/show_bug.cgi?id=779052
       if (this.busName !== 'org.mpris.MediaPlayer2.GnomeMusic') {
         this._mediaServerTracklist.GoToRemote(track);
       }
-    },
+    }
 
-    raise: function() {
+    raise() {
       if (this.app) {
         this.app.activate_full(-1, 0);
       }
       else if (this._mediaServer.CanRaise) {
         this._mediaServer.RaiseRemote();
       }
-    },
+    }
 
-    quit: function() {
+    quit() {
       if (this.canQuit) {
         this._mediaServer.QuitRemote();
       }
-    },
+    }
 
-    _refreshProperties: function(newState) {
+    _refreshProperties(newState) {
       // Check properties
       // Many players have a habit of changing properties without emitting
       // a PropertiesChanged signal as they should. This is basically CYA.
@@ -899,7 +897,7 @@ var MPRISPlayer = new Lang.Class({
                     newState.canPause = canPause;
                     newState.emitSignal = true;
                   }
-                }                             
+                }
                 if (newState.canGoNext === null && props.CanGoNext) {
                 let canGoNext = props.CanGoNext.unpack();
                   if (this.state.canGoNext !== canGoNext) {
@@ -985,9 +983,9 @@ var MPRISPlayer = new Lang.Class({
               }
           }));
       }));
-    },
+    }
 
-    _getPlaylists: function(orderings) {
+    _getPlaylists(orderings) {
       // A player may have trigger the fetching of a playlist
       // before our initial startup timeout happens.
       if (this._playlistTimeOutId !== 0) {
@@ -1007,14 +1005,14 @@ var MPRISPlayer = new Lang.Class({
             this.emit('update-player-state', new PlayerState({showPlaylist: true}));
           }
           this.emit('update-player-state', new PlayerState({playlists: playlists}));
-        } 
+        }
         else {
           this.emit('update-player-state', new PlayerState({showPlaylist: false}));
         }
       }));
-    },
+    }
 
-    _getTracklist: function() {
+    _getTracklist() {
       // A player may have trigger the fetching of a tracklist
       // before our initial startup timeout happens.
       if (this._tracklistTimeOutId !== 0) {
@@ -1038,9 +1036,9 @@ var MPRISPlayer = new Lang.Class({
           }
         }));
       }
-    },
+    }
 
-    _onStatusChange: function(newState) {
+    _onStatusChange(newState) {
       // If the player is broken (Spotify you suck...) we'll never see the
       // position slider any way. No need to waste CPU cycles
       // on a timer...
@@ -1049,7 +1047,7 @@ var MPRISPlayer = new Lang.Class({
       }
       // sync track time
       // If the time is fresh we just came from a
-      // properties refresh and don't need to do it again. 
+      // properties refresh and don't need to do it again.
       if (!newState.timeFresh) {
         let newState = new PlayerState();
         this._refreshProperties(newState);
@@ -1064,24 +1062,24 @@ var MPRISPlayer = new Lang.Class({
         this._stopTimer();
         this.trackTime = 0;
       }
-    },
+    }
 
-    _startTimer: function() {
+    _startTimer() {
       if (this._timerId === 0) {
         this._timerId = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
           return this.trackTime += 1;
         }));
       }
-    },
+    }
 
-    _stopTimer: function() {
+    _stopTimer() {
       if (this._timerId !== 0) {
         Mainloop.source_remove(this._timerId);
         this._timerId = 0;
       }
-    },
+    }
 
-    _formatTime: function(s) {
+    _formatTime(s) {
       if (Number.isNaN(s) || s < 0) {
         return '0:00'
       }
@@ -1092,9 +1090,9 @@ var MPRISPlayer = new Lang.Class({
       m = m < 10 && h > 0 ? '0' + m + ':' : m + ':';
       h = h > 0 ? h + ':' : '';
       return h + m + s;
-    },
+    }
 
-    destroy: function() {
+    destroy() {
         // Cancel all pending timeouts.
         this._stopTimer();
         if (this._playlistTimeOutId !== 0) {
@@ -1125,10 +1123,10 @@ var MPRISPlayer = new Lang.Class({
         for (let id in this._signalsId) {
             this._settings.disconnect(this._signalsId[id]);
         }
-    },
+    }
 
-    toString: function() {
+    toString() {
         return "<object MPRISPlayer(%s)>".format(this.info.identity);
     }
-});
+};
 Signals.addSignalMethods(MPRISPlayer.prototype);
