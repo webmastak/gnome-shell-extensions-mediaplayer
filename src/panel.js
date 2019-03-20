@@ -21,6 +21,7 @@
 
 const Lang = imports.lang;
 const Clutter = imports.gi.Clutter;
+const GObject = imports.gi.GObject;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const PanelMenu = imports.ui.panelMenu;
@@ -134,7 +135,7 @@ const IndicatorMixin = {
       this._thirdIndicator.clutter_text.set_markup('');
       this._statusTextWidth = 0;
       this._stateText = '';
-      this._thirdIndicator.hide();      
+      this._thirdIndicator.hide();
     }
     else if (state.playerName || state.trackTitle || state.trackArtist || state.trackAlbum) {
       let stateText = this.compileTemplate(this._stateTemplate, state);
@@ -164,7 +165,7 @@ const IndicatorMixin = {
   },
 
   _commonOnActivePlayerRemove: function() {
-    this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';    
+    this._primaryIndicator.icon_name = 'audio-x-generic-symbolic';
     this._thirdIndicator.clutter_text.set_markup('');
     this._thirdIndicator.set_width(0);
     this._secondaryIndicator.set_width(0);
@@ -174,12 +175,10 @@ const IndicatorMixin = {
   }
 };
 
-var PanelIndicator = new Lang.Class({
-  Name: 'PanelIndicator',
-  Extends: PanelMenu.Button,
+var PanelIndicator = GObject.registerClass(class PanelIndicator extends PanelMenu.Button {
 
-  _init: function() {
-    this.parent(0.0, "mediaplayer");
+  _init() {
+    super._init(0.0, "mediaplayer");
 
     this._manager = null;
     this.actor.add_style_class_name('panel-status-button');
@@ -216,32 +215,30 @@ var PanelIndicator = new Lang.Class({
     this.actor.add_actor(this.indicators);
     this.actor.connect('scroll-event', Lang.bind(this, this._onScrollEvent));
     this.actor.hide();
-  },
+  }
 
   // Override PanelMenu.Button._onEvent
-  _onEvent: function(actor, event) {
+  _onEvent(actor, event) {
     if (this._onButtonEvent(actor, event) == Clutter.EVENT_PROPAGATE)
-      this.parent(actor, event);
-  },
+      super._onEvent(actor, event);
+  }
 
-  _onActivePlayerUpdate: function(state) {
+  _onActivePlayerUpdate(state) {
     if (this.manager.activePlayer) {
       this.actor.show();
     }
-  },
+  }
 
-  _onActivePlayerRemove: function() {
+  _onActivePlayerRemove() {
     this.actor.hide();
   }
 });
 Util._extends(PanelIndicator, IndicatorMixin);
 
-var AggregateMenuIndicator = new Lang.Class({
-  Name: 'AggregateMenuIndicator',
-  Extends: PanelMenu.SystemIndicator,
+var AggregateMenuIndicator = class AggregateMenuIndicator extends PanelMenu.SystemIndicator {
 
-  _init: function() {
-    this.parent();
+  constructor() {
+    super();
 
     this._manager = null;
     this.compileTemplate = Util.compileTemplate;
@@ -279,9 +276,9 @@ var AggregateMenuIndicator = new Lang.Class({
         this.indicators.show();
       }
     }));
-  },
+  }
 
-  _onActivePlayerUpdate: function(state) {
+  _onActivePlayerUpdate(state) {
     let alwaysHide = this._settings.get_boolean(Settings.MEDIAPLAYER_HIDE_AGGINDICATOR_KEY);
     if (state.status && state.status === Settings.Status.STOP || alwaysHide) {
       this.indicators.hide();
@@ -289,10 +286,10 @@ var AggregateMenuIndicator = new Lang.Class({
     else if (state.status && !alwaysHide) {
       this.indicators.show();
     }
-  },
+  }
 
-  _onActivePlayerRemove: function() {
+  _onActivePlayerRemove() {
     this.indicators.hide();
   }
-});
+};
 Util._extends(AggregateMenuIndicator, IndicatorMixin);

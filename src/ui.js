@@ -35,12 +35,10 @@ const Settings = Me.imports.settings;
 const Util = Me.imports.util;
 
 
-var PlayerUI = new Lang.Class({
-  Name: 'PlayerUI',
-  Extends: Widget.PlayerMenu,
+var PlayerUI = class PlayerUI extends Widget.PlayerMenu {
 
-  _init: function(player) {
-    this.parent('', true);
+  constructor(player) {
+    super('', true);
     this.hidePlayStatusIcon();
     this.player = player;
     this.setCoverIconAsync = Util.setCoverIconAsync;
@@ -66,7 +64,7 @@ var PlayerUI = new Lang.Class({
     this.info = new Widget.Info();
     this.info.connect('activate', Lang.bind(this.player, this.player.raise));
     this.addMenuItem(this.info);
-        
+
     this.trackControls = new Widget.PlayerButtons();
     this.trackControls.connect('activate', Lang.bind(this.player, this.player.raise));
 
@@ -81,7 +79,7 @@ var PlayerUI = new Lang.Class({
     this.stopButton = new Widget.PlayerButton('media-playback-stop-symbolic',
                                               Lang.bind(this.player, this.player.stop));
     this.trackControls.addButton(this.stopButton);
-    
+
     this.nextButton = new Widget.PlayerButton('media-skip-forward-symbolic',
                                               Lang.bind(this.player, this.player.next));
     this.trackControls.addButton(this.nextButton);
@@ -114,7 +112,7 @@ var PlayerUI = new Lang.Class({
     this.tracklist = this._createTracklistWidget();
     this.addMenuItem(this.tracklist);
     this.tracklist.hide();
- 
+
     this.playlists = this._createPlaylistWidget();
     this.addMenuItem(this.playlists);
     this.playlists.hide();
@@ -134,15 +132,15 @@ var PlayerUI = new Lang.Class({
       this.stockMpris = Main.panel.statusArea.dateMenu._messageList._mediaSection;
       //Monkey patch
       this.stockMprisOldShouldShow = this.stockMpris._shouldShow;
-      
-    } 
-  },
+
+    }
+  }
 
   get state() {
     return this.player.state;
-  },
+  }
 
-  update: function(player, newState) {
+  update(player, newState) {
     if (newState.desktopEntry !== null) {
       this.icon.icon_name = Util.getPlayerSymbolicIcon(this.state.desktopEntry);
     }
@@ -177,7 +175,7 @@ var PlayerUI = new Lang.Class({
           && !this.state.isRhythmboxStream
           && this.state.status !== Settings.Status.STOP) {
         this.shuffleLoopStatus.showAnimate();
-      }             
+      }
     }
 
     if (newState.showPlayStatusIcon !== null) {
@@ -186,7 +184,7 @@ var PlayerUI = new Lang.Class({
       }
       else {
         this.hidePlayStatusIcon();
-      }              
+      }
     }
 
     if (newState.showRating !== null) {
@@ -198,7 +196,7 @@ var PlayerUI = new Lang.Class({
       }
       else {
         this.trackRatings.hideAnimate();
-      }              
+      }
     }
 
     if (newState.showVolume !== null) {
@@ -336,7 +334,7 @@ var PlayerUI = new Lang.Class({
           volumeIcon = 'audio-volume-low-symbolic';
         }
         else if (n >= 3) {
-          volumeIcon = 'audio-volume-high-symbolic';          
+          volumeIcon = 'audio-volume-high-symbolic';
         }
         else {
           volumeIcon = 'audio-volume-medium-symbolic';
@@ -468,8 +466,8 @@ var PlayerUI = new Lang.Class({
         }
         else {
            this.playButton.disable();
-        }                 
-      }      
+        }
+      }
       if (this.state.status === Settings.Status.STOP) {
         this.setPlayStatusIcon('media-playback-stop-symbolic');
         this.stopButton.hide();
@@ -513,7 +511,7 @@ var PlayerUI = new Lang.Class({
     if (newState.showStopButton !== null) {
       if (this.state.showStopButton && this.state.status !== Settings.Status.STOP) {
         this.stopButton.show();
-      }       
+      }
       else if (this.state.status === Settings.Status.PLAY && this.state.canPause) {
         this.stopButton.hide();
       }
@@ -561,9 +559,9 @@ var PlayerUI = new Lang.Class({
     if (newState.updatedMetadata !== null) {
       this.tracklist.updateMetadata(this.state.updatedMetadata);
     }
-  },
+  }
 
-  _createPlaylistWidget: function() {
+  _createPlaylistWidget() {
     let playlistTitle = _("Playlists");
     let altPlaylistTitles = Settings.ALTERNATIVE_PLAYLIST_TITLES;
     for (let i = 0; i < altPlaylistTitles.length; i++) {
@@ -576,9 +574,9 @@ var PlayerUI = new Lang.Class({
       }
     }
     return new Widget.Playlists(playlistTitle, this.player);
-  },
+  }
 
-  _createTracklistWidget: function() {
+  _createTracklistWidget() {
     let tracklistTitle = _("Tracks");
     let altTracklistTitles = Settings.ALTERNATIVE_TRACKLIST_TITLES;
     for (let i = 0; i < altTracklistTitles.length; i++) {
@@ -591,18 +589,16 @@ var PlayerUI = new Lang.Class({
       }
     }
     return new Widget.TrackList(tracklistTitle, this.player);
-  },
+  }
 
-  toString: function() {
+  toString() {
       return '[object PlayerUI(%s)]'.format(this.player.busName);
-  },
+  }
 
-
-  destroy: function() {
+  destroy() {
     if (this._updateId) {
       this.player.disconnect(this._updateId);
     }
-    this.parent();
+    super.destroy();
   }
-
-});
+};

@@ -41,12 +41,10 @@ const Util = Me.imports.util;
 const DBusIface = Me.imports.dbus;
 
 
-var SubMenu = new Lang.Class({
-    Name: 'SubMenu',
-    Extends: PopupMenu.PopupMenuBase,
+var SubMenu = class SubMenu extends PopupMenu.PopupMenuBase {
 
-    _init: function(sourceActor, sourceArrow, isPlayerMenu) {
-        this.parent(sourceActor);
+    constructor(sourceActor, sourceArrow, isPlayerMenu) {
+        super(sourceActor);
         this._isPlayerMenu = isPlayerMenu;
         this._arrow = sourceArrow;
 
@@ -59,22 +57,22 @@ var SubMenu = new Lang.Class({
         this.actor.clip_to_allocation = true;
         this.actor.connect('key-press-event', Lang.bind(this, this._onKeyPressEvent));
         this.actor.hide();
-    },
+    }
 
-    _needsScrollbar: function() {
+    _needsScrollbar() {
         let topMenu = this._getTopMenu();
         let [topMinHeight, topNaturalHeight] = topMenu.actor.get_preferred_height(-1);
         let topThemeNode = topMenu.actor.get_theme_node();
 
         let topMaxHeight = topThemeNode.get_max_height();
         return topMaxHeight >= 0 && topNaturalHeight >= topMaxHeight;
-    },
+    }
 
-    getSensitive: function() {
+    getSensitive() {
         return this._sensitive && this.sourceActor._delegate.getSensitive();
-    },
+    }
 
-    open: function() {
+    open() {
         if (this.isOpen || this.isEmpty())
             return;
 
@@ -93,9 +91,9 @@ var SubMenu = new Lang.Class({
         }
 
         this._arrow.rotation_angle_z = this.actor.text_direction == Clutter.TextDirection.RTL ? -90 : 90;
-    },
+    }
 
-    close: function() {
+    close() {
         if (!this.isOpen || this.isEmpty())
             return;
 
@@ -106,9 +104,9 @@ var SubMenu = new Lang.Class({
             this._activeMenuItem.setActive(false);
         this._arrow.rotation_angle_z = 0;
         this.actor.hide();
-    },
+    }
 
-    _onKeyPressEvent: function(actor, event) {
+    _onKeyPressEvent(actor, event) {
         // Move focus back to parent menu if the user types Left.
 
         if (this.isOpen && event.get_key_symbol() == Clutter.KEY_Left) {
@@ -119,43 +117,39 @@ var SubMenu = new Lang.Class({
 
         return Clutter.EVENT_PROPAGATE;
     }
-});
+};
 
-var PlayerMenu = new Lang.Class({
-  Name: 'PlayerMenu',
-  Extends: PopupMenu.PopupSubMenuMenuItem,
+var PlayerMenu = class PlayerMenu extends PopupMenu.PopupSubMenuMenuItem {
 
-  _init: function(label, wantIcon) {
-    this.parent(label, wantIcon);
+  constructor(label, wantIcon) {
+    super(label, wantIcon);
     this._playStatusIcon = new St.Icon({style_class: 'popup-menu-icon'});
     this.actor.insert_child_at_index(this._playStatusIcon, 3);
     this.menu = new SubMenu(this.actor, this._triangle, true);
     this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
-  },
+  }
 
-  addMenuItem: function(item) {
+  addMenuItem(item) {
     this.menu.addMenuItem(item);
-  },
+  }
 
-  setPlayStatusIcon: function(icon) {
+  setPlayStatusIcon(icon) {
     this._playStatusIcon.icon_name = icon;
-  },
+  }
 
-  hidePlayStatusIcon: function() {
+  hidePlayStatusIcon() {
     this._playStatusIcon.hide();
-  },
+  }
 
-  showPlayStatusIcon: function() {
+  showPlayStatusIcon() {
     this._playStatusIcon.show();
   }
-});
+};
 
-var BaseContainer = new Lang.Class({
-    Name: "BaseContainer",
-    Extends: PopupMenu.PopupBaseMenuItem,
+var BaseContainer = class BaseContainer extends PopupMenu.PopupBaseMenuItem {
 
-    _init: function(parms) {
-      this.parent(parms);
+    constructor(parms) {
+      super(parms);
       this._hidden = false;
       this._animating = false;
       //We don't want our BaseContainers to be highlighted when clicked,
@@ -163,39 +157,39 @@ var BaseContainer = new Lang.Class({
       //We want to maintain the illusion that they are normal UI containers,
       //and that our main track UI area is one big container.
       this.actor.add_style_pseudo_class = function() {return null;};
-    },
+    }
 
     get hidden() {
       return this._hidden;
-    },
+    }
 
     set hidden(value) {
       this._hidden = value;
-    },
+    }
 
     get animating() {
       return this._animating;
-    },
+    }
 
     set animating(value) {
       this._animating = value;
-    },
+    }
 
-    hide: function() {
+    hide() {
       this.actor.hide();
       this.actor.opacity = 0;
       this.actor.set_height(0);
       this.hidden = true;
-    },
+    }
 
-    show: function() {
+    show() {
       this.actor.show();
       this.actor.opacity = 255;
       this.actor.set_height(-1);
       this.hidden = false;
-    },
+    }
 
-    showAnimate: function() {
+    showAnimate() {
       if (!this.actor.get_stage() || !this._hidden || this.animating) {
         return;
       }
@@ -214,9 +208,9 @@ var BaseContainer = new Lang.Class({
         },
         onCompleteScope: this
       });
-    },
+    }
 
-    hideAnimate: function() {
+    hideAnimate() {
       if (!this.actor.get_stage() || this._hidden || this.animating) {
         return;
       }
@@ -232,38 +226,33 @@ var BaseContainer = new Lang.Class({
         onCompleteScope: this
       });
     }
-});
+};
 
-var CenteredBaseContainer = new Lang.Class({
-    Name: "CenteredBaseContainer",
-    Extends: BaseContainer,
+var CenteredBaseContainer = class CenteredBaseContainer extends BaseContainer {
 
-    _init: function(parms) {
-      this.parent(parms);
+    constructor(parms) {
+      super(parms);
       this.actor.add_style_class_name('album-details');
-    },
-});
+    }
+};
 
-var PlayerButtons = new Lang.Class({
-    Name: 'PlayerButtons',
-    Extends: CenteredBaseContainer,
+var PlayerButtons = class PlayerButtons extends CenteredBaseContainer {
 
-    _init: function() {
-        this.parent({hover: false});
+    constructor() {
+        super({hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding-bottom player-buttons'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-    },
-    addButton: function(button) {
+    }
+
+    addButton(button) {
         this.box.add(button.actor, {expand: false});
     }
-});
+};
 
-var ShuffleLoopStatus = new Lang.Class({
-    Name: 'PlayerButtons',
-    Extends: BaseContainer,
+var ShuffleLoopStatus = class PlayerButtons extends BaseContainer {
 
-    _init: function(player) {
-        this.parent({hover: false});
+    constructor(player) {
+        super({hover: false});
         this._player = player;
         this.box = new St.BoxLayout({style_class: 'no-padding-bottom no-padding-top'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
@@ -291,9 +280,9 @@ var ShuffleLoopStatus = new Lang.Class({
           this._player.loopStatus = this._player.state.loopStatus == 'Playlist' ? 'None' : 'Playlist';
         }));
         this.box.add(this._repeatAllButton);
-    },
+    }
 
-    setLoopStaus: function (loopStatus) {
+    setLoopStaus(loopStatus) {
       if (loopStatus == 'None') {
         this._setButtonActive(this._repeatButton, false);
         this._setButtonActive(this._repeatAllButton, false);
@@ -306,43 +295,40 @@ var ShuffleLoopStatus = new Lang.Class({
         this._setButtonActive(this._repeatButton, false);
         this._setButtonActive(this._repeatAllButton, true);
       }
-    },
+    }
 
-    setShuffle: function (shuffle) {
+    setShuffle(shuffle) {
       this._setButtonActive(this._shuffleButton, shuffle);
-    },
+    }
 
-    _setButtonActive: function (button, active) {
+    _setButtonActive(button, active) {
       button._isActive = active;
       button.opacity = active ? 204 : 102;
-    },
+    }
 
-    _onButtonHover: function (button) {
+    _onButtonHover(button) {
       button.opacity = button.hover ? 255 : button._isActive ? 204 : 102;
     }
-});
+};
 
-var PlaylistTitle = new Lang.Class({
-    Name: 'PlaylistTitle',
-    Extends: CenteredBaseContainer,
+var PlaylistTitle = class PlaylistTitle extends CenteredBaseContainer {
 
-    _init: function () {
-        this.parent({hover: false, style_class: 'no-padding-bottom'});
+    constructor() {
+        super({hover: false, style_class: 'no-padding-bottom'});
         this._label = new St.Label({style_class: 'track-info-artist'});
         this.actor.add(this._label, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-    },
+    }
 
-    update: function(name) {
+    update(name) {
       if (name && this._label.text != name) {
         this._label.text = name;
       }
     }
-});
+};
 
-var PlayerButton = new Lang.Class({
-    Name: "PlayerButton",
+var PlayerButton = class PlayerButton {
 
-    _init: function(icon, callback) {
+    constructor(icon, callback) {
         this.actor = new St.Button({child: new St.Icon({icon_name: icon})});
         this.actor.opacity = 204;
         this.actor._delegate = this;
@@ -350,13 +336,13 @@ var PlayerButton = new Lang.Class({
         this.actor.connect('notify::hover', Lang.bind(this, function(button) {
           this.actor.opacity = button.hover ? 255 : 204;
         }));
-    },
+    }
 
-    setIcon: function(icon) {
+    setIcon(icon) {
         this.actor.child.icon_name = icon;
-    },
+    }
 
-    setIconSize: function(style) {
+    setIconSize(style) {
         if (style == Settings.ButtonIconStyles.CIRCULAR) {
           this.actor.child.style_class = null;
           this.actor.style_class = 'system-menu-action';
@@ -373,75 +359,70 @@ var PlayerButton = new Lang.Class({
           this.actor.style_class = null;
           this.actor.child.style_class = 'shell-mount-operation-icon large-player-button';
         }
-    },
+    }
 
-    enable: function() {
+    enable() {
         this.actor.reactive = true;
         this.actor.opacity = 204;
-    },
+    }
 
-    disable: function() {
+    disable() {
         this.actor.reactive = false;
         this.actor.opacity = 102;
-    },
+    }
 
-    hide: function() {
+    hide() {
       this.actor.hide();
-    },
+    }
 
-    show: function() {
+    show() {
       this.actor.show();
     }
-});
+};
 
-var SliderItem = new Lang.Class({
-    Name: "SliderItem",
-    Extends: CenteredBaseContainer,
+var SliderItem = class SliderItem extends CenteredBaseContainer {
 
-    _init: function(icon) {
-        this.parent({hover: false});
+    constructor(icon) {
+        super({hover: false});
         this._icon = new St.Icon({style_class: 'popup-menu-icon', icon_name: icon});
         this._slider = new Slider.Slider(0);
         this.actor.add_style_class_name('slider-row');
+
         this.actor.add(this._icon);
         this.actor.add(this._slider.actor, {expand: true});
-    },
+    }
 
-    setReactive: function(reactive) {
+    setReactive(reactive) {
         this._slider.actor.reactive = reactive;
-    },
+    }
 
-    setValue: function(value) {
+    setValue(value) {
         this._slider.setValue(value);
-    },
+    }
 
-    setIcon: function(icon) {
+    setIcon(icon) {
         this._icon.icon_name = icon;
-    },
+    }
 
-    sliderConnect: function(signal, callback) {
+    sliderConnect(signal, callback) {
         this._slider.connect(signal, callback);
     }
-});
+};
 
-var TrackCover = new Lang.Class({
-    Name: "TrackBox",
-    Extends: CenteredBaseContainer,
+var TrackCover = class TrackBox extends CenteredBaseContainer {
 
-    _init: function(icon) {
-      this.parent({hover: false, style_class: 'no-padding-bottom'});
+    constructor(icon) {
+      super({hover: false, style_class: 'no-padding-bottom'});
       this.icon = icon;
       this.actor.add(this.icon, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
     }
-});
+};
 
-var Info = new Lang.Class({
-    Name: "SecondaryInfo",
-    Extends: CenteredBaseContainer,
+var Info = class SecondaryInfo extends CenteredBaseContainer {
 
-    _init: function() {
-      this.parent({hover: false, style_class: 'no-padding-bottom'});
-      this._animateChange = Util.animateChange;     
+    constructor() {
+      super({hover: false, style_class: 'no-padding-bottom'});
+      this._animateChange = Util.animateChange;
       this.infos = new St.BoxLayout({vertical: true});
       this._artistLabel = new St.Label({style_class: 'track-info-artist'});
       this._titleLabel = new St.Label({style_class: 'track-info-title'});
@@ -450,15 +431,15 @@ var Info = new Lang.Class({
       this.infos.add(this._titleLabel, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
       this.infos.add(this._albumLabel, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
       this.actor.add(this.infos, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
-    },
+    }
 
-    update: function(state) {
+    update(state) {
       this._setInfoText(this._artistLabel, state.trackArtist);
       this._setInfoText(this._titleLabel, state.trackTitle);
       this._setInfoText(this._albumLabel, state.trackAlbum);
-    },
+    }
 
-    _setInfoText: function(actor, text) {
+    _setInfoText(actor, text) {
       if (text) {
         if (actor.text != text) {
           this._showAnimateInfoItem(actor, text);
@@ -467,21 +448,21 @@ var Info = new Lang.Class({
       else {
         this._hideAnimateInfoItem(actor, text);
       }
-    },
+    }
 
-    _hideInfoItem: function(actor) {
+    _hideInfoItem(actor) {
       actor.hide();
       actor.opacity = 0;
       actor.set_height(0);
-    },
+    }
 
-    _showInfoItem: function(actor) {
+    _showInfoItem(actor) {
       actor.show();
       actor.opacity = 255;
       actor.set_height(-1);
-    },
+    }
 
-    _showAnimateInfoItem: function(actor, text) {
+    _showAnimateInfoItem(actor, text) {
       if (actor.visible && !this.animating) {
         this._animateChange(actor, 'text', text);
       }
@@ -505,9 +486,9 @@ var Info = new Lang.Class({
           onCompleteScope: this
         });
       }
-    },
+    }
 
-    _hideAnimateInfoItem: function(actor, text) {
+    _hideAnimateInfoItem(actor, text) {
       if (!actor.visible && !this.animating) {
         actor.text = text;
       }
@@ -528,17 +509,15 @@ var Info = new Lang.Class({
         });
       }
     }
-});
+};
 
-var TrackRating = new Lang.Class({
-    Name: "TrackRating",
-    Extends: CenteredBaseContainer,
+var TrackRating = class TrackRating extends CenteredBaseContainer {
 
-    _init: function(player, value) {
+    constructor(player, value) {
+        super({style_class: 'no-padding-bottom', hover: false});
         this._hidden = false;
         this._player = player;
         this._animateChange = Util.animateChange;
-        this.parent({style_class: 'no-padding-bottom', hover: false});
         this.box = new St.BoxLayout({style_class: 'no-padding track-info-album'});
         this.actor.add(this.box, {expand: true, x_fill: false, x_align: St.Align.MIDDLE});
         this._applyFunc = null;
@@ -574,9 +553,9 @@ var TrackRating = new Lang.Class({
           this.rate = this._rate;
           this._buildStars();
         }
-    },
+    }
 
-    _buildStars: function() {
+    _buildStars() {
         this._starButton = [];
         for(let i=0; i < 5; i++) {
             // Create star icons
@@ -607,9 +586,9 @@ var TrackRating = new Lang.Class({
             // Put the button in the box
             this.box.add(this._starButton[i]);
         }
-    },
+    }
 
-    _buildPithosRatings: function() {
+    _buildPithosRatings() {
         this.box.add_style_class_name('pithos-rating-box');
         this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon no-padding'});
         this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
@@ -638,9 +617,9 @@ var TrackRating = new Lang.Class({
         }));
         this._unRateButton.hide();
         this.box.set_width(-1);
-    },
+    }
 
-    _ratePithos: function(rating) {
+    _ratePithos(rating) {
         if (this._value == rating) {
           return;
         }
@@ -668,10 +647,10 @@ var TrackRating = new Lang.Class({
              }));
          }
          this._value = rating;
-         this.box.set_width(-1);      
-    },
+         this.box.set_width(-1);
+    }
 
-    _rate: function(value) {
+    _rate(value) {
         // For Pithos versions without ratings support.
         if (value.constructor === String) {
           value = value == 'love' ? 5 : 0;
@@ -682,7 +661,7 @@ var TrackRating = new Lang.Class({
         if (this._value == value) {
           return;
         }
-        this._value = value;       
+        this._value = value;
         for (let i = 0; i < 5; i++) {
             let icon_name = i < this._value ? 'starred-symbolic' : 'non-starred-symbolic';
             if (this.animating) {
@@ -696,23 +675,23 @@ var TrackRating = new Lang.Class({
               }));
             }
         }
-    },
+    }
 
-    applyQuodLibetRating: function(value) {
+    applyQuodLibetRating(value) {
         // Quod Libet works on 0.0 to 1.0 scores.
         // Quod Libet also does the right thing and emits a prop change signal
         // on ratings changes so we don't have to fake it and set it ourself.
         GLib.spawn_command_line_async("quodlibet --set-rating=%f".format(value / 5.0));
-    },
+    }
 
-    applyLollypopRating: function(value) {
+    applyLollypopRating(value) {
         // Lollypop works on 0 to 5 scores.
         // Lollypop also does the right thing and emits a prop change signal
         // on ratings changes so we don't have to fake it and set it ourself.
         GLib.spawn_command_line_async("lollypop --set-rating=%s".format(value));
-    },
+    }
 
-    applyRhythmbox3Rating: function(value) {
+    applyRhythmbox3Rating(value) {
         if (this._player.state.trackUrl) {
             this._rhythmbox3Proxy.SetEntryPropertiesRemote(this._player.state.trackUrl,
                                                            {rating: GLib.Variant.new_double(value)});
@@ -720,57 +699,55 @@ var TrackRating = new Lang.Class({
           // than likely stick so we just fake it...
           this.rate(value);
         }
-    },
-    
-    applyNuvolaRating: function(value) {
+    }
+
+    applyNuvolaRating(value) {
         if (this.player._mediaServerPlayer.NuvolaCanRate) {
             this.player._mediaServerPlayer.NuvolaSetRatingRemote(value / 5.0);
         }
-    },
+    }
 
-    applyRatingsExtension: function(value) {
+    applyRatingsExtension(value) {
         if (this._player.state.trackObj) {
             this._player._ratingsExtension.SetRatingRemote(this._player.state.trackObj, value / 5.0);
         }
     }
-});
+};
 
-var ListSubMenu = new Lang.Class({
-  Name: 'ListSubMenu',
-  Extends: PopupMenu.PopupSubMenuMenuItem,
+var ListSubMenu = class ListSubMenu extends PopupMenu.PopupSubMenuMenuItem {
 
-  _init: function(label) {
-    this.parent(label, false);
+  constructor(label) {
+    super(label, false);
     this.activeObject = null;
     this._hidden = false;
     this.menu = new SubMenu(this.actor, this._triangle, false);
     this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
-  },
+  }
 
   get hidden() {
     return this._hidden;
-  },
+  }
 
   set hidden(value) {
     this._hidden = value;
-  },
+  }
 
-  hide: function() {
+  hide() {
     this.menu.close();
     this.actor.hide();
     this.actor.opacity = 0;
     this.actor.set_height(0);
     this.hidden = true;
-  },
+  }
 
-  show: function() {
+  show() {
     this.actor.show();
     this.actor.opacity = 255;
     this.actor.set_height(-1);
     this.hidden = false;
-  }, 
+  }
 
-  showAnimate: function() {
+  showAnimate() {
     if (!this.actor.get_stage() || !this._hidden)
       return;
     this.actor.set_height(-1);
@@ -786,9 +763,9 @@ var ListSubMenu = new Lang.Class({
       },
       onCompleteScope: this
     });
-  },
+  }
 
-  hideAnimate: function() {
+  hideAnimate() {
     if (!this.actor.get_stage() || this._hidden)
       return;
     Tweener.addTween(this.actor, {
@@ -800,9 +777,9 @@ var ListSubMenu = new Lang.Class({
       },
       onCompleteScope: this
     });
-  },
+  }
 
-  setObjectActive: function(objPath) {
+  setObjectActive(objPath) {
     this.activeObject = objPath;
     this.menu._getMenuItems().forEach(function(listItem) {
       if (listItem.obj == objPath) {
@@ -812,11 +789,11 @@ var ListSubMenu = new Lang.Class({
         listItem.setOrnament(PopupMenu.Ornament.NONE);
       }
     });
-  },
-  
-  getItem: function(obj) {        
+  }
+
+  getItem(obj) {
     let menuItems = this.menu._getMenuItems().filter(function(item) {
-        return item.obj === obj;  
+        return item.obj === obj;
     });
     if (menuItems && menuItems[0]) {
       return menuItems[0];
@@ -824,9 +801,9 @@ var ListSubMenu = new Lang.Class({
     else {
       return null;
     }
-  },
+  }
 
-  hasUniqueObjPaths: function(objects, isTracklistMetadata) {
+  hasUniqueObjPaths(objects, isTracklistMetadata) {
     //Check for unique values in the playlist and tracklist object paths.
     let unique = objects.reduce(function(values, object) {
       if (isTracklistMetadata) {
@@ -839,9 +816,9 @@ var ListSubMenu = new Lang.Class({
       return values;
     }, {});
     return Object.keys(unique).length === objects.length;
-  },
+  }
 
-  _subMenuOpenStateChanged: function(menu, open) {
+  _subMenuOpenStateChanged(menu, open) {
     if (open) {
       this.actor.add_style_pseudo_class('open');
       this.actor.add_accessible_state(Atk.StateType.EXPANDED);
@@ -853,34 +830,32 @@ var ListSubMenu = new Lang.Class({
       this.actor.remove_style_pseudo_class('checked');
     }
   }
-});
+};
 
-var TrackList = new Lang.Class({
-    Name: "Tracklist",
-    Extends: ListSubMenu,
+var TrackList = class Tracklist extends ListSubMenu {
 
-  _init: function(label, player) {
-    this.parent(label);
+  constructor(label, player) {
+    super(label);
     this.player = player;
     this.parseMetadata = Util.parseMetadata;
-  },
+  }
 
-  showRatings: function(value) {
+  showRatings(value) {
     this.menu._getMenuItems().forEach(function(tracklistItem) {
       tracklistItem.showRatings(value);
     });
-  },
+  }
 
-  updateMetadata: function(UpdatedMetadata) {
+  updateMetadata(UpdatedMetadata) {
     let metadata = {};
     this.parseMetadata(UpdatedMetadata, metadata);
     let trackListItem = this.getItem(metadata.trackObj);
     if (trackListItem) {
       trackListItem.updateMetadata(metadata);
     }
-  },
+  }
 
-  loadTracklist: function(trackListMetaData, showRatings) {
+  loadTracklist(trackListMetaData, showRatings) {
     this.menu.removeAll();
     //As per spec all object paths MUST be unique.
     //If we don't have unique object paths reject the whole array.
@@ -905,19 +880,16 @@ var TrackList = new Lang.Class({
       }
     }
   }
+};
 
-});
+var Playlists = class Playlists extends ListSubMenu {
 
-var Playlists = new Lang.Class({
-    Name: "Playlists",
-    Extends: ListSubMenu,
-
-  _init: function(label, player) {
-    this.parent(label);
+  constructor(label, player) {
+    super(label);
     this.player = player;
-  },
+  }
 
-  loadPlaylists: function(playlists) {
+  loadPlaylists(playlists) {
     this.menu.removeAll();
     //As per spec all object paths MUST be unique.
     //If we don't have unique object paths reject the whole array.
@@ -940,43 +912,37 @@ var Playlists = new Lang.Class({
         this.setObjectActive(this.activeObject);
       }
     }
-  },
+  }
 
-  updatePlaylist: function(UpdatedPlaylist) {
+  updatePlaylist(UpdatedPlaylist) {
     let [obj, name] = UpdatedPlaylist;
     let playlistItem = this.getItem(obj);
     if (playlistItem) {
       playlistItem.updatePlaylistName(name);
     }
   }
+};
 
-});
+var PlaylistItem = class PlaylistItem extends PopupMenu.PopupBaseMenuItem {
 
-var PlaylistItem = new Lang.Class({
-    Name: "PlaylistItem",
-    Extends: PopupMenu.PopupBaseMenuItem,
-
-    _init: function (text, obj) {
-        this.parent();
+    constructor(text, obj) {
+        super();
         this.obj = obj;
         this.label = new St.Label({text: text});
         this.actor.add(this.label);
-    },
+    }
 
-    updatePlaylistName: function(name) {
+    updatePlaylistName(name) {
       if (this.label.text != name) {
         this.label.text = name;
       }
     }
+};
 
-});
+var TracklistItem = class TracklistItem extends PopupMenu.PopupBaseMenuItem {
 
-var TracklistItem = new Lang.Class({
-    Name: "TracklistItem",
-    Extends: PopupMenu.PopupBaseMenuItem,
-
-    _init: function (metadata, player) {
-        this.parent();
+    constructor(metadata, player) {
+        super();
         this.actor.child_set_property(this._ornamentLabel, "y-fill", false);
         this.actor.child_set_property(this._ornamentLabel, "y-align", St.Align.MIDDLE);
         this._player = player;
@@ -1026,9 +992,9 @@ var TracklistItem = new Lang.Class({
           }
         }
         this.updateMetadata(metadata);
-    },
+    }
 
-    updateMetadata: function(metadata) {
+    updateMetadata(metadata) {
       this._setCoverIconAsync(this._coverIcon, metadata.trackCoverUrl);
       this._setArtist(metadata.trackArtist);
       this._setTitle(metadata.trackTitle);
@@ -1040,27 +1006,27 @@ var TracklistItem = new Lang.Class({
       else {
         this.showRatings(false);
       }
-    },
+    }
 
-    _setArtist: function(artist) {
+    _setArtist(artist) {
       if (this._artistLabel.text != artist) {
         this._animateChange(this._artistLabel, 'text', artist);
       }
-    },
+    }
 
-    _setTitle: function(title) {
+    _setTitle(title) {
       if (this._titleLabel.text != title) {
         this._animateChange(this._titleLabel, 'text', title);
       }
-    },
+    }
 
-    _setAlbum: function(album) {
+    _setAlbum(album) {
       if (this._albumLabel.text != album) {
         this._animateChange(this._albumLabel, 'text', album);
       }
-    },
+    }
 
-    _buildStars: function(value) {
+    _buildStars(value) {
       // For Pithos versions without ratings support.
       if (value.constructor === String) {
         value = value == 'love' ? 5 : 0;
@@ -1078,12 +1044,12 @@ var TracklistItem = new Lang.Class({
           this._animateChange(starIcon, 'icon_name', icon_name);
           return false;
         }));
-        
+
       }
       this._rating = value;
-    },
+    }
 
-    _buildPithosRatings: function(rating) {
+    _buildPithosRatings(rating) {
       this._ratingBox.add_style_class_name('pithos-rating-box');
       this._ratingsIcon = new St.Icon({style_class: 'popup-menu-icon no-padding'});
       this._unRateButton = new St.Button({x_align: St.Align.MIDDLE,
@@ -1102,9 +1068,9 @@ var TracklistItem = new Lang.Class({
       }));
       this._unRateButton.hide();
       this._setPithosRating(rating);
-    },
+    }
 
-    _setPithosRating: function(rating) {
+    _setPithosRating(rating) {
       if (this._rating == rating) {
         return;
       }
@@ -1186,9 +1152,9 @@ var TracklistItem = new Lang.Class({
       }
       this._box.set_width(-1);
       this._rating = rating;
-    },
+    }
 
-  _setStarRating: function(value) {
+  _setStarRating(value) {
     // For Pithos versions without ratings support.
     if (value.constructor === String) {
       value = value == 'love' ? 5 : 0;
@@ -1207,9 +1173,9 @@ var TracklistItem = new Lang.Class({
         }));
       }
     }
-  },
+  }
 
-  showRatings: function(value) {
+  showRatings(value) {
     if (value && this._validRatings) {
       this._albumLabel.hide();
       this._ratingBox.show();
@@ -1219,5 +1185,4 @@ var TracklistItem = new Lang.Class({
       this._albumLabel.show();
     }
   }
-
-});
+};
