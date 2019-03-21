@@ -2,21 +2,22 @@
 # Copyright (C) 2012 gnome-shell-extension-mediaplayer package.
 # This file is distributed under the same license as the gnome-shell-extension-mediaplayer package.
 # Osman Karagöz <osmank3@gmail.com>, 2013
+# Serdar Sağlam <teknomobil@yandex.com>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-extension-mediaplayer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-27 18:32+0200\n"
-"PO-Revision-Date: 2013-04-03 13:23+0200\n"
-"Last-Translator: Osman Karagöz <osmank3@gmail.com>\n"
-"Language-Team: \n"
-"Language: Turkish\n"
+"PO-Revision-Date: 2019-03-13 02:34+0300\n"
+"Last-Translator: Serdar Sağlam <teknomobil@yandex.com>\n"
+"Language-Team: Turkish <>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 1.5.4\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"X-Generator: Gtranslator 3.31.90\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: ../src/ui.js:165
@@ -41,7 +42,7 @@ msgstr "Duraklatıldı"
 
 #: ../src/prefs.js:40
 msgid "Indicator position"
-msgstr ""
+msgstr "Gösterge konumu"
 
 #: ../src/prefs.js:42
 msgid "Center"
@@ -53,12 +54,11 @@ msgstr "Sağ"
 
 #: ../src/prefs.js:44
 msgid "System menu"
-msgstr ""
+msgstr "Sistem menüsü"
 
 #: ../src/prefs.js:49
-#, fuzzy
 msgid "Indicator appearance"
-msgstr "Görünüm"
+msgstr "Gösterge görünümü"
 
 #: ../src/prefs.js:51
 msgid "Symbolic icon"
@@ -69,27 +69,28 @@ msgid "Current album cover"
 msgstr "Şuanki albüm kapağı"
 
 #: ../src/prefs.js:57
-#, fuzzy
 msgid "Indicator status text"
-msgstr "Durum iletisi"
+msgstr "Gösterge durum metni"
 
 #: ../src/prefs.js:58
-#, fuzzy
 msgid ""
 "{trackArtist}: Artist, {trackAlbum}: Album, {trackTitle}: Title. Pango "
 "markup supported."
-msgstr "%a: Sanatçı, %b: Albüm, %t: Başlık. Pango biçimlendirme desteği"
+msgstr ""
+"{trackArtist}: Sanatçı, {trackAlbum}: Albüm, {trackTitle}: Başlık. Pango "
+"işaretlemesi desteği."
 
 #: ../src/prefs.js:62
-#, fuzzy
 msgid "Indicator status text width"
-msgstr "Durum iletisi"
+msgstr "Gösterge durum metni genişliği"
 
 #: ../src/prefs.js:63
 msgid ""
 "The the maximum width before the status text gets an ellipsis. Default is "
 "300px."
 msgstr ""
+"Durum metninden önce en fazla genişlik üç nokta alır. Öntanımlı değer 300 "
+"piksel."
 
 #: ../src/prefs.js:71
 msgid "Allow to start the default media player"
@@ -109,49 +110,8 @@ msgstr "Medya oynatıcı oynatma listesi göster"
 
 #: ../src/prefs.js:87
 msgid "Display song rating"
-msgstr "Şarkı popülerliğini göster"
+msgstr "Şarkı puanını göster"
 
 #: ../src/prefs.js:88
 msgid "Display the currently playing song's rating on a 0 to 5 scale"
-msgstr "Çalan şarkının popülerliğini 0-5 aralığında göster"
-
-#~ msgid "Position in the top panel"
-#~ msgstr "Üst paneldeki konum"
-
-#~ msgid "Restart the shell to apply this setting."
-#~ msgstr "Bu ayarları uygulamak için kabuğu tekrar başlatın"
-
-#~ msgid "Volume menu integration"
-#~ msgstr "Ses ayar menüsüne yerleş"
-
-#, fuzzy
-#~ msgid ""
-#~ "Runs the default mediaplayer by clicking on the indicator or from the menu"
-#~ msgstr "Eklenti düğmesi öntanımlı medya oynatıcıyı başlatır"
-
-#~ msgid "rating"
-#~ msgstr "popülerlik"
-
-#~ msgid "by"
-#~ msgstr "sanatçı"
-
-#~ msgid "from"
-#~ msgstr "albüm"
-
-#~ msgid "Unknown Artist"
-#~ msgstr "Bilinmeyen Sanatçı"
-
-#~ msgid "Unknown Album"
-#~ msgstr "Bilinmeyen Albüm"
-
-#~ msgid "Unknown Title"
-#~ msgstr "Bilinmeyen Başlık"
-
-#~ msgid "Album cover size"
-#~ msgstr "Albüm kapak boyutu"
-
-#~ msgid "The size of the cover displayed in the menu. Default is 80px width."
-#~ msgstr "Menüde görünen kapak boyutudur. Öntanımlı genişlik 80 piksel"
-
-#~ msgid "Show the media player in the volume menu"
-#~ msgstr "Medya oynatıcısını ses menüsünde göster"
+msgstr "Çalan şarkının puanını 0 ila 5 aralığında göster"
