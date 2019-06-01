@@ -843,11 +843,7 @@ var MPRISPlayer = class MPRISPlayer {
     }
 
     playTrack(track) {
-      // GNOME Music crashes if you call the GoTo method.
-      //https://bugzilla.gnome.org/show_bug.cgi?id=779052
-      if (this.busName !== 'org.mpris.MediaPlayer2.GnomeMusic') {
         this._mediaServerTracklist.GoToRemote(track);
-      }
     }
 
     raise() {
