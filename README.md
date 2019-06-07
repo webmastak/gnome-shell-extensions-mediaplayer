@@ -1,6 +1,8 @@
 # gnome-shell-extensions-mediaplayer
 
-## THIS EXTENSION HAS BEEN RETIRED
+## THIS EXTENSION HAS BEEN RETIRED and the repository has been archived.
+If you wish to take over maintership please contact [the owner of this repo](https://github.com/JasonLG1979)
+
 
 gnome-shell-extensions-mediaplayer is a gnome-shell extension for controlling
 any MPRIS v2.1 capable media player.
